@@ -193,7 +193,7 @@ const EditCustomerPage = () => {
                 <span className="font-medium">No Orders Yet</span>
               </div>
               <p className="text-amber-700 text-sm mt-1">
-                This customer doesn't have any orders. Create their first order to get started.
+                This customer doesn&apos;t have any orders. Create their first order to get started.
               </p>
             </div>
           )}

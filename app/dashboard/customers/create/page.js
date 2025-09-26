@@ -116,9 +116,6 @@ const AddCustomerPage = () => {
                   <User className="h-5 w-5" />
                   Customer Information
                 </CardTitle>
-                <CardDescription>
-                  Enter the customer's personal details and debt information
-                </CardDescription>
               </CardHeader>
               <CardContent>
                 <form onSubmit={handleSubmit} className="space-y-6">

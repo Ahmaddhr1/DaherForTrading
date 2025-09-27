@@ -3,7 +3,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { useParams } from "next/navigation";
 import { format } from "date-fns";
-import { Loader2, User, Package, CreditCard, Calendar, Tag } from "lucide-react";
+import { Loader2, User, Package, CreditCard, Calendar, Tag, Printer } from "lucide-react";
 
 import {
   Table,
@@ -17,6 +17,7 @@ import {
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
+import { Button } from "@/components/ui/button";
 
 const fetchOrder = async (id) => {
   const res = await fetch(`/api/orders/${id}`);
@@ -77,15 +78,21 @@ export default function OrderDetailsPage() {
             <div>
               <h1 className="text-3xl font-bold text-gray-900">Order Details</h1>
               <p className="text-gray-600 mt-1">Order #{order._id}</p>
+
             </div>
             <Badge className={`px-3 py-1 text-sm font-medium ${status.color} self-start sm:self-auto`}>
               {status.label}
             </Badge>
+
           </div>
           <div className="flex items-center text-gray-500 text-sm">
             <Calendar className="h-4 w-4 mr-1" />
             {format(new Date(order.createdAt), "EEEE, MMMM d, yyyy 'at' h:mm a")}
           </div>
+          <Button variant="outline" onClick={() => window.print()} className="flex items-center gap-2">
+            <Printer className="h-4 w-4" />
+            Print
+          </Button>
         </div>
 
         <div className="grid gap-6 lg:grid-cols-3">
@@ -165,25 +172,24 @@ export default function OrderDetailsPage() {
                   <span className="text-gray-600">Subtotal</span>
                   <span className="font-medium text-gray-900">${Number(order.total).toFixed(2)}</span>
                 </div>
-                
+
                 <div className="flex justify-between items-center pt-2 border-t">
                   <span className="text-gray-600">Amount Paid</span>
                   <span className="text-green-600 font-medium">
                     ${Number(order.amountpaid || 0).toFixed(2)}
                   </span>
                 </div>
-                
+
                 <div className="flex justify-between items-center pt-2 border-t">
                   <span className="text-gray-600">Remaining Balance</span>
-                  <span className={`font-medium ${
-                    Number(order.remainingBalance || 0) > 0 ? "text-red-600" : "text-gray-900"
-                  }`}>
+                  <span className={`font-medium ${Number(order.remainingBalance || 0) > 0 ? "text-red-600" : "text-gray-900"
+                    }`}>
                     ${Number(order.remainingBalance || 0).toFixed(2)}
                   </span>
                 </div>
-                
+
                 <Separator />
-                
+
                 <div className="flex justify-between items-center pt-2">
                   <span className="font-semibold text-gray-900">Status</span>
                   <Badge variant="outline" className={status.color}>

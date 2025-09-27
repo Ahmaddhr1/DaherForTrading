@@ -457,22 +457,6 @@ const EditProductPage = () => {
                       </p>
                     </div>
                   )}
-
-                  {/* Profit Status */}
-                  <div className="text-center">
-                    <Badge 
-                      variant={profit >= 0 ? "default" : "destructive"} 
-                      className="text-sm px-3 py-1"
-                    >
-                      {profit >= 0 ? "Profitable" : "Selling at Loss"}
-                    </Badge>
-                    <p className="text-xs text-gray-600 mt-1">
-                      {profit >= 0 
-                        ? "This product will generate profit" 
-                        : "Warning: Selling below cost price"
-                      }
-                    </p>
-                  </div>
                 </div>
 
                 <Separator />

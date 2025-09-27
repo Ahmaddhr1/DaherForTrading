@@ -176,10 +176,6 @@ const AddCustomerPage = () => {
                     <div className="space-y-6">
                       {/* Monetary Debt */}
                       <div className="space-y-4">
-                        <div className="flex items-center gap-2">
-                          <DollarSign className="h-5 w-5 text-amber-600" />
-                          <h3 className="font-medium text-gray-900">Money Debt</h3>
-                        </div>
                         <div className="space-y-2">
                           <Label htmlFor="debt" className="text-sm font-medium text-gray-700">
                             Amount Owed ($)

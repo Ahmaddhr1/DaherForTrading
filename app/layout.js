@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata = {
-  title: "I Glow",
+  title: "MDT",
   description: "Admin Panel",
 };
 

@@ -9,13 +9,33 @@ export async function GET(req) {
   const page = parseInt(searchParams.get("page")) || 1;
   const limit = parseInt(searchParams.get("limit")) || 20;
   const search = searchParams.get("search")?.toLowerCase() || "";
+  const debtFilter = searchParams.get("debtFilter"); // "hasDebt" or "noDebt"
 
   const skip = (page - 1) * limit;
 
   try {
-    const query = search
-      ? { fullName: { $regex: new RegExp(search, "i") } }
-      : {};
+    // Build query object
+    let query = {};
+
+    // Add search filter
+    if (search) {
+      query.fullName = { $regex: new RegExp(search, "i") };
+    }
+
+    // Add debt filter
+    if (debtFilter === "hasDebt") {
+      query.$or = [
+        { debt: { $gt: 0 } },
+        { smallBottlesDebt: { $gt: 0 } },
+        { bigBottlesDebt: { $gt: 0 } }
+      ];
+    } else if (debtFilter === "noDebt") {
+      query.$and = [
+        { debt: { $lte: 0 } },
+        { smallBottlesDebt: { $lte: 0 } },
+        { bigBottlesDebt: { $lte: 0 } }
+      ];
+    }
 
     const total = await Customer.countDocuments(query);
     const customers = await Customer.find(query)

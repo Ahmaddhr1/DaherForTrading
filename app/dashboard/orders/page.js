@@ -51,7 +51,7 @@ const OrdersPage = () => {
               <TabsList className="grid grid-cols-3 w-full">
                 <TabsTrigger value="today" className="flex items-center gap-2">
                   <Package className="h-4 w-4" />
-                  Today's Orders
+                  {"Today's"} Orders
                 </TabsTrigger>
                 <TabsTrigger value="pending" className="flex items-center gap-2">
                   <Clock className="h-4 w-4" />

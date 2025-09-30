@@ -28,7 +28,6 @@ const EditCategoryPage = () => {
 
   const [formData, setFormData] = useState({
     name: "",
-    description: ""
   });
   const [showProducts, setShowProducts] = useState(false);
 
@@ -47,7 +46,6 @@ const EditCategoryPage = () => {
     if (category) {
       setFormData({
         name: category.name || "",
-        description: category.description || ""
       });
     }
   }, [category]);
@@ -93,7 +91,7 @@ const EditCategoryPage = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    
+
     if (!formData.name.trim()) {
       toast.error("Validation Error", {
         description: "Category name is required."
@@ -114,8 +112,8 @@ const EditCategoryPage = () => {
 
   const handleDelete = () => {
     const productCount = category?.products?.length || 0;
-    const message = productCount > 0 
-      ? `This category contains ${productCount} product(s). Deleting it will remove the category but products will remain without a category. Are you sure?`
+    const message = productCount > 0
+      ? `This category contains ${productCount} product(s). Deleting it will remove the category and its products. Are you sure?`
       : "Are you sure you want to delete this category?";
 
     if (window.confirm(message)) {
@@ -165,7 +163,7 @@ const EditCategoryPage = () => {
   return (
     <div className="min-h-screen bg-gray-50 py-6">
       <div className="container mx-auto px-4 max-w-4xl">
-        
+
         {/* Header */}
         <div className="mb-8">
           <Link href="/dashboard/categories">
@@ -174,7 +172,7 @@ const EditCategoryPage = () => {
               Back to Categories
             </Button>
           </Link>
-          
+
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="p-2 bg-blue-100 rounded-lg">
@@ -185,7 +183,7 @@ const EditCategoryPage = () => {
                 <p className="text-gray-600">Update category information and products</p>
               </div>
             </div>
-            
+
             <Button
               variant="destructive"
               onClick={handleDelete}
@@ -217,7 +215,7 @@ const EditCategoryPage = () => {
               </CardHeader>
               <CardContent>
                 <form onSubmit={handleSubmit} className="space-y-6">
-                  
+
                   {/* Category Name */}
                   <div className="space-y-2">
                     <Label htmlFor="name" className="text-sm font-medium">
@@ -274,8 +272,8 @@ const EditCategoryPage = () => {
                   </span>
                 </CardTitle>
                 <CardDescription>
-                  {productCount === 0 
-                    ? "No products are currently assigned to this category" 
+                  {productCount === 0
+                    ? "No products are currently assigned to this category"
                     : `Products that belong to "${formData.name}"`
                   }
                 </CardDescription>
@@ -293,9 +291,9 @@ const EditCategoryPage = () => {
                   </div>
                 ) : (
                   <>
-                    <Button 
-                      onClick={() => setShowProducts(!showProducts)} 
-                      variant="outline" 
+                    <Button
+                      onClick={() => setShowProducts(!showProducts)}
+                      variant="outline"
                       className="mb-4"
                     >
                       {showProducts ? "Hide Products" : "View Products"}
@@ -316,28 +314,21 @@ const EditCategoryPage = () => {
                             <TableRow key={product._id}>
                               <TableCell className="font-medium">
                                 <div className="flex items-center gap-3">
-                                  {product.img?.[0] ? (
-                                    <img
-                                      src={product.img[0]}
-                                      alt={product.name}
-                                      className="w-8 h-8 rounded object-cover"
-                                    />
-                                  ) : (
-                                    <Package className="h-5 w-5 text-gray-400" />
-                                  )}
+                                  <Package className="h-5 w-5 text-gray-400" />
                                   {product.name}
                                 </div>
                               </TableCell>
                               <TableCell className="text-center font-medium">
-                                ${product.price.toFixed(2)}
+                                ${product?.price.toFixed(2)}
                               </TableCell>
                               <TableCell className="text-center">
-                                <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs ${
-                                  product.quantity > 0 
-                                    ? "bg-green-100 text-green-800" 
+                                <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs ${product.quantity > 10
+                                  ? "bg-green-100 text-green-800"
+                                  : product.quantity > 0
+                                    ? "bg-yellow-100 text-yellow-800"
                                     : "bg-red-100 text-red-800"
-                                }`}>
-                                  {product.quantity} in stock
+                                  }`}>
+                                  {product?.quantity} in stock
                                 </span>
                               </TableCell>
                               <TableCell className="text-right">

@@ -7,7 +7,7 @@ export async function GET(_, { params }) {
   await connectToDB();
   const category = await Category.findById(params.id).populate({
     path:"products",
-    select:"name price"
+    select:"name price quantity"
   });
   if (!category) {
     return NextResponse.json({ error: 'Category not found' }, { status: 404 });

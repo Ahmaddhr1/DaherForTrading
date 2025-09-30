@@ -232,7 +232,7 @@ export default function ProductsPage() {
                                 : "bg-red-100 text-red-800"
                           }`}>
                             <Box className="h-3 w-3 mr-1" />
-                            {product.quantity} in stock
+                            {product?.quantity} in stock
                           </div>
                         </TableCell>
                         

@@ -8,11 +8,11 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
+import { CardGridSkeleton } from "@/components/ui/skeleton-patterns";
 import {
   Folder,
   Plus,
   ArrowRight,
-  Loader2,
   FileText,
   Grid3X3,
   Search,
@@ -102,14 +102,7 @@ const CategoriesPage = () => {
         )}
 
         {/* Loading State */}
-        {isLoading && (
-          <div className="flex justify-center items-center py-20">
-            <div className="text-center">
-              <Loader2 className="h-8 w-8 animate-spin text-blue-600 mx-auto mb-3" />
-              <p className="text-gray-600">Loading categories...</p>
-            </div>
-          </div>
-        )}
+        {isLoading && <CardGridSkeleton count={limit} />}
 
         {/* Error State */}
         {error && !isLoading && (

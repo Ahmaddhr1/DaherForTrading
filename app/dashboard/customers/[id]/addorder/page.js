@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
+import { ListSkeleton, PageHeaderSkeleton } from "@/components/ui/skeleton-patterns";
 import { toast } from "sonner";
 import { Loader2, Plus, Trash2, ShoppingCart, ArrowLeft } from "lucide-react";
 import Link from "next/link";
@@ -149,9 +150,12 @@ const MakeOrderPage = () => {
     return (
       <div className="min-h-screen bg-gray-50 py-6">
         <div className="container mx-auto px-4 max-w-4xl">
-          <div className="flex justify-center items-center min-h-96">
-            <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
-          </div>
+          <PageHeaderSkeleton />
+          <Card className="shadow-sm border-gray-200">
+            <CardContent className="pt-6">
+              <ListSkeleton rows={2} rowHeight="h-16" />
+            </CardContent>
+          </Card>
         </div>
       </div>
     );

@@ -11,6 +11,8 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@/components/ui/skeleton";
+import { FormSkeleton, PageHeaderSkeleton } from "@/components/ui/skeleton-patterns";
 import { Loader2, Package, ArrowLeft, DollarSign, Tag, Box, TrendingUp, PackageCheck } from "lucide-react";
 
 const fetchProduct = async (id) => {
@@ -131,10 +133,23 @@ const EditProductPage = () => {
     return (
       <div className="min-h-screen bg-gray-50/30 py-8">
         <div className="container mx-auto px-4 max-w-4xl">
-          <div className="flex justify-center items-center min-h-96">
-            <div className="text-center space-y-4">
-              <Loader2 className="h-8 w-8 animate-spin text-gray-600 mx-auto" />
-              <p className="text-gray-600">Loading product data...</p>
+          <PageHeaderSkeleton />
+          <div className="grid gap-6 lg:grid-cols-3">
+            <div className="lg:col-span-2">
+              <Card className="shadow-sm border-gray-200">
+                <CardContent className="pt-6">
+                  <FormSkeleton fields={5} />
+                </CardContent>
+              </Card>
+            </div>
+            <div className="lg:col-span-1">
+              <Card className="shadow-sm border-gray-200">
+                <CardContent className="pt-6 space-y-4">
+                  <Skeleton className="h-5 w-32" />
+                  <Skeleton className="h-20 w-full rounded-lg" />
+                  <Skeleton className="h-24 w-full rounded-lg" />
+                </CardContent>
+              </Card>
             </div>
           </div>
         </div>

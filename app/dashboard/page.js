@@ -12,10 +12,12 @@ import TopCustomers from "@/components/dashboard/TopCustomers";
 import DashboardFilters from "@/components/dashboard/DashboardFilters";
 import SalesTrendsChart from "@/components/dashboard/SalesTrendsChart";
 
+const getTodayString = () => new Date().toISOString().split("T")[0];
+
 const DEFAULT_FILTERS = {
   range: "all",
-  startDate: "",
-  endDate: "",
+  startDate: getTodayString(),
+  endDate: getTodayString(),
   topProductsSort: "orders",
   topProductsCategory: "",
   topProductsLimit: 10,

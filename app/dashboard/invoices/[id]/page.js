@@ -3,7 +3,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { useParams } from "next/navigation";
 import { format } from "date-fns";
-import { Loader2, User, Package, CreditCard, Calendar, Tag, Printer } from "lucide-react";
+import { User, Package, CreditCard, Calendar, Tag, Printer } from "lucide-react";
 
 import {
   Table,
@@ -18,6 +18,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
+import { PageHeaderSkeleton, TableSkeleton } from "@/components/ui/skeleton-patterns";
 
 const fetchOrder = async (id) => {
   const res = await fetch(`/api/orders/${id}`);
@@ -36,10 +38,18 @@ export default function OrderDetailsPage() {
 
   if (isLoading) {
     return (
-      <div className="flex justify-center items-center min-h-96">
-        <div className="text-center space-y-4">
-          <Loader2 className="h-8 w-8 animate-spin text-gray-600 mx-auto" />
-          <p className="text-gray-600">Loading order details...</p>
+      <div className="min-h-screen bg-gray-50/30 py-8">
+        <div className="container mx-auto px-4 max-w-4xl">
+          <PageHeaderSkeleton />
+          <div className="grid gap-6 lg:grid-cols-3">
+            <div className="lg:col-span-2">
+              <TableSkeleton rows={4} cols={4} />
+            </div>
+            <div className="space-y-6">
+              <Skeleton className="h-40 w-full rounded-lg" />
+              <Skeleton className="h-48 w-full rounded-lg" />
+            </div>
+          </div>
         </div>
       </div>
     );

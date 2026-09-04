@@ -10,6 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Modal } from "@/components/ui/modal";
+import { TableSkeleton } from "@/components/ui/skeleton-patterns";
 import {
   Table,
   TableBody,
@@ -219,12 +220,7 @@ export default function PaymentsPage() {
 
         {/* History Table */}
         {isLoading ? (
-          <div className="flex justify-center items-center py-12">
-            <div className="text-center">
-              <Loader2 className="h-8 w-8 animate-spin text-blue-600 mx-auto mb-2" />
-              <p className="text-gray-600">Loading payment history...</p>
-            </div>
-          </div>
+          <TableSkeleton rows={pageSize} cols={6} />
         ) : error ? (
           <Card>
             <CardContent className="pt-6 text-center">

@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { CardGridSkeleton } from "@/components/ui/skeleton-patterns";
 import {
   Search,
   Building2,
@@ -17,7 +18,6 @@ import {
   Phone,
   ChevronLeft,
   ChevronRight,
-  Loader2,
   Filter,
   DollarSign,
   CheckCircle,
@@ -236,14 +236,7 @@ export default function CompaniesPage() {
         </div>
 
         {/* Loading State */}
-        {isLoading && (
-          <div className="flex justify-center items-center py-12">
-            <div className="text-center">
-              <Loader2 className="h-8 w-8 animate-spin text-blue-600 mx-auto mb-2" />
-              <p className="text-gray-600">Loading companies...</p>
-            </div>
-          </div>
-        )}
+        {isLoading && <CardGridSkeleton count={pageSize} />}
 
         {/* Error State */}
         {error && !isLoading && (

@@ -12,7 +12,8 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Loader2, ArrowLeft, ChevronLeft, ChevronRight, Plus, History } from "lucide-react";
+import { ArrowLeft, ChevronLeft, ChevronRight, Plus, History } from "lucide-react";
+import { TableSkeleton } from "@/components/ui/skeleton-patterns";
 import { format } from "date-fns";
 import { useRouter, useParams } from "next/navigation";
 import axios from "axios";
@@ -75,9 +76,7 @@ export default function CompanyPurchasesPage() {
         </div>
 
         {isLoading ? (
-          <div className="flex justify-center py-10">
-            <Loader2 className="animate-spin h-6 w-6" />
-          </div>
+          <TableSkeleton rows={limit} cols={7} />
         ) : isError ? (
           <div className="text-center py-10 text-red-600">Failed to load purchases.</div>
         ) : (

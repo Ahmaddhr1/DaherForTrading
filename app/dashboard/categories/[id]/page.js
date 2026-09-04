@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
+import { FormSkeleton, ListSkeleton, PageHeaderSkeleton } from "@/components/ui/skeleton-patterns";
 import {
   Table,
   TableBody,
@@ -125,10 +126,19 @@ const EditCategoryPage = () => {
     return (
       <div className="min-h-screen bg-gray-50 py-6">
         <div className="container mx-auto px-4 max-w-4xl">
-          <div className="flex justify-center items-center min-h-96">
-            <div className="text-center space-y-4">
-              <Loader2 className="h-8 w-8 animate-spin text-blue-600 mx-auto" />
-              <p className="text-gray-600">Loading category data...</p>
+          <PageHeaderSkeleton />
+          <div className="grid gap-6 lg:grid-cols-3">
+            <div className="lg:col-span-2 space-y-6">
+              <Card className="shadow-sm border-gray-200">
+                <CardContent className="pt-6">
+                  <FormSkeleton fields={1} />
+                </CardContent>
+              </Card>
+              <Card className="shadow-sm border-gray-200">
+                <CardContent className="pt-6">
+                  <ListSkeleton rows={3} rowHeight="h-12" />
+                </CardContent>
+              </Card>
             </div>
           </div>
         </div>

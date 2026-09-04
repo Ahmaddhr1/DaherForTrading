@@ -3,8 +3,9 @@
 import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
-import { Loader2, AlertCircle, Package, ChevronLeft, ChevronRight } from "lucide-react";
+import { AlertCircle, Package, ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { ListSkeleton } from "@/components/ui/skeleton-patterns";
 import OrderCard from "./OrderCard";
 
 const TodaysOrders = () => {
@@ -27,11 +28,7 @@ const TodaysOrders = () => {
   };
 
   if (isLoading) {
-    return (
-      <div className="flex justify-center items-center py-12">
-        <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
-      </div>
-    );
+    return <ListSkeleton rows={4} rowHeight="h-28" />;
   }
 
   if (error) {

@@ -10,6 +10,7 @@ import { format } from "date-fns";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
+import { TableSkeleton } from "@/components/ui/skeleton-patterns";
 import {
   Table,
   TableBody,
@@ -131,14 +132,7 @@ export default function ProductsPage() {
         </div>
 
         {/* Loading State */}
-        {isLoading && (
-          <Card>
-            <CardContent className="pt-6 text-center">
-              <Loader2 className="h-8 w-8 animate-spin text-blue-600 mx-auto mb-2" />
-              <p className="text-gray-600">Loading products...</p>
-            </CardContent>
-          </Card>
-        )}
+        {isLoading && <TableSkeleton rows={8} cols={8} />}
 
         {/* Error State */}
         {error && !isLoading && (

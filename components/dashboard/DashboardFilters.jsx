@@ -23,6 +23,8 @@ const PRODUCT_SORT_OPTIONS = [
 
 const LIMIT_OPTIONS = [5, 10, 20];
 
+const getTodayString = () => new Date().toISOString().split("T")[0];
+
 export default function DashboardFilters({ filters, setFilters }) {
   const { data: categories = [] } = useQuery({
     queryKey: ["categories"],
@@ -45,7 +47,18 @@ export default function DashboardFilters({ filters, setFilters }) {
           </div>
           <select
             value={filters.range}
-            onChange={(e) => update({ range: e.target.value })}
+            onChange={(e) => {
+              const nextRange = e.target.value;
+              if (nextRange === "custom") {
+                update({
+                  range: nextRange,
+                  startDate: filters.startDate || getTodayString(),
+                  endDate: filters.endDate || getTodayString(),
+                });
+              } else {
+                update({ range: nextRange });
+              }
+            }}
             className="border rounded-md text-sm px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
             {RANGE_OPTIONS.map((option) => (

@@ -19,6 +19,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { TableSkeleton } from "@/components/ui/skeleton-patterns";
 import {
   Loader2,
   ArrowLeft,
@@ -216,12 +217,7 @@ export default function CustomerOrdersTable() {
         </Card>
 
         {isLoading ? (
-          <div className="flex justify-center items-center py-12">
-            <div className="text-center">
-              <Loader2 className="h-8 w-8 animate-spin text-blue-600 mx-auto mb-2" />
-              <p className="text-gray-600">Loading orders...</p>
-            </div>
-          </div>
+          <TableSkeleton rows={pageSize} cols={5} />
         ) : isError ? (
           <Card>
             <CardContent className="pt-6 text-center text-red-600">

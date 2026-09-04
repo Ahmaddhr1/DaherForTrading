@@ -8,6 +8,8 @@ import { toast } from "sonner";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
+import { FormSkeleton } from "@/components/ui/skeleton-patterns";
 import { Loader2, CheckCircle } from "lucide-react";
 
 export default function OrderDetailsPage() {
@@ -67,7 +69,22 @@ export default function OrderDetailsPage() {
     mutation.mutate(amountPaid);
   };
 
-  if (isLoading) return <p className="text-center mt-10">Loading...</p>;
+  if (isLoading) {
+    return (
+      <div className="max-w-xl mx-auto p-6 space-y-6">
+        <Skeleton className="h-8 w-64 mx-auto" />
+        <Card>
+          <CardContent className="space-y-4 py-6">
+            <Skeleton className="h-4 w-40" />
+            <Skeleton className="h-4 w-32" />
+            <Skeleton className="h-4 w-36" />
+            <Skeleton className="h-6 w-24" />
+            <FormSkeleton fields={1} />
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
   if (error)
     return (
       <p className="text-center text-red-500 mt-10">Error loading order</p>

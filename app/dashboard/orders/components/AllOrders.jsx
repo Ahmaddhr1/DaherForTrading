@@ -20,8 +20,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { TableSkeleton } from "@/components/ui/skeleton-patterns";
 import {
-  Loader2,
   ChevronLeft,
   ChevronRight,
   Search,
@@ -175,9 +175,7 @@ export default function AllOrders() {
       </Card>
 
       {isLoading ? (
-        <div className="flex justify-center items-center py-12">
-          <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
-        </div>
+        <TableSkeleton rows={pageSize} cols={6} />
       ) : isError ? (
         <div className="text-center py-12 text-red-600">Failed to load orders.</div>
       ) : orders.length === 0 ? (

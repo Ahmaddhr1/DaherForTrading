@@ -1,13 +1,24 @@
-import { NextResponse } from "next/server"; 
+import { NextResponse } from "next/server";
 import { connectToDB } from "@/lib/connectDb";
 import Product from "@/models/Products";
 import Order from "@/models/Orders";
 import Customer from "@/models/Customers";
 import Category from "@/models/Category";
+import { resolveDateRange } from "@/lib/dashboardRange";
 
-export async function GET() {
+export async function GET(req) {
   try {
     await connectToDB();
+
+    const { searchParams } = new URL(req.url);
+    const range = searchParams.get("range") || "all";
+    const startDateParam = searchParams.get("startDate");
+    const endDateParam = searchParams.get("endDate");
+    const { start: selectedStart, end: selectedEnd } = resolveDateRange(
+      range,
+      startDateParam,
+      endDateParam
+    );
 
     const now = new Date();
     const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
@@ -42,34 +53,37 @@ export async function GET() {
 
     // Fetch all counts in parallel
     const [
-      allProducts, 
-      allOrders, 
-      allCategories, 
+      allProducts,
+      allOrders,
+      allCategories,
       allCustomers,
-      todayOrders, 
+      todayOrders,
       lastWeekOrders,
       lastMonthOrders,
-      todayCustomers, 
+      todayCustomers,
       lastWeekCustomers,
       lastMonthCustomers,
       todayProducts,
       lastWeekProducts,
-      lastMonthProducts
+      lastMonthProducts,
+      selectedOrders,
+      selectedCustomers,
+      selectedProducts,
     ] = await Promise.all([
       // All-time counts
       Product.countDocuments(),
       Order.countDocuments(),
       Category.countDocuments(),
       Customer.countDocuments(),
-      
+
       // Today counts
       Order.countDocuments({ createdAt: { $gte: startOfToday } }),
       // Last week counts
-      Order.countDocuments({ 
-        createdAt: { 
+      Order.countDocuments({
+        createdAt: {
           $gte: startOfLastWeek,
-          $lte: endOfLastWeek 
-        } 
+          $lte: endOfLastWeek
+        }
       }),
       // Last month counts
       Order.countDocuments({
@@ -78,14 +92,14 @@ export async function GET() {
           $lte: endOfLastMonth
         }
       }),
-      
+
       // Customer counts
       Customer.countDocuments({ createdAt: { $gte: startOfToday } }),
-      Customer.countDocuments({ 
-        createdAt: { 
+      Customer.countDocuments({
+        createdAt: {
           $gte: startOfLastWeek,
-          $lte: endOfLastWeek 
-        } 
+          $lte: endOfLastWeek
+        }
       }),
       Customer.countDocuments({
         createdAt: {
@@ -93,44 +107,53 @@ export async function GET() {
           $lte: endOfLastMonth
         }
       }),
-      
+
       // Product counts (optional)
       Product.countDocuments({ createdAt: { $gte: startOfToday } }),
-      Product.countDocuments({ 
-        createdAt: { 
+      Product.countDocuments({
+        createdAt: {
           $gte: startOfLastWeek,
-          $lte: endOfLastWeek 
-        } 
+          $lte: endOfLastWeek
+        }
       }),
       Product.countDocuments({
         createdAt: {
           $gte: startOfLastMonth,
           $lte: endOfLastMonth
         }
-      })
+      }),
+
+      // Counts for the currently selected filter range
+      Order.countDocuments({ createdAt: { $gte: selectedStart, $lte: selectedEnd } }),
+      Customer.countDocuments({ createdAt: { $gte: selectedStart, $lte: selectedEnd } }),
+      Product.countDocuments({ createdAt: { $gte: selectedStart, $lte: selectedEnd } }),
     ]);
 
     return NextResponse.json({
       success: true,
+      range,
       counts: {
         products: {
           allTime: allProducts,
           today: todayProducts,
           lastWeek: lastWeekProducts,
-          lastMonth: lastMonthProducts
+          lastMonth: lastMonthProducts,
+          selected: selectedProducts,
         },
         categories: allCategories,
         customers: {
           allTime: allCustomers,
           today: todayCustomers,
           lastWeek: lastWeekCustomers,
-          lastMonth: lastMonthCustomers
+          lastMonth: lastMonthCustomers,
+          selected: selectedCustomers,
         },
         orders: {
           allTime: allOrders,
           today: todayOrders,
           lastWeek: lastWeekOrders,
           lastMonth: lastMonthOrders,
+          selected: selectedOrders,
           monthly: monthlyData.reverse(),
         },
       },

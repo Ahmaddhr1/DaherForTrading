@@ -10,28 +10,56 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Search, User, Trash2, Phone, Users, ChevronLeft, ChevronRight, Loader2, Filter, DollarSign, CheckCircle } from "lucide-react";
+import {
+  Search,
+  User,
+  Trash2,
+  Phone,
+  Users,
+  ChevronLeft,
+  ChevronRight,
+  Loader2,
+  Filter,
+  DollarSign,
+  CheckCircle,
+  ArrowUpDown,
+  Trophy,
+} from "lucide-react";
+
+const SORT_OPTIONS = [
+  { value: "newest", label: "Newest First" },
+  { value: "oldest", label: "Oldest First" },
+  { value: "debtDesc", label: "Debt: High to Low" },
+  { value: "debtAsc", label: "Debt: Low to High" },
+  { value: "nameAsc", label: "Name: A to Z" },
+  { value: "nameDesc", label: "Name: Z to A" },
+];
+
+const PAGE_SIZE_OPTIONS = [10, 20, 50];
 
 export default function CustomersPage() {
-  // State for search, pagination, and filters
+  // State for search, pagination, sorting and filters
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(20);
   const [debtFilter, setDebtFilter] = useState("all"); // "all", "hasDebt", "noDebt"
+  const [sortBy, setSortBy] = useState("newest");
   const queryClient = useQueryClient();
 
   // Fetch customers data with filters
   const { data, isLoading, error } = useQuery({
-    queryKey: ["customers", currentPage, searchTerm, debtFilter],
+    queryKey: ["customers", currentPage, pageSize, searchTerm, debtFilter, sortBy],
     queryFn: async () => {
       const params = {
         page: currentPage,
-        limit: 20,
+        limit: pageSize,
         search: searchTerm,
-        debtFilter: debtFilter !== "all" ? debtFilter : undefined
+        sort: sortBy,
+        debtFilter: debtFilter !== "all" ? debtFilter : undefined,
       };
 
       // Remove undefined parameters
-      Object.keys(params).forEach(key => params[key] === undefined && delete params[key]);
+      Object.keys(params).forEach((key) => params[key] === undefined && delete params[key]);
 
       const response = await axios.get("/api/customers", { params });
       return response.data;
@@ -59,7 +87,7 @@ export default function CustomersPage() {
     }, 500);
 
     return () => clearTimeout(timer);
-  }, [searchTerm, debtFilter]);
+  }, [searchTerm, debtFilter, sortBy, pageSize]);
 
   // Show error message if something went wrong
   useEffect(() => {
@@ -75,14 +103,19 @@ export default function CustomersPage() {
     }
   };
 
+  const handleShowTopDebtors = () => {
+    setSortBy("debtDesc");
+    setDebtFilter("hasDebt");
+    setPageSize(10);
+    setCurrentPage(1);
+  };
+
   // Extract data from response
   const customers = data?.customers || [];
   const totalPages = data?.totalPages || 1;
   const totalCount = data?.total || 0;
 
-  // Calculate debt statistics
-  const hasDebtCount = customers.filter(customer => customer.debt > 0).length;
-  const noDebtCount = customers.filter(customer => customer.debt === 0).length;
+  const isTopDebtorsView = sortBy === "debtDesc" && debtFilter === "hasDebt" && pageSize === 10;
 
   return (
     <div className="min-h-screen bg-gray-50 py-6">
@@ -138,9 +171,6 @@ export default function CustomersPage() {
             >
               <Users className="h-4 w-4" />
               All Customers
-              <Badge variant="secondary" className="ml-1">
-                {totalCount}
-              </Badge>
             </Button>
 
             <Button
@@ -151,9 +181,6 @@ export default function CustomersPage() {
             >
               <DollarSign className="h-4 w-4" />
               Has Debt
-              <Badge variant="secondary" className="ml-1">
-                {hasDebtCount}
-              </Badge>
             </Button>
 
             <Button
@@ -164,10 +191,51 @@ export default function CustomersPage() {
             >
               <CheckCircle className="h-4 w-4" />
               No Debt
-              <Badge variant="secondary" className="ml-1">
-                {noDebtCount}
-              </Badge>
             </Button>
+
+            <Button
+              variant={isTopDebtorsView ? "default" : "outline"}
+              size="sm"
+              onClick={handleShowTopDebtors}
+              className="flex items-center gap-2"
+            >
+              <Trophy className="h-4 w-4" />
+              Top 10 Debtors
+            </Button>
+          </div>
+
+          {/* Sort & Page Size */}
+          <div className="flex flex-wrap items-center gap-4">
+            <div className="flex items-center gap-2">
+              <ArrowUpDown className="h-4 w-4 text-gray-500" />
+              <span className="text-sm font-medium text-gray-700">Sort by:</span>
+              <select
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value)}
+                className="border rounded-md text-sm px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                {SORT_OPTIONS.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <span className="text-sm font-medium text-gray-700">Per page:</span>
+              <select
+                value={pageSize}
+                onChange={(e) => setPageSize(parseInt(e.target.value))}
+                className="border rounded-md text-sm px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                {PAGE_SIZE_OPTIONS.map((size) => (
+                  <option key={size} value={size}>
+                    {size}
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
         </div>
 
@@ -179,6 +247,9 @@ export default function CustomersPage() {
               <span className="ml-2 text-blue-600">
                 • Filtered by: {debtFilter === "hasDebt" ? "Has Debt" : "No Debt"}
               </span>
+            )}
+            {sortBy === "debtDesc" && (
+              <span className="ml-2 text-amber-600">• Sorted by debt: high to low</span>
             )}
           </p>
         </div>
@@ -223,6 +294,7 @@ export default function CustomersPage() {
                     onClick={() => {
                       setSearchTerm("");
                       setDebtFilter("all");
+                      setSortBy("newest");
                     }}
                   >
                     Clear Filters
@@ -242,7 +314,7 @@ export default function CustomersPage() {
           <>
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
               {customers.map((customer, index) => {
-                const customerNumber = (currentPage - 1) * 20 + index + 1;
+                const customerNumber = (currentPage - 1) * pageSize + index + 1;
                 const hasDebt = customer.debt > 0;
 
                 return (
@@ -250,8 +322,14 @@ export default function CustomersPage() {
                     href={`/dashboard/customers/${customer._id}`}
                     key={customer._id}
                   >
-                    <Card className="hover:shadow-md transition-shadow cursor-pointer h-full">
+                    <Card className="hover:shadow-md transition-shadow cursor-pointer h-full relative">
                       <CardContent className="p-4">
+                        {sortBy === "debtDesc" && (
+                          <Badge className="absolute top-2 left-2 bg-amber-500 hover:bg-amber-500">
+                            #{customerNumber}
+                          </Badge>
+                        )}
+
                         {/* Customer Avatar */}
                         <div className="flex justify-center mb-3">
                           <div className={`w-16 h-16 rounded-full flex items-center justify-center ${hasDebt ? "bg-red-100" : "bg-green-100"
@@ -277,41 +355,13 @@ export default function CustomersPage() {
                         {/* Debt Information */}
                         <div className="text-center mb-4">
                           {hasDebt ? (
-                            <div>
-                              <p className="text-red-600 font-medium">
-                                Debt: ${customer.debt}
-                              </p>
-                              <div className="flex justify-center gap-2 mt-1">
-                                {customer.smallBottlesDebt > 0 && (
-                                  <Badge variant="outline" className="text-xs">
-                                    Small: {customer.smallBottlesDebt}
-                                  </Badge>
-                                )}
-                                {customer.bigBottlesDebt > 0 && (
-                                  <Badge variant="outline" className="text-xs">
-                                    Big: {customer.bigBottlesDebt}
-                                  </Badge>
-                                )}
-                              </div>
-                            </div>
+                            <p className="text-red-600 font-medium">
+                              Debt: ${customer.debt}
+                            </p>
                           ) : (
-                            <div>
-                              <div className="text-green-600 font-medium">
-                                <CheckCircle className="h-4 w-4 inline mr-1" />
-                                No debt
-                              </div>
-                              <div className="flex justify-center gap-2 mt-1">
-                                {customer.smallBottlesDebt > 0 && (
-                                  <Badge variant="outline" className="text-xs">
-                                    Small: {customer.smallBottlesDebt}
-                                  </Badge>
-                                )}
-                                {customer.bigBottlesDebt > 0 && (
-                                  <Badge variant="outline" className="text-xs">
-                                    Big: {customer.bigBottlesDebt}
-                                  </Badge>
-                                )}
-                              </div>
+                            <div className="text-green-600 font-medium">
+                              <CheckCircle className="h-4 w-4 inline mr-1" />
+                              No debt
                             </div>
                           )}
                         </div>

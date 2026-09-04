@@ -19,7 +19,7 @@ const fetchProduct = async (id) => {
 };
 
 const fetchCategories = async () => {
-  const res = await axios.get("/api/categories");
+  const res = await axios.get("/api/categories", { params: { all: true } });
   return res.data;
 };
 

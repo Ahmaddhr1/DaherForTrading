@@ -1,6 +1,7 @@
 import { connectToDB } from "@/lib/connectDb";
 import Customer from "@/models/Customers";
 import Order from "@/models/Orders";
+import Payment from "@/models/Payment";
 import { NextResponse } from "next/server";
 
 // GET one customer
@@ -36,6 +37,9 @@ export async function PUT(req, { params }) {
   try {
     const id = params.id;
     const body = await req.json();
+    // Debt is no longer editable directly here; it will be managed by
+    // dedicated debt/purchase endpoints.
+    delete body.debt;
     const updatedCustomer = await Customer.findByIdAndUpdate(id, body, {
       new: true,
     });
@@ -70,6 +74,7 @@ export async function DELETE(req, { params }) {
       );
     }
     await Order.deleteMany({ customer: id });
+    await Payment.deleteMany({ customer: id });
     return NextResponse.json(
       { message: "Customer deleted successfully" },
       { status: 200 }

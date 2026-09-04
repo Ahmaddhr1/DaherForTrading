@@ -3,11 +3,12 @@
 import { useParams, useRouter } from "next/navigation";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Loader2, CheckCircle } from "lucide-react";
 
 export default function OrderDetailsPage() {
   const { orderId } = useParams();
@@ -28,16 +29,30 @@ export default function OrderDetailsPage() {
     enabled: !!orderId,
   });
 
+  const remainingBalance = order
+    ? order.remainingBalance ?? order.total - (order.amountpaid || 0)
+    : 0;
+
+  // Default the payment amount to the full remaining balance, like the normal payments flow.
+  useEffect(() => {
+    if (order && order.status !== "paid") {
+      setAmountPaid(remainingBalance > 0 ? String(remainingBalance) : "");
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [order?._id, remainingBalance]);
+
   const mutation = useMutation({
-    mutationFn: async (amountpaid) => {
+    mutationFn: async (amount) => {
       const res = await axios.put(`/api/orders/${orderId}/paritallypaid`, {
-        amountpaid: Number(amountpaid),
+        amountpaid: Number(amount),
       });
       return res.data;
     },
     onSuccess: (data) => {
-      toast.success(data.message || "Partial payment updated");
+      toast.success(data.message || "Payment recorded");
       queryClient.invalidateQueries({ queryKey: ["order", orderId] });
+      queryClient.invalidateQueries({ queryKey: ["payments-history"] });
+      queryClient.invalidateQueries({ queryKey: ["customers"] });
       setAmountPaid("");
       router.replace("/dashboard/customers/" + order?.customer?._id);
     },
@@ -48,7 +63,7 @@ export default function OrderDetailsPage() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (!amountPaid) return toast.error("Please enter an amount");
+    if (!amountPaid || Number(amountPaid) <= 0) return toast.error("Please enter a valid amount");
     mutation.mutate(amountPaid);
   };
 
@@ -58,19 +73,25 @@ export default function OrderDetailsPage() {
       <p className="text-center text-red-500 mt-10">Error loading order</p>
     );
 
+  const paymentAmount = parseFloat(amountPaid) || 0;
+  const remainingAfterPayment = Math.max(0, remainingBalance - paymentAmount);
+  const isValidAmount = paymentAmount > 0 && paymentAmount <= remainingBalance;
+
   return (
     <div className="max-w-xl mx-auto p-6 space-y-6">
       <h1 className="text-2xl font-semibold text-center">
-        Edit Payment for Order #{orderId}
+        Payment for Order #{orderId}
       </h1>
 
       <Card>
-        <CardContent className="space-y-4 py-6">
+        <CardHeader>
+          <CardTitle className="text-lg">Order Summary</CardTitle>
+          <CardDescription>
+            {order.customer?.fullName || "N/A"}
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
           <div className="space-y-1">
-            <p>
-              <span className="font-medium">Customer:</span>{" "}
-              {order.customer?.fullName || "N/A"}
-            </p>
             <p>
               <span className="font-medium">Total:</span> $
               {order.total.toFixed(2)}
@@ -81,8 +102,7 @@ export default function OrderDetailsPage() {
             </p>
             <p>
               <span className="font-medium">Remaining:</span> $
-              {order.remainingBalance?.toFixed(2) ||
-                order.total - (order.amountpaid || 0)}
+              {remainingBalance.toFixed(2)}
             </p>
             <p>
               <span className="font-medium">Status:</span>
@@ -102,33 +122,54 @@ export default function OrderDetailsPage() {
 
           {order.status !== "paid" && (
             <form onSubmit={handleSubmit} className="space-y-4">
-              <Input
-                type="number"
-                placeholder="Enter amount to add"
-                value={amountPaid}
-                onChange={(e) => {
-                  // Allow decimal values with up to 2 decimal places
-                  const value = e.target.value;
-                  if (value === "" || /^\d*\.?\d{0,2}$/.test(value)) {
-                    setAmountPaid(value);
-                  }
-                }}
-                min="0"
-                max={order?.total || 0}
-                step="0.01" // This allows decimal values with 2 decimal places
-              />
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-gray-700">Payment Amount ($)</label>
+                <Input
+                  type="number"
+                  placeholder="Enter amount to pay"
+                  value={amountPaid}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    if (value === "" || /^\d*\.?\d{0,2}$/.test(value)) {
+                      setAmountPaid(value);
+                    }
+                  }}
+                  min="0"
+                  max={remainingBalance}
+                  step="0.01"
+                />
+                <p className="text-xs text-gray-500">
+                  Defaults to the full remaining balance. Enter a smaller amount for a partial payment.
+                </p>
+              </div>
+
+              <div className="bg-gray-50 rounded-lg p-4 flex items-center justify-between">
+                <span className="text-sm font-medium text-gray-700">Remaining After Payment</span>
+                <span className={`font-bold ${remainingAfterPayment > 0 ? "text-red-600" : "text-green-600"}`}>
+                  ${remainingAfterPayment.toLocaleString()}
+                </span>
+              </div>
+
               <Button
                 type="submit"
-                disabled={mutation.isPending}
+                disabled={mutation.isPending || !isValidAmount}
                 className="w-full"
               >
-                {mutation.isPending ? "Updating..." : "Submit Partial Payment"}
+                {mutation.isPending ? (
+                  <span className="flex items-center gap-2 justify-center">
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    Recording Payment...
+                  </span>
+                ) : (
+                  "Record Payment"
+                )}
               </Button>
             </form>
           )}
 
           {order.status === "paid" && (
-            <p className="text-green-600 font-medium text-center mt-4">
+            <p className="text-green-600 font-medium text-center mt-4 flex items-center justify-center gap-2">
+              <CheckCircle className="h-4 w-4" />
               Order is fully paid.
             </p>
           )}

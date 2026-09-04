@@ -2,15 +2,51 @@ import { NextResponse } from "next/server";
 import { connectToDB } from "@/lib/connectDb";
 import Product from "@/models/Products";
 
-export async function GET() {
+export async function GET(req) {
   try {
     await connectToDB();
 
-    // Find top 5 products sorted by nbOfOrders descending
-    const topProducts = await Product.find({})
-      .sort({ nbOfOrders: -1 })
-      .limit(5)
-      .select("name nbOfOrders price img quantity");
+    const { searchParams } = new URL(req.url);
+    const limit = Math.min(parseInt(searchParams.get("limit")) || 10, 50);
+    const sort = searchParams.get("sort") || "orders"; // "orders" or "profit"
+    const category = searchParams.get("category");
+
+    const query = category ? { category } : {};
+
+    let topProducts;
+    if (sort === "profit") {
+      topProducts = await Product.aggregate([
+        { $match: query },
+        {
+          $addFields: {
+            totalProfit: {
+              $multiply: [
+                { $subtract: ["$price", "$initialPrice"] },
+                "$nbOfOrders",
+              ],
+            },
+          },
+        },
+        { $sort: { totalProfit: -1 } },
+        { $limit: limit },
+        {
+          $project: {
+            name: 1,
+            nbOfOrders: 1,
+            price: 1,
+            initialPrice: 1,
+            img: 1,
+            quantity: 1,
+            totalProfit: 1,
+          },
+        },
+      ]);
+    } else {
+      topProducts = await Product.find(query)
+        .sort({ nbOfOrders: -1 })
+        .limit(limit)
+        .select("name nbOfOrders price initialPrice img quantity");
+    }
 
     return NextResponse.json(
       {

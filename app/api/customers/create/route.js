@@ -5,8 +5,7 @@ import { NextResponse } from "next/server";
 export async function POST(req) {
   await connectToDB();
   try {
-    const { fullName, phoneNumber, debt, smallBottlesDebt, bigBottlesDebt } =
-      await req.json();
+    const { fullName, phoneNumber, debt } = await req.json();
 
     if (!fullName || !phoneNumber) {
       return NextResponse.json(
@@ -26,8 +25,6 @@ export async function POST(req) {
       fullName,
       phoneNumber,
       debt,
-      smallBottlesDebt,
-      bigBottlesDebt,
     });
     await newCustomer.save();
     return NextResponse.json(

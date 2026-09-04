@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import Order from "@/models/Orders";
 import Customer from "@/models/Customers";
+import Payment from "@/models/Payment";
 import { connectToDB } from "@/lib/connectDb";
 
 export async function PUT(req, { params }) {
@@ -58,6 +59,16 @@ export async function PUT(req, { params }) {
     await Customer.findByIdAndUpdate(order.customer, {
       $set: { debt: newDebtValue }
     });
+
+    // Record this as a normal payment so it shows up in the payment history
+    if (maxAllowedPayment > 0) {
+      await Payment.create({
+        customer: order.customer,
+        amount: maxAllowedPayment,
+        previousDebt: customer.debt,
+        newDebt: newDebtValue,
+      });
+    }
 
     return NextResponse.json({
       message: `Payment of ${amountpaid.toFixed(2)} applied successfully. ${newRemaining > 0 ? `Remaining balance: ${newRemaining.toFixed(2)}` : 'Order fully paid!'}`,

@@ -7,15 +7,17 @@ import axios from "axios";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 
-const fetchProfitChartData = async () => {
-  const response = await axios.get("/api/dashboard/profit");
+const fetchProfitChartData = async (range, startDate, endDate) => {
+  const response = await axios.get("/api/dashboard/profit", {
+    params: { range, startDate: startDate || undefined, endDate: endDate || undefined },
+  });
   return response.data;
 };
 
-const ProfitChart = () => {
+const ProfitChart = ({ range = "all", startDate, endDate }) => {
   const { data, isLoading, error } = useQuery({
-    queryKey: ["dashboard-profit-chart"],
-    queryFn: fetchProfitChartData,
+    queryKey: ["dashboard-profit-chart", range, startDate, endDate],
+    queryFn: () => fetchProfitChartData(range, startDate, endDate),
   });
 
   if (error) {
@@ -35,6 +37,7 @@ const ProfitChart = () => {
     { period: "Today", profit: profitData?.today?.realProfit || 0 },
     { period: "Last Week", profit: profitData?.lastWeek?.realProfit || 0 },
     { period: "Last Month", profit: profitData?.lastMonth?.realProfit || 0 },
+    { period: "Selected Range", profit: profitData?.selected?.realProfit || 0 },
   ];
 
   // Simple bar chart using CSS

@@ -10,14 +10,6 @@ const customerSchema = new mongoose.Schema(
       ref: "Order",
       default: []
     },
-    smallBottlesDebt: {
-      type: Number,
-      default: 0,
-    },
-    bigBottlesDebt: {
-      type: Number,
-      default: 0,
-    }
   },
   { timestamps: true }
 );

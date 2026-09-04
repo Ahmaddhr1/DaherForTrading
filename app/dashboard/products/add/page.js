@@ -14,7 +14,7 @@ import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 
 const fetchCategories = async () => {
-  const { data } = await axios.get("/api/categories");
+  const { data } = await axios.get("/api/categories", { params: { all: true } });
   return data;
 };
 

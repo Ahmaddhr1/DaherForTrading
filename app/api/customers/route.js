@@ -10,8 +10,18 @@ export async function GET(req) {
   const limit = parseInt(searchParams.get("limit")) || 20;
   const search = searchParams.get("search")?.toLowerCase() || "";
   const debtFilter = searchParams.get("debtFilter"); // "hasDebt" or "noDebt"
+  const sort = searchParams.get("sort") || "newest"; // newest, oldest, debtDesc, debtAsc, nameAsc, nameDesc
 
   const skip = (page - 1) * limit;
+
+  const SORT_MAP = {
+    newest: { createdAt: -1 },
+    oldest: { createdAt: 1 },
+    debtDesc: { debt: -1 },
+    debtAsc: { debt: 1 },
+    nameAsc: { fullName: 1 },
+    nameDesc: { fullName: -1 },
+  };
 
   try {
     // Build query object
@@ -24,22 +34,14 @@ export async function GET(req) {
 
     // Add debt filter
     if (debtFilter === "hasDebt") {
-      query.$or = [
-        { debt: { $gt: 0 } },
-        { smallBottlesDebt: { $gt: 0 } },
-        { bigBottlesDebt: { $gt: 0 } }
-      ];
+      query.debt = { $gt: 0 };
     } else if (debtFilter === "noDebt") {
-      query.$and = [
-        { debt: { $lte: 0 } },
-        { smallBottlesDebt: { $lte: 0 } },
-        { bigBottlesDebt: { $lte: 0 } }
-      ];
+      query.debt = { $lte: 0 };
     }
 
     const total = await Customer.countDocuments(query);
     const customers = await Customer.find(query)
-      .sort({ createdAt: -1 })
+      .sort(SORT_MAP[sort] || SORT_MAP.newest)
       .skip(skip)
       .limit(limit);
 

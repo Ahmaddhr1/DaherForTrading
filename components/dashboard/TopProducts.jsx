@@ -6,17 +6,20 @@ import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Badge } from "@/components/ui/badge";
 import { Package } from "lucide-react";
 
-const fetchTopProducts = async () => {
-  const response = await axios.get("/api/dashboard/top-products");
+const fetchTopProducts = async (limit, sort, category) => {
+  const response = await axios.get("/api/dashboard/top-products", {
+    params: { limit, sort, category: category || undefined },
+  });
   return response.data;
 };
 
-const TopProducts = () => {
+const TopProducts = ({ limit = 10, sort = "orders", category = "" }) => {
   const { data, isLoading, error } = useQuery({
-    queryKey: ["dashboard-top-products"],
-    queryFn: fetchTopProducts,
+    queryKey: ["dashboard-top-products", limit, sort, category],
+    queryFn: () => fetchTopProducts(limit, sort, category),
   });
 
   if (error) {
@@ -36,24 +39,29 @@ const TopProducts = () => {
       <CardHeader>
         <CardTitle className="flex items-center gap-2 text-lg font-medium">
           <Package className="h-5 w-5 text-blue-600" />
-          Top 5 Products
+          Top {limit} Products ({sort === "profit" ? "Most Profitable" : "Most Ordered"})
         </CardTitle>
       </CardHeader>
       <CardContent>
         {isLoading ? (
           <div className="space-y-4">
-            {[1, 2, 3, 4, 5].map((item) => (
-              <Skeleton key={item} className="h-16 rounded-lg" />
+            {Array.from({ length: Math.min(limit, 5) }).map((_, i) => (
+              <Skeleton key={i} className="h-16 rounded-lg" />
             ))}
           </div>
+        ) : topProducts.length === 0 ? (
+          <div className="text-center py-8 text-gray-500">No products found</div>
         ) : (
           <div className="space-y-4">
-            {topProducts.slice(0, 5).map((product, index) => (
+            {topProducts.map((product, index) => (
               <div
                 key={product._id || index}
                 className="flex items-center justify-between bg-gray-50 rounded-lg p-4"
               >
                 <div className="flex items-center gap-3">
+                  <Badge className="bg-blue-500 hover:bg-blue-500 w-7 h-7 rounded-full flex items-center justify-center p-0">
+                    {index + 1}
+                  </Badge>
                   {product.img?.[0] ? (
                     <img
                       src={product.img[0]}
@@ -73,8 +81,16 @@ const TopProducts = () => {
                   </div>
                 </div>
                 <div className="text-right">
-                  <p className="font-semibold">${product.price}</p>
-                  <p className="text-sm text-gray-500">each</p>
+                  {sort === "profit" ? (
+                    <p className="font-semibold text-green-600">
+                      ${(product.totalProfit || 0).toFixed(2)}
+                    </p>
+                  ) : (
+                    <p className="font-semibold">${product.price}</p>
+                  )}
+                  <p className="text-sm text-gray-500">
+                    {sort === "profit" ? "total profit" : "each"}
+                  </p>
                 </div>
               </div>
             ))}

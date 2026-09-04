@@ -7,22 +7,24 @@ import axios from "axios";
 import DashboardCard from "./DashboardCard";
 import { Skeleton } from "@/components/ui/skeleton";
 
-const fetchOrdersData = async () => {
-  const response = await axios.get("/api/dashboard/profit");
+const fetchOrdersData = async (range, startDate, endDate) => {
+  const response = await axios.get("/api/dashboard/profit", {
+    params: { range, startDate: startDate || undefined, endDate: endDate || undefined },
+  });
   return response.data;
 };
 
-const OrdersBreakdown = () => {
+const OrdersBreakdown = ({ range = "all", startDate, endDate }) => {
   const { data, isLoading, error } = useQuery({
-    queryKey: ["dashboard-orders"],
-    queryFn: fetchOrdersData,
+    queryKey: ["dashboard-orders", range, startDate, endDate],
+    queryFn: () => fetchOrdersData(range, startDate, endDate),
   });
 
   if (error) {
     return <div className="text-red-500">Error loading orders data</div>;
   }
 
-  const ordersData = data?.data?.allTime || {};
+  const ordersData = data?.data?.selected || {};
 
   if (isLoading) {
     return (
@@ -42,14 +44,14 @@ const OrdersBreakdown = () => {
         description={`$${(ordersData.paidOrdersTotal || 0).toLocaleString()}`}
         color="green"
       />
-      
+
       <DashboardCard
         title="Pending Orders"
         value={(ordersData.pendingOrdersCount || 0).toLocaleString()}
         description={`$${(ordersData.pendingOrdersTotal || 0).toLocaleString()}`}
         color="yellow"
       />
-      
+
       <DashboardCard
         title="Partial Orders"
         value={(ordersData.partialOrdersCount || 0).toLocaleString()}

@@ -7,15 +7,17 @@ import axios from "axios";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 
-const fetchOrdersChartData = async () => {
-  const response = await axios.get("/api/dashboard/stats");
+const fetchOrdersChartData = async (range, startDate, endDate) => {
+  const response = await axios.get("/api/dashboard/stats", {
+    params: { range, startDate: startDate || undefined, endDate: endDate || undefined },
+  });
   return response.data;
 };
 
-const OrdersChart = () => {
+const OrdersChart = ({ range = "all", startDate, endDate }) => {
   const { data, isLoading, error } = useQuery({
-    queryKey: ["dashboard-orders-chart"],
-    queryFn: fetchOrdersChartData,
+    queryKey: ["dashboard-orders-chart", range, startDate, endDate],
+    queryFn: () => fetchOrdersChartData(range, startDate, endDate),
   });
 
   if (error) {
@@ -36,6 +38,7 @@ const OrdersChart = () => {
     { period: "Today", orders: orderCounts.today || 0 },
     { period: "Last Week", orders: orderCounts.lastWeek || 0 },
     { period: "All Time", orders: orderCounts.allTime || 0 },
+    { period: "Selected Range", orders: orderCounts.selected || 0 },
   ];
 
   const maxOrders = Math.max(...chartData.map(item => item.orders), 1);

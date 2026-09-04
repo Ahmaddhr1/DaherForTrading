@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import Order from "@/models/Orders";
 import Customer from "@/models/Customers";
+import Payment from "@/models/Payment";
 import { connectToDB } from "@/lib/connectDb";
 
 export async function PUT(req, { params }) {
@@ -50,6 +51,16 @@ export async function PUT(req, { params }) {
       { $set: { debt: finalDebt } },
       { new: true }
     );
+
+    // Record this as a normal payment so it shows up in the payment history
+    if (actualDebtReduction > 0) {
+      await Payment.create({
+        customer: order.customer,
+        amount: actualDebtReduction,
+        previousDebt: customer.debt,
+        newDebt: finalDebt,
+      });
+    }
 
     return NextResponse.json(
       { 

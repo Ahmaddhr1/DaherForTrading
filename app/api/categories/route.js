@@ -36,19 +36,52 @@ export async function POST(req) {
   }
 }
 
-export async function GET() {
+export async function GET(req) {
   try {
     await connectToDB();
 
-    const categories = await Category.find().sort({ createdAt: -1 }); // Newest first
+    const { searchParams } = new URL(req.url);
+    const page = parseInt(searchParams.get("page")) || 1;
+    const limit = parseInt(searchParams.get("limit")) || 20;
+    const search = searchParams.get("search")?.toLowerCase() || "";
+    const all = searchParams.get("all") === "true";
 
-    return NextResponse.json(categories, {
-      status: 200,
-      headers: {
-        "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Methods": "GET",
+    const query = search ? { name: { $regex: new RegExp(search, "i") } } : {};
+
+    // Some callers (e.g. dropdowns) need the full unpaginated list.
+    if (all) {
+      const categories = await Category.find(query).sort({ createdAt: -1 });
+      return NextResponse.json(categories, {
+        status: 200,
+        headers: {
+          "Access-Control-Allow-Origin": "*",
+          "Access-Control-Allow-Methods": "GET",
+        },
+      });
+    }
+
+    const skip = (page - 1) * limit;
+    const total = await Category.countDocuments(query);
+    const categories = await Category.find(query)
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit);
+
+    return NextResponse.json(
+      {
+        categories,
+        total,
+        page,
+        totalPages: Math.ceil(total / limit),
       },
-    });
+      {
+        status: 200,
+        headers: {
+          "Access-Control-Allow-Origin": "*",
+          "Access-Control-Allow-Methods": "GET",
+        },
+      }
+    );
   } catch (err) {
     console.error("Error fetching categories:", err);
     return NextResponse.json(

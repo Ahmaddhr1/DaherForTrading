@@ -9,7 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import React, { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import axios from "axios";
-import { Loader2, UserPlus, ArrowLeft, DollarSign, Phone, User, Scale, PillBottle } from "lucide-react";
+import { Loader2, UserPlus, ArrowLeft, DollarSign, Phone, User, Scale } from "lucide-react";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 
@@ -19,13 +19,11 @@ const AddCustomerPage = () => {
     fullName: "",
     phoneNumber: "",
     debt: "",
-    smallBottlesDebt: 0,
-    bigBottlesDebt: 0
   });
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    const numericFields = ["phoneNumber", "debt", "smallBottlesDebt", "bigBottlesDebt"];
+    const numericFields = ["phoneNumber", "debt"];
     const cleanValue = numericFields.includes(name) ? value.replace(/\D/g, "") : value;
     
     setForm((prev) => ({
@@ -73,14 +71,10 @@ const AddCustomerPage = () => {
     mutation.mutate({
       ...form,
       debt: form.debt || "0",
-      smallBottlesDebt: parseInt(form.smallBottlesDebt) || 0,
-      bigBottlesDebt: parseInt(form.bigBottlesDebt) || 0
     });
   };
 
-  const hasMonetaryDebt = parseInt(form.debt) > 0;
-  const hasBottleDebt = parseInt(form.smallBottlesDebt) > 0 || parseInt(form.bigBottlesDebt) > 0;
-  const hasAnyDebt = hasMonetaryDebt || hasBottleDebt;
+  const hasAnyDebt = parseInt(form.debt) > 0;
 
   return (
     <div className="min-h-screen bg-gray-50/30 py-8">
@@ -192,52 +186,6 @@ const AddCustomerPage = () => {
                           />
                         </div>
                       </div>
-
-                      <Separator />
-
-                      {/* Bottle Debt */}
-                      <div className="space-y-4">
-                        <div className="flex items-center gap-2">
-                          <PillBottle className="h-5 w-5 text-green-600" />
-                          <h3 className="font-medium text-gray-900">Bottle Debt</h3>
-                        </div>
-                        
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                          <div className="space-y-2">
-                            <Label htmlFor="smallBottlesDebt" className="text-sm font-medium text-gray-700">
-                              Small Bottles
-                            </Label>
-                            <Input
-                              id="smallBottlesDebt"
-                              type="number"
-                              inputMode="numeric"
-                              placeholder="0"
-                              name="smallBottlesDebt"
-                              value={form.smallBottlesDebt}
-                              onChange={handleChange}
-                              min="0"
-                              className="focus:border-green-500 transition-colors"
-                            />
-                          </div>
-
-                          <div className="space-y-2">
-                            <Label htmlFor="bigBottlesDebt" className="text-sm font-medium text-gray-700">
-                              Big Bottles
-                            </Label>
-                            <Input
-                              id="bigBottlesDebt"
-                              type="number"
-                              inputMode="numeric"
-                              placeholder="0"
-                              name="bigBottlesDebt"
-                              value={form.bigBottlesDebt}
-                              onChange={handleChange}
-                              min="0"
-                              className="focus:border-green-500 transition-colors"
-                            />
-                          </div>
-                        </div>
-                      </div>
                     </div>
                   </div>
 
@@ -321,42 +269,11 @@ const AddCustomerPage = () => {
                       <span className="text-lg font-bold text-amber-900">
                         ${(parseInt(form.debt) || 0).toLocaleString()}
                       </span>
-                      <Badge 
-                        variant={hasMonetaryDebt ? "default" : "outline"} 
-                        className={`ml-2 ${hasMonetaryDebt ? 'bg-amber-100 text-amber-800' : ''}`}
+                      <Badge
+                        variant={hasAnyDebt ? "default" : "outline"}
+                        className={`ml-2 ${hasAnyDebt ? 'bg-amber-100 text-amber-800' : ''}`}
                       >
-                        {hasMonetaryDebt ? "Owes Money" : "No Money Debt"}
-                      </Badge>
-                    </div>
-                  </div>
-                </div>
-
-                <Separator />
-
-                {/* Bottle Debt Summary */}
-                <div className="space-y-3">
-                  <h4 className="font-medium text-gray-900 flex items-center gap-2">
-                    <PillBottle className="h-4 w-4" />
-                    Bottle Debt
-                  </h4>
-                  <div className="space-y-2">
-                    <div className="flex justify-between items-center">
-                      <span className="text-sm text-gray-600">Small Bottles</span>
-                      <span className="font-medium text-gray-900">{form.smallBottlesDebt || 0}</span>
-                    </div>
-                    
-                    <div className="flex justify-between items-center">
-                      <span className="text-sm text-gray-600">Big Bottles</span>
-                      <span className="font-medium text-gray-900">{form.bigBottlesDebt || 0}</span>
-                    </div>
-                    
-                    <div className="flex justify-between items-center pt-2 border-t">
-                      <span className="text-sm font-medium text-gray-700">Total Bottles</span>
-                      <Badge 
-                        variant={hasBottleDebt ? "default" : "outline"} 
-                        className={hasBottleDebt ? 'bg-green-100 text-green-800' : ''}
-                      >
-                        {hasBottleDebt ? "Owes Bottles" : "No Bottle Debt"}
+                        {hasAnyDebt ? "Owes Money" : "No Money Debt"}
                       </Badge>
                     </div>
                   </div>
@@ -378,9 +295,9 @@ const AddCustomerPage = () => {
                       {hasAnyDebt ? "Customer Has Debt" : "Debt-Free Customer"}
                     </Badge>
                     <p className="text-xs text-gray-600 mt-2">
-                      {hasAnyDebt 
-                        ? "This customer has outstanding obligations" 
-                        : "No current debts or bottle obligations"
+                      {hasAnyDebt
+                        ? "This customer has an outstanding balance"
+                        : "No current debt"
                       }
                     </p>
                   </div>

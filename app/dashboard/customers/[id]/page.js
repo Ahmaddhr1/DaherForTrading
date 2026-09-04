@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
-import { Eye, Loader2, User, Phone, DollarSign, ArrowLeft, UserCog, Package, PhoneCall, PillBottle } from "lucide-react";
+import { Eye, Loader2, User, Phone, DollarSign, ArrowLeft, UserCog, Package, PhoneCall, Lock } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -25,8 +25,6 @@ const EditCustomerPage = () => {
     phoneNumber: "",
     debt: "",
     orders: [],
-    smallBottlesDebt: 0,
-    bigBottlesDebt: 0
   });
 
   // Fetch existing customer data
@@ -46,8 +44,6 @@ const EditCustomerPage = () => {
         phoneNumber: data.phoneNumber || "",
         debt: data.debt?.toString() || "",
         orders: data?.orders || [],
-        smallBottlesDebt: data.smallBottlesDebt || 0,
-        bigBottlesDebt: data.bigBottlesDebt || 0
       });
     }
     if (isError) {
@@ -57,9 +53,9 @@ const EditCustomerPage = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    const numericFields = ["phoneNumber", "debt", "bigBottlesDebt", "smallBottlesDebt"];
+    const numericFields = ["phoneNumber"];
     const cleanValue = numericFields.includes(name) ? value.replace(/\D/g, "") : value;
-    
+
     setForm((prev) => ({ ...prev, [name]: cleanValue }));
   };
 
@@ -100,17 +96,12 @@ const EditCustomerPage = () => {
       return;
     }
 
-    mutation.mutate({
-      ...form,
-      debt: form.debt || "0",
-      smallBottlesDebt: parseInt(form.smallBottlesDebt) || 0,
-      bigBottlesDebt: parseInt(form.bigBottlesDebt) || 0
-    });
+    // Debt is not editable from this form; it's managed separately.
+    const { debt, ...editableFields } = form;
+    mutation.mutate(editableFields);
   };
 
-  const hasMonetaryDebt = parseInt(form.debt) > 0;
-  const hasBottleDebt = parseInt(form.smallBottlesDebt) > 0 || parseInt(form.bigBottlesDebt) > 0;
-  const hasAnyDebt = hasMonetaryDebt || hasBottleDebt;
+  const hasAnyDebt = parseInt(form.debt) > 0;
   const ordersCount = form.orders?.length || 0;
 
   if (isLoading) {
@@ -267,72 +258,24 @@ const EditCustomerPage = () => {
                       <div className="w-1 h-4 bg-amber-600 rounded"></div>
                       Debt Information
                     </div>
-                    
-                    <div className="space-y-6">
-                      {/* Monetary Debt */}
-                      <div className="space-y-4">
-                        <div className="space-y-2">
-                          <Label htmlFor="debt" className="text-sm font-medium text-gray-700">
-                            Amount Owed ($)
-                          </Label>
-                          <Input
-                            id="debt"
-                            type="text"
-                            inputMode="numeric"
-                            placeholder="0"
-                            name="debt"
-                            value={form.debt}
-                            onChange={handleChange}
-                            className="focus:border-amber-500 transition-colors max-w-xs"
-                          />
-                        </div>
-                      </div>
 
-                      <Separator />
-
-                      {/* Bottle Debt */}
-                      <div className="space-y-4">
-                        <div className="flex items-center gap-2">
-                          <PillBottle className="h-5 w-5 text-green-600" />
-                          <h3 className="font-medium text-gray-900">Bottle Debt</h3>
-                        </div>
-                        
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                          <div className="space-y-2">
-                            <Label htmlFor="smallBottlesDebt" className="text-sm font-medium text-gray-700">
-                              Small Bottles
-                            </Label>
-                            <Input
-                              id="smallBottlesDebt"
-                              type="number"
-                              inputMode="numeric"
-                              placeholder="0"
-                              name="smallBottlesDebt"
-                              value={form.smallBottlesDebt}
-                              onChange={handleChange}
-                              min="0"
-                              className="focus:border-green-500 transition-colors"
-                            />
-                          </div>
-
-                          <div className="space-y-2">
-                            <Label htmlFor="bigBottlesDebt" className="text-sm font-medium text-gray-700">
-                              Big Bottles
-                            </Label>
-                            <Input
-                              id="bigBottlesDebt"
-                              type="number"
-                              inputMode="numeric"
-                              placeholder="0"
-                              name="bigBottlesDebt"
-                              value={form.bigBottlesDebt}
-                              onChange={handleChange}
-                              min="0"
-                              className="focus:border-green-500 transition-colors"
-                            />
-                          </div>
-                        </div>
-                      </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="debt" className="text-sm font-medium text-gray-700 flex items-center gap-2">
+                        Amount Owed ($)
+                        <Lock className="h-3 w-3 text-gray-400" />
+                      </Label>
+                      <Input
+                        id="debt"
+                        type="text"
+                        name="debt"
+                        value={form.debt}
+                        disabled
+                        readOnly
+                        className="max-w-xs bg-gray-100 text-gray-500 cursor-not-allowed"
+                      />
+                      <p className="text-xs text-gray-500">
+                        Debt is managed automatically through orders and payments and can no longer be edited directly here.
+                      </p>
                     </div>
                   </div>
 
@@ -421,42 +364,11 @@ const EditCustomerPage = () => {
                       <span className="text-lg font-bold text-amber-900">
                         ${(parseInt(form.debt) || 0).toLocaleString()}
                       </span>
-                      <Badge 
-                        variant={hasMonetaryDebt ? "default" : "outline"} 
-                        className={`ml-2 ${hasMonetaryDebt ? 'bg-amber-100 text-amber-800' : ''}`}
+                      <Badge
+                        variant={hasAnyDebt ? "default" : "outline"}
+                        className={`ml-2 ${hasAnyDebt ? 'bg-amber-100 text-amber-800' : ''}`}
                       >
-                        {hasMonetaryDebt ? "Owes Money" : "No Money Debt"}
-                      </Badge>
-                    </div>
-                  </div>
-                </div>
-
-                <Separator />
-
-                {/* Bottle Debt Summary */}
-                <div className="space-y-3">
-                  <h4 className="font-medium text-gray-900 flex items-center gap-2">
-                    <PillBottle className="h-4 w-4" />
-                    Bottle Debt
-                  </h4>
-                  <div className="space-y-2">
-                    <div className="flex justify-between items-center">
-                      <span className="text-sm text-gray-600">Small Bottles</span>
-                      <span className="font-medium text-gray-900">{form.smallBottlesDebt || 0}</span>
-                    </div>
-                    
-                    <div className="flex justify-between items-center">
-                      <span className="text-sm text-gray-600">Big Bottles</span>
-                      <span className="font-medium text-gray-900">{form.bigBottlesDebt || 0}</span>
-                    </div>
-                    
-                    <div className="flex justify-between items-center pt-2 border-t">
-                      <span className="text-sm font-medium text-gray-700">Total Bottles</span>
-                      <Badge 
-                        variant={hasBottleDebt ? "default" : "outline"} 
-                        className={hasBottleDebt ? 'bg-green-100 text-green-800' : ''}
-                      >
-                        {hasBottleDebt ? "Owes Bottles" : "No Bottle Debt"}
+                        {hasAnyDebt ? "Owes Money" : "No Money Debt"}
                       </Badge>
                     </div>
                   </div>
@@ -478,9 +390,9 @@ const EditCustomerPage = () => {
                       {hasAnyDebt ? "Customer Has Debt" : "Debt-Free Customer"}
                     </Badge>
                     <p className="text-xs text-gray-600">
-                      {hasAnyDebt 
-                        ? "This customer has outstanding obligations" 
-                        : "No current debts or bottle obligations"
+                      {hasAnyDebt
+                        ? "This customer has an outstanding balance"
+                        : "No current debt"
                       }
                     </p>
                   </div>

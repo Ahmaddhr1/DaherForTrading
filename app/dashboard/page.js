@@ -11,7 +11,7 @@ import TopProducts from "@/components/dashboard/TopProducts";
 import TopCustomers from "@/components/dashboard/TopCustomers";
 import DashboardFilters from "@/components/dashboard/DashboardFilters";
 import SalesTrendsChart from "@/components/dashboard/SalesTrendsChart";
-import { getTodayDateString } from "@/lib/dateUtils";
+import { getTodayDateString, localDayStartISO, localDayEndISO } from "@/lib/dateUtils";
 
 const DEFAULT_FILTERS = {
   range: "all",
@@ -26,6 +26,13 @@ const DEFAULT_FILTERS = {
 
 export default function DashboardPage() {
   const [filters, setFilters] = useState(DEFAULT_FILTERS);
+
+  // Resolved to precise UTC instants here (in the browser) rather than
+  // sent as bare dates, so "custom" range filtering means the admin's own
+  // local calendar day - not whatever timezone the server happens to run
+  // in. See lib/dateUtils.js.
+  const rangeStart = localDayStartISO(filters.startDate);
+  const rangeEnd = localDayEndISO(filters.endDate);
 
   return (
     <div className="min-h-screen bg-gray-50 py-6">
@@ -42,8 +49,8 @@ export default function DashboardPage() {
         {/* Summary Cards */}
         <SummaryCards
           range={filters.range}
-          startDate={filters.startDate}
-          endDate={filters.endDate}
+          startDate={rangeStart}
+          endDate={rangeEnd}
         />
 
         {/* Debt and Orders */}
@@ -54,8 +61,8 @@ export default function DashboardPage() {
           <div className="lg:col-span-3">
             <OrdersBreakdown
               range={filters.range}
-              startDate={filters.startDate}
-              endDate={filters.endDate}
+              startDate={rangeStart}
+              endDate={rangeEnd}
             />
           </div>
         </div>
@@ -64,13 +71,13 @@ export default function DashboardPage() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
           <ProfitChart
             range={filters.range}
-            startDate={filters.startDate}
-            endDate={filters.endDate}
+            startDate={rangeStart}
+            endDate={rangeEnd}
           />
           <OrdersChart
             range={filters.range}
-            startDate={filters.startDate}
-            endDate={filters.endDate}
+            startDate={rangeStart}
+            endDate={rangeEnd}
           />
         </div>
 

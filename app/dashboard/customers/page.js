@@ -25,6 +25,7 @@ import {
   CheckCircle,
   ArrowUpDown,
   Trophy,
+  Plus,
 } from "lucide-react";
 
 const SORT_OPTIONS = [
@@ -141,8 +142,9 @@ export default function CustomersPage() {
             </div>
 
             <Link href="/dashboard/customers/create">
-              <Button className="bg-blue-600 hover:bg-blue-700">
-                + Add Customer
+              <Button className="bg-blue-600 hover:bg-blue-700 flex items-center gap-2">
+                <Plus className="h-4 w-4" />
+                <span className="hidden sm:inline">Add Customer</span>
               </Button>
             </Link>
           </div>
@@ -164,8 +166,8 @@ export default function CustomersPage() {
             </div>
 
             {/* Debt Filter Buttons */}
-            <div className="flex flex-wrap gap-2">
-              <div className="flex items-center gap-2 mr-4">
+            <div className="flex flex-col sm:flex-row sm:flex-wrap gap-2">
+              <div className="flex items-center gap-2">
                 <Filter className="h-4 w-4 text-gray-500" />
                 <span className="text-sm font-medium text-gray-700">Filter by Debt:</span>
               </div>
@@ -174,7 +176,7 @@ export default function CustomersPage() {
                 variant={debtFilter === "all" ? "default" : "outline"}
                 size="sm"
                 onClick={() => setDebtFilter("all")}
-                className="flex items-center gap-2"
+                className="flex items-center justify-center gap-2 w-full sm:w-auto"
               >
                 <Users className="h-4 w-4" />
                 All Customers
@@ -184,7 +186,7 @@ export default function CustomersPage() {
                 variant={debtFilter === "hasDebt" ? "default" : "outline"}
                 size="sm"
                 onClick={() => setDebtFilter("hasDebt")}
-                className="flex items-center gap-2"
+                className="flex items-center justify-center gap-2 w-full sm:w-auto"
               >
                 <DollarSign className="h-4 w-4" />
                 Has Debt
@@ -194,7 +196,7 @@ export default function CustomersPage() {
                 variant={debtFilter === "noDebt" ? "default" : "outline"}
                 size="sm"
                 onClick={() => setDebtFilter("noDebt")}
-                className="flex items-center gap-2"
+                className="flex items-center justify-center gap-2 w-full sm:w-auto"
               >
                 <CheckCircle className="h-4 w-4" />
                 No Debt
@@ -204,7 +206,7 @@ export default function CustomersPage() {
                 variant={isTopDebtorsView ? "default" : "outline"}
                 size="sm"
                 onClick={handleShowTopDebtors}
-                className="flex items-center gap-2"
+                className="flex items-center justify-center gap-2 w-full sm:w-auto"
               >
                 <Trophy className="h-4 w-4" />
                 Top 10 Debtors
@@ -212,14 +214,16 @@ export default function CustomersPage() {
             </div>
 
             {/* Sort & Page Size */}
-            <div className="flex flex-wrap items-center gap-4">
-              <div className="flex items-center gap-2">
-                <ArrowUpDown className="h-4 w-4 text-gray-500" />
-                <span className="text-sm font-medium text-gray-700">Sort by:</span>
+            <div className="flex flex-col sm:flex-row sm:flex-wrap sm:items-center gap-3 sm:gap-4">
+              <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-2">
+                <span className="flex items-center gap-1.5 text-sm font-medium text-gray-700">
+                  <ArrowUpDown className="h-4 w-4 text-gray-500" />
+                  Sort by
+                </span>
                 <select
                   value={sortBy}
                   onChange={(e) => setSortBy(e.target.value)}
-                  className="border rounded-md text-sm px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full sm:w-auto border rounded-md text-sm px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
                   {SORT_OPTIONS.map((option) => (
                     <option key={option.value} value={option.value}>
@@ -229,12 +233,12 @@ export default function CustomersPage() {
                 </select>
               </div>
 
-              <div className="flex items-center gap-2">
-                <span className="text-sm font-medium text-gray-700">Per page:</span>
+              <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-2">
+                <span className="text-sm font-medium text-gray-700">Per page</span>
                 <select
                   value={pageSize}
                   onChange={(e) => setPageSize(parseInt(e.target.value))}
-                  className="border rounded-md text-sm px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full sm:w-auto border rounded-md text-sm px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
                   {PAGE_SIZE_OPTIONS.map((size) => (
                     <option key={size} value={size}>

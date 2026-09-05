@@ -1,7 +1,6 @@
 import { connectToDB } from "@/lib/connectDb";
 import Disbursement from "@/models/Disbursement";
 import { NextResponse } from "next/server";
-import { startOfDayUTC, endOfDayUTC } from "@/lib/dateUtils";
 
 export async function POST(req) {
   await connectToDB();
@@ -66,12 +65,16 @@ export async function GET(req) {
       query.category = category;
     }
     if (startDateParam || endDateParam) {
+      // The client resolves these to precise instants (see
+      // lib/dateUtils.js localDayStartISO/localDayEndISO) before sending
+      // them, so they're parsed directly here rather than re-derived
+      // from a bare calendar date.
       query.createdAt = {};
       if (startDateParam) {
-        query.createdAt.$gte = startOfDayUTC(startDateParam);
+        query.createdAt.$gte = new Date(startDateParam);
       }
       if (endDateParam) {
-        query.createdAt.$lte = endOfDayUTC(endDateParam);
+        query.createdAt.$lte = new Date(endDateParam);
       }
     }
 

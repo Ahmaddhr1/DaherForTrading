@@ -90,21 +90,21 @@ export default function ProductsPage() {
         
         {/* Page Header */}
         <div className="mb-8">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-blue-100 rounded-lg">
+          <div className="flex items-center justify-between gap-3">
+            <div className="flex items-center gap-3 min-w-0">
+              <div className="p-2 bg-blue-100 rounded-lg shrink-0">
                 <Package className="h-6 w-6 text-blue-600" />
               </div>
-              <div>
-                <h1 className="text-3xl font-bold text-gray-900">Products</h1>
-                <p className="text-gray-600">Manage your product inventory</p>
+              <div className="min-w-0">
+                <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 truncate">Products</h1>
+                <p className="text-gray-600 text-sm sm:text-base truncate">Manage your product inventory</p>
               </div>
             </div>
-            
+
             <Link href="/dashboard/products/add">
-              <Button className="bg-blue-600 hover:bg-blue-700 flex items-center gap-2">
+              <Button className="bg-blue-600 hover:bg-blue-700 flex items-center gap-2 shrink-0">
                 <Plus className="h-4 w-4" />
-                Add Product
+                <span className="hidden sm:inline">Add Product</span>
               </Button>
             </Link>
           </div>

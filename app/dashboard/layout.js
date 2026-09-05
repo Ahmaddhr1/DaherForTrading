@@ -1,4 +1,5 @@
 import { MySideBar } from "@/components/MySideBar";
+import { MobileBottomBar } from "@/components/MobileBottomBar";
 import { Geist, Geist_Mono } from "next/font/google";
 
 const geistSans = Geist({
@@ -18,9 +19,10 @@ export default function RootLayout({ children }) {
         <div className="w-fit">
           <MySideBar />
         </div>
-        <main className="flex-1 p-4 overflow-auto">
+        <main className="flex-1 p-4 pb-24 lg:pb-4 overflow-auto">
           {children}
         </main>
+        <MobileBottomBar />
       </div>
   );
 }

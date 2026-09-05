@@ -22,6 +22,7 @@ import axios from "axios";
 import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
 import { localDayStartISO, localDayEndISO } from "@/lib/dateUtils";
+import ProductPurchaseBreakdown from "./ProductPurchaseBreakdown";
 
 export default function CompanyPurchasesPage() {
   const router = useRouter();
@@ -65,27 +66,30 @@ export default function CompanyPurchasesPage() {
             Back to Company
           </Button>
 
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-blue-100 rounded-lg">
+          <div className="flex items-center justify-between gap-3">
+            <div className="flex items-center gap-3 min-w-0">
+              <div className="p-2 bg-blue-100 rounded-lg shrink-0">
                 <History className="h-6 w-6 text-blue-600" />
               </div>
-              <div>
-                <h1 className="text-2xl font-bold text-gray-900">
+              <div className="min-w-0">
+                <h1 className="text-xl sm:text-2xl font-bold text-gray-900 truncate">
                   Purchase History {data?.companyName ? `— ${data.companyName}` : ""}
                 </h1>
-                <p className="text-gray-600">All restocking purchases from this company</p>
+                <p className="text-gray-600 text-sm sm:text-base truncate">All restocking purchases from this company</p>
               </div>
             </div>
 
-            <Link href={`/dashboard/companies/${id}/addpurchase`}>
+            <Link href={`/dashboard/companies/${id}/addpurchase`} className="shrink-0">
               <Button className="flex items-center gap-2">
                 <Plus className="h-4 w-4" />
-                New Purchase
+                <span className="hidden sm:inline">New Purchase</span>
               </Button>
             </Link>
           </div>
         </div>
+
+        {/* Per-product breakdown: amount purchased and expected profit per product */}
+        <ProductPurchaseBreakdown companyId={id} />
 
         {/* Summary for the current filter scope */}
         <Card className="shadow-sm border-gray-200 mb-6">

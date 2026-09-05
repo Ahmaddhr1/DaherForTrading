@@ -196,71 +196,69 @@ const MakeOrderPage = () => {
               {/* Product Rows */}
               <div className="space-y-4">
                 {orderRows.map((row, index) => (
-                  <div key={row.id} className="grid grid-cols-12 gap-4 items-end p-4 border rounded-lg bg-gray-50">
-                    
-                    {/* Product Selection */}
-                    <div className="col-span-5">
+                  <div key={row.id} className="p-4 border rounded-lg bg-gray-50 space-y-4">
+                    <div className="flex items-center justify-between">
                       <Label htmlFor={`product-${row.id}`} className="text-sm font-medium">
                         Product {index + 1}
                       </Label>
-                      <select
-                        id={`product-${row.id}`}
-                        value={row.productId}
-                        onChange={(e) => handleRowChange(row.id, "productId", e.target.value)}
-                        className="w-full p-2 border rounded-md focus:border-blue-500"
-                        required
-                      >
-                        <option value="">Select a product</option>
-                        {products.map(product => (
-                          <option key={product._id} value={product._id}>
-                            {product.name}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-
-                    {/* Price */}
-                    <div className="col-span-3">
-                      <Label htmlFor={`price-${row.id}`} className="text-sm font-medium">
-                        Price ($)
-                      </Label>
-                      <Input
-                        id={`price-${row.id}`}
-                        type="text"
-                        value={row.price}
-                        onChange={(e) => handleRowChange(row.id, "price", e.target.value)}
-                        placeholder="0.00"
-                        required
-                      />
-                    </div>
-
-                    {/* Quantity */}
-                    <div className="col-span-2">
-                      <Label htmlFor={`quantity-${row.id}`} className="text-sm font-medium">
-                        Quantity
-                      </Label>
-                      <Input
-                        id={`quantity-${row.id}`}
-                        type="number"
-                        min="1"
-                        value={row.quantity}
-                        onChange={(e) => handleRowChange(row.id, "quantity", e.target.value)}
-                        required
-                      />
-                    </div>
-
-                    {/* Remove Button */}
-                    <div className="col-span-2">
                       <Button
                         type="button"
-                        variant="destructive"
-                        size="sm"
+                        variant="ghost"
+                        size="icon"
                         onClick={() => removeProductRow(row.id)}
                         disabled={orderRows.length <= 1}
-                        className="w-full"
+                        className="h-7 w-7 text-red-500 hover:text-red-700 hover:bg-red-50"
                       >
                         <Trash2 className="h-4 w-4" />
                       </Button>
+                    </div>
+
+                    {/* Product Selection */}
+                    <select
+                      id={`product-${row.id}`}
+                      value={row.productId}
+                      onChange={(e) => handleRowChange(row.id, "productId", e.target.value)}
+                      className="w-full p-2 border rounded-md focus:border-blue-500"
+                      required
+                    >
+                      <option value="">Select a product</option>
+                      {products.map(product => (
+                        <option key={product._id} value={product._id}>
+                          {product.name}
+                        </option>
+                      ))}
+                    </select>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      {/* Price */}
+                      <div className="space-y-2">
+                        <Label htmlFor={`price-${row.id}`} className="text-sm font-medium">
+                          Price ($)
+                        </Label>
+                        <Input
+                          id={`price-${row.id}`}
+                          type="text"
+                          value={row.price}
+                          onChange={(e) => handleRowChange(row.id, "price", e.target.value)}
+                          placeholder="0.00"
+                          required
+                        />
+                      </div>
+
+                      {/* Quantity */}
+                      <div className="space-y-2">
+                        <Label htmlFor={`quantity-${row.id}`} className="text-sm font-medium">
+                          Quantity
+                        </Label>
+                        <Input
+                          id={`quantity-${row.id}`}
+                          type="number"
+                          min="1"
+                          value={row.quantity}
+                          onChange={(e) => handleRowChange(row.id, "quantity", e.target.value)}
+                          required
+                        />
+                      </div>
                     </div>
                   </div>
                 ))}

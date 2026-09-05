@@ -12,6 +12,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { CardGridSkeleton } from "@/components/ui/skeleton-patterns";
 import { FiltersPanel } from "@/components/ui/filters-panel";
+import { localDayStartISO, localDayEndISO } from "@/lib/dateUtils";
 import {
   Search,
   Building2,
@@ -25,6 +26,8 @@ import {
   ArrowUpDown,
   Trophy,
   Plus,
+  TrendingUp,
+  Wallet,
 } from "lucide-react";
 
 const SORT_OPTIONS = [
@@ -44,10 +47,12 @@ export default function CompaniesPage() {
   const [pageSize, setPageSize] = useState(20);
   const [debtFilter, setDebtFilter] = useState("all"); // "all", "hasDebt", "noDebt"
   const [sortBy, setSortBy] = useState("newest");
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
   const queryClient = useQueryClient();
 
   const { data, isLoading, error } = useQuery({
-    queryKey: ["companies", currentPage, pageSize, searchTerm, debtFilter, sortBy],
+    queryKey: ["companies", currentPage, pageSize, searchTerm, debtFilter, sortBy, startDate, endDate],
     queryFn: async () => {
       const params = {
         page: currentPage,
@@ -55,6 +60,8 @@ export default function CompaniesPage() {
         search: searchTerm,
         sort: sortBy,
         debtFilter: debtFilter !== "all" ? debtFilter : undefined,
+        startDate: localDayStartISO(startDate),
+        endDate: localDayEndISO(endDate),
       };
       Object.keys(params).forEach((key) => params[key] === undefined && delete params[key]);
 
@@ -79,7 +86,7 @@ export default function CompaniesPage() {
   useEffect(() => {
     const timer = setTimeout(() => setCurrentPage(1), 500);
     return () => clearTimeout(timer);
-  }, [searchTerm, debtFilter, sortBy, pageSize]);
+  }, [searchTerm, debtFilter, sortBy, pageSize, startDate, endDate]);
 
   useEffect(() => {
     if (error) toast.error("Failed to load companies");
@@ -106,7 +113,10 @@ export default function CompaniesPage() {
     searchTerm,
     debtFilter !== "all" ? debtFilter : "",
     sortBy !== "newest" ? sortBy : "",
+    startDate,
+    endDate,
   ].filter(Boolean).length;
+  const summary = data?.summary || { totalDebt: 0, totalSpent: 0, expectedProfit: 0 };
 
   return (
     <div className="min-h-screen bg-gray-50 py-6">
@@ -132,6 +142,43 @@ export default function CompaniesPage() {
               </Button>
             </Link>
           </div>
+        </div>
+
+        {/* Debt / spending / expected profit summary */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+          <Card className="shadow-sm border-gray-200">
+            <CardContent className="p-4 flex flex-col gap-1">
+              <span className="flex items-center gap-1.5 text-xs font-medium text-gray-500">
+                <DollarSign className="h-3.5 w-3.5" />
+                Total We Owe (All Companies)
+              </span>
+              <span className="text-lg font-bold text-amber-700">
+                ${summary.totalDebt.toLocaleString()}
+              </span>
+            </CardContent>
+          </Card>
+          <Card className="shadow-sm border-gray-200">
+            <CardContent className="p-4 flex flex-col gap-1">
+              <span className="flex items-center gap-1.5 text-xs font-medium text-gray-500">
+                <Wallet className="h-3.5 w-3.5" />
+                Total Spent (Purchases)
+              </span>
+              <span className="text-lg font-bold text-gray-900">
+                ${summary.totalSpent.toLocaleString()}
+              </span>
+            </CardContent>
+          </Card>
+          <Card className="shadow-sm border-gray-200">
+            <CardContent className="p-4 flex flex-col gap-1">
+              <span className="flex items-center gap-1.5 text-xs font-medium text-gray-500">
+                <TrendingUp className="h-3.5 w-3.5" />
+                Expected Profit From Stock
+              </span>
+              <span className={`text-lg font-bold ${summary.expectedProfit >= 0 ? "text-green-600" : "text-red-600"}`}>
+                ${summary.expectedProfit.toLocaleString()}
+              </span>
+            </CardContent>
+          </Card>
         </div>
 
         {/* Search and Filter Section */}
@@ -197,6 +244,25 @@ export default function CompaniesPage() {
 
             <div className="flex flex-col sm:flex-row sm:flex-wrap sm:items-center gap-3 sm:gap-4">
               <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-2">
+                <span className="text-sm font-medium text-gray-700">From</span>
+                <input
+                  type="date"
+                  value={startDate}
+                  onChange={(e) => setStartDate(e.target.value)}
+                  className="w-full sm:w-auto border rounded-md text-sm px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+              <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-2">
+                <span className="text-sm font-medium text-gray-700">To</span>
+                <input
+                  type="date"
+                  value={endDate}
+                  onChange={(e) => setEndDate(e.target.value)}
+                  className="w-full sm:w-auto border rounded-md text-sm px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+
+              <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-2">
                 <span className="flex items-center gap-1.5 text-sm font-medium text-gray-700">
                   <ArrowUpDown className="h-4 w-4 text-gray-500" />
                   Sort by
@@ -227,6 +293,20 @@ export default function CompaniesPage() {
                     </option>
                   ))}
                 </select>
+
+                {(startDate || endDate) && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => {
+                      setStartDate("");
+                      setEndDate("");
+                    }}
+                    className="w-full sm:w-auto justify-center text-gray-500"
+                  >
+                    Clear Dates
+                  </Button>
+                )}
               </div>
             </div>
           </div>

@@ -30,9 +30,6 @@ import {
   Filter,
   ArrowUpDown,
   ShoppingCart,
-  DollarSign,
-  TrendingUp,
-  Receipt,
 } from "lucide-react";
 import { format } from "date-fns";
 import { useRouter, useParams } from "next/navigation";
@@ -40,6 +37,7 @@ import axios from "axios";
 import { toast } from "sonner";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { localDayStartISO, localDayEndISO } from "@/lib/dateUtils";
+import ProductBreakdown from "./ProductBreakdown";
 
 const SORT_OPTIONS = [
   { value: "newest", label: "Newest First" },
@@ -102,7 +100,6 @@ export default function CustomerOrdersTable() {
     setEndDate("");
   };
   const activeFilterCount = [category, startDate, endDate].filter(Boolean).length;
-  const summary = data?.summary || { totalSales: 0, totalCost: 0, totalProfit: 0, totalQuantity: 0 };
 
   const handleAction = async (action, orderId) => {
     try {
@@ -166,47 +163,8 @@ export default function CustomerOrdersTable() {
           </div>
         </div>
 
-        {/* Sales / Cost / Profit summary for the current filter scope */}
-        <Card className="shadow-sm border-gray-200 mb-6">
-          <CardContent className="p-4 grid grid-cols-2 sm:grid-cols-4 gap-4">
-            <div className="flex flex-col items-center sm:items-start gap-1">
-              <span className="flex items-center gap-1.5 text-xs font-medium text-gray-500">
-                <Receipt className="h-3.5 w-3.5" />
-                Total Sales
-              </span>
-              <span className="text-lg font-bold text-gray-900">
-                ${summary.totalSales.toLocaleString()}
-              </span>
-            </div>
-            <div className="flex flex-col items-center sm:items-start gap-1">
-              <span className="flex items-center gap-1.5 text-xs font-medium text-gray-500">
-                <DollarSign className="h-3.5 w-3.5" />
-                Total Cost
-              </span>
-              <span className="text-lg font-bold text-gray-900">
-                ${summary.totalCost.toLocaleString()}
-              </span>
-            </div>
-            <div className="flex flex-col items-center sm:items-start gap-1">
-              <span className="flex items-center gap-1.5 text-xs font-medium text-gray-500">
-                <TrendingUp className="h-3.5 w-3.5" />
-                Total Profit
-              </span>
-              <span className={`text-lg font-bold ${summary.totalProfit >= 0 ? "text-green-600" : "text-red-600"}`}>
-                ${summary.totalProfit.toLocaleString()}
-              </span>
-            </div>
-            <div className="flex flex-col items-center sm:items-start gap-1">
-              <span className="flex items-center gap-1.5 text-xs font-medium text-gray-500">
-                <Package className="h-3.5 w-3.5" />
-                Units Sold
-              </span>
-              <span className="text-lg font-bold text-gray-900">
-                {summary.totalQuantity.toLocaleString()}
-              </span>
-            </div>
-          </CardContent>
-        </Card>
+        {/* Per-product breakdown: amount, sales and profit for each product bought */}
+        <ProductBreakdown customerId={id} />
 
         {/* Filters */}
         <FiltersPanel activeCount={activeFilterCount}>

@@ -12,25 +12,35 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, ChevronLeft, ChevronRight, Plus, History } from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card";
+import { FiltersPanel } from "@/components/ui/filters-panel";
+import { ArrowLeft, ChevronLeft, ChevronRight, Plus, History, DollarSign, Package } from "lucide-react";
 import { TableSkeleton } from "@/components/ui/skeleton-patterns";
 import { format } from "date-fns";
 import { useRouter, useParams } from "next/navigation";
 import axios from "axios";
 import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
+import { localDayStartISO, localDayEndISO } from "@/lib/dateUtils";
 
 export default function CompanyPurchasesPage() {
   const router = useRouter();
   const { id } = useParams();
   const [page, setPage] = useState(1);
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
   const limit = 10;
 
   const { data, isLoading, isError } = useQuery({
-    queryKey: ["company-purchases", id, page],
+    queryKey: ["company-purchases", id, page, startDate, endDate],
     queryFn: async () => {
       const res = await axios.get(`/api/companies/${id}/purchases`, {
-        params: { page, limit },
+        params: {
+          page,
+          limit,
+          startDate: localDayStartISO(startDate),
+          endDate: localDayEndISO(endDate),
+        },
       });
       return res.data;
     },
@@ -39,6 +49,8 @@ export default function CompanyPurchasesPage() {
 
   const purchases = data?.purchases || [];
   const totalPages = data?.totalPages || 1;
+  const summary = data?.summary || { totalAmount: 0, totalQuantity: 0 };
+  const activeFilterCount = [startDate, endDate].filter(Boolean).length;
 
   return (
     <div className="min-h-screen bg-gray-50 py-6">
@@ -74,6 +86,78 @@ export default function CompanyPurchasesPage() {
             </Link>
           </div>
         </div>
+
+        {/* Summary for the current filter scope */}
+        <Card className="shadow-sm border-gray-200 mb-6">
+          <CardContent className="p-4 grid grid-cols-2 gap-4">
+            <div className="flex flex-col items-center sm:items-start gap-1">
+              <span className="flex items-center gap-1.5 text-xs font-medium text-gray-500">
+                <DollarSign className="h-3.5 w-3.5" />
+                Total Purchased
+              </span>
+              <span className="text-lg font-bold text-gray-900">
+                ${summary.totalAmount.toLocaleString()}
+              </span>
+            </div>
+            <div className="flex flex-col items-center sm:items-start gap-1">
+              <span className="flex items-center gap-1.5 text-xs font-medium text-gray-500">
+                <Package className="h-3.5 w-3.5" />
+                Units Purchased
+              </span>
+              <span className="text-lg font-bold text-gray-900">
+                {summary.totalQuantity.toLocaleString()}
+              </span>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Filters */}
+        <FiltersPanel activeCount={activeFilterCount}>
+          <Card className="shadow-sm border-gray-200 mb-6">
+            <CardContent className="p-4">
+              <div className="flex flex-col sm:flex-row sm:flex-wrap sm:items-center gap-3 sm:gap-4">
+                <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-2">
+                  <span className="text-sm font-medium text-gray-700">From</span>
+                  <input
+                    type="date"
+                    value={startDate}
+                    onChange={(e) => {
+                      setStartDate(e.target.value);
+                      setPage(1);
+                    }}
+                    className="w-full sm:w-auto border rounded-md text-sm px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+                <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-2">
+                  <span className="text-sm font-medium text-gray-700">To</span>
+                  <input
+                    type="date"
+                    value={endDate}
+                    onChange={(e) => {
+                      setEndDate(e.target.value);
+                      setPage(1);
+                    }}
+                    className="w-full sm:w-auto border rounded-md text-sm px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+                {(startDate || endDate) && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => {
+                      setStartDate("");
+                      setEndDate("");
+                      setPage(1);
+                    }}
+                    className="w-full sm:w-auto justify-center text-gray-500"
+                  >
+                    Clear Filters
+                  </Button>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+        </FiltersPanel>
 
         {isLoading ? (
           <TableSkeleton rows={limit} cols={7} />

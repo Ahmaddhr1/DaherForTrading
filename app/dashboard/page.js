@@ -11,6 +11,7 @@ import TopProducts from "@/components/dashboard/TopProducts";
 import TopCustomers from "@/components/dashboard/TopCustomers";
 import DashboardFilters from "@/components/dashboard/DashboardFilters";
 import SalesTrendsChart from "@/components/dashboard/SalesTrendsChart";
+import RealProfitChart from "@/components/dashboard/RealProfitChart";
 import { getTodayDateString, localDayStartISO, localDayEndISO } from "@/lib/dateUtils";
 
 const DEFAULT_FILTERS = {
@@ -83,6 +84,11 @@ export default function DashboardPage() {
 
         {/* Trends: sales vs purchases vs profit, and order volume, by day/month/year */}
         <SalesTrendsChart />
+
+        {/* Real profit: sum of (selling price - initial cost) per unit sold */}
+        <div className="mb-8">
+          <RealProfitChart />
+        </div>
 
         {/* Top Products & Top Debtors */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">

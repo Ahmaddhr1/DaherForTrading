@@ -24,12 +24,34 @@ export async function GET(req) {
       .skip(skip)
       .limit(limit);
 
+    // Stock value across ALL products matching the search (not just the
+    // current page), so the summary cards reflect the whole inventory.
+    const summaryAgg = await Product.aggregate([
+      { $match: query },
+      {
+        $group: {
+          _id: null,
+          stockValueCost: { $sum: { $multiply: ["$quantity", "$initialPrice"] } },
+          stockValueSelling: { $sum: { $multiply: ["$quantity", "$price"] } },
+          totalUnits: { $sum: "$quantity" },
+        },
+      },
+    ]);
+    const summaryRow = summaryAgg[0] || { stockValueCost: 0, stockValueSelling: 0, totalUnits: 0 };
+    const summary = {
+      stockValueCost: summaryRow.stockValueCost,
+      stockValueSelling: summaryRow.stockValueSelling,
+      potentialProfit: summaryRow.stockValueSelling - summaryRow.stockValueCost,
+      totalUnits: summaryRow.totalUnits,
+    };
+
     return NextResponse.json(
       {
         products,
         total,
         page,
         totalPages: Math.ceil(total / limit),
+        summary,
       },
       { status: 200 }
     );

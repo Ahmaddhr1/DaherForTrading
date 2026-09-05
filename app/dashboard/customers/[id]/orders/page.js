@@ -20,6 +20,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { TableSkeleton } from "@/components/ui/skeleton-patterns";
+import { FiltersPanel } from "@/components/ui/filters-panel";
 import {
   Loader2,
   ArrowLeft,
@@ -29,12 +30,16 @@ import {
   Filter,
   ArrowUpDown,
   ShoppingCart,
+  DollarSign,
+  TrendingUp,
+  Receipt,
 } from "lucide-react";
 import { format } from "date-fns";
 import { useRouter, useParams } from "next/navigation";
 import axios from "axios";
 import { toast } from "sonner";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { localDayStartISO, localDayEndISO } from "@/lib/dateUtils";
 
 const SORT_OPTIONS = [
   { value: "newest", label: "Newest First" },
@@ -55,9 +60,20 @@ export default function CustomerOrdersTable() {
   const [pageSize, setPageSize] = useState(10);
   const [statusFilter, setStatusFilter] = useState("all"); // all | pending | partiallyPaid | paid
   const [sortBy, setSortBy] = useState("newest");
+  const [category, setCategory] = useState("");
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
+
+  const { data: categories = [] } = useQuery({
+    queryKey: ["categories"],
+    queryFn: async () => {
+      const res = await axios.get("/api/categories", { params: { all: true } });
+      return res.data;
+    },
+  });
 
   const { data, isLoading, isError } = useQuery({
-    queryKey: ["customer-orders", id, page, pageSize, statusFilter, sortBy],
+    queryKey: ["customer-orders", id, page, pageSize, statusFilter, sortBy, category, startDate, endDate],
     queryFn: async () => {
       const res = await axios.get(`/api/customers/${id}/orders`, {
         params: {
@@ -65,6 +81,9 @@ export default function CustomerOrdersTable() {
           limit: pageSize,
           status: statusFilter !== "all" ? statusFilter : undefined,
           sort: sortBy,
+          category: category || undefined,
+          startDate: localDayStartISO(startDate),
+          endDate: localDayEndISO(endDate),
         },
       });
       return res.data;
@@ -74,7 +93,16 @@ export default function CustomerOrdersTable() {
 
   useEffect(() => {
     setPage(1);
-  }, [statusFilter, sortBy, pageSize]);
+  }, [statusFilter, sortBy, pageSize, category, startDate, endDate]);
+
+  const hasActiveFilters = category || startDate || endDate;
+  const handleClearFilters = () => {
+    setCategory("");
+    setStartDate("");
+    setEndDate("");
+  };
+  const activeFilterCount = [category, startDate, endDate].filter(Boolean).length;
+  const summary = data?.summary || { totalSales: 0, totalCost: 0, totalProfit: 0, totalQuantity: 0 };
 
   const handleAction = async (action, orderId) => {
     try {
@@ -138,83 +166,177 @@ export default function CustomerOrdersTable() {
           </div>
         </div>
 
-        {/* Filters */}
+        {/* Sales / Cost / Profit summary for the current filter scope */}
         <Card className="shadow-sm border-gray-200 mb-6">
-          <CardContent className="p-4 space-y-4">
-            <div className="flex flex-wrap gap-2">
-              <div className="flex items-center gap-2 mr-2">
-                <Filter className="h-4 w-4 text-gray-500" />
-                <span className="text-sm font-medium text-gray-700">Status:</span>
-              </div>
-
-              <Button
-                variant={statusFilter === "all" ? "default" : "outline"}
-                size="sm"
-                onClick={() => setStatusFilter("all")}
-              >
-                All
-                <Badge variant="secondary" className="ml-1">{totalCount}</Badge>
-              </Button>
-              <Button
-                variant={statusFilter === "pending" ? "default" : "outline"}
-                size="sm"
-                onClick={() => setStatusFilter("pending")}
-              >
-                Pending
-                <Badge variant="secondary" className="ml-1">{counts.pending}</Badge>
-              </Button>
-              <Button
-                variant={statusFilter === "partiallyPaid" ? "default" : "outline"}
-                size="sm"
-                onClick={() => setStatusFilter("partiallyPaid")}
-              >
-                Partially Paid
-                <Badge variant="secondary" className="ml-1">{counts.partiallyPaid}</Badge>
-              </Button>
-              <Button
-                variant={statusFilter === "paid" ? "default" : "outline"}
-                size="sm"
-                onClick={() => setStatusFilter("paid")}
-              >
-                Paid
-                <Badge variant="secondary" className="ml-1">{counts.paid}</Badge>
-              </Button>
+          <CardContent className="p-4 grid grid-cols-2 sm:grid-cols-4 gap-4">
+            <div className="flex flex-col items-center sm:items-start gap-1">
+              <span className="flex items-center gap-1.5 text-xs font-medium text-gray-500">
+                <Receipt className="h-3.5 w-3.5" />
+                Total Sales
+              </span>
+              <span className="text-lg font-bold text-gray-900">
+                ${summary.totalSales.toLocaleString()}
+              </span>
             </div>
-
-            <div className="flex flex-wrap items-center gap-4">
-              <div className="flex items-center gap-2">
-                <ArrowUpDown className="h-4 w-4 text-gray-500" />
-                <span className="text-sm font-medium text-gray-700">Sort by:</span>
-                <select
-                  value={sortBy}
-                  onChange={(e) => setSortBy(e.target.value)}
-                  className="border rounded-md text-sm px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                >
-                  {SORT_OPTIONS.map((option) => (
-                    <option key={option.value} value={option.value}>
-                      {option.label}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div className="flex items-center gap-2">
-                <span className="text-sm font-medium text-gray-700">Per page:</span>
-                <select
-                  value={pageSize}
-                  onChange={(e) => setPageSize(parseInt(e.target.value))}
-                  className="border rounded-md text-sm px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                >
-                  {PAGE_SIZE_OPTIONS.map((size) => (
-                    <option key={size} value={size}>
-                      {size}
-                    </option>
-                  ))}
-                </select>
-              </div>
+            <div className="flex flex-col items-center sm:items-start gap-1">
+              <span className="flex items-center gap-1.5 text-xs font-medium text-gray-500">
+                <DollarSign className="h-3.5 w-3.5" />
+                Total Cost
+              </span>
+              <span className="text-lg font-bold text-gray-900">
+                ${summary.totalCost.toLocaleString()}
+              </span>
+            </div>
+            <div className="flex flex-col items-center sm:items-start gap-1">
+              <span className="flex items-center gap-1.5 text-xs font-medium text-gray-500">
+                <TrendingUp className="h-3.5 w-3.5" />
+                Total Profit
+              </span>
+              <span className={`text-lg font-bold ${summary.totalProfit >= 0 ? "text-green-600" : "text-red-600"}`}>
+                ${summary.totalProfit.toLocaleString()}
+              </span>
+            </div>
+            <div className="flex flex-col items-center sm:items-start gap-1">
+              <span className="flex items-center gap-1.5 text-xs font-medium text-gray-500">
+                <Package className="h-3.5 w-3.5" />
+                Units Sold
+              </span>
+              <span className="text-lg font-bold text-gray-900">
+                {summary.totalQuantity.toLocaleString()}
+              </span>
             </div>
           </CardContent>
         </Card>
+
+        {/* Filters */}
+        <FiltersPanel activeCount={activeFilterCount}>
+          <Card className="shadow-sm border-gray-200 mb-6">
+            <CardContent className="p-4 space-y-4">
+              <div className="flex flex-col sm:flex-row sm:flex-wrap gap-2">
+                <div className="flex items-center gap-2">
+                  <Filter className="h-4 w-4 text-gray-500" />
+                  <span className="text-sm font-medium text-gray-700">Status:</span>
+                </div>
+
+                <Button
+                  variant={statusFilter === "all" ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => setStatusFilter("all")}
+                  className="w-full sm:w-auto justify-center"
+                >
+                  All
+                  <Badge variant="secondary" className="ml-1">{totalCount}</Badge>
+                </Button>
+                <Button
+                  variant={statusFilter === "pending" ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => setStatusFilter("pending")}
+                  className="w-full sm:w-auto justify-center"
+                >
+                  Pending
+                  <Badge variant="secondary" className="ml-1">{counts.pending}</Badge>
+                </Button>
+                <Button
+                  variant={statusFilter === "partiallyPaid" ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => setStatusFilter("partiallyPaid")}
+                  className="w-full sm:w-auto justify-center"
+                >
+                  Partially Paid
+                  <Badge variant="secondary" className="ml-1">{counts.partiallyPaid}</Badge>
+                </Button>
+                <Button
+                  variant={statusFilter === "paid" ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => setStatusFilter("paid")}
+                  className="w-full sm:w-auto justify-center"
+                >
+                  Paid
+                  <Badge variant="secondary" className="ml-1">{counts.paid}</Badge>
+                </Button>
+              </div>
+
+              <div className="flex flex-col sm:flex-row sm:flex-wrap sm:items-center gap-3 sm:gap-4">
+                <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-2">
+                  <span className="text-sm font-medium text-gray-700">Category</span>
+                  <select
+                    value={category}
+                    onChange={(e) => setCategory(e.target.value)}
+                    className="w-full sm:w-auto border rounded-md text-sm px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    <option value="">All Categories</option>
+                    {categories.map((cat) => (
+                      <option key={cat._id} value={cat._id}>{cat.name}</option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-2">
+                  <span className="text-sm font-medium text-gray-700">From</span>
+                  <input
+                    type="date"
+                    value={startDate}
+                    onChange={(e) => setStartDate(e.target.value)}
+                    className="w-full sm:w-auto border rounded-md text-sm px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+                <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-2">
+                  <span className="text-sm font-medium text-gray-700">To</span>
+                  <input
+                    type="date"
+                    value={endDate}
+                    onChange={(e) => setEndDate(e.target.value)}
+                    className="w-full sm:w-auto border rounded-md text-sm px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+
+                <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-2">
+                  <span className="flex items-center gap-1.5 text-sm font-medium text-gray-700">
+                    <ArrowUpDown className="h-4 w-4 text-gray-500" />
+                    Sort by
+                  </span>
+                  <select
+                    value={sortBy}
+                    onChange={(e) => setSortBy(e.target.value)}
+                    className="w-full sm:w-auto border rounded-md text-sm px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    {SORT_OPTIONS.map((option) => (
+                      <option key={option.value} value={option.value}>
+                        {option.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-2">
+                  <span className="text-sm font-medium text-gray-700">Per page</span>
+                  <select
+                    value={pageSize}
+                    onChange={(e) => setPageSize(parseInt(e.target.value))}
+                    className="w-full sm:w-auto border rounded-md text-sm px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    {PAGE_SIZE_OPTIONS.map((size) => (
+                      <option key={size} value={size}>
+                        {size}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {hasActiveFilters && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={handleClearFilters}
+                    className="w-full sm:w-auto justify-center text-gray-500"
+                  >
+                    Clear Filters
+                  </Button>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+        </FiltersPanel>
 
         {isLoading ? (
           <TableSkeleton rows={pageSize} cols={5} />

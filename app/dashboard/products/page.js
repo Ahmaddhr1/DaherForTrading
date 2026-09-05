@@ -20,7 +20,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Search, Package, Plus, Edit, Trash2, ChevronLeft, ChevronRight, Loader2, DollarSign, Box } from "lucide-react";
+import { Search, Package, Plus, Edit, Trash2, ChevronLeft, ChevronRight, Loader2, DollarSign, Box, TrendingUp, Wallet } from "lucide-react";
 
 export default function ProductsPage() {
   // State for search and pagination
@@ -83,6 +83,12 @@ export default function ProductsPage() {
   const products = data?.products || [];
   const totalPages = data?.totalPages || 1;
   const totalCount = data?.total || 0;
+  const summary = data?.summary || {
+    stockValueCost: 0,
+    stockValueSelling: 0,
+    potentialProfit: 0,
+    totalUnits: 0,
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 py-6">
@@ -108,6 +114,54 @@ export default function ProductsPage() {
               </Button>
             </Link>
           </div>
+        </div>
+
+        {/* Stock value / potential profit summary */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+          <Card className="shadow-sm border-gray-200">
+            <CardContent className="p-4 flex flex-col gap-1">
+              <span className="flex items-center gap-1.5 text-xs font-medium text-gray-500">
+                <Wallet className="h-3.5 w-3.5" />
+                Stock Value (Cost)
+              </span>
+              <span className="text-lg font-bold text-gray-900">
+                ${summary.stockValueCost.toLocaleString()}
+              </span>
+            </CardContent>
+          </Card>
+          <Card className="shadow-sm border-gray-200">
+            <CardContent className="p-4 flex flex-col gap-1">
+              <span className="flex items-center gap-1.5 text-xs font-medium text-gray-500">
+                <DollarSign className="h-3.5 w-3.5" />
+                Stock Value (Selling)
+              </span>
+              <span className="text-lg font-bold text-gray-900">
+                ${summary.stockValueSelling.toLocaleString()}
+              </span>
+            </CardContent>
+          </Card>
+          <Card className="shadow-sm border-gray-200">
+            <CardContent className="p-4 flex flex-col gap-1">
+              <span className="flex items-center gap-1.5 text-xs font-medium text-gray-500">
+                <TrendingUp className="h-3.5 w-3.5" />
+                Potential Profit
+              </span>
+              <span className={`text-lg font-bold ${summary.potentialProfit >= 0 ? "text-green-600" : "text-red-600"}`}>
+                ${summary.potentialProfit.toLocaleString()}
+              </span>
+            </CardContent>
+          </Card>
+          <Card className="shadow-sm border-gray-200">
+            <CardContent className="p-4 flex flex-col gap-1">
+              <span className="flex items-center gap-1.5 text-xs font-medium text-gray-500">
+                <Box className="h-3.5 w-3.5" />
+                Units in Stock
+              </span>
+              <span className="text-lg font-bold text-gray-900">
+                {summary.totalUnits.toLocaleString()}
+              </span>
+            </CardContent>
+          </Card>
         </div>
 
         {/* Search Bar */}

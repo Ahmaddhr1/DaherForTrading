@@ -14,6 +14,7 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { FormSkeleton, PageHeaderSkeleton } from "@/components/ui/skeleton-patterns";
 import { Loader2, Package, ArrowLeft, DollarSign, Tag, Box, TrendingUp, PackageCheck } from "lucide-react";
+import ProductHistory from "./ProductHistory";
 
 const fetchProduct = async (id) => {
   const res = await axios.get(`/api/products/${id}`);
@@ -490,6 +491,8 @@ const EditProductPage = () => {
             </Card>
           </div>
         </div>
+
+        <ProductHistory productId={id} />
       </div>
     </div>
   );

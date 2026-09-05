@@ -12,6 +12,8 @@ export async function GET(req, { params }) {
     const { searchParams } = new URL(req.url);
     const page = parseInt(searchParams.get("page")) || 1;
     const limit = parseInt(searchParams.get("limit")) || 10;
+    const startDateParam = searchParams.get("startDate");
+    const endDateParam = searchParams.get("endDate");
     const skip = (page - 1) * limit;
 
     const company = await Company.findById(id).select("name");
@@ -20,11 +22,33 @@ export async function GET(req, { params }) {
     }
 
     const query = { company: id };
+    if (startDateParam || endDateParam) {
+      // The client resolves these to precise instants before sending them
+      // (see lib/dateUtils.js localDayStartISO/localDayEndISO).
+      query.createdAt = {};
+      if (startDateParam) query.createdAt.$gte = new Date(startDateParam);
+      if (endDateParam) query.createdAt.$lte = new Date(endDateParam);
+    }
+
     const total = await Purchase.countDocuments(query);
     const purchases = await Purchase.find(query)
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limit);
+
+    const summaryAgg = await Purchase.aggregate([
+      { $match: query },
+      {
+        $group: {
+          _id: null,
+          totalAmount: { $sum: "$total" },
+          totalQuantity: { $sum: "$quantity" },
+        },
+      },
+    ]);
+    const summary = summaryAgg[0]
+      ? { totalAmount: summaryAgg[0].totalAmount, totalQuantity: summaryAgg[0].totalQuantity }
+      : { totalAmount: 0, totalQuantity: 0 };
 
     return NextResponse.json(
       {
@@ -33,6 +57,7 @@ export async function GET(req, { params }) {
         total,
         page,
         totalPages: Math.ceil(total / limit),
+        summary,
       },
       { status: 200 }
     );

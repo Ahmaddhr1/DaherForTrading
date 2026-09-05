@@ -3,6 +3,7 @@ import { connectToDB } from "@/lib/connectDb";
 import Customer from "@/models/Customers";
 import Payment from "@/models/Payment";
 import { NextResponse } from "next/server";
+import { startOfDayUTC, endOfDayUTC } from "@/lib/dateUtils";
 
 // Create a payment against a customer's outstanding debt.
 export async function POST(req) {
@@ -95,14 +96,10 @@ export async function GET(req) {
     if (startDateParam || endDateParam) {
       query.createdAt = {};
       if (startDateParam) {
-        const start = new Date(startDateParam);
-        start.setHours(0, 0, 0, 0);
-        query.createdAt.$gte = start;
+        query.createdAt.$gte = startOfDayUTC(startDateParam);
       }
       if (endDateParam) {
-        const end = new Date(endDateParam);
-        end.setHours(23, 59, 59, 999);
-        query.createdAt.$lte = end;
+        query.createdAt.$lte = endOfDayUTC(endDateParam);
       }
     }
 

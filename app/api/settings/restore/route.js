@@ -52,31 +52,55 @@ export async function POST(req) {
     );
   }
 
-  const summary = {};
-  const session = await mongoose.startSession();
+  const runRestore = async (session) => {
+    const summary = {};
+    for (const key of recognizedKeys) {
+      const Model = COLLECTION_MODELS[key];
+      const docs = collections[key];
 
-  try {
-    await session.withTransaction(async () => {
-      for (const key of recognizedKeys) {
-        const Model = COLLECTION_MODELS[key];
-        const docs = collections[key];
-
-        await Model.deleteMany({}, { session });
-        if (docs.length > 0) {
-          await Model.insertMany(docs, { session, ordered: true, timestamps: false });
-        }
-        summary[key] = docs.length;
+      await Model.deleteMany({}, session ? { session } : undefined);
+      if (docs.length > 0) {
+        await Model.insertMany(docs, {
+          ...(session ? { session } : {}),
+          ordered: true,
+          timestamps: false,
+        });
       }
-    });
+      summary[key] = docs.length;
+    }
+    return summary;
+  };
+
+  const session = await mongoose.startSession();
+  try {
+    let summary;
+    try {
+      await session.withTransaction(async () => {
+        summary = await runRestore(session);
+      });
+    } catch (txError) {
+      // Self-hosted, non-replica-set MongoDB deployments don't support
+      // transactions at all (every write throws immediately), so a backup
+      // taken from an Atlas/replica-set deployment can never be restored
+      // there via withTransaction. Fall back to a best-effort sequential
+      // restore instead of failing the import outright.
+      const transactionsUnsupported =
+        txError?.code === 20 ||
+        /Transaction numbers are only allowed on a replica set member or mongos/i.test(
+          txError?.message || ""
+        );
+      if (!transactionsUnsupported) throw txError;
+      summary = await runRestore(null);
+    }
+
+    return NextResponse.json({ message: "Backup restored successfully", summary });
   } catch (error) {
     console.error("Restore failed:", error);
     return NextResponse.json(
-      { message: "Restore failed - no data was changed", error: error.message },
+      { message: "Restore failed - data may be incomplete", error: error.message },
       { status: 500 }
     );
   } finally {
     await session.endSession();
   }
-
-  return NextResponse.json({ message: "Backup restored successfully", summary });
 }

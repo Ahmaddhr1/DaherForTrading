@@ -124,3 +124,21 @@ body {
 .header {
   @apply font-bold text-lg;
 }
+
+/* Thermal receipt printing (supermarket-style narrow receipt).
+   The receipt is portalled to a direct child of <body> so that, while
+   body carries the "printing-thermal" class, everything else on the page
+   (sidebar, normal invoice layout, toaster) can be hidden and only the
+   receipt prints - without touching the app's normal print styles. */
+#thermal-receipt-root {
+  display: none;
+}
+
+@media print {
+  body.printing-thermal > *:not(#thermal-receipt-root) {
+    display: none !important;
+  }
+  body.printing-thermal #thermal-receipt-root {
+    display: block !important;
+  }
+}

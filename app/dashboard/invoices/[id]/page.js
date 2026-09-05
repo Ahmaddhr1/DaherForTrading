@@ -1,10 +1,12 @@
 "use client";
 
+import { useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useParams } from "next/navigation";
 import { format } from "date-fns";
-import { User, Package, CreditCard, Calendar, Tag, Printer, MessageCircle } from "lucide-react";
+import { User, Package, CreditCard, Calendar, Tag, Printer, MessageCircle, Receipt } from "lucide-react";
 import { toast } from "sonner";
+import ThermalReceipt from "./ThermalReceipt";
 
 import {
   Table,
@@ -36,6 +38,19 @@ export default function OrderDetailsPage() {
     queryFn: () => fetchOrder(id),
     enabled: !!id,
   });
+
+  // Cleans up the thermal-print body class if the user cancels the print
+  // dialog instead of completing it.
+  useEffect(() => {
+    const handleAfterPrint = () => document.body.classList.remove("printing-thermal");
+    window.addEventListener("afterprint", handleAfterPrint);
+    return () => window.removeEventListener("afterprint", handleAfterPrint);
+  }, []);
+
+  const handlePrintThermal = () => {
+    document.body.classList.add("printing-thermal");
+    window.print();
+  };
 
   if (isLoading) {
     return (
@@ -113,10 +128,14 @@ export default function OrderDetailsPage() {
             <Calendar className="h-4 w-4 mr-1" />
             {format(new Date(order.createdAt), "EEEE, MMMM d, yyyy 'at' h:mm a")}
           </div>
-          <div className="flex gap-2 mt-2">
+          <div className="flex flex-wrap gap-2 mt-2">
             <Button variant="outline" onClick={() => window.print()} className="flex items-center gap-2">
               <Printer className="h-4 w-4" />
               Print
+            </Button>
+            <Button variant="outline" onClick={handlePrintThermal} className="flex items-center gap-2">
+              <Receipt className="h-4 w-4" />
+              Thermal Receipt
             </Button>
             <Button
               onClick={handleShareWhatsApp}
@@ -127,6 +146,8 @@ export default function OrderDetailsPage() {
             </Button>
           </div>
         </div>
+
+        <ThermalReceipt order={order} />
 
         <div className="grid gap-6 lg:grid-cols-3">
           {/* Left Column */}

@@ -11,6 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { CardGridSkeleton } from "@/components/ui/skeleton-patterns";
+import { FiltersPanel } from "@/components/ui/filters-panel";
 import {
   Search,
   User,
@@ -116,6 +117,11 @@ export default function CustomersPage() {
   const totalCount = data?.total || 0;
 
   const isTopDebtorsView = sortBy === "debtDesc" && debtFilter === "hasDebt" && pageSize === 10;
+  const activeFilterCount = [
+    searchTerm,
+    debtFilter !== "all" ? debtFilter : "",
+    sortBy !== "newest" ? sortBy : "",
+  ].filter(Boolean).length;
 
   return (
     <div className="min-h-screen bg-gray-50 py-6">
@@ -143,101 +149,103 @@ export default function CustomersPage() {
         </div>
 
         {/* Search and Filter Section */}
-        <div className="mb-6 space-y-4">
-          {/* Search Bar */}
-          <div className="relative max-w-md">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-            <Input
-              type="text"
-              placeholder="Search customers by name..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10"
-            />
-          </div>
-
-          {/* Debt Filter Buttons */}
-          <div className="flex flex-wrap gap-2">
-            <div className="flex items-center gap-2 mr-4">
-              <Filter className="h-4 w-4 text-gray-500" />
-              <span className="text-sm font-medium text-gray-700">Filter by Debt:</span>
+        <FiltersPanel activeCount={activeFilterCount}>
+          <div className="mb-6 space-y-4">
+            {/* Search Bar */}
+            <div className="relative max-w-md">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+              <Input
+                type="text"
+                placeholder="Search customers by name..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10"
+              />
             </div>
 
-            <Button
-              variant={debtFilter === "all" ? "default" : "outline"}
-              size="sm"
-              onClick={() => setDebtFilter("all")}
-              className="flex items-center gap-2"
-            >
-              <Users className="h-4 w-4" />
-              All Customers
-            </Button>
+            {/* Debt Filter Buttons */}
+            <div className="flex flex-wrap gap-2">
+              <div className="flex items-center gap-2 mr-4">
+                <Filter className="h-4 w-4 text-gray-500" />
+                <span className="text-sm font-medium text-gray-700">Filter by Debt:</span>
+              </div>
 
-            <Button
-              variant={debtFilter === "hasDebt" ? "default" : "outline"}
-              size="sm"
-              onClick={() => setDebtFilter("hasDebt")}
-              className="flex items-center gap-2"
-            >
-              <DollarSign className="h-4 w-4" />
-              Has Debt
-            </Button>
-
-            <Button
-              variant={debtFilter === "noDebt" ? "default" : "outline"}
-              size="sm"
-              onClick={() => setDebtFilter("noDebt")}
-              className="flex items-center gap-2"
-            >
-              <CheckCircle className="h-4 w-4" />
-              No Debt
-            </Button>
-
-            <Button
-              variant={isTopDebtorsView ? "default" : "outline"}
-              size="sm"
-              onClick={handleShowTopDebtors}
-              className="flex items-center gap-2"
-            >
-              <Trophy className="h-4 w-4" />
-              Top 10 Debtors
-            </Button>
-          </div>
-
-          {/* Sort & Page Size */}
-          <div className="flex flex-wrap items-center gap-4">
-            <div className="flex items-center gap-2">
-              <ArrowUpDown className="h-4 w-4 text-gray-500" />
-              <span className="text-sm font-medium text-gray-700">Sort by:</span>
-              <select
-                value={sortBy}
-                onChange={(e) => setSortBy(e.target.value)}
-                className="border rounded-md text-sm px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              <Button
+                variant={debtFilter === "all" ? "default" : "outline"}
+                size="sm"
+                onClick={() => setDebtFilter("all")}
+                className="flex items-center gap-2"
               >
-                {SORT_OPTIONS.map((option) => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
-                  </option>
-                ))}
-              </select>
+                <Users className="h-4 w-4" />
+                All Customers
+              </Button>
+
+              <Button
+                variant={debtFilter === "hasDebt" ? "default" : "outline"}
+                size="sm"
+                onClick={() => setDebtFilter("hasDebt")}
+                className="flex items-center gap-2"
+              >
+                <DollarSign className="h-4 w-4" />
+                Has Debt
+              </Button>
+
+              <Button
+                variant={debtFilter === "noDebt" ? "default" : "outline"}
+                size="sm"
+                onClick={() => setDebtFilter("noDebt")}
+                className="flex items-center gap-2"
+              >
+                <CheckCircle className="h-4 w-4" />
+                No Debt
+              </Button>
+
+              <Button
+                variant={isTopDebtorsView ? "default" : "outline"}
+                size="sm"
+                onClick={handleShowTopDebtors}
+                className="flex items-center gap-2"
+              >
+                <Trophy className="h-4 w-4" />
+                Top 10 Debtors
+              </Button>
             </div>
 
-            <div className="flex items-center gap-2">
-              <span className="text-sm font-medium text-gray-700">Per page:</span>
-              <select
-                value={pageSize}
-                onChange={(e) => setPageSize(parseInt(e.target.value))}
-                className="border rounded-md text-sm px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              >
-                {PAGE_SIZE_OPTIONS.map((size) => (
-                  <option key={size} value={size}>
-                    {size}
-                  </option>
-                ))}
-              </select>
+            {/* Sort & Page Size */}
+            <div className="flex flex-wrap items-center gap-4">
+              <div className="flex items-center gap-2">
+                <ArrowUpDown className="h-4 w-4 text-gray-500" />
+                <span className="text-sm font-medium text-gray-700">Sort by:</span>
+                <select
+                  value={sortBy}
+                  onChange={(e) => setSortBy(e.target.value)}
+                  className="border rounded-md text-sm px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  {SORT_OPTIONS.map((option) => (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <span className="text-sm font-medium text-gray-700">Per page:</span>
+                <select
+                  value={pageSize}
+                  onChange={(e) => setPageSize(parseInt(e.target.value))}
+                  className="border rounded-md text-sm px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  {PAGE_SIZE_OPTIONS.map((size) => (
+                    <option key={size} value={size}>
+                      {size}
+                    </option>
+                  ))}
+                </select>
+              </div>
             </div>
           </div>
-        </div>
+        </FiltersPanel>
 
         {/* Results Count */}
         <div className="mb-4">

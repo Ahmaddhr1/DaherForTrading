@@ -148,43 +148,43 @@ const EditCustomerPage = () => {
             Back to Customers
           </Button>
           
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-blue-100 rounded-lg">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
+            <div className="flex items-center gap-3 min-w-0">
+              <div className="p-2 bg-blue-100 rounded-lg shrink-0">
                 <UserCog className="h-6 w-6 text-blue-600" />
               </div>
-              <div>
-                <h1 className="text-3xl font-bold text-gray-900">Edit Customer</h1>
-                <p className="text-gray-600">Update customer profile and debt information</p>
+              <div className="min-w-0">
+                <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 truncate">Edit Customer</h1>
+                <p className="text-gray-600 text-sm sm:text-base truncate">Update customer profile and debt information</p>
               </div>
             </div>
-            
+
             <div className="flex items-center gap-3">
-              <Link href={`/dashboard/customers/${id}/addorder`}>
-                <Button className="flex items-center gap-2">
+              <Link href={`/dashboard/customers/${id}/addorder`} className="flex-1 sm:flex-none">
+                <Button className="flex items-center gap-2 w-full sm:w-auto justify-center">
                   <Package className="h-4 w-4" />
-                  Create Order
+                  <span className="hidden sm:inline">Create Order</span>
                 </Button>
               </Link>
             </div>
           </div>
 
           {/* Customer Quick Actions */}
-          <div className="flex flex-wrap gap-4 mb-4">
+          <div className="flex flex-col sm:flex-row sm:flex-wrap gap-3 sm:gap-4 mb-4">
             <a
               href={`https://wa.me/${form.phoneNumber}`}
               target="_blank"
               rel="noopener noreferrer"
             >
-              <Button variant="outline" className="flex items-center gap-2">
+              <Button variant="outline" className="flex items-center justify-center gap-2 w-full sm:w-auto">
                 <PhoneCall className="h-4 w-4" />
                 Contact via WhatsApp
               </Button>
             </a>
-            
+
             {ordersCount > 0 && (
               <Link href={`/dashboard/customers/${id}/orders`}>
-                <Button variant="outline" className="flex items-center gap-2">
+                <Button variant="outline" className="flex items-center justify-center gap-2 w-full sm:w-auto">
                   <Eye className="h-4 w-4" />
                   View Orders ({ordersCount})
                 </Button>

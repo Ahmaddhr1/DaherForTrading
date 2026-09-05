@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import axios from "axios";
 import { useParams, useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
@@ -10,17 +10,18 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { toast } from "sonner";
-import { Loader2, ShoppingBag, ArrowLeft } from "lucide-react";
+import { Loader2, ShoppingBag, ArrowLeft, Plus, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { useMutation, useQuery } from "@tanstack/react-query";
+
+let nextRowId = 1;
+const emptyRow = () => ({ id: nextRowId++, productId: "", unitPrice: "", quantity: "1" });
 
 const NewPurchasePage = () => {
   const { id: companyId } = useParams();
   const router = useRouter();
 
-  const [productId, setProductId] = useState("");
-  const [unitPrice, setUnitPrice] = useState("");
-  const [quantity, setQuantity] = useState("1");
+  const [rows, setRows] = useState([emptyRow()]);
   const [paid, setPaid] = useState(true);
 
   const { data: company } = useQuery({
@@ -40,28 +41,42 @@ const NewPurchasePage = () => {
     },
   });
 
-  // Prefill the unit price with the product's current cost when selected
-  useEffect(() => {
-    if (productId) {
-      const product = products.find((p) => p._id === productId);
-      if (product) {
-        setUnitPrice(product.initialPrice?.toString() || "");
-      }
-    }
-  }, [productId, products]);
+  const addRow = () => setRows((prev) => [...prev, emptyRow()]);
+  const removeRow = (id) => setRows((prev) => (prev.length > 1 ? prev.filter((r) => r.id !== id) : prev));
+
+  const updateRow = (id, field, value) => {
+    setRows((prev) =>
+      prev.map((row) => {
+        if (row.id !== id) return row;
+        const updated = { ...row, [field]: value };
+        // Prefill the unit price with the product's current cost when selected
+        if (field === "productId") {
+          const product = products.find((p) => p._id === value);
+          updated.unitPrice = product?.initialPrice?.toString() || "";
+        }
+        return updated;
+      })
+    );
+  };
 
   const mutation = useMutation({
     mutationFn: async () => {
-      const res = await axios.post(`/api/companies/${companyId}/purchases`, {
-        productId,
-        unitPrice: parseFloat(unitPrice),
-        quantity: parseInt(quantity, 10),
-        paid,
-      });
-      return res.data;
+      // Each row is its own Purchase record - post them one at a time so a
+      // failure partway through doesn't leave duplicate stock increments
+      // from a retried Promise.all.
+      for (const row of rows) {
+        await axios.post(`/api/companies/${companyId}/purchases`, {
+          productId: row.productId,
+          unitPrice: parseFloat(row.unitPrice),
+          quantity: parseInt(row.quantity, 10),
+          paid,
+        });
+      }
     },
     onSuccess: () => {
-      toast.success("Purchase recorded successfully!");
+      toast.success(
+        rows.length > 1 ? `${rows.length} purchases recorded successfully!` : "Purchase recorded successfully!"
+      );
       router.push(`/dashboard/companies/${companyId}/purchases`);
     },
     onError: (error) => {
@@ -72,24 +87,28 @@ const NewPurchasePage = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    if (!productId) {
-      toast.error("Please select a product");
-      return;
-    }
-    if (!unitPrice || parseFloat(unitPrice) <= 0) {
-      toast.error("Please enter a valid unit price");
-      return;
-    }
-    if (!quantity || parseInt(quantity, 10) <= 0) {
-      toast.error("Quantity must be at least 1");
-      return;
+    for (const row of rows) {
+      if (!row.productId) {
+        toast.error("Please select a product for every row");
+        return;
+      }
+      if (!row.unitPrice || parseFloat(row.unitPrice) <= 0) {
+        toast.error("Please enter a valid unit price for every row");
+        return;
+      }
+      if (!row.quantity || parseInt(row.quantity, 10) <= 0) {
+        toast.error("Quantity must be at least 1 for every row");
+        return;
+      }
     }
 
     mutation.mutate();
   };
 
-  const total = (parseFloat(unitPrice) || 0) * (parseInt(quantity, 10) || 0);
-  const selectedProduct = products.find((p) => p._id === productId);
+  const total = rows.reduce(
+    (sum, row) => sum + (parseFloat(row.unitPrice) || 0) * (parseInt(row.quantity, 10) || 0),
+    0
+  );
 
   return (
     <div className="min-h-screen bg-gray-50 py-6">
@@ -118,60 +137,87 @@ const NewPurchasePage = () => {
         <Card className="shadow-sm border-gray-200">
           <CardHeader>
             <CardTitle className="text-xl">Purchase Details</CardTitle>
-            <CardDescription>Select the product and enter purchase quantity and pricing</CardDescription>
+            <CardDescription>Select the products and enter purchase quantity and pricing</CardDescription>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-6">
-              <div className="space-y-2">
-                <Label htmlFor="product" className="text-sm font-medium">Product *</Label>
-                <select
-                  id="product"
-                  value={productId}
-                  onChange={(e) => setProductId(e.target.value)}
-                  className="w-full p-2 border rounded-md focus:border-blue-500"
-                  disabled={productsLoading}
-                  required
-                >
-                  <option value="">Select a product</option>
-                  {products.map((product) => (
-                    <option key={product._id} value={product._id}>
-                      {product.name} (current stock: {product.quantity})
-                    </option>
-                  ))}
-                </select>
+              <div className="space-y-4">
+                {rows.map((row, index) => {
+                  const rowProduct = products.find((p) => p._id === row.productId);
+                  return (
+                    <div key={row.id} className="p-4 border rounded-lg bg-gray-50 space-y-4">
+                      <div className="flex items-center justify-between">
+                        <Label className="text-sm font-medium">Product {index + 1} *</Label>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => removeRow(row.id)}
+                          disabled={rows.length <= 1}
+                          className="h-7 w-7 text-red-500 hover:text-red-700 hover:bg-red-50"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+
+                      <select
+                        value={row.productId}
+                        onChange={(e) => updateRow(row.id, "productId", e.target.value)}
+                        className="w-full p-2 border rounded-md focus:border-blue-500"
+                        disabled={productsLoading}
+                        required
+                      >
+                        <option value="">Select a product</option>
+                        {products.map((product) => (
+                          <option key={product._id} value={product._id}>
+                            {product.name} (current stock: {product.quantity})
+                          </option>
+                        ))}
+                      </select>
+
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <Label className="text-sm font-medium">Unit Price ($) *</Label>
+                          <Input
+                            type="text"
+                            inputMode="decimal"
+                            placeholder="0.00"
+                            value={row.unitPrice}
+                            onChange={(e) => updateRow(row.id, "unitPrice", e.target.value.replace(/[^0-9.]/g, ""))}
+                            required
+                          />
+                          {rowProduct && (
+                            <p className="text-xs text-gray-500">
+                              Current cost on file: ${rowProduct.initialPrice?.toFixed(2)}
+                            </p>
+                          )}
+                        </div>
+
+                        <div className="space-y-2">
+                          <Label className="text-sm font-medium">Quantity Purchased *</Label>
+                          <Input
+                            type="number"
+                            min="1"
+                            value={row.quantity}
+                            onChange={(e) => updateRow(row.id, "quantity", e.target.value)}
+                            required
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="unitPrice" className="text-sm font-medium">Unit Price ($) *</Label>
-                  <Input
-                    id="unitPrice"
-                    type="text"
-                    inputMode="decimal"
-                    placeholder="0.00"
-                    value={unitPrice}
-                    onChange={(e) => setUnitPrice(e.target.value.replace(/[^0-9.]/g, ""))}
-                    required
-                  />
-                  {selectedProduct && (
-                    <p className="text-xs text-gray-500">
-                      Current cost on file: ${selectedProduct.initialPrice?.toFixed(2)}
-                    </p>
-                  )}
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="quantity" className="text-sm font-medium">Quantity Purchased *</Label>
-                  <Input
-                    id="quantity"
-                    type="number"
-                    min="1"
-                    value={quantity}
-                    onChange={(e) => setQuantity(e.target.value)}
-                    required
-                  />
-                </div>
-              </div>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={addRow}
+                className="flex items-center gap-2"
+              >
+                <Plus className="h-4 w-4" />
+                Add Another Product
+              </Button>
 
               <Separator />
 

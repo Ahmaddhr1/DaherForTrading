@@ -5,6 +5,7 @@ import React from "react";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { Card, CardContent } from "@/components/ui/card";
+import { getTodayDateString } from "@/lib/dateUtils";
 import { CalendarRange, ListFilter, Trophy, Package } from "lucide-react";
 
 const RANGE_OPTIONS = [
@@ -22,8 +23,6 @@ const PRODUCT_SORT_OPTIONS = [
 ];
 
 const LIMIT_OPTIONS = [5, 10, 20];
-
-const getTodayString = () => new Date().toISOString().split("T")[0];
 
 export default function DashboardFilters({ filters, setFilters }) {
   const { data: categories = [] } = useQuery({
@@ -52,8 +51,8 @@ export default function DashboardFilters({ filters, setFilters }) {
               if (nextRange === "custom") {
                 update({
                   range: nextRange,
-                  startDate: filters.startDate || getTodayString(),
-                  endDate: filters.endDate || getTodayString(),
+                  startDate: filters.startDate || getTodayDateString(),
+                  endDate: filters.endDate || getTodayDateString(),
                 });
               } else {
                 update({ range: nextRange });

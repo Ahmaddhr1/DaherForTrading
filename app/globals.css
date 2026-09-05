@@ -118,6 +118,9 @@
 body {
   @apply bg-background text-foreground;
 }
+html[dir="rtl"] body {
+  font-family: var(--font-arabic), sans-serif;
+}
 .section {
   @apply p-8 md:mt-0 mt-10;
 }

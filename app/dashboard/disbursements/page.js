@@ -12,6 +12,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Modal } from "@/components/ui/modal";
 import { TableSkeleton } from "@/components/ui/skeleton-patterns";
+import { getTodayDateString } from "@/lib/dateUtils";
 import {
   Table,
   TableBody,
@@ -50,8 +51,8 @@ const PAGE_SIZE_OPTIONS = [10, 20, 50];
 export default function DisbursementsPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [category, setCategory] = useState("");
-  const [startDate, setStartDate] = useState("");
-  const [endDate, setEndDate] = useState("");
+  const [startDate, setStartDate] = useState(getTodayDateString());
+  const [endDate, setEndDate] = useState(getTodayDateString());
   const [sortBy, setSortBy] = useState("newest");
   const [pageSize, setPageSize] = useState(10);
   const [currentPage, setCurrentPage] = useState(1);

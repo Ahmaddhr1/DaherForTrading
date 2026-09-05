@@ -3,7 +3,8 @@
 import { useQuery } from "@tanstack/react-query";
 import { useParams } from "next/navigation";
 import { format } from "date-fns";
-import { User, Package, CreditCard, Calendar, Tag, Printer } from "lucide-react";
+import { User, Package, CreditCard, Calendar, Tag, Printer, MessageCircle } from "lucide-react";
+import { toast } from "sonner";
 
 import {
   Table,
@@ -79,6 +80,19 @@ export default function OrderDetailsPage() {
 
   const status = statusConfig[order.status] || statusConfig.unpaid;
 
+  const handleShareWhatsApp = () => {
+    const phoneDigits = order.customer?.phoneNumber?.toString().replace(/\D/g, "");
+    if (!phoneDigits) {
+      toast.error("This customer has no phone number on file");
+      return;
+    }
+
+    const shareUrl = `${window.location.origin}/invoice/${order._id}`;
+    const message = `Hello ${order.customer?.fullName || ""}, here is your invoice: ${shareUrl}`;
+    const waUrl = `https://wa.me/${phoneDigits}?text=${encodeURIComponent(message)}`;
+    window.open(waUrl, "_blank", "noopener,noreferrer");
+  };
+
   return (
     <div className="min-h-screen bg-gray-50/30 py-8">
       <div className="container mx-auto px-4 max-w-4xl">
@@ -99,10 +113,19 @@ export default function OrderDetailsPage() {
             <Calendar className="h-4 w-4 mr-1" />
             {format(new Date(order.createdAt), "EEEE, MMMM d, yyyy 'at' h:mm a")}
           </div>
-          <Button variant="outline" onClick={() => window.print()} className="flex items-center gap-2">
-            <Printer className="h-4 w-4" />
-            Print
-          </Button>
+          <div className="flex gap-2 mt-2">
+            <Button variant="outline" onClick={() => window.print()} className="flex items-center gap-2">
+              <Printer className="h-4 w-4" />
+              Print
+            </Button>
+            <Button
+              onClick={handleShareWhatsApp}
+              className="flex items-center gap-2 bg-green-600 hover:bg-green-700"
+            >
+              <MessageCircle className="h-4 w-4" />
+              Share via WhatsApp
+            </Button>
+          </div>
         </div>
 
         <div className="grid gap-6 lg:grid-cols-3">

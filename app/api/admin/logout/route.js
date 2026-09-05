@@ -2,8 +2,9 @@ import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 
 export async function POST() {
-  const cookieStore = cookies();
-  await cookieStore.set("session", "", {
+  const cookieStore = await cookies();
+  cookieStore.set("session", "", {
+    httpOnly: true,
     path: "/",
     maxAge: 0,
   });

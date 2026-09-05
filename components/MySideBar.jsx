@@ -3,18 +3,21 @@
 import { useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
-import { LogOut, Menu, X, ListCollapse } from "lucide-react";
+import { LogOut, Menu, X, ListCollapse, Languages } from "lucide-react";
 import tabs from "@/lib/SideBarTabs";
 import { toast } from "sonner";
+import { useLanguage } from "@/lib/i18n/LanguageContext";
 
 export function MySideBar() {
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(false);
   const pathname = usePathname();
   const router = useRouter();
+  const { t, language, setLanguage } = useLanguage();
 
   const toggleMobile = () => setIsMobileOpen(!isMobileOpen);
   const toggleCollapse = () => setIsCollapsed(!isCollapsed);
+  const toggleLanguage = () => setLanguage(language === "ar" ? "en" : "ar");
 
   const handleLogout = async() => {
     try {
@@ -40,7 +43,7 @@ export function MySideBar() {
         onClick={() => setIsMobileOpen(false)}
       >
         <span>{tab.icon}</span>
-        {!isCollapsed && <span className="ml-3">{tab.label}</span>}
+        {!isCollapsed && <span className="ms-3">{t(tab.labelKey)}</span>}
       </Link>
     );
   };
@@ -50,7 +53,7 @@ export function MySideBar() {
       {/* Mobile Toggle Button */}
       <button
         onClick={toggleMobile}
-        className="lg:hidden fixed top-4 right-6 z-40 p-2 bg-primary text-white rounded-lg"
+        className="lg:hidden fixed top-4 end-6 z-40 p-2 bg-primary text-white rounded-lg"
         aria-label="Toggle sidebar"
       >
         {isMobileOpen ? <X size={24} /> : <Menu size={24} />}
@@ -66,10 +69,10 @@ export function MySideBar() {
 
       {/* Combined Sidebar */}
       <aside
-        className={`fixed lg:sticky top-0 left-0 h-screen z-40 bg-sidebar text-primary 
+        className={`fixed lg:sticky top-0 start-0 h-screen z-40 bg-sidebar text-primary
                     transition-all duration-300 ease-in-out
-                    ${isMobileOpen ? "translate-x-0" : "-translate-x-full"} 
-                    lg:translate-x-0 
+                    ${isMobileOpen ? "translate-x-0" : "-translate-x-full rtl:translate-x-full"}
+                    lg:translate-x-0
                     ${isCollapsed ? "w-20" : "w-64"}`}
       >
         <div className="flex flex-col h-full">
@@ -81,7 +84,7 @@ export function MySideBar() {
               className="p-2 rounded-lg hover:bg-primary hover:text-white duration-150"
               aria-label={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
             >
-              <ListCollapse className={isCollapsed ? "" : "rotate-180"} />
+              <ListCollapse className={isCollapsed ? "rtl:rotate-180" : "rotate-180 rtl:rotate-0"} />
             </button>
           </div>
 
@@ -92,6 +95,19 @@ export function MySideBar() {
             </div>
           </nav>
 
+          {/* Language Switcher */}
+          <button
+            onClick={toggleLanguage}
+            className={`p-4 border-t border-gray-700 flex items-center hover:bg-primary hover:text-white cursor-pointer duration-150 ${
+              isCollapsed ? "justify-center" : ""
+            }`}
+          >
+            <Languages />
+            {!isCollapsed && (
+              <span className="ms-3">{language === "ar" ? "English" : "العربية"}</span>
+            )}
+          </button>
+
           {/* Footer */}
           <button
             onClick={handleLogout}
@@ -100,7 +116,7 @@ export function MySideBar() {
             }`}
           >
             <LogOut />
-            {!isCollapsed && <span className="ml-3">Logout</span>}
+            {!isCollapsed && <span className="ms-3">{t("nav.logout")}</span>}
           </button>
         </div>
       </aside>

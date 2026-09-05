@@ -6,6 +6,7 @@ import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import DashboardCard from "./DashboardCard";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useLanguage } from "@/lib/i18n/LanguageContext";
 import {
   ShoppingCart,
   Receipt,
@@ -31,6 +32,7 @@ const SectionHeading = ({ children }) => (
 );
 
 const SummaryCards = ({ range = "all", startDate, endDate }) => {
+  const { t } = useLanguage();
   const { data, isLoading, error } = useQuery({
     queryKey: ["dashboard-summary", range, startDate, endDate],
     queryFn: () => fetchSummaryData(range, startDate, endDate),
@@ -69,7 +71,7 @@ const SummaryCards = ({ range = "all", startDate, endDate }) => {
     <div className="space-y-6 mb-8">
       {/* Sales & Orders */}
       <div>
-        <SectionHeading>Sales &amp; Orders</SectionHeading>
+        <SectionHeading>{t("dashboard.salesAndOrders")}</SectionHeading>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           <DashboardCard
             icon={Package}
@@ -97,7 +99,7 @@ const SummaryCards = ({ range = "all", startDate, endDate }) => {
 
       {/* Profit */}
       <div>
-        <SectionHeading>Profit</SectionHeading>
+        <SectionHeading>{t("dashboard.profit")}</SectionHeading>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           <DashboardCard
             icon={TrendingUp}
@@ -125,7 +127,7 @@ const SummaryCards = ({ range = "all", startDate, endDate }) => {
 
       {/* Cash Flow */}
       <div>
-        <SectionHeading>Cash Flow</SectionHeading>
+        <SectionHeading>{t("dashboard.cashFlow")}</SectionHeading>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           <DashboardCard
             icon={netRevenue < 0 ? TrendingDown : TrendingUp}

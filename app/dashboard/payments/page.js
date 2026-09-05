@@ -12,7 +12,7 @@ import { Badge } from "@/components/ui/badge";
 import { Modal } from "@/components/ui/modal";
 import { TableSkeleton } from "@/components/ui/skeleton-patterns";
 import { FiltersPanel } from "@/components/ui/filters-panel";
-import { getTodayDateString } from "@/lib/dateUtils";
+import { getTodayDateString, localDayStartISO, localDayEndISO } from "@/lib/dateUtils";
 import {
   Table,
   TableBody,
@@ -68,8 +68,8 @@ export default function PaymentsPage() {
         page: currentPage,
         limit: pageSize,
         search: searchTerm || undefined,
-        startDate: startDate || undefined,
-        endDate: endDate || undefined,
+        startDate: localDayStartISO(startDate),
+        endDate: localDayEndISO(endDate),
         sort: sortBy,
       };
       Object.keys(params).forEach((key) => params[key] === undefined && delete params[key]);

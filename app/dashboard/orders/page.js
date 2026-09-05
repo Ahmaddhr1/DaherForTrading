@@ -51,20 +51,32 @@ const OrdersPage = () => {
           </CardHeader>
           <CardContent>
             <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-6">
-              <TabsList className="grid grid-cols-4 w-full">
-                <TabsTrigger value="all" className="flex items-center gap-2">
+              <TabsList className="grid grid-cols-2 sm:grid-cols-4 gap-1 w-full h-auto p-1">
+                <TabsTrigger
+                  value="all"
+                  className="flex flex-col sm:flex-row items-center justify-center gap-1 h-14 sm:h-9 px-1 text-xs sm:text-sm whitespace-normal sm:whitespace-nowrap"
+                >
                   <ListOrdered className="h-4 w-4" />
                   All Orders
                 </TabsTrigger>
-                <TabsTrigger value="today" className="flex items-center gap-2">
+                <TabsTrigger
+                  value="today"
+                  className="flex flex-col sm:flex-row items-center justify-center gap-1 h-14 sm:h-9 px-1 text-xs sm:text-sm whitespace-normal sm:whitespace-nowrap"
+                >
                   <Package className="h-4 w-4" />
                   {"Today's"} Orders
                 </TabsTrigger>
-                <TabsTrigger value="pending" className="flex items-center gap-2">
+                <TabsTrigger
+                  value="pending"
+                  className="flex flex-col sm:flex-row items-center justify-center gap-1 h-14 sm:h-9 px-1 text-xs sm:text-sm whitespace-normal sm:whitespace-nowrap"
+                >
                   <Clock className="h-4 w-4" />
                   Pending
                 </TabsTrigger>
-                <TabsTrigger value="partially-paid" className="flex items-center gap-2">
+                <TabsTrigger
+                  value="partially-paid"
+                  className="flex flex-col sm:flex-row items-center justify-center gap-1 h-14 sm:h-9 px-1 text-xs sm:text-sm whitespace-normal sm:whitespace-nowrap"
+                >
                   <DollarSign className="h-4 w-4" />
                   Partially Paid
                 </TabsTrigger>

@@ -11,6 +11,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Modal } from "@/components/ui/modal";
 import { TableSkeleton } from "@/components/ui/skeleton-patterns";
+import { FiltersPanel } from "@/components/ui/filters-panel";
 import { getTodayDateString } from "@/lib/dateUtils";
 import {
   Table,
@@ -105,33 +106,36 @@ export default function PaymentsPage() {
   const totalCount = data?.total || 0;
   const totalCollected = data?.totalCollected || 0;
   const hasActiveFilters = searchTerm || startDate || endDate || sortBy !== "newest";
+  const activeFilterCount = [searchTerm, startDate, endDate, sortBy !== "newest" ? sortBy : ""].filter(
+    Boolean
+  ).length;
 
   return (
     <div className="min-h-screen bg-gray-50 py-6">
       <div className="container mx-auto px-4">
         {/* Header */}
         <div className="mb-8">
-          <div className="flex items-center justify-between flex-wrap gap-4">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-blue-100 rounded-lg">
+          <div className="flex items-center justify-between gap-3">
+            <div className="flex items-center gap-3 min-w-0">
+              <div className="p-2 bg-blue-100 rounded-lg shrink-0">
                 <Wallet className="h-6 w-6 text-blue-600" />
               </div>
-              <div>
-                <h1 className="text-3xl font-bold text-gray-900">Payments</h1>
-                <p className="text-gray-600">Payment history across all customers</p>
+              <div className="min-w-0">
+                <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 truncate">Payments</h1>
+                <p className="text-gray-600 text-sm sm:text-base truncate">Payment history across all customers</p>
               </div>
             </div>
 
-            <Button onClick={() => setIsModalOpen(true)} className="bg-blue-600 hover:bg-blue-700 flex items-center gap-2">
+            <Button onClick={() => setIsModalOpen(true)} className="bg-blue-600 hover:bg-blue-700 flex items-center gap-2 shrink-0">
               <Plus className="h-4 w-4" />
-              Make a Payment
+              <span className="hidden sm:inline">Make a Payment</span>
             </Button>
           </div>
         </div>
 
         {/* Summary */}
         <Card className="shadow-sm border-gray-200 mb-6">
-          <CardContent className="p-4 flex items-center justify-between flex-wrap gap-4">
+          <CardContent className="p-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
             <div className="flex items-center gap-2 text-gray-700">
               <History className="h-4 w-4 text-gray-500" />
               <span className="text-sm font-medium">
@@ -146,78 +150,80 @@ export default function PaymentsPage() {
         </Card>
 
         {/* Filters */}
-        <Card className="shadow-sm border-gray-200 mb-6">
-          <CardContent className="p-4 space-y-4">
-            <div className="relative max-w-md">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-              <Input
-                type="text"
-                placeholder="Search by customer name..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10"
-              />
-            </div>
-
-            <div className="flex flex-wrap items-center gap-4">
-              <div className="flex items-center gap-2">
-                <Filter className="h-4 w-4 text-gray-500" />
-                <span className="text-sm font-medium text-gray-700">From:</span>
-                <input
-                  type="date"
-                  value={startDate}
-                  onChange={(e) => setStartDate(e.target.value)}
-                  className="border rounded-md text-sm px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-                <span className="text-sm font-medium text-gray-700">To:</span>
-                <input
-                  type="date"
-                  value={endDate}
-                  onChange={(e) => setEndDate(e.target.value)}
-                  className="border rounded-md text-sm px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500"
+        <FiltersPanel activeCount={activeFilterCount}>
+          <Card className="shadow-sm border-gray-200 mb-6">
+            <CardContent className="p-4 space-y-4">
+              <div className="relative max-w-md">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+                <Input
+                  type="text"
+                  placeholder="Search by customer name..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-10"
                 />
               </div>
 
-              <div className="flex items-center gap-2">
-                <ArrowUpDown className="h-4 w-4 text-gray-500" />
-                <span className="text-sm font-medium text-gray-700">Sort by:</span>
-                <select
-                  value={sortBy}
-                  onChange={(e) => setSortBy(e.target.value)}
-                  className="border rounded-md text-sm px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                >
-                  {SORT_OPTIONS.map((option) => (
-                    <option key={option.value} value={option.value}>
-                      {option.label}
-                    </option>
-                  ))}
-                </select>
-              </div>
+              <div className="flex flex-wrap items-center gap-4">
+                <div className="flex flex-wrap items-center gap-2">
+                  <Filter className="h-4 w-4 text-gray-500" />
+                  <span className="text-sm font-medium text-gray-700">From:</span>
+                  <input
+                    type="date"
+                    value={startDate}
+                    onChange={(e) => setStartDate(e.target.value)}
+                    className="border rounded-md text-sm px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                  <span className="text-sm font-medium text-gray-700">To:</span>
+                  <input
+                    type="date"
+                    value={endDate}
+                    onChange={(e) => setEndDate(e.target.value)}
+                    className="border rounded-md text-sm px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
 
-              <div className="flex items-center gap-2">
-                <span className="text-sm font-medium text-gray-700">Per page:</span>
-                <select
-                  value={pageSize}
-                  onChange={(e) => setPageSize(parseInt(e.target.value))}
-                  className="border rounded-md text-sm px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                >
-                  {PAGE_SIZE_OPTIONS.map((size) => (
-                    <option key={size} value={size}>
-                      {size}
-                    </option>
-                  ))}
-                </select>
-              </div>
+                <div className="flex items-center gap-2">
+                  <ArrowUpDown className="h-4 w-4 text-gray-500" />
+                  <span className="text-sm font-medium text-gray-700">Sort by:</span>
+                  <select
+                    value={sortBy}
+                    onChange={(e) => setSortBy(e.target.value)}
+                    className="border rounded-md text-sm px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    {SORT_OPTIONS.map((option) => (
+                      <option key={option.value} value={option.value}>
+                        {option.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
 
-              {hasActiveFilters && (
-                <Button variant="ghost" size="sm" onClick={handleClearFilters} className="flex items-center gap-1 text-gray-500">
-                  <X className="h-3 w-3" />
-                  Clear Filters
-                </Button>
-              )}
-            </div>
-          </CardContent>
-        </Card>
+                <div className="flex items-center gap-2">
+                  <span className="text-sm font-medium text-gray-700">Per page:</span>
+                  <select
+                    value={pageSize}
+                    onChange={(e) => setPageSize(parseInt(e.target.value))}
+                    className="border rounded-md text-sm px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    {PAGE_SIZE_OPTIONS.map((size) => (
+                      <option key={size} value={size}>
+                        {size}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {hasActiveFilters && (
+                  <Button variant="ghost" size="sm" onClick={handleClearFilters} className="flex items-center gap-1 text-gray-500">
+                    <X className="h-3 w-3" />
+                    Clear Filters
+                  </Button>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+        </FiltersPanel>
 
         {/* History Table */}
         {isLoading ? (

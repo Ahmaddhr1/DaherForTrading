@@ -5,6 +5,7 @@ import React from "react";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { Card, CardContent } from "@/components/ui/card";
+import { FiltersPanel } from "@/components/ui/filters-panel";
 import { getTodayDateString } from "@/lib/dateUtils";
 import { CalendarRange, ListFilter, Trophy, Package } from "lucide-react";
 
@@ -35,7 +36,14 @@ export default function DashboardFilters({ filters, setFilters }) {
 
   const update = (patch) => setFilters((prev) => ({ ...prev, ...patch }));
 
+  const activeFilterCount = [
+    filters.range !== "all" ? filters.range : "",
+    filters.topProductsCategory,
+    filters.topCustomersMinDebt > 0 ? filters.topCustomersMinDebt : "",
+  ].filter(Boolean).length;
+
   return (
+    <FiltersPanel activeCount={activeFilterCount}>
     <Card className="shadow-sm border-gray-200 mb-8">
       <CardContent className="p-4 space-y-4">
         {/* Date Range */}
@@ -161,5 +169,6 @@ export default function DashboardFilters({ filters, setFilters }) {
         </div>
       </CardContent>
     </Card>
+    </FiltersPanel>
   );
 }

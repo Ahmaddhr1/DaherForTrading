@@ -11,6 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { CardGridSkeleton } from "@/components/ui/skeleton-patterns";
+import { FiltersPanel } from "@/components/ui/filters-panel";
 import {
   Search,
   Building2,
@@ -23,6 +24,7 @@ import {
   CheckCircle,
   ArrowUpDown,
   Trophy,
+  Plus,
 } from "lucide-react";
 
 const SORT_OPTIONS = [
@@ -100,6 +102,11 @@ export default function CompaniesPage() {
   const totalPages = data?.totalPages || 1;
   const totalCount = data?.total || 0;
   const isTopDebtView = sortBy === "debtDesc" && debtFilter === "hasDebt" && pageSize === 10;
+  const activeFilterCount = [
+    searchTerm,
+    debtFilter !== "all" ? debtFilter : "",
+    sortBy !== "newest" ? sortBy : "",
+  ].filter(Boolean).length;
 
   return (
     <div className="min-h-screen bg-gray-50 py-6">
@@ -107,118 +114,123 @@ export default function CompaniesPage() {
 
         {/* Page Header */}
         <div className="mb-8">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-blue-100 rounded-lg">
+          <div className="flex items-center justify-between gap-3">
+            <div className="flex items-center gap-3 min-w-0">
+              <div className="p-2 bg-blue-100 rounded-lg shrink-0">
                 <Building2 className="h-6 w-6 text-blue-600" />
               </div>
-              <div>
-                <h1 className="text-3xl font-bold text-gray-900">Companies</h1>
-                <p className="text-gray-600">Manage your suppliers and purchase history</p>
+              <div className="min-w-0">
+                <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 truncate">Companies</h1>
+                <p className="text-gray-600 text-sm sm:text-base truncate">Manage your suppliers and purchase history</p>
               </div>
             </div>
 
             <Link href="/dashboard/companies/create">
-              <Button className="bg-blue-600 hover:bg-blue-700">
-                + Add Company
+              <Button className="bg-blue-600 hover:bg-blue-700 flex items-center gap-2 shrink-0">
+                <Plus className="h-4 w-4" />
+                <span className="hidden sm:inline">Add Company</span>
               </Button>
             </Link>
           </div>
         </div>
 
         {/* Search and Filter Section */}
-        <div className="mb-6 space-y-4">
-          <div className="relative max-w-md">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-            <Input
-              type="text"
-              placeholder="Search companies by name..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10"
-            />
-          </div>
-
-          <div className="flex flex-wrap gap-2">
-            <div className="flex items-center gap-2 mr-4">
-              <Filter className="h-4 w-4 text-gray-500" />
-              <span className="text-sm font-medium text-gray-700">Filter by Debt We Owe:</span>
+        <FiltersPanel activeCount={activeFilterCount}>
+          <div className="mb-6 space-y-4">
+            <div className="relative max-w-md">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+              <Input
+                type="text"
+                placeholder="Search companies by name..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10"
+              />
             </div>
 
-            <Button
-              variant={debtFilter === "all" ? "default" : "outline"}
-              size="sm"
-              onClick={() => setDebtFilter("all")}
-              className="flex items-center gap-2"
-            >
-              <Building2 className="h-4 w-4" />
-              All Companies
-            </Button>
+            <div className="flex flex-col sm:flex-row sm:flex-wrap gap-2">
+              <div className="flex items-center gap-2">
+                <Filter className="h-4 w-4 text-gray-500" />
+                <span className="text-sm font-medium text-gray-700">Filter by Debt We Owe:</span>
+              </div>
 
-            <Button
-              variant={debtFilter === "hasDebt" ? "default" : "outline"}
-              size="sm"
-              onClick={() => setDebtFilter("hasDebt")}
-              className="flex items-center gap-2"
-            >
-              <DollarSign className="h-4 w-4" />
-              We Owe Them
-            </Button>
-
-            <Button
-              variant={debtFilter === "noDebt" ? "default" : "outline"}
-              size="sm"
-              onClick={() => setDebtFilter("noDebt")}
-              className="flex items-center gap-2"
-            >
-              <CheckCircle className="h-4 w-4" />
-              Settled
-            </Button>
-
-            <Button
-              variant={isTopDebtView ? "default" : "outline"}
-              size="sm"
-              onClick={handleShowTopDebts}
-              className="flex items-center gap-2"
-            >
-              <Trophy className="h-4 w-4" />
-              Top 10 We Owe
-            </Button>
-          </div>
-
-          <div className="flex flex-wrap items-center gap-4">
-            <div className="flex items-center gap-2">
-              <ArrowUpDown className="h-4 w-4 text-gray-500" />
-              <span className="text-sm font-medium text-gray-700">Sort by:</span>
-              <select
-                value={sortBy}
-                onChange={(e) => setSortBy(e.target.value)}
-                className="border rounded-md text-sm px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              <Button
+                variant={debtFilter === "all" ? "default" : "outline"}
+                size="sm"
+                onClick={() => setDebtFilter("all")}
+                className="flex items-center justify-center gap-2 w-full sm:w-auto"
               >
-                {SORT_OPTIONS.map((option) => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
-                  </option>
-                ))}
-              </select>
+                <Building2 className="h-4 w-4" />
+                All Companies
+              </Button>
+
+              <Button
+                variant={debtFilter === "hasDebt" ? "default" : "outline"}
+                size="sm"
+                onClick={() => setDebtFilter("hasDebt")}
+                className="flex items-center justify-center gap-2 w-full sm:w-auto"
+              >
+                <DollarSign className="h-4 w-4" />
+                We Owe Them
+              </Button>
+
+              <Button
+                variant={debtFilter === "noDebt" ? "default" : "outline"}
+                size="sm"
+                onClick={() => setDebtFilter("noDebt")}
+                className="flex items-center justify-center gap-2 w-full sm:w-auto"
+              >
+                <CheckCircle className="h-4 w-4" />
+                Settled
+              </Button>
+
+              <Button
+                variant={isTopDebtView ? "default" : "outline"}
+                size="sm"
+                onClick={handleShowTopDebts}
+                className="flex items-center justify-center gap-2 w-full sm:w-auto"
+              >
+                <Trophy className="h-4 w-4" />
+                Top 10 We Owe
+              </Button>
             </div>
 
-            <div className="flex items-center gap-2">
-              <span className="text-sm font-medium text-gray-700">Per page:</span>
-              <select
-                value={pageSize}
-                onChange={(e) => setPageSize(parseInt(e.target.value))}
-                className="border rounded-md text-sm px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              >
-                {PAGE_SIZE_OPTIONS.map((size) => (
-                  <option key={size} value={size}>
-                    {size}
-                  </option>
-                ))}
-              </select>
+            <div className="flex flex-col sm:flex-row sm:flex-wrap sm:items-center gap-3 sm:gap-4">
+              <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-2">
+                <span className="flex items-center gap-1.5 text-sm font-medium text-gray-700">
+                  <ArrowUpDown className="h-4 w-4 text-gray-500" />
+                  Sort by
+                </span>
+                <select
+                  value={sortBy}
+                  onChange={(e) => setSortBy(e.target.value)}
+                  className="w-full sm:w-auto border rounded-md text-sm px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  {SORT_OPTIONS.map((option) => (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-2">
+                <span className="text-sm font-medium text-gray-700">Per page</span>
+                <select
+                  value={pageSize}
+                  onChange={(e) => setPageSize(parseInt(e.target.value))}
+                  className="w-full sm:w-auto border rounded-md text-sm px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  {PAGE_SIZE_OPTIONS.map((size) => (
+                    <option key={size} value={size}>
+                      {size}
+                    </option>
+                  ))}
+                </select>
+              </div>
             </div>
           </div>
-        </div>
+        </FiltersPanel>
 
         {/* Results Count */}
         <div className="mb-4">

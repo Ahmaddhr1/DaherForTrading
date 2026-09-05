@@ -164,32 +164,38 @@ export default function PaymentsPage() {
                 />
               </div>
 
-              <div className="flex flex-wrap items-center gap-4">
-                <div className="flex flex-wrap items-center gap-2">
-                  <Filter className="h-4 w-4 text-gray-500" />
-                  <span className="text-sm font-medium text-gray-700">From:</span>
+              <div className="flex flex-col sm:flex-row sm:flex-wrap sm:items-center gap-3 sm:gap-4">
+                <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-2">
+                  <span className="flex items-center gap-1.5 text-sm font-medium text-gray-700">
+                    <Filter className="h-4 w-4 text-gray-500" />
+                    From
+                  </span>
                   <input
                     type="date"
                     value={startDate}
                     onChange={(e) => setStartDate(e.target.value)}
-                    className="border rounded-md text-sm px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full sm:w-auto border rounded-md text-sm px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
-                  <span className="text-sm font-medium text-gray-700">To:</span>
+                </div>
+                <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-2">
+                  <span className="text-sm font-medium text-gray-700">To</span>
                   <input
                     type="date"
                     value={endDate}
                     onChange={(e) => setEndDate(e.target.value)}
-                    className="border rounded-md text-sm px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full sm:w-auto border rounded-md text-sm px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
 
-                <div className="flex items-center gap-2">
-                  <ArrowUpDown className="h-4 w-4 text-gray-500" />
-                  <span className="text-sm font-medium text-gray-700">Sort by:</span>
+                <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-2">
+                  <span className="flex items-center gap-1.5 text-sm font-medium text-gray-700">
+                    <ArrowUpDown className="h-4 w-4 text-gray-500" />
+                    Sort by
+                  </span>
                   <select
                     value={sortBy}
                     onChange={(e) => setSortBy(e.target.value)}
-                    className="border rounded-md text-sm px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full sm:w-auto border rounded-md text-sm px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   >
                     {SORT_OPTIONS.map((option) => (
                       <option key={option.value} value={option.value}>
@@ -199,12 +205,12 @@ export default function PaymentsPage() {
                   </select>
                 </div>
 
-                <div className="flex items-center gap-2">
-                  <span className="text-sm font-medium text-gray-700">Per page:</span>
+                <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-2">
+                  <span className="text-sm font-medium text-gray-700">Per page</span>
                   <select
                     value={pageSize}
                     onChange={(e) => setPageSize(parseInt(e.target.value))}
-                    className="border rounded-md text-sm px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full sm:w-auto border rounded-md text-sm px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   >
                     {PAGE_SIZE_OPTIONS.map((size) => (
                       <option key={size} value={size}>
@@ -215,7 +221,12 @@ export default function PaymentsPage() {
                 </div>
 
                 {hasActiveFilters && (
-                  <Button variant="ghost" size="sm" onClick={handleClearFilters} className="flex items-center gap-1 text-gray-500">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={handleClearFilters}
+                    className="flex items-center justify-center gap-1 text-gray-500 w-full sm:w-auto"
+                  >
                     <X className="h-3 w-3" />
                     Clear Filters
                   </Button>

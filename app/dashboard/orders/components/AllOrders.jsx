@@ -171,49 +171,71 @@ export default function AllOrders() {
               />
             </div>
 
-            <div className="flex flex-wrap gap-2">
-              <div className="flex items-center gap-2 mr-2">
+            <div className="flex flex-col sm:flex-row sm:flex-wrap gap-2">
+              <div className="flex items-center gap-2">
                 <Filter className="h-4 w-4 text-gray-500" />
                 <span className="text-sm font-medium text-gray-700">Status:</span>
               </div>
-              <Button variant={statusFilter === "all" ? "default" : "outline"} size="sm" onClick={() => setStatusFilter("all")}>
+              <Button
+                variant={statusFilter === "all" ? "default" : "outline"}
+                size="sm"
+                onClick={() => setStatusFilter("all")}
+                className="w-full sm:w-auto justify-center"
+              >
                 All
                 <Badge variant="secondary" className="ml-1">{totalCount}</Badge>
               </Button>
-              <Button variant={statusFilter === "pending" ? "default" : "outline"} size="sm" onClick={() => setStatusFilter("pending")}>
+              <Button
+                variant={statusFilter === "pending" ? "default" : "outline"}
+                size="sm"
+                onClick={() => setStatusFilter("pending")}
+                className="w-full sm:w-auto justify-center"
+              >
                 Pending
                 <Badge variant="secondary" className="ml-1">{counts.pending}</Badge>
               </Button>
-              <Button variant={statusFilter === "partiallyPaid" ? "default" : "outline"} size="sm" onClick={() => setStatusFilter("partiallyPaid")}>
+              <Button
+                variant={statusFilter === "partiallyPaid" ? "default" : "outline"}
+                size="sm"
+                onClick={() => setStatusFilter("partiallyPaid")}
+                className="w-full sm:w-auto justify-center"
+              >
                 Partially Paid
                 <Badge variant="secondary" className="ml-1">{counts.partiallyPaid}</Badge>
               </Button>
-              <Button variant={statusFilter === "paid" ? "default" : "outline"} size="sm" onClick={() => setStatusFilter("paid")}>
+              <Button
+                variant={statusFilter === "paid" ? "default" : "outline"}
+                size="sm"
+                onClick={() => setStatusFilter("paid")}
+                className="w-full sm:w-auto justify-center"
+              >
                 Paid
                 <Badge variant="secondary" className="ml-1">{counts.paid}</Badge>
               </Button>
             </div>
 
-            <div className="flex flex-wrap items-center gap-4">
-              <div className="flex items-center gap-2">
-                <ArrowUpDown className="h-4 w-4 text-gray-500" />
-                <span className="text-sm font-medium text-gray-700">Sort by:</span>
+            <div className="flex flex-col sm:flex-row sm:flex-wrap sm:items-center gap-3 sm:gap-4">
+              <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-2">
+                <span className="flex items-center gap-1.5 text-sm font-medium text-gray-700">
+                  <ArrowUpDown className="h-4 w-4 text-gray-500" />
+                  Sort by
+                </span>
                 <select
                   value={sortBy}
                   onChange={(e) => setSortBy(e.target.value)}
-                  className="border rounded-md text-sm px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full sm:w-auto border rounded-md text-sm px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
                   {SORT_OPTIONS.map((option) => (
                     <option key={option.value} value={option.value}>{option.label}</option>
                   ))}
                 </select>
               </div>
-              <div className="flex items-center gap-2">
-                <span className="text-sm font-medium text-gray-700">Per page:</span>
+              <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-2">
+                <span className="text-sm font-medium text-gray-700">Per page</span>
                 <select
                   value={pageSize}
                   onChange={(e) => setPageSize(parseInt(e.target.value))}
-                  className="border rounded-md text-sm px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full sm:w-auto border rounded-md text-sm px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
                   {PAGE_SIZE_OPTIONS.map((size) => (
                     <option key={size} value={size}>{size}</option>

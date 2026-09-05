@@ -20,10 +20,11 @@ import {
   FileJson,
   AlertTriangle,
 } from "lucide-react";
-import { useLanguage } from "@/lib/i18n/LanguageContext";
+
+const RESTORE_WARNING =
+  "This will permanently replace all current customers, orders, products, categories, companies, purchases, payments, and disbursements with the contents of this file. This cannot be undone. Continue?";
 
 export default function SettingsPage() {
-  const { t } = useLanguage();
   const queryClient = useQueryClient();
 
   const [passwordForm, setPasswordForm] = useState({
@@ -138,7 +139,7 @@ export default function SettingsPage() {
 
   const handleRestore = () => {
     if (!restoreFile) return;
-    if (!window.confirm(t("settings.restoreWarning"))) return;
+    if (!window.confirm(RESTORE_WARNING)) return;
 
     const reader = new FileReader();
     reader.onload = () => {
@@ -162,8 +163,8 @@ export default function SettingsPage() {
               <SettingsIcon className="h-6 w-6 text-blue-600" />
             </div>
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">{t("settings.title")}</h1>
-              <p className="text-gray-600">{t("settings.subtitle")}</p>
+              <h1 className="text-3xl font-bold text-gray-900">Settings</h1>
+              <p className="text-gray-600">Manage your account and data</p>
             </div>
           </div>
         </div>
@@ -173,14 +174,14 @@ export default function SettingsPage() {
           <CardHeader>
             <CardTitle className="text-lg flex items-center gap-2">
               <Lock className="h-5 w-5 text-blue-600" />
-              {t("settings.changePassword")}
+              Change Password
             </CardTitle>
-            <CardDescription>{t("settings.changePasswordDesc")}</CardDescription>
+            <CardDescription>Update the password used to log in to this dashboard</CardDescription>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="currentPassword">{t("settings.currentPassword")}</Label>
+                <Label htmlFor="currentPassword">Current Password</Label>
                 <Input
                   id="currentPassword"
                   name="currentPassword"
@@ -195,7 +196,7 @@ export default function SettingsPage() {
               <Separator />
 
               <div className="space-y-2">
-                <Label htmlFor="newPassword">{t("settings.newPassword")}</Label>
+                <Label htmlFor="newPassword">New Password</Label>
                 <Input
                   id="newPassword"
                   name="newPassword"
@@ -209,7 +210,7 @@ export default function SettingsPage() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="confirmPassword">{t("settings.confirmPassword")}</Label>
+                <Label htmlFor="confirmPassword">Confirm New Password</Label>
                 <Input
                   id="confirmPassword"
                   name="confirmPassword"
@@ -232,7 +233,7 @@ export default function SettingsPage() {
                     Updating...
                   </span>
                 ) : (
-                  t("settings.updatePassword")
+                  "Update Password"
                 )}
               </Button>
             </form>
@@ -244,9 +245,12 @@ export default function SettingsPage() {
           <CardHeader>
             <CardTitle className="text-lg flex items-center gap-2">
               <DatabaseBackup className="h-5 w-5 text-green-600" />
-              {t("settings.backup")}
+              Database Backup
             </CardTitle>
-            <CardDescription>{t("settings.backupDesc")}</CardDescription>
+            <CardDescription>
+              Download a full copy of your business data (customers, orders, products,
+              categories, companies, purchases, payments, and disbursements) as a JSON file
+            </CardDescription>
           </CardHeader>
           <CardContent>
             <Button
@@ -263,7 +267,7 @@ export default function SettingsPage() {
               ) : (
                 <>
                   <DatabaseBackup className="h-4 w-4" />
-                  {t("settings.downloadBackup")}
+                  Download Backup
                 </>
               )}
             </Button>
@@ -279,14 +283,17 @@ export default function SettingsPage() {
           <CardHeader>
             <CardTitle className="text-lg flex items-center gap-2">
               <Upload className="h-5 w-5 text-amber-600" />
-              {t("settings.restore")}
+              Import Backup
             </CardTitle>
-            <CardDescription>{t("settings.restoreDesc")}</CardDescription>
+            <CardDescription>
+              Restore your business data from a previously downloaded backup file. This
+              replaces all current data.
+            </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 flex items-start gap-2">
               <AlertTriangle className="h-4 w-4 text-amber-600 shrink-0 mt-0.5" />
-              <p className="text-xs text-amber-800">{t("settings.restoreWarning")}</p>
+              <p className="text-xs text-amber-800">{RESTORE_WARNING}</p>
             </div>
 
             <div className="space-y-2">
@@ -306,7 +313,7 @@ export default function SettingsPage() {
                   className="flex items-center gap-2"
                 >
                   <FileJson className="h-4 w-4" />
-                  {t("settings.chooseFile")}
+                  Choose Backup File
                 </Button>
                 {restoreFile && (
                   <Badge variant="outline" className="flex items-center gap-1">
@@ -331,7 +338,7 @@ export default function SettingsPage() {
               ) : (
                 <>
                   <Upload className="h-4 w-4" />
-                  {t("settings.restoreButton")}
+                  Restore from Backup
                 </>
               )}
             </Button>

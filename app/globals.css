@@ -118,18 +118,9 @@
 body {
   @apply bg-background text-foreground;
 }
-html[dir="rtl"] body {
-  font-family: var(--font-arabic), sans-serif;
-}
 .section {
   @apply p-8 md:mt-0 mt-10;
 }
 .header {
   @apply font-bold text-lg;
-}
-.uploadthing-upload-button {
-  @apply border-2 border-black bg-gray-900;
-  border-radius: 8px !important;
-  padding: 8px 12px !important;
-  font-weight: 600 !important;
 }

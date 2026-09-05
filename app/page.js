@@ -7,9 +7,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Loader2, Lock, User, ShieldCheck, Languages } from "lucide-react";
+import { Loader2, Lock, User, ShieldCheck } from "lucide-react";
 import { toast } from "sonner";
-import { useLanguage } from "@/lib/i18n/LanguageContext";
 
 export default function LoginPage() {
   const [formData, setFormData] = useState({
@@ -17,7 +16,6 @@ export default function LoginPage() {
     password: ""
   });
   const router = useRouter();
-  const { t, language, setLanguage } = useLanguage();
 
   const loginMutation = useMutation({
     mutationFn: async () => {
@@ -70,42 +68,33 @@ export default function LoginPage() {
   const isFormValid = formData.username.trim() && formData.password.trim();
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4 relative">
-      <button
-        type="button"
-        onClick={() => setLanguage(language === "ar" ? "en" : "ar")}
-        className="absolute top-4 end-4 flex items-center gap-2 text-sm text-gray-600 hover:text-gray-900 bg-white border border-gray-200 rounded-lg px-3 py-1.5 shadow-sm"
-      >
-        <Languages className="h-4 w-4" />
-        {language === "ar" ? "English" : "العربية"}
-      </button>
-
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
       <div className="w-full max-w-md">
         <div className="flex flex-col items-center mb-6">
           <div className="p-3 bg-blue-100 rounded-xl mb-3">
             <ShieldCheck className="h-8 w-8 text-blue-600" />
           </div>
-          <h1 className="text-2xl font-bold text-gray-900">{t("login.title")}</h1>
-          <p className="text-gray-600 text-sm mt-1">{t("login.subtitle")}</p>
+          <h1 className="text-2xl font-bold text-gray-900">MDT Admin Panel</h1>
+          <p className="text-gray-600 text-sm mt-1">Sign in to manage your business</p>
         </div>
 
         <Card className="shadow-sm border-gray-200">
           <CardHeader>
-            <CardTitle className="text-lg">{t("login.welcome")}</CardTitle>
-            <CardDescription>{t("login.description")}</CardDescription>
+            <CardTitle className="text-lg">Welcome back</CardTitle>
+            <CardDescription>Enter your credentials to continue</CardDescription>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="username" className="text-sm font-medium flex items-center gap-2">
                   <User className="h-4 w-4" />
-                  {t("login.username")}
+                  Username
                 </Label>
                 <Input
                   id="username"
                   type="text"
                   name="username"
-                  placeholder={t("login.usernamePlaceholder")}
+                  placeholder="Enter your username"
                   value={formData.username}
                   onChange={handleChange}
                   disabled={isLoading}
@@ -118,13 +107,13 @@ export default function LoginPage() {
               <div className="space-y-2">
                 <Label htmlFor="password" className="text-sm font-medium flex items-center gap-2">
                   <Lock className="h-4 w-4" />
-                  {t("login.password")}
+                  Password
                 </Label>
                 <Input
                   id="password"
                   type="password"
                   name="password"
-                  placeholder={t("login.passwordPlaceholder")}
+                  placeholder="Enter your password"
                   value={formData.password}
                   onChange={handleChange}
                   disabled={isLoading}
@@ -142,10 +131,10 @@ export default function LoginPage() {
                 {isLoading ? (
                   <span className="flex items-center gap-2">
                     <Loader2 className="h-4 w-4 animate-spin" />
-                    {t("login.loggingIn")}
+                    Logging In...
                   </span>
                 ) : (
-                  t("login.submit")
+                  "Login"
                 )}
               </Button>
             </form>
@@ -153,7 +142,7 @@ export default function LoginPage() {
         </Card>
 
         <p className="text-center text-xs text-gray-400 mt-6">
-          {t("login.footer")}
+          Access is restricted to authorized administrators only.
         </p>
       </div>
     </div>

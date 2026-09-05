@@ -12,7 +12,6 @@ import TopCustomers from "@/components/dashboard/TopCustomers";
 import DashboardFilters from "@/components/dashboard/DashboardFilters";
 import SalesTrendsChart from "@/components/dashboard/SalesTrendsChart";
 import { getTodayDateString } from "@/lib/dateUtils";
-import { useLanguage } from "@/lib/i18n/LanguageContext";
 
 const DEFAULT_FILTERS = {
   range: "all",
@@ -27,15 +26,14 @@ const DEFAULT_FILTERS = {
 
 export default function DashboardPage() {
   const [filters, setFilters] = useState(DEFAULT_FILTERS);
-  const { t } = useLanguage();
 
   return (
     <div className="min-h-screen bg-gray-50 py-6">
       <div className="container mx-auto px-4">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">{t("dashboard.title")}</h1>
-          <p className="text-gray-600">{t("dashboard.subtitle")}</p>
+          <h1 className="text-3xl font-bold text-gray-900">Business Dashboard</h1>
+          <p className="text-gray-600">Overview of your business performance</p>
         </div>
 
         {/* Filters */}

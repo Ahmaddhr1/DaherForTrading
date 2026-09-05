@@ -1,4 +1,4 @@
-import { Geist, Geist_Mono, Tajawal } from "next/font/google";
+import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Providers from "@/lib/providers";
 import { Toaster } from "sonner";
@@ -13,14 +13,6 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-// Arabic UI font, used automatically whenever the page direction is RTL -
-// see the [dir="rtl"] rule in globals.css.
-const tajawal = Tajawal({
-  variable: "--font-arabic",
-  subsets: ["arabic"],
-  weight: ["400", "500", "700"],
-});
-
 export const metadata = {
   title: "MDT",
   description: "Admin Panel",
@@ -29,7 +21,7 @@ export const metadata = {
 export default async function RootLayout({ children }) {
 
   return (
-    <html lang="en" className={`${geistSans.variable} ${geistMono.variable} ${tajawal.variable} ${geistSans.className}`}>
+    <html lang="en" className={geistSans.className}>
       <body
         className="antialiased"
       >

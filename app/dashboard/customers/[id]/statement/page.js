@@ -3,9 +3,11 @@
 import { useQuery } from "@tanstack/react-query";
 import { useParams } from "next/navigation";
 import { format } from "date-fns";
-import { FileText, Calendar, Printer, MessageCircle, ArrowLeft } from "lucide-react";
+import { FileText, Calendar, Printer, MessageCircle, ArrowLeft, Receipt, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import Link from "next/link";
+import { useState } from "react";
+import { generateThermalStatementPdf, sharePdfOrDownload } from "@/lib/thermalPdf";
 import {
   Table,
   TableBody,
@@ -36,6 +38,7 @@ const statusConfig = {
 
 export default function CustomerStatementPage() {
   const { id } = useParams();
+  const [isSharingPdf, setIsSharingPdf] = useState(false);
 
   const { data: statement, isLoading, isError } = useQuery({
     queryKey: ["customer-statement", id],
@@ -54,6 +57,34 @@ export default function CustomerStatementPage() {
     const message = `Hello ${statement.fullName || ""}, here is your account statement: ${shareUrl}`;
     const waUrl = `https://wa.me/${phoneDigits}?text=${encodeURIComponent(message)}`;
     window.open(waUrl, "_blank", "noopener,noreferrer");
+  };
+
+  const handleShareThermalPdf = async () => {
+    setIsSharingPdf(true);
+    try {
+      const blob = generateThermalStatementPdf({
+        title: "ACCOUNT STATEMENT",
+        subtitle: statement.fullName,
+        meta: format(new Date(), "MMM d, yyyy h:mm a"),
+        rows: statement.orders.map((order) => ({
+          label: format(new Date(order.createdAt), "MMM d, yyyy"),
+          amount: `$${order.total.toFixed(3)}`,
+          sub: `Paid $${order.amountpaid.toFixed(3)}  Rem $${order.remainingBalance.toFixed(3)}  [${(statusConfig[order.status] || statusConfig.pending).label}]`,
+        })),
+        totals: [
+          { label: "Total Billed", value: `$${statement.totals.totalAmount.toFixed(3)}` },
+          { label: "Total Paid", value: `$${statement.totals.totalPaid.toFixed(3)}` },
+          { label: "Total Owed", value: `$${statement.totals.totalRemaining.toFixed(3)}`, bold: true },
+        ],
+        footer: "Powered by Ahmad Daher",
+      });
+      const result = await sharePdfOrDownload(blob, `statement-${statement.fullName?.replace(/\s+/g, "-") || id}.pdf`);
+      if (result === "downloaded") toast.success("Statement PDF downloaded");
+    } catch (error) {
+      toast.error("Failed to generate PDF");
+    } finally {
+      setIsSharingPdf(false);
+    }
   };
 
   if (isLoading) {
@@ -113,6 +144,15 @@ export default function CustomerStatementPage() {
             >
               <MessageCircle className="h-4 w-4" />
               Share via WhatsApp
+            </Button>
+            <Button
+              variant="outline"
+              onClick={handleShareThermalPdf}
+              disabled={isSharingPdf}
+              className="flex items-center gap-2"
+            >
+              {isSharingPdf ? <Loader2 className="h-4 w-4 animate-spin" /> : <Receipt className="h-4 w-4" />}
+              Share as PDF
             </Button>
           </div>
         </div>

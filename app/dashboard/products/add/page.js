@@ -28,7 +28,6 @@ const Page = () => {
 
   const [form, setForm] = useState({
     name: "",
-    quantity: "",
     price: "",
     initialPrice: "",
     category: "",
@@ -42,7 +41,7 @@ const Page = () => {
 
       const payload = {
         name: form.name,
-        quantity: parseInt(form.quantity, 10),
+        quantity: 0,
         price,
         initialPrice,
         profit,
@@ -83,10 +82,6 @@ const Page = () => {
     const { name, value } = e.target;
     let cleanValue = value;
 
-    if (name === "quantity") {
-      cleanValue = value.replace(/\D/g, "");
-    }
-
     if (name === "price" || name === "initialPrice") {
       cleanValue = value.replace(/[^0-9.]/g, "").replace(/(\..*?)\..*/g, "$1");
     }
@@ -102,12 +97,9 @@ const Page = () => {
   const costPrice = parseFloat(form.initialPrice) || 0;
   const profit = sellingPrice - costPrice;
   const profitMargin = costPrice > 0 ? (profit / costPrice) * 100 : 0;
-  const quantity = parseInt(form.quantity) || 0;
-  const totalValue = sellingPrice * quantity;
 
   const isFormValid =
     form.name.trim() !== "" &&
-    form.quantity.trim() !== "" &&
     form.price.trim() !== "" &&
     form.initialPrice.trim() !== "" &&
     form.category.trim() !== "";
@@ -199,23 +191,6 @@ const Page = () => {
                             </option>
                           ))}
                         </select>
-                      </div>
-
-                      <div className="space-y-2">
-                        <Label htmlFor="quantity" className="text-sm font-medium flex items-center gap-2">
-                          <Package className="h-4 w-4" />
-                          Quantity in Stock *
-                        </Label>
-                        <Input
-                          id="quantity"
-                          placeholder="Enter quantity"
-                          name="quantity"
-                          value={form.quantity}
-                          onChange={handleChange}
-                          inputMode="numeric"
-                          className="focus:border-blue-500 transition-colors"
-                          required
-                        />
                       </div>
                     </div>
                   </div>
@@ -324,11 +299,6 @@ const Page = () => {
                         {form.name || "Not provided"}
                       </span>
                     </div>
-                    
-                    <div className="flex justify-between items-center">
-                      <span className="text-sm text-gray-600">Quantity</span>
-                      <Badge variant="outline">{quantity}</Badge>
-                    </div>
                   </div>
                 </div>
 
@@ -343,12 +313,12 @@ const Page = () => {
                   <div className="space-y-2">
                     <div className="flex justify-between items-center">
                       <span className="text-sm text-gray-600">Cost Price</span>
-                      <span className="font-medium text-gray-900">${costPrice.toFixed(2)}</span>
+                      <span className="font-medium text-gray-900">${costPrice.toFixed(3)}</span>
                     </div>
                     
                     <div className="flex justify-between items-center">
                       <span className="text-sm text-gray-600">Selling Price</span>
-                      <span className="font-medium text-gray-900">${sellingPrice.toFixed(2)}</span>
+                      <span className="font-medium text-gray-900">${sellingPrice.toFixed(3)}</span>
                     </div>
                   </div>
                 </div>
@@ -366,7 +336,7 @@ const Page = () => {
                     <div className="flex justify-between items-center mb-1">
                       <span className="text-sm font-medium text-green-800">Profit per Unit</span>
                       <Badge variant={profit >= 0 ? "default" : "destructive"} className="bg-green-100 text-green-800">
-                        ${Math.abs(profit).toFixed(2)}
+                        ${Math.abs(profit).toFixed(3)}
                       </Badge>
                     </div>
                     
@@ -375,13 +345,6 @@ const Page = () => {
                       <span className={`text-sm font-medium ${profitMargin >= 0 ? 'text-green-800' : 'text-red-800'}`}>
                         {profitMargin.toFixed(1)}%
                       </span>
-                    </div>
-                    
-                    <div className="pt-2 border-t border-green-200">
-                      <div className="flex justify-between items-center">
-                        <span className="text-xs text-green-700">Total Inventory Value</span>
-                        <span className="text-sm font-bold text-green-900">${totalValue.toFixed(2)}</span>
-                      </div>
                     </div>
                   </div>
                 </div>

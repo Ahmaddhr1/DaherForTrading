@@ -94,7 +94,7 @@ export default function ProductHistory({ productId }) {
                 </div>
                 <div className="flex justify-between">
                   <span className="text-green-700">Revenue</span>
-                  <span className="font-medium text-green-900">${sales.totalRevenue.toFixed(2)}</span>
+                  <span className="font-medium text-green-900">${sales.totalRevenue.toFixed(3)}</span>
                 </div>
                 <div className="flex justify-between pt-1.5 border-t border-green-200">
                   <span className="text-green-700 flex items-center gap-1">
@@ -106,7 +106,7 @@ export default function ProductHistory({ productId }) {
                     Est. Profit
                   </span>
                   <span className={`font-bold ${sales.totalProfit >= 0 ? "text-green-900" : "text-red-700"}`}>
-                    ${sales.totalProfit.toFixed(2)}
+                    ${sales.totalProfit.toFixed(3)}
                   </span>
                 </div>
               </div>
@@ -116,7 +116,7 @@ export default function ProductHistory({ productId }) {
                 ) : (
                   sales.entries.map((e, i) => (
                     <div key={i} className="flex justify-between text-xs text-green-800 bg-white/60 rounded px-2 py-1">
-                      <span>{e.quantity} x ${e.price.toFixed(2)}</span>
+                      <span>{e.quantity} x ${e.price.toFixed(3)}</span>
                       <span>{format(new Date(e.createdAt), "MMM d, yyyy")}</span>
                     </div>
                   ))
@@ -137,7 +137,7 @@ export default function ProductHistory({ productId }) {
                 </div>
                 <div className="flex justify-between pt-1.5 border-t border-orange-200">
                   <span className="text-orange-700">Total Cost</span>
-                  <span className="font-bold text-orange-900">${purchases.totalCost.toFixed(2)}</span>
+                  <span className="font-bold text-orange-900">${purchases.totalCost.toFixed(3)}</span>
                 </div>
               </div>
               <div className="max-h-48 overflow-y-auto space-y-1">
@@ -146,7 +146,7 @@ export default function ProductHistory({ productId }) {
                 ) : (
                   purchases.entries.map((p) => (
                     <div key={p._id} className="flex justify-between text-xs text-orange-800 bg-white/60 rounded px-2 py-1">
-                      <span>{p.quantity} x ${p.unitPrice.toFixed(2)}</span>
+                      <span>{p.quantity} x ${p.unitPrice.toFixed(3)}</span>
                       <span>{format(new Date(p.createdAt), "MMM d, yyyy")}</span>
                     </div>
                   ))

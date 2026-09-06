@@ -3,7 +3,7 @@ import mongoose, { Mongoose } from "mongoose";
 const productSchema = new mongoose.Schema(
   {
     name: { type: String, required: true },
-    quantity: { type: Number },
+    quantity: { type: Number, default: 0 },
     price: { type: Number },
     initialPrice: { type: Number },
     profit: { type: Number },

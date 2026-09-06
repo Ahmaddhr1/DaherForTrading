@@ -8,7 +8,7 @@ import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { FormSkeleton, PageHeaderSkeleton } from "@/components/ui/skeleton-patterns";
-import { Eye, Loader2, User, Phone, DollarSign, ArrowLeft, UserCog, Package, PhoneCall, Lock } from "lucide-react";
+import { Eye, Loader2, User, Phone, DollarSign, ArrowLeft, UserCog, Package, PhoneCall, Lock, FileText } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -190,6 +190,13 @@ const EditCustomerPage = () => {
                 </Button>
               </Link>
             )}
+
+            <Link href={`/dashboard/customers/${id}/statement`}>
+              <Button variant="outline" className="flex items-center justify-center gap-2 w-full sm:w-auto">
+                <FileText className="h-4 w-4" />
+                Statement
+              </Button>
+            </Link>
           </div>
 
           {ordersCount === 0 && (

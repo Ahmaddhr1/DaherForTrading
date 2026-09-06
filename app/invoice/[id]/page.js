@@ -106,7 +106,7 @@ export default function PublicInvoicePage() {
                       <TableCell className="font-medium">{item.name}</TableCell>
                       <TableCell className="text-center">{item.quantity}</TableCell>
                       <TableCell className="text-right">
-                        ${(item.price * item.quantity).toFixed(2)}
+                        ${(item.price * item.quantity).toFixed(3)}
                       </TableCell>
                     </TableRow>
                   ))}
@@ -119,16 +119,16 @@ export default function PublicInvoicePage() {
             <div className="space-y-2">
               <div className="flex justify-between">
                 <span className="text-gray-600">Total</span>
-                <span className="font-semibold text-gray-900">${order.total.toFixed(2)}</span>
+                <span className="font-semibold text-gray-900">${order.total.toFixed(3)}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-600">Paid</span>
-                <span className="text-green-600 font-medium">${order.amountpaid.toFixed(2)}</span>
+                <span className="text-green-600 font-medium">${order.amountpaid.toFixed(3)}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-600">Remaining</span>
                 <span className={`font-medium ${order.remainingBalance > 0 ? "text-red-600" : "text-gray-900"}`}>
-                  ${order.remainingBalance.toFixed(2)}
+                  ${order.remainingBalance.toFixed(3)}
                 </span>
               </div>
             </div>

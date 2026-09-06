@@ -83,7 +83,7 @@ const TopProducts = ({ limit = 10, sort = "orders", category = "" }) => {
                 <div className="text-right">
                   {sort === "profit" ? (
                     <p className="font-semibold text-green-600">
-                      ${(product.totalProfit || 0).toFixed(2)}
+                      ${(product.totalProfit || 0).toFixed(3)}
                     </p>
                   ) : (
                     <p className="font-semibold">${product.price}</p>

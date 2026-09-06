@@ -417,12 +417,12 @@ const EditProductPage = () => {
                   <div className="space-y-2">
                     <div className="flex justify-between items-center">
                       <span className="text-sm text-gray-600">Cost Price</span>
-                      <span className="font-medium text-gray-900">${costPrice.toFixed(2)}</span>
+                      <span className="font-medium text-gray-900">${costPrice.toFixed(3)}</span>
                     </div>
                     
                     <div className="flex justify-between items-center">
                       <span className="text-sm text-gray-600">Selling Price</span>
-                      <span className="font-medium text-gray-900">${sellingPrice.toFixed(2)}</span>
+                      <span className="font-medium text-gray-900">${sellingPrice.toFixed(3)}</span>
                     </div>
                   </div>
                 </div>
@@ -440,7 +440,7 @@ const EditProductPage = () => {
                     <div className="flex justify-between items-center mb-1">
                       <span className="text-sm font-medium text-green-800">Profit per Unit</span>
                       <Badge variant={profit >= 0 ? "default" : "destructive"} className="bg-green-100 text-green-800">
-                        ${Math.abs(profit).toFixed(2)}
+                        ${Math.abs(profit).toFixed(3)}
                       </Badge>
                     </div>
                     
@@ -454,7 +454,7 @@ const EditProductPage = () => {
                     <div className="pt-2 border-t border-green-200">
                       <div className="flex justify-between items-center">
                         <span className="text-xs text-green-700">Total Inventory Value</span>
-                        <span className="text-sm font-bold text-green-900">${totalValue.toFixed(2)}</span>
+                        <span className="text-sm font-bold text-green-900">${totalValue.toFixed(3)}</span>
                       </div>
                     </div>
                   </div>
@@ -465,7 +465,7 @@ const EditProductPage = () => {
                       <div className="flex justify-between items-center">
                         <span className="text-sm font-medium text-blue-800">Profit Change</span>
                         <Badge variant={profitChange >= 0 ? "default" : "destructive"} className={profitChange >= 0 ? 'bg-blue-100 text-blue-800' : ''}>
-                          {profitChange >= 0 ? '+' : ''}{profitChange.toFixed(2)}$
+                          {profitChange >= 0 ? '+' : ''}{profitChange.toFixed(3)}$
                         </Badge>
                       </div>
                       <p className="text-xs text-blue-700 mt-1">

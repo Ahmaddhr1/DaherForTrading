@@ -40,9 +40,9 @@ export default function ThermalReceipt({ order }) {
             </div>
             <div className="flex justify-between">
               <span>
-                {item.quantity} x ${Number(item.price).toFixed(2)}
+                {item.quantity} x ${Number(item.price).toFixed(3)}
               </span>
-              <span>${(item.quantity * item.price).toFixed(2)}</span>
+              <span>${(item.quantity * item.price).toFixed(3)}</span>
             </div>
           </div>
         ))}
@@ -51,15 +51,15 @@ export default function ThermalReceipt({ order }) {
 
         <div className="flex justify-between font-bold">
           <span>TOTAL</span>
-          <span>${Number(order.total).toFixed(2)}</span>
+          <span>${Number(order.total).toFixed(3)}</span>
         </div>
         <div className="flex justify-between">
           <span>Paid</span>
-          <span>${Number(order.amountpaid || 0).toFixed(2)}</span>
+          <span>${Number(order.amountpaid || 0).toFixed(3)}</span>
         </div>
         <div className="flex justify-between">
           <span>Remaining</span>
-          <span>${Number(order.remainingBalance || 0).toFixed(2)}</span>
+          <span>${Number(order.remainingBalance || 0).toFixed(3)}</span>
         </div>
 
         <div className="border-t border-dashed border-black my-1" />

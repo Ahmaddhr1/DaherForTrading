@@ -288,13 +288,13 @@ export default function ProductsPage() {
                         <TableCell className="text-center font-medium text-green-600">
                           <div className="flex items-center justify-center gap-1">
                             <DollarSign className="h-3 w-3" />
-                            {product.price.toFixed(2)}
+                            {product.price.toFixed(3)}
                           </div>
                         </TableCell>
                         
                         {/* Cost */}
                         <TableCell className="text-center text-gray-600">
-                          ${product.initialPrice.toFixed(2)}
+                          ${product.initialPrice.toFixed(3)}
                         </TableCell>
                         
                         {/* Profit */}
@@ -302,7 +302,7 @@ export default function ProductsPage() {
                           <div className={`font-medium ${
                             profit >= 0 ? "text-green-600" : "text-red-600"
                           }`}>
-                            ${profit.toFixed(2)}
+                            ${profit.toFixed(3)}
                             <div className="text-xs text-gray-500">
                               {profitMargin.toFixed(1)}%
                             </div>

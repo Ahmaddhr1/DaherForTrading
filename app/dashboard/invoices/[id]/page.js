@@ -177,10 +177,10 @@ export default function OrderDetailsPage() {
                         <TableCell className="font-medium text-gray-900">{item.name}</TableCell>
                         <TableCell className="text-center text-gray-600">{item.quantity}</TableCell>
                         <TableCell className="text-center text-gray-600">
-                          ${item.price.toFixed(2)}
+                          ${item.price.toFixed(3)}
                         </TableCell>
                         <TableCell className="text-right font-medium text-gray-900">
-                          ${(item.price * item.quantity).toFixed(2)}
+                          ${(item.price * item.quantity).toFixed(3)}
                         </TableCell>
                       </TableRow>
                     ))}
@@ -224,13 +224,13 @@ export default function OrderDetailsPage() {
               <CardContent className="space-y-4">
                 <div className="flex justify-between items-center">
                   <span className="text-gray-600">Subtotal</span>
-                  <span className="font-medium text-gray-900">${Number(order.total).toFixed(2)}</span>
+                  <span className="font-medium text-gray-900">${Number(order.total).toFixed(3)}</span>
                 </div>
 
                 <div className="flex justify-between items-center pt-2 border-t">
                   <span className="text-gray-600">Amount Paid</span>
                   <span className="text-green-600 font-medium">
-                    ${Number(order.amountpaid || 0).toFixed(2)}
+                    ${Number(order.amountpaid || 0).toFixed(3)}
                   </span>
                 </div>
 
@@ -238,7 +238,7 @@ export default function OrderDetailsPage() {
                   <span className="text-gray-600">Remaining Balance</span>
                   <span className={`font-medium ${Number(order.remainingBalance || 0) > 0 ? "text-red-600" : "text-gray-900"
                     }`}>
-                    ${Number(order.remainingBalance || 0).toFixed(2)}
+                    ${Number(order.remainingBalance || 0).toFixed(3)}
                   </span>
                 </div>
 

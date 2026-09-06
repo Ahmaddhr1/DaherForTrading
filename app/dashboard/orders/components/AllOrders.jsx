@@ -137,6 +137,11 @@ export default function AllOrders() {
         <DropdownMenuItem onClick={() => handleAction("view", order._id)}>
           View Invoice
         </DropdownMenuItem>
+        {order.status === "pending" && (
+          <DropdownMenuItem onClick={() => router.push(`/dashboard/orders/${order._id}/edit`)}>
+            Update Order
+          </DropdownMenuItem>
+        )}
         {order.status !== "paid" && (
           <>
             <DropdownMenuItem onClick={() => handleAction("pay", order._id)}>
@@ -280,7 +285,7 @@ export default function AllOrders() {
                   <div className="flex items-center justify-between mt-3">
                     {statusBadge(order.status)}
                     <span className="font-semibold text-gray-900">
-                      ${Number(order.total).toFixed(2)}
+                      ${Number(order.total).toFixed(3)}
                     </span>
                   </div>
                 </CardContent>
@@ -311,7 +316,7 @@ export default function AllOrders() {
                     <TableCell className="font-medium text-gray-900">
                       {order.customer?.fullName || "Deleted Customer"}
                     </TableCell>
-                    <TableCell className="text-center font-medium">${Number(order.total).toFixed(2)}</TableCell>
+                    <TableCell className="text-center font-medium">${Number(order.total).toFixed(3)}</TableCell>
                     <TableCell className="text-center">{statusBadge(order.status)}</TableCell>
                     <TableCell className="text-gray-500 text-sm">
                       {format(new Date(order.createdAt), "MMM d, yyyy HH:mm")}

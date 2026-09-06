@@ -128,12 +128,12 @@ export default function ProductPurchaseBreakdown({ companyId }) {
                     </div>
                     <div>
                       <p className="text-xs text-gray-500">Amount Spent</p>
-                      <p className="font-medium">${item.totalSpent.toFixed(2)}</p>
+                      <p className="font-medium">${item.totalSpent.toFixed(3)}</p>
                     </div>
                     <div>
                       <p className="text-xs text-gray-500">Expected Profit</p>
                       <p className={`font-medium ${item.expectedProfit >= 0 ? "text-green-600" : "text-red-600"}`}>
-                        ${item.expectedProfit.toFixed(2)}
+                        ${item.expectedProfit.toFixed(3)}
                       </p>
                     </div>
                   </div>
@@ -158,9 +158,9 @@ export default function ProductPurchaseBreakdown({ companyId }) {
                     <TableRow key={item.productId || item.name}>
                       <TableCell className="font-medium text-gray-900">{item.name}</TableCell>
                       <TableCell className="text-center">{item.quantity}</TableCell>
-                      <TableCell className="text-center font-medium">${item.totalSpent.toFixed(2)}</TableCell>
+                      <TableCell className="text-center font-medium">${item.totalSpent.toFixed(3)}</TableCell>
                       <TableCell className={`text-center font-medium ${item.expectedProfit >= 0 ? "text-green-600" : "text-red-600"}`}>
-                        ${item.expectedProfit.toFixed(2)}
+                        ${item.expectedProfit.toFixed(3)}
                       </TableCell>
                     </TableRow>
                   ))}
@@ -185,7 +185,7 @@ export default function ProductPurchaseBreakdown({ companyId }) {
                 <Wallet className="h-3.5 w-3.5" />
                 Total Spent
               </span>
-              <span className="text-lg font-bold text-gray-900">${totals.totalSpent.toFixed(2)}</span>
+              <span className="text-lg font-bold text-gray-900">${totals.totalSpent.toFixed(3)}</span>
             </div>
             <div className="flex flex-col items-center gap-1">
               <span className="flex items-center gap-1.5 text-xs font-medium text-gray-500">
@@ -193,7 +193,7 @@ export default function ProductPurchaseBreakdown({ companyId }) {
                 Expected Profit
               </span>
               <span className={`text-lg font-bold ${totals.totalExpectedProfit >= 0 ? "text-green-600" : "text-red-600"}`}>
-                ${totals.totalExpectedProfit.toFixed(2)}
+                ${totals.totalExpectedProfit.toFixed(3)}
               </span>
             </div>
           </div>

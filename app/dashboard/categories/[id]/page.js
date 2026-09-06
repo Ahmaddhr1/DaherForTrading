@@ -329,7 +329,7 @@ const EditCategoryPage = () => {
                                 </div>
                               </TableCell>
                               <TableCell className="text-center font-medium">
-                                ${product?.price.toFixed(2)}
+                                ${product?.price.toFixed(3)}
                               </TableCell>
                               <TableCell className="text-center">
                                 <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs ${product.quantity > 10

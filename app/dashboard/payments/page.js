@@ -516,7 +516,7 @@ function MakePaymentForm({ onSuccess }) {
                   type="number"
                   min="0"
                   max={currentDebt}
-                  step="0.01"
+                  step="0.001"
                   value={amount}
                   onChange={(e) => setAmount(e.target.value)}
                 />

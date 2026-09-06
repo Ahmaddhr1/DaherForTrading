@@ -1,150 +1,125 @@
-// app/dashboard/customers/[id]/addorder/page.jsx
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useParams, useRouter } from "next/navigation";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
-import { ListSkeleton, PageHeaderSkeleton } from "@/components/ui/skeleton-patterns";
+import { PageHeaderSkeleton, ListSkeleton } from "@/components/ui/skeleton-patterns";
 import { toast } from "sonner";
-import { Loader2, Plus, Trash2, ShoppingCart, ArrowLeft } from "lucide-react";
+import { Loader2, Plus, Trash2, PencilLine, ArrowLeft } from "lucide-react";
 import Link from "next/link";
 
-const MakeOrderPage = () => {
-  const { id: customerId } = useParams();
+let rowIdCounter = 1;
+
+export default function EditOrderPage() {
+  const { orderId } = useParams();
   const router = useRouter();
+  const queryClient = useQueryClient();
 
   const [products, setProducts] = useState([]);
-  const [orderRows, setOrderRows] = useState([{ 
-    id: 1, 
-    productId: "", 
-    quantity: 1, 
-    price: "" 
-  }]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [orderRows, setOrderRows] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Load products
+  const { data: order, isLoading: isLoadingOrder } = useQuery({
+    queryKey: ["order", orderId],
+    queryFn: async () => {
+      const res = await axios.get(`/api/orders/${orderId}`);
+      return res.data;
+    },
+    enabled: !!orderId,
+  });
+
+  const { data: productsData, isLoading: isLoadingProducts } = useQuery({
+    queryKey: ["products-all"],
+    queryFn: async () => {
+      const res = await axios.get("/api/products");
+      return res.data;
+    },
+  });
+
   useEffect(() => {
-    const loadProducts = async () => {
-      try {
-        const response = await axios.get("/api/products");
-        setProducts(response.data);
-      } catch (error) {
-        toast.error("Failed to load products");
-      } finally {
-        setIsLoading(false);
-      }
-    };
+    if (productsData) setProducts(productsData);
+  }, [productsData]);
 
-    loadProducts();
-  }, []);
-
-  // Add new product row
-  const addProductRow = () => {
-    const newId = orderRows.length + 1;
-    setOrderRows([...orderRows, { 
-      id: newId, 
-      productId: "", 
-      quantity: 1, 
-      price: "" 
-    }]);
-  };
-
-  // Remove product row
-  const removeProductRow = (id) => {
-    if (orderRows.length > 1) {
-      setOrderRows(orderRows.filter(row => row.id !== id));
+  useEffect(() => {
+    if (order?.products?.length) {
+      setOrderRows(
+        order.products.map((p) => ({
+          id: rowIdCounter++,
+          productId: p.productId?._id || p.productId,
+          quantity: p.quantity,
+          price: p.price.toString(),
+        }))
+      );
     }
+  }, [order]);
+
+  const addProductRow = () => {
+    setOrderRows((rows) => [...rows, { id: rowIdCounter++, productId: "", quantity: 1, price: "" }]);
   };
 
-  // Handle row changes
+  const removeProductRow = (id) => {
+    setOrderRows((rows) => (rows.length > 1 ? rows.filter((row) => row.id !== id) : rows));
+  };
+
   const handleRowChange = (id, field, value) => {
-    setOrderRows(orderRows.map(row => {
-      if (row.id !== id) return row;
-
-      const updatedRow = { ...row };
-
-      if (field === "productId") {
-        updatedRow.productId = value;
-        // Auto-fill price when product is selected
-        const selectedProduct = products.find(p => p._id === value);
-        if (selectedProduct) {
-          updatedRow.price = selectedProduct.price.toString();
+    setOrderRows((rows) =>
+      rows.map((row) => {
+        if (row.id !== id) return row;
+        const updatedRow = { ...row };
+        if (field === "productId") {
+          updatedRow.productId = value;
+          const selectedProduct = products.find((p) => p._id === value);
+          if (selectedProduct) updatedRow.price = selectedProduct.price.toString();
+        } else if (field === "quantity") {
+          updatedRow.quantity = parseInt(value) || 1;
+        } else if (field === "price") {
+          updatedRow.price = value.replace(/[^0-9.]/g, "");
         }
-      } 
-      else if (field === "quantity") {
-        updatedRow.quantity = parseInt(value) || 1;
-      }
-      else if (field === "price") {
-        updatedRow.price = value.replace(/[^0-9.]/g, "");
-      }
-
-      return updatedRow;
-    }));
+        return updatedRow;
+      })
+    );
   };
 
-  // Calculate total order amount
-  const calculateTotal = () => {
-    return orderRows.reduce((total, row) => {
-      const price = parseFloat(row.price) || 0;
-      const quantity = row.quantity || 0;
-      return total + (price * quantity);
-    }, 0);
-  };
+  const calculateTotal = () =>
+    orderRows.reduce((total, row) => total + ((parseFloat(row.price) || 0) * (row.quantity || 0)), 0);
 
-  // Get product name by ID
-  const getProductName = (productId) => {
-    const product = products.find(p => p._id === productId);
-    return product ? product.name : "Select Product";
-  };
-
-  // Submit order
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
-    // Validation
+
     for (const row of orderRows) {
-      if (!row.productId) {
-        toast.error("Please select a product for all items");
-        return;
-      }
-      if (!row.quantity || row.quantity < 1) {
-        toast.error("Quantity must be at least 1");
-        return;
-      }
-      if (!row.price || parseFloat(row.price) <= 0) {
-        toast.error("Please enter a valid price");
-        return;
-      }
+      if (!row.productId) return toast.error("Please select a product for all items");
+      if (!row.quantity || row.quantity < 1) return toast.error("Quantity must be at least 1");
+      if (!row.price || parseFloat(row.price) <= 0) return toast.error("Please enter a valid price");
     }
 
     setIsSubmitting(true);
-
     try {
-      const orderData = {
-        products: orderRows.map(row => ({
+      await axios.put(`/api/orders/${orderId}`, {
+        products: orderRows.map((row) => ({
           productId: row.productId,
           quantity: row.quantity,
-          price: parseFloat(row.price)
+          price: parseFloat(row.price),
         })),
-        total: calculateTotal()
-      };
+      });
 
-      await axios.post(`/api/orders/${customerId}`, orderData);
-      
-      toast.success("Order created successfully!");
-      router.push(`/dashboard/customers/${customerId}/orders`);
-      
+      toast.success("Order updated successfully!");
+      queryClient.invalidateQueries({ queryKey: ["order", orderId] });
+      queryClient.invalidateQueries({ queryKey: ["customer-orders"] });
+      queryClient.invalidateQueries({ queryKey: ["customer", order?.customer?._id] });
+      router.push(`/dashboard/orders/${orderId}`);
     } catch (error) {
-      toast.error(error.response?.data?.message || "Failed to create order");
+      toast.error(error.response?.data?.message || "Failed to update order");
     } finally {
       setIsSubmitting(false);
     }
   };
+
+  const isLoading = isLoadingOrder || isLoadingProducts || orderRows.length === 0;
 
   if (isLoading) {
     return (
@@ -161,26 +136,37 @@ const MakeOrderPage = () => {
     );
   }
 
+  if (order && order.status !== "pending") {
+    return (
+      <div className="min-h-screen bg-gray-50 py-6">
+        <div className="container mx-auto px-4 max-w-xl text-center">
+          <p className="text-gray-600 mb-4">Only pending orders can be updated. This order is {order.status}.</p>
+          <Link href={`/dashboard/orders/${orderId}`}>
+            <Button variant="outline">Back to Order</Button>
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gray-50 py-6">
       <div className="container mx-auto px-4 max-w-4xl">
-        
-        {/* Header */}
         <div className="mb-8">
-          <Link href={`/dashboard/customers/${customerId}`}>
+          <Link href={`/dashboard/orders/${orderId}`}>
             <Button variant="ghost" className="mb-4 flex items-center gap-2 text-gray-600 hover:text-gray-900">
               <ArrowLeft className="h-4 w-4" />
-              Back to Customer
+              Back to Order
             </Button>
           </Link>
-          
+
           <div className="flex items-center gap-3 mb-2">
             <div className="p-2 bg-blue-100 rounded-lg">
-              <ShoppingCart className="h-6 w-6 text-blue-600" />
+              <PencilLine className="h-6 w-6 text-blue-600" />
             </div>
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">Create New Order</h1>
-              <p className="text-gray-600">Add products to create an order</p>
+              <h1 className="text-3xl font-bold text-gray-900">Update Order</h1>
+              <p className="text-gray-600">Edit products, quantities, and prices for this pending order</p>
             </div>
           </div>
         </div>
@@ -188,12 +174,10 @@ const MakeOrderPage = () => {
         <Card className="shadow-sm border-gray-200">
           <CardHeader>
             <CardTitle className="text-xl">Order Details</CardTitle>
-            <CardDescription>Select products and quantities for this order</CardDescription>
+            <CardDescription>Update products and quantities for this order</CardDescription>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-6">
-              
-              {/* Product Rows */}
               <div className="space-y-4">
                 {orderRows.map((row, index) => (
                   <div key={row.id} className="p-4 border rounded-lg bg-gray-50 space-y-4">
@@ -213,7 +197,6 @@ const MakeOrderPage = () => {
                       </Button>
                     </div>
 
-                    {/* Product Selection */}
                     <select
                       id={`product-${row.id}`}
                       value={row.productId}
@@ -222,7 +205,7 @@ const MakeOrderPage = () => {
                       required
                     >
                       <option value="">Select a product</option>
-                      {products.map(product => (
+                      {products.map((product) => (
                         <option key={product._id} value={product._id}>
                           {product.name}
                         </option>
@@ -230,7 +213,6 @@ const MakeOrderPage = () => {
                     </select>
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      {/* Price */}
                       <div className="space-y-2">
                         <Label htmlFor={`price-${row.id}`} className="text-sm font-medium">
                           Price ($)
@@ -245,7 +227,6 @@ const MakeOrderPage = () => {
                         />
                       </div>
 
-                      {/* Quantity */}
                       <div className="space-y-2">
                         <Label htmlFor={`quantity-${row.id}`} className="text-sm font-medium">
                           Quantity
@@ -264,48 +245,34 @@ const MakeOrderPage = () => {
                 ))}
               </div>
 
-              {/* Add Product Button */}
-              <Button
-                type="button"
-                variant="outline"
-                onClick={addProductRow}
-                className="flex items-center gap-2"
-              >
+              <Button type="button" variant="outline" onClick={addProductRow} className="flex items-center gap-2">
                 <Plus className="h-4 w-4" />
                 Add Another Product
               </Button>
 
-              {/* Total Amount */}
               <div className="bg-blue-50 rounded-lg p-4 border border-blue-200">
                 <div className="flex justify-between items-center">
                   <span className="text-lg font-semibold text-blue-900">Total Amount:</span>
-                  <span className="text-2xl font-bold text-blue-900">
-                    ${calculateTotal().toFixed(3)}
-                  </span>
+                  <span className="text-2xl font-bold text-blue-900">${calculateTotal().toFixed(3)}</span>
                 </div>
               </div>
 
-              {/* Submit Button */}
               <div className="flex gap-3 pt-4">
-                <Link href={`/dashboard/customers/${customerId}`} className="flex-1">
+                <Link href={`/dashboard/orders/${orderId}`} className="flex-1">
                   <Button type="button" variant="outline" className="w-full">
                     Cancel
                   </Button>
                 </Link>
-                <Button
-                  type="submit"
-                  disabled={isSubmitting}
-                  className="flex-1 bg-blue-600 hover:bg-blue-700"
-                >
+                <Button type="submit" disabled={isSubmitting} className="flex-1 bg-blue-600 hover:bg-blue-700">
                   {isSubmitting ? (
                     <span className="flex items-center gap-2">
                       <Loader2 className="animate-spin h-4 w-4" />
-                      Creating Order...
+                      Updating Order...
                     </span>
                   ) : (
                     <span className="flex items-center gap-2">
-                      <ShoppingCart className="h-4 w-4" />
-                      Create Order
+                      <PencilLine className="h-4 w-4" />
+                      Update Order
                     </span>
                   )}
                 </Button>
@@ -316,6 +283,4 @@ const MakeOrderPage = () => {
       </div>
     </div>
   );
-};
-
-export default MakeOrderPage;
+}

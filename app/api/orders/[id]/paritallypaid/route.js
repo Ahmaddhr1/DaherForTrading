@@ -29,7 +29,7 @@ export async function PUT(req, { params }) {
       amountpaid > previousRemaining
     ) {
       return NextResponse.json(
-        { error: `Invalid payment. You can only pay up to ${previousRemaining.toFixed(2)}.` },
+        { error: `Invalid payment. You can only pay up to ${previousRemaining.toFixed(3)}.` },
         { status: 400 }
       );
     }
@@ -71,7 +71,7 @@ export async function PUT(req, { params }) {
     }
 
     return NextResponse.json({
-      message: `Payment of ${amountpaid.toFixed(2)} applied successfully. ${newRemaining > 0 ? `Remaining balance: ${newRemaining.toFixed(2)}` : 'Order fully paid!'}`,
+      message: `Payment of ${amountpaid.toFixed(3)} applied successfully. ${newRemaining > 0 ? `Remaining balance: ${newRemaining.toFixed(3)}` : 'Order fully paid!'}`,
       paymentDetails: {
         amountPaid: amountpaid,
         debtReduction: maxAllowedPayment,

@@ -194,9 +194,9 @@ export default function CompanyPurchasesPage() {
                     <TableRow key={purchase._id}>
                       <TableCell>{(page - 1) * limit + index + 1}</TableCell>
                       <TableCell className="font-medium">{purchase.productName}</TableCell>
-                      <TableCell className="text-center">${purchase.unitPrice.toFixed(2)}</TableCell>
+                      <TableCell className="text-center">${purchase.unitPrice.toFixed(3)}</TableCell>
                       <TableCell className="text-center">{purchase.quantity}</TableCell>
-                      <TableCell className="text-center font-medium">${purchase.total.toFixed(2)}</TableCell>
+                      <TableCell className="text-center font-medium">${purchase.total.toFixed(3)}</TableCell>
                       <TableCell className="text-center">
                         <Badge variant={purchase.paid ? "default" : "destructive"} className={purchase.paid ? "bg-green-100 text-green-800" : ""}>
                           {purchase.paid ? "Paid" : "Unpaid"}

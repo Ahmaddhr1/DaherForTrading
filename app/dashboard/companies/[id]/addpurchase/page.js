@@ -188,7 +188,7 @@ const NewPurchasePage = () => {
                           />
                           {rowProduct && (
                             <p className="text-xs text-gray-500">
-                              Current cost on file: ${rowProduct.initialPrice?.toFixed(2)}
+                              Current cost on file: ${rowProduct.initialPrice?.toFixed(3)}
                             </p>
                           )}
                         </div>
@@ -242,12 +242,12 @@ const NewPurchasePage = () => {
               <div className="bg-blue-50 rounded-lg p-4 border border-blue-200">
                 <div className="flex justify-between items-center">
                   <span className="text-lg font-semibold text-blue-900">Total Amount:</span>
-                  <span className="text-2xl font-bold text-blue-900">${total.toFixed(2)}</span>
+                  <span className="text-2xl font-bold text-blue-900">${total.toFixed(3)}</span>
                 </div>
                 {!paid && (
                   <div className="flex justify-between items-center mt-2 text-sm">
                     <span className="text-amber-700">Added to company debt</span>
-                    <Badge variant="destructive">+${total.toFixed(2)}</Badge>
+                    <Badge variant="destructive">+${total.toFixed(3)}</Badge>
                   </div>
                 )}
               </div>

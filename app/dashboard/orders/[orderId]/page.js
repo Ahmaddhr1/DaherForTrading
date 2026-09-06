@@ -10,7 +10,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { FormSkeleton } from "@/components/ui/skeleton-patterns";
-import { Loader2, CheckCircle } from "lucide-react";
+import { Loader2, CheckCircle, PencilLine } from "lucide-react";
+import Link from "next/link";
 
 export default function OrderDetailsPage() {
   const { orderId } = useParams();
@@ -111,15 +112,15 @@ export default function OrderDetailsPage() {
           <div className="space-y-1">
             <p>
               <span className="font-medium">Total:</span> $
-              {order.total.toFixed(2)}
+              {order.total.toFixed(3)}
             </p>
             <p>
               <span className="font-medium">Paid:</span> $
-              {order.amountpaid?.toFixed(2) || 0}
+              {order.amountpaid?.toFixed(3) || 0}
             </p>
             <p>
               <span className="font-medium">Remaining:</span> $
-              {remainingBalance.toFixed(2)}
+              {remainingBalance.toFixed(3)}
             </p>
             <p>
               <span className="font-medium">Status:</span>
@@ -137,6 +138,15 @@ export default function OrderDetailsPage() {
             </p>
           </div>
 
+          {order.status === "pending" && (
+            <Link href={`/dashboard/orders/${orderId}/edit`}>
+              <Button variant="outline" className="w-full flex items-center gap-2">
+                <PencilLine className="h-4 w-4" />
+                Update Order
+              </Button>
+            </Link>
+          )}
+
           {order.status !== "paid" && (
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
@@ -147,13 +157,13 @@ export default function OrderDetailsPage() {
                   value={amountPaid}
                   onChange={(e) => {
                     const value = e.target.value;
-                    if (value === "" || /^\d*\.?\d{0,2}$/.test(value)) {
+                    if (value === "" || /^\d*\.?\d{0,3}$/.test(value)) {
                       setAmountPaid(value);
                     }
                   }}
                   min="0"
                   max={remainingBalance}
-                  step="0.01"
+                  step="0.001"
                 />
                 <p className="text-xs text-gray-500">
                   Defaults to the full remaining balance. Enter a smaller amount for a partial payment.

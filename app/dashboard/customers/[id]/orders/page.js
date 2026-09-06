@@ -335,7 +335,7 @@ export default function CustomerOrdersTable() {
                     <TableCell className="font-medium text-gray-500">
                       {(page - 1) * pageSize + index + 1}
                     </TableCell>
-                    <TableCell className="font-medium">${Number(order.total).toFixed(2)}</TableCell>
+                    <TableCell className="font-medium">${Number(order.total).toFixed(3)}</TableCell>
                     <TableCell className="text-gray-500 text-sm">
                       {format(new Date(order.createdAt), "yyyy-MM-dd HH:mm")}
                     </TableCell>
@@ -372,6 +372,11 @@ export default function CustomerOrdersTable() {
                             {actionLoading && <Loader2 className="animate-spin h-4 w-4 mr-2" />}
                             Print
                           </DropdownMenuItem>
+                          {order.status === "pending" && (
+                            <DropdownMenuItem onClick={() => router.push(`/dashboard/orders/${order._id}/edit`)}>
+                              Update Order
+                            </DropdownMenuItem>
+                          )}
                           {order.status !== "paid" && (
                             <>
                               <DropdownMenuItem onClick={() => handleAction("delete", order._id)}>

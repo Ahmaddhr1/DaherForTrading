@@ -16,14 +16,15 @@ export async function POST(req) {
       category,
     } = await req.json();
 
-    if (!name?.trim() || price == null || quantity == null ) {
+    if (!name?.trim() || price == null) {
       return NextResponse.json(
-        { error: "Name, price, and quantity are required." },
+        { error: "Name and price are required." },
         { status: 400 }
       );
     }
 
-    const parsedQuantity = parseInt(quantity, 10);
+    // New products start with no stock - stock is added later via purchases.
+    const parsedQuantity = quantity == null || quantity === "" ? 0 : parseInt(quantity, 10);
     const parsedPrice = parseFloat(price);
     const parsedInitialPrice = parseFloat(initialPrice);
     const parsedProfit = parseFloat(profit);

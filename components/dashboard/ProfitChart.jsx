@@ -32,12 +32,12 @@ const ProfitChart = ({ range = "all", startDate, endDate }) => {
 
   const profitData = data?.data || {};
 
-  // Simple chart data
+  // Fixed lookback periods only - the selected-range figure already has its
+  // own card in the Profit summary section above, so it isn't repeated here.
   const chartData = [
     { period: "Today", profit: profitData?.today?.realProfit || 0 },
     { period: "Last Week", profit: profitData?.lastWeek?.realProfit || 0 },
     { period: "Last Month", profit: profitData?.lastMonth?.realProfit || 0 },
-    { period: "Selected Range", profit: profitData?.selected?.realProfit || 0 },
   ];
 
   // Simple bar chart using CSS

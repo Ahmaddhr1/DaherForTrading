@@ -29,6 +29,8 @@ import {
   Filter,
   ArrowUpDown,
   Package,
+  Receipt,
+  TrendingUp,
 } from "lucide-react";
 import { format } from "date-fns";
 import { useRouter } from "next/navigation";
@@ -124,6 +126,7 @@ export default function AllOrders() {
   const totalPages = data?.totalPages || 1;
   const totalCount = data?.total || 0;
   const counts = data?.counts || { draft: 0, pending: 0, partiallyPaid: 0, paid: 0 };
+  const totals = data?.totals || { totalAmount: 0, totalProfit: 0 };
   const activeFilterCount = [
     searchTerm,
     statusFilter !== "all" ? statusFilter : "",
@@ -198,6 +201,30 @@ export default function AllOrders() {
 
   return (
     <div className="space-y-4">
+      {/* Totals for the current filter scope (drafts excluded until finalized) */}
+      <Card className="shadow-sm border-gray-200">
+        <CardContent className="p-4 grid grid-cols-2 gap-4">
+          <div className="flex flex-col items-center sm:items-start gap-1">
+            <span className="flex items-center gap-1.5 text-xs font-medium text-gray-500">
+              <Receipt className="h-3.5 w-3.5" />
+              Total of All Orders
+            </span>
+            <span className="text-lg font-bold text-gray-900">
+              ${totals.totalAmount.toLocaleString()}
+            </span>
+          </div>
+          <div className="flex flex-col items-center sm:items-start gap-1">
+            <span className="flex items-center gap-1.5 text-xs font-medium text-gray-500">
+              <TrendingUp className="h-3.5 w-3.5" />
+              Profit Made
+            </span>
+            <span className={`text-lg font-bold ${totals.totalProfit >= 0 ? "text-green-600" : "text-red-600"}`}>
+              ${totals.totalProfit.toLocaleString()}
+            </span>
+          </div>
+        </CardContent>
+      </Card>
+
       {/* Filters */}
       <FiltersPanel activeCount={activeFilterCount}>
         <Card className="shadow-sm border-gray-200">

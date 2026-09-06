@@ -24,7 +24,7 @@ export async function GET(req, { params }) {
       return NextResponse.json({ message: "Customer not found" }, { status: 404 });
     }
 
-    const match = { customer: customer._id };
+    const match = { customer: customer._id, status: { $ne: "draft" } };
     if (startDateParam || endDateParam) {
       // The client resolves these to precise instants before sending them
       // (see lib/dateUtils.js localDayStartISO/localDayEndISO).

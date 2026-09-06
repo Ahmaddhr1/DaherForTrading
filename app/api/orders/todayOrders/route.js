@@ -16,6 +16,7 @@ export async function GET(req) {
     const startOfTomorrow = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
 
     const query = {
+      status: { $ne: "draft" },
       createdAt: {
         $gte: startOfToday,
         $lt: startOfTomorrow,

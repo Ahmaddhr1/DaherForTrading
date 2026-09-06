@@ -102,15 +102,28 @@ export default function CustomerOrdersTable() {
   const activeFilterCount = [category, startDate, endDate].filter(Boolean).length;
 
   const handleAction = async (action, orderId) => {
+    if (action === "delete" && !window.confirm("Undo this order? Stock will be restored and the customer's debt reduced.")) {
+      return;
+    }
+    if (action === "markPaid" && !window.confirm("Mark this order as fully paid?")) {
+      return;
+    }
+    if (action === "deleteDraft" && !window.confirm("Delete this draft? This cannot be undone.")) {
+      return;
+    }
+    if (action === "finalize" && !window.confirm("Finalize this draft into a real order? This will deduct stock and add to the customer's debt.")) {
+      return;
+    }
+
     try {
       setActionLoading(true);
 
       if (action === "print") {
         const res = await axios.get(`http://localhost:3001/print/${orderId}`);
         toast.success(res.data?.message || "Print triggered!");
-      } else if (action === "delete") {
+      } else if (action === "delete" || action === "deleteDraft") {
         const res = await axios.delete(`/api/orders/${orderId}`);
-        toast.success(res.data?.message || "Order reverted.");
+        toast.success(res.data?.message || (action === "deleteDraft" ? "Draft deleted." : "Order reverted."));
         queryClient.invalidateQueries(["customer-orders", id]);
         queryClient.invalidateQueries(["customer", id]);
       } else if (action === "markPaid") {
@@ -119,13 +132,18 @@ export default function CustomerOrdersTable() {
         queryClient.invalidateQueries(["customer-orders", id]);
         queryClient.invalidateQueries(["customer", id]);
         queryClient.invalidateQueries(["payments-history"]);
-      } else if (action === "edit") {
-        router.push(`/dashboard/orders/${orderId}`);
+      } else if (action === "finalize") {
+        await axios.put(`/api/orders/${orderId}/finalize`);
+        toast.success("Order finalized!");
+        queryClient.invalidateQueries(["customer-orders", id]);
+        queryClient.invalidateQueries(["customer", id]);
+      } else if (action === "edit" || action === "continueEditing") {
+        router.push(action === "continueEditing" ? `/dashboard/orders/${orderId}/edit` : `/dashboard/orders/${orderId}`);
       } else if (action === "view") {
         router.push(`/dashboard/invoices/${orderId}`);
       }
-    } catch {
-      toast.error("Action failed.");
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Action failed.");
     } finally {
       setActionLoading(false);
     }
@@ -134,7 +152,7 @@ export default function CustomerOrdersTable() {
   const orders = data?.orders || [];
   const totalPages = data?.totalPages || 1;
   const totalCount = data?.total || 0;
-  const counts = data?.counts || { pending: 0, partiallyPaid: 0, paid: 0 };
+  const counts = data?.counts || { draft: 0, pending: 0, partiallyPaid: 0, paid: 0 };
 
   return (
     <div className="min-h-screen bg-gray-50 py-6">
@@ -184,6 +202,15 @@ export default function CustomerOrdersTable() {
                 >
                   All
                   <Badge variant="secondary" className="ml-1">{totalCount}</Badge>
+                </Button>
+                <Button
+                  variant={statusFilter === "draft" ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => setStatusFilter("draft")}
+                  className="w-full sm:w-auto justify-center"
+                >
+                  Draft
+                  <Badge variant="secondary" className="ml-1">{counts.draft}</Badge>
                 </Button>
                 <Button
                   variant={statusFilter === "pending" ? "default" : "outline"}
@@ -347,6 +374,8 @@ export default function CustomerOrdersTable() {
                             ? "bg-green-100 text-green-800"
                             : order.status === "partiallyPaid"
                             ? "bg-yellow-100 text-yellow-800"
+                            : order.status === "draft"
+                            ? "bg-slate-200 text-slate-800"
                             : ""
                         }
                       >
@@ -354,6 +383,8 @@ export default function CustomerOrdersTable() {
                           ? "Paid"
                           : order.status === "partiallyPaid"
                           ? "Partially Paid"
+                          : order.status === "draft"
+                          ? "Draft"
                           : "Pending"}
                       </Badge>
                     </TableCell>
@@ -365,37 +396,55 @@ export default function CustomerOrdersTable() {
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
-                          <DropdownMenuItem onClick={() => handleAction("view", order._id)}>
-                            View Invoice
-                          </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => handleAction("print", order._id)}>
-                            {actionLoading && <Loader2 className="animate-spin h-4 w-4 mr-2" />}
-                            Print
-                          </DropdownMenuItem>
-                          {order.status === "pending" && (
-                            <DropdownMenuItem onClick={() => router.push(`/dashboard/orders/${order._id}/edit`)}>
-                              Update Order
-                            </DropdownMenuItem>
-                          )}
-                          {order.status !== "paid" && (
+                          {order.status === "draft" ? (
                             <>
-                              <DropdownMenuItem onClick={() => handleAction("delete", order._id)}>
-                                {actionLoading && (
-                                  <Loader2 className="animate-spin h-4 w-4 mr-2" />
-                                )}
-                                Undo Order
+                              <DropdownMenuItem onClick={() => handleAction("continueEditing", order._id)}>
+                                Continue Editing
                               </DropdownMenuItem>
-                              <DropdownMenuItem onClick={() => handleAction("markPaid", order._id)}>
-                                {actionLoading && (
-                                  <Loader2 className="animate-spin h-4 w-4 mr-2" />
-                                )}
-                                Mark as Paid
+                              <DropdownMenuItem onClick={() => handleAction("finalize", order._id)}>
+                                {actionLoading && <Loader2 className="animate-spin h-4 w-4 mr-2" />}
+                                Finalize Order
+                              </DropdownMenuItem>
+                              <DropdownMenuItem onClick={() => handleAction("deleteDraft", order._id)}>
+                                {actionLoading && <Loader2 className="animate-spin h-4 w-4 mr-2" />}
+                                Delete Draft
+                              </DropdownMenuItem>
+                            </>
+                          ) : (
+                            <>
+                              <DropdownMenuItem onClick={() => handleAction("view", order._id)}>
+                                View Invoice
+                              </DropdownMenuItem>
+                              <DropdownMenuItem onClick={() => handleAction("print", order._id)}>
+                                {actionLoading && <Loader2 className="animate-spin h-4 w-4 mr-2" />}
+                                Print
+                              </DropdownMenuItem>
+                              {order.status === "pending" && (
+                                <DropdownMenuItem onClick={() => router.push(`/dashboard/orders/${order._id}/edit`)}>
+                                  Update Order
+                                </DropdownMenuItem>
+                              )}
+                              {order.status !== "paid" && (
+                                <>
+                                  <DropdownMenuItem onClick={() => handleAction("delete", order._id)}>
+                                    {actionLoading && (
+                                      <Loader2 className="animate-spin h-4 w-4 mr-2" />
+                                    )}
+                                    Undo Order
+                                  </DropdownMenuItem>
+                                  <DropdownMenuItem onClick={() => handleAction("markPaid", order._id)}>
+                                    {actionLoading && (
+                                      <Loader2 className="animate-spin h-4 w-4 mr-2" />
+                                    )}
+                                    Mark as Paid
+                                  </DropdownMenuItem>
+                                </>
+                              )}
+                              <DropdownMenuItem onClick={() => handleAction("edit", order._id)}>
+                                {order.status === "paid" ? "View Payment" : "Make Payment"}
                               </DropdownMenuItem>
                             </>
                           )}
-                          <DropdownMenuItem onClick={() => handleAction("edit", order._id)}>
-                            {order.status === "paid" ? "View Payment" : "Make Payment"}
-                          </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
                     </TableCell>

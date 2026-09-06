@@ -18,6 +18,7 @@ import {
   Plus,
   History,
   Lock,
+  FileText,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -160,6 +161,12 @@ const EditCompanyPage = () => {
                 <Button className="flex items-center gap-2 w-full sm:w-auto justify-center">
                   <Plus className="h-4 w-4" />
                   <span className="hidden sm:inline">New Purchase</span>
+                </Button>
+              </Link>
+              <Link href={`/dashboard/companies/${id}/statement`} className="flex-1 sm:flex-none">
+                <Button variant="outline" className="flex items-center gap-2 w-full sm:w-auto justify-center">
+                  <FileText className="h-4 w-4" />
+                  <span className="hidden sm:inline">Statement</span>
                 </Button>
               </Link>
             </div>

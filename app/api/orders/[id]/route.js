@@ -37,33 +37,35 @@ export async function DELETE(request, { params }) {
       return NextResponse.json({ message: "Order not found" }, { status: 404 });
     }
 
-    // Only allow deleting pending orders
-    if (order.status !== "pending") {
+    // Only allow deleting pending orders and drafts
+    if (order.status !== "pending" && order.status !== "draft") {
       return NextResponse.json(
-        { message: "Only pending orders can be deleted" },
+        { message: "Only pending orders or drafts can be deleted" },
         { status: 400 }
       );
     }
 
-    // Roll back product quantities and nbOfOrders
-    for (const item of order.products) {
-      await Product.findByIdAndUpdate(item.productId, {
-        $inc: {
-          quantity: item.quantity,
-          nbOfOrders: -item.quantity,
-        },
+    // A draft never touched stock or debt, so there's nothing to roll back -
+    // just detach it from the customer and remove it.
+    if (order.status === "pending") {
+      for (const item of order.products) {
+        await Product.findByIdAndUpdate(item.productId, {
+          $inc: {
+            quantity: item.quantity,
+            nbOfOrders: -item.quantity,
+          },
+        });
+      }
+
+      await Customer.findByIdAndUpdate(order.customer, {
+        $inc: { debt: -order.total },
+        $pull: { orders: order._id },
+      });
+    } else {
+      await Customer.findByIdAndUpdate(order.customer, {
+        $pull: { orders: order._id },
       });
     }
-
-    // Decrease customer's debt by the total of the order
-    await Customer.findByIdAndUpdate(order.customer, {
-      $inc: {
-        debt: -order.total,
-      },
-      $pull: {
-        orders: order._id,
-      },
-    });
 
     // Delete the order itself
     await Order.findByIdAndDelete(id);
@@ -81,11 +83,13 @@ export async function DELETE(request, { params }) {
   }
 }
 
-// Edit the products/quantities/prices of a still-pending order. Rebuilds the
-// order's line items from scratch: stock and nbOfOrders are computed as a net
-// delta against the order's current items (so switching a row's product or
-// quantity nets out correctly against a single product touched twice), and
-// everything is validated against that net delta before any write happens.
+// Edit the products/quantities/prices of a draft or still-pending order.
+// A draft never touched stock or debt, so it's just overwritten in place. A
+// pending order rebuilds its line items from scratch: stock and nbOfOrders
+// are computed as a net delta against the order's current items (so
+// switching a row's product or quantity nets out correctly against a single
+// product touched twice), and everything is validated against that net
+// delta before any write happens.
 export async function PUT(req, { params }) {
   await connectToDB();
 
@@ -105,10 +109,52 @@ export async function PUT(req, { params }) {
       return NextResponse.json({ message: "Order not found" }, { status: 404 });
     }
 
-    if (order.status !== "pending") {
+    if (order.status !== "pending" && order.status !== "draft") {
       return NextResponse.json(
-        { message: "Only pending orders can be updated" },
+        { message: "Only pending orders or drafts can be updated" },
         { status: 400 }
+      );
+    }
+
+    if (order.status === "draft") {
+      const enrichedProducts = [];
+      let totalProfit = 0;
+      let total = 0;
+
+      for (const item of products) {
+        const product = await Product.findById(item.productId);
+        if (!product) {
+          return NextResponse.json(
+            { message: `Product with ID ${item.productId} not found.` },
+            { status: 404 }
+          );
+        }
+        if (typeof item.price !== "number" || isNaN(item.price)) {
+          return NextResponse.json(
+            { message: `Invalid price for product ${product.name}` },
+            { status: 400 }
+          );
+        }
+
+        totalProfit += (item.price - product.initialPrice) * item.quantity;
+        total += item.price * item.quantity;
+
+        enrichedProducts.push({
+          productId: item.productId,
+          name: product.name,
+          quantity: item.quantity,
+          price: item.price,
+        });
+      }
+
+      order.products = enrichedProducts;
+      order.total = total;
+      order.profit = totalProfit;
+      await order.save();
+
+      return NextResponse.json(
+        { message: "Draft updated successfully", order },
+        { status: 200 }
       );
     }
 
@@ -218,7 +264,7 @@ export async function POST(req, { params }) {
 
   try {
     const customerId = params.id;
-    const { products, total } = await req.json();
+    const { products, total, asDraft } = await req.json();
 
     if (!products?.length) {
       return NextResponse.json(
@@ -248,8 +294,9 @@ export async function POST(req, { params }) {
         );
       }
 
-      // Check stock
-      if (product.quantity < item.quantity) {
+      // A draft doesn't touch stock, so it's exempt from the stock check -
+      // it's only enforced once the draft is finalized into a real order.
+      if (!asDraft && product.quantity < item.quantity) {
         return NextResponse.json(
           {
             message: `Insufficient stock for "${product.name}". Available: ${product.quantity}, requested: ${item.quantity}`,
@@ -275,38 +322,42 @@ export async function POST(req, { params }) {
         price: item.price,
       });
 
-      productUpdates.push({
-        updateOne: {
-          filter: { _id: product._id },
-          update: {
-            $inc: {
-              quantity: -item.quantity,
-              nbOfOrders: item.quantity,
+      if (!asDraft) {
+        productUpdates.push({
+          updateOne: {
+            filter: { _id: product._id },
+            update: {
+              $inc: {
+                quantity: -item.quantity,
+                nbOfOrders: item.quantity,
+              },
             },
           },
-        },
-      });
+        });
+      }
     }
 
     const newOrder = await Order.create({
       customer: customerId,
       products: enrichedProducts,
       total,
-      remainingBalance: total,
+      status: asDraft ? "draft" : "pending",
+      remainingBalance: asDraft ? undefined : total,
       profit: totalProfit, // store calculated profit
     });
 
-    // Update product quantities
-    await Product.bulkWrite(productUpdates);
+    // A draft never reserves stock or counts toward debt until finalized.
+    if (!asDraft) {
+      await Product.bulkWrite(productUpdates);
+    }
 
-    // Attach order to customer and update debt
     await Customer.findByIdAndUpdate(customerId, {
       $push: { orders: newOrder._id },
-      $inc: { debt: newOrder.total },
+      ...(asDraft ? {} : { $inc: { debt: newOrder.total } }),
     });
 
     return NextResponse.json(
-      { message: "Order created successfully", order: newOrder },
+      { message: asDraft ? "Draft saved successfully" : "Order created successfully", order: newOrder },
       { status: 201 }
     );
   } catch (error) {

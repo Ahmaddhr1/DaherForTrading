@@ -31,7 +31,7 @@ export async function GET(req, { params }) {
     }
 
     const query = { customer: customer._id };
-    if (status && ["pending", "partiallyPaid", "paid"].includes(status)) {
+    if (status && ["draft", "pending", "partiallyPaid", "paid"].includes(status)) {
       query.status = status;
     }
     if (startDateParam || endDateParam) {
@@ -76,7 +76,7 @@ export async function GET(req, { params }) {
       { $match: { customer: customer._id } },
       { $group: { _id: "$status", count: { $sum: 1 } } },
     ]);
-    const counts = { pending: 0, partiallyPaid: 0, paid: 0 };
+    const counts = { draft: 0, pending: 0, partiallyPaid: 0, paid: 0 };
     statusCounts.forEach((s) => {
       if (counts[s._id] !== undefined) counts[s._id] = s.count;
     });

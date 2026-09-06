@@ -102,6 +102,10 @@ const NewPurchasePage = () => {
       }
     }
 
+    if (!window.confirm(`Record ${rows.length > 1 ? "these purchases" : "this purchase"} for $${total.toFixed(3)}? Stock will increase and the company's balance will be updated.`)) {
+      return;
+    }
+
     mutation.mutate();
   };
 

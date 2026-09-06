@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { FormSkeleton } from "@/components/ui/skeleton-patterns";
-import { Loader2, CheckCircle, PencilLine } from "lucide-react";
+import { Loader2, CheckCircle, PencilLine, Trash2 } from "lucide-react";
 import Link from "next/link";
 
 export default function OrderDetailsPage() {
@@ -67,7 +67,48 @@ export default function OrderDetailsPage() {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!amountPaid || Number(amountPaid) <= 0) return toast.error("Please enter a valid amount");
+    if (!window.confirm(`Record a payment of $${Number(amountPaid).toFixed(3)} for this order?`)) return;
     mutation.mutate(amountPaid);
+  };
+
+  const finalizeMutation = useMutation({
+    mutationFn: async () => {
+      const res = await axios.put(`/api/orders/${orderId}/finalize`);
+      return res.data;
+    },
+    onSuccess: () => {
+      toast.success("Order finalized!");
+      queryClient.invalidateQueries({ queryKey: ["order", orderId] });
+      queryClient.invalidateQueries({ queryKey: ["customer-orders"] });
+      queryClient.invalidateQueries({ queryKey: ["customer", order?.customer?._id] });
+    },
+    onError: (err) => {
+      toast.error(err.response?.data?.message || "Failed to finalize order");
+    },
+  });
+
+  const deleteDraftMutation = useMutation({
+    mutationFn: async () => {
+      const res = await axios.delete(`/api/orders/${orderId}`);
+      return res.data;
+    },
+    onSuccess: () => {
+      toast.success("Draft deleted");
+      router.push(`/dashboard/customers/${order?.customer?._id}`);
+    },
+    onError: (err) => {
+      toast.error(err.response?.data?.message || "Failed to delete draft");
+    },
+  });
+
+  const handleFinalize = () => {
+    if (!window.confirm(`Finalize this draft into a real order for $${order?.total.toFixed(3)}? This will deduct stock and add to the customer's debt.`)) return;
+    finalizeMutation.mutate();
+  };
+
+  const handleDeleteDraft = () => {
+    if (!window.confirm("Delete this draft? This cannot be undone.")) return;
+    deleteDraftMutation.mutate();
   };
 
   if (isLoading) {
@@ -130,6 +171,8 @@ export default function OrderDetailsPage() {
                     ? "bg-green-100 text-green-700"
                     : order.status === "partiallyPaid"
                     ? "bg-yellow-100 text-yellow-700"
+                    : order.status === "draft"
+                    ? "bg-slate-200 text-slate-700"
                     : "bg-gray-100 text-gray-700"
                 }`}
               >
@@ -147,7 +190,46 @@ export default function OrderDetailsPage() {
             </Link>
           )}
 
-          {order.status !== "paid" && (
+          {order.status === "draft" && (
+            <div className="space-y-3">
+              <p className="text-sm text-gray-600 text-center">
+                This is a draft - it hasn&apos;t been finalized yet, so stock and the customer&apos;s debt haven&apos;t been affected.
+              </p>
+              <Link href={`/dashboard/orders/${orderId}/edit`}>
+                <Button variant="outline" className="w-full flex items-center gap-2">
+                  <PencilLine className="h-4 w-4" />
+                  Continue Editing
+                </Button>
+              </Link>
+              <Button
+                onClick={handleFinalize}
+                disabled={finalizeMutation.isPending}
+                className="w-full flex items-center gap-2 bg-green-600 hover:bg-green-700"
+              >
+                {finalizeMutation.isPending ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <CheckCircle className="h-4 w-4" />
+                )}
+                Finalize Order
+              </Button>
+              <Button
+                variant="outline"
+                onClick={handleDeleteDraft}
+                disabled={deleteDraftMutation.isPending}
+                className="w-full flex items-center gap-2 text-red-600 hover:text-red-700 hover:bg-red-50"
+              >
+                {deleteDraftMutation.isPending ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Trash2 className="h-4 w-4" />
+                )}
+                Delete Draft
+              </Button>
+            </div>
+          )}
+
+          {order.status !== "paid" && order.status !== "draft" && (
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
                 <label className="text-sm font-medium text-gray-700">Payment Amount ($)</label>

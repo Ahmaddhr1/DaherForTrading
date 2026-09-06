@@ -10,7 +10,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Label } from "@/components/ui/label";
 import { ListSkeleton, PageHeaderSkeleton } from "@/components/ui/skeleton-patterns";
 import { toast } from "sonner";
-import { Loader2, Plus, Trash2, ShoppingCart, ArrowLeft } from "lucide-react";
+import { Loader2, Plus, Trash2, ShoppingCart, ArrowLeft, Save } from "lucide-react";
 import Link from "next/link";
 
 const MakeOrderPage = () => {
@@ -26,6 +26,7 @@ const MakeOrderPage = () => {
   }]);
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSavingDraft, setIsSavingDraft] = useState(false);
 
   // Load products
   useEffect(() => {
@@ -102,24 +103,31 @@ const MakeOrderPage = () => {
     return product ? product.name : "Select Product";
   };
 
-  // Submit order
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    
-    // Validation
+  const validateRows = () => {
     for (const row of orderRows) {
       if (!row.productId) {
         toast.error("Please select a product for all items");
-        return;
+        return false;
       }
       if (!row.quantity || row.quantity < 1) {
         toast.error("Quantity must be at least 1");
-        return;
+        return false;
       }
       if (!row.price || parseFloat(row.price) <= 0) {
         toast.error("Please enter a valid price");
-        return;
+        return false;
       }
+    }
+    return true;
+  };
+
+  // Submit order (real order - deducts stock and adds to the customer's debt)
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!validateRows()) return;
+
+    if (!window.confirm(`Create this order for $${calculateTotal().toFixed(3)}? This will deduct stock and add to the customer's debt.`)) {
+      return;
     }
 
     setIsSubmitting(true);
@@ -135,14 +143,42 @@ const MakeOrderPage = () => {
       };
 
       await axios.post(`/api/orders/${customerId}`, orderData);
-      
+
       toast.success("Order created successfully!");
       router.push(`/dashboard/customers/${customerId}/orders`);
-      
+
     } catch (error) {
       toast.error(error.response?.data?.message || "Failed to create order");
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  // Save as a draft - no stock deduction, no debt change, can be resumed or
+  // finalized into a real order later.
+  const handleSaveDraft = async () => {
+    if (!validateRows()) return;
+
+    setIsSavingDraft(true);
+    try {
+      const orderData = {
+        products: orderRows.map(row => ({
+          productId: row.productId,
+          quantity: row.quantity,
+          price: parseFloat(row.price)
+        })),
+        total: calculateTotal(),
+        asDraft: true,
+      };
+
+      await axios.post(`/api/orders/${customerId}`, orderData);
+
+      toast.success("Draft saved!");
+      router.push(`/dashboard/customers/${customerId}/orders`);
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Failed to save draft");
+    } finally {
+      setIsSavingDraft(false);
     }
   };
 
@@ -285,17 +321,36 @@ const MakeOrderPage = () => {
                 </div>
               </div>
 
-              {/* Submit Button */}
-              <div className="flex gap-3 pt-4">
-                <Link href={`/dashboard/customers/${customerId}`} className="flex-1">
+              {/* Submit Buttons */}
+              <div className="flex flex-col sm:flex-row gap-3 pt-4">
+                <Link href={`/dashboard/customers/${customerId}`} className="sm:flex-1">
                   <Button type="button" variant="outline" className="w-full">
                     Cancel
                   </Button>
                 </Link>
                 <Button
+                  type="button"
+                  variant="outline"
+                  onClick={handleSaveDraft}
+                  disabled={isSubmitting || isSavingDraft}
+                  className="sm:flex-1"
+                >
+                  {isSavingDraft ? (
+                    <span className="flex items-center gap-2">
+                      <Loader2 className="animate-spin h-4 w-4" />
+                      Saving Draft...
+                    </span>
+                  ) : (
+                    <span className="flex items-center gap-2">
+                      <Save className="h-4 w-4" />
+                      Save as Draft
+                    </span>
+                  )}
+                </Button>
+                <Button
                   type="submit"
-                  disabled={isSubmitting}
-                  className="flex-1 bg-blue-600 hover:bg-blue-700"
+                  disabled={isSubmitting || isSavingDraft}
+                  className="sm:flex-1 bg-blue-600 hover:bg-blue-700"
                 >
                   {isSubmitting ? (
                     <span className="flex items-center gap-2">

@@ -427,6 +427,9 @@ function MakePaymentForm({ onSuccess }) {
       toast.error("Enter a valid payment amount (up to the current debt)");
       return;
     }
+    if (!window.confirm(`Record a payment of $${paymentAmount.toFixed(3)} for ${selectedCustomer.fullName}?`)) {
+      return;
+    }
     paymentMutation.mutate();
   };
 

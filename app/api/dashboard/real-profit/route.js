@@ -30,7 +30,7 @@ export async function GET(req) {
     const hasDateFilter = Object.keys(dateMatch).length > 0;
 
     const agg = await Order.aggregate([
-      ...(hasDateFilter ? [{ $match: { createdAt: dateMatch } }] : []),
+      { $match: { status: { $ne: "draft" }, ...(hasDateFilter ? { createdAt: dateMatch } : {}) } },
       {
         $group: {
           _id: { $dateToString: { format: dateFormat, date: "$createdAt" } },

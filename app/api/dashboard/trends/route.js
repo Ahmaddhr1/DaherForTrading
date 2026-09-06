@@ -23,6 +23,7 @@ export async function GET(req) {
 
     const [salesAgg, purchasesAgg] = await Promise.all([
       Order.aggregate([
+        { $match: { status: { $ne: "draft" } } },
         {
           $group: {
             _id: { $dateToString: { format: dateFormat, date: "$createdAt" } },

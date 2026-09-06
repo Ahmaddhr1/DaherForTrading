@@ -32,6 +32,7 @@ export async function GET(req, { params }) {
       {
         $match: {
           "products.productId": product._id,
+          status: { $ne: "draft" },
           ...(hasDateFilter ? { createdAt: dateMatch } : {}),
         },
       },

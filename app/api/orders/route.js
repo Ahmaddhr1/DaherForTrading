@@ -66,6 +66,30 @@ export async function GET(req) {
       if (counts[s._id] !== undefined) counts[s._id] = s.count;
     });
 
+    // Sum of order value and real profit across every order matching the
+    // current filters (not just the current page). Drafts never count
+    // toward either figure since they haven't been finalized - unless the
+    // status filter is explicitly "draft", in which case that's exactly
+    // what's being viewed.
+    const totalsMatch = { ...query };
+    if (!totalsMatch.status) {
+      totalsMatch.status = { $ne: "draft" };
+    }
+    const [totalsResult] = await Order.aggregate([
+      { $match: totalsMatch },
+      {
+        $group: {
+          _id: null,
+          totalAmount: { $sum: "$total" },
+          totalProfit: { $sum: { $ifNull: ["$profit", 0] } },
+        },
+      },
+    ]);
+    const totals = {
+      totalAmount: totalsResult?.totalAmount || 0,
+      totalProfit: totalsResult?.totalProfit || 0,
+    };
+
     return NextResponse.json(
       {
         orders,
@@ -73,6 +97,7 @@ export async function GET(req) {
         page,
         totalPages: Math.ceil(total / limit),
         counts,
+        totals,
       },
       { status: 200 }
     );

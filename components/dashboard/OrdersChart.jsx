@@ -33,12 +33,13 @@ const OrdersChart = ({ range = "all", startDate, endDate }) => {
   const stats = data || {};
   const orderCounts = stats?.counts?.orders || {};
 
-  // Simple chart data
+  // Fixed lookback periods only - the selected-range count already has its
+  // own "Total Orders" card in the summary section above, so it isn't
+  // repeated here.
   const chartData = [
     { period: "Today", orders: orderCounts.today || 0 },
     { period: "Last Week", orders: orderCounts.lastWeek || 0 },
     { period: "All Time", orders: orderCounts.allTime || 0 },
-    { period: "Selected Range", orders: orderCounts.selected || 0 },
   ];
 
   const maxOrders = Math.max(...chartData.map(item => item.orders), 1);

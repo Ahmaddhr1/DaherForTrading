@@ -10,7 +10,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Label } from "@/components/ui/label";
 import { PageHeaderSkeleton, ListSkeleton } from "@/components/ui/skeleton-patterns";
 import { toast } from "sonner";
-import { Loader2, Plus, Trash2, PencilLine, ArrowLeft } from "lucide-react";
+import { Loader2, Plus, Trash2, PencilLine, ArrowLeft, CheckCircle } from "lucide-react";
 import Link from "next/link";
 
 let rowIdCounter = 1;
@@ -23,6 +23,7 @@ export default function EditOrderPage() {
   const [products, setProducts] = useState([]);
   const [orderRows, setOrderRows] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isFinalizing, setIsFinalizing] = useState(false);
 
   const { data: order, isLoading: isLoadingOrder } = useQuery({
     queryKey: ["order", orderId],
@@ -88,13 +89,35 @@ export default function EditOrderPage() {
   const calculateTotal = () =>
     orderRows.reduce((total, row) => total + ((parseFloat(row.price) || 0) * (row.quantity || 0)), 0);
 
+  const isDraft = order?.status === "draft";
+
+  const validateRows = () => {
+    for (const row of orderRows) {
+      if (!row.productId) {
+        toast.error("Please select a product for all items");
+        return false;
+      }
+      if (!row.quantity || row.quantity < 1) {
+        toast.error("Quantity must be at least 1");
+        return false;
+      }
+      if (!row.price || parseFloat(row.price) <= 0) {
+        toast.error("Please enter a valid price");
+        return false;
+      }
+    }
+    return true;
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!validateRows()) return;
 
-    for (const row of orderRows) {
-      if (!row.productId) return toast.error("Please select a product for all items");
-      if (!row.quantity || row.quantity < 1) return toast.error("Quantity must be at least 1");
-      if (!row.price || parseFloat(row.price) <= 0) return toast.error("Please enter a valid price");
+    // A draft is just a scratchpad, so it's saved without asking - but a
+    // pending order already reserves stock and counts toward debt, so
+    // changing its line items is confirmed first.
+    if (!isDraft && !window.confirm(`Update this order to $${calculateTotal().toFixed(3)}? Stock and the customer's debt will be adjusted for the difference.`)) {
+      return;
     }
 
     setIsSubmitting(true);
@@ -107,7 +130,7 @@ export default function EditOrderPage() {
         })),
       });
 
-      toast.success("Order updated successfully!");
+      toast.success(isDraft ? "Draft saved!" : "Order updated successfully!");
       queryClient.invalidateQueries({ queryKey: ["order", orderId] });
       queryClient.invalidateQueries({ queryKey: ["customer-orders"] });
       queryClient.invalidateQueries({ queryKey: ["customer", order?.customer?._id] });
@@ -116,6 +139,36 @@ export default function EditOrderPage() {
       toast.error(error.response?.data?.message || "Failed to update order");
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  const handleFinalize = async () => {
+    if (!validateRows()) return;
+    if (!window.confirm(`Finalize this draft into a real order for $${calculateTotal().toFixed(3)}? This will deduct stock and add to the customer's debt.`)) {
+      return;
+    }
+
+    setIsFinalizing(true);
+    try {
+      // Save any in-progress edits first, then finalize.
+      await axios.put(`/api/orders/${orderId}`, {
+        products: orderRows.map((row) => ({
+          productId: row.productId,
+          quantity: row.quantity,
+          price: parseFloat(row.price),
+        })),
+      });
+      await axios.put(`/api/orders/${orderId}/finalize`);
+
+      toast.success("Order finalized!");
+      queryClient.invalidateQueries({ queryKey: ["order", orderId] });
+      queryClient.invalidateQueries({ queryKey: ["customer-orders"] });
+      queryClient.invalidateQueries({ queryKey: ["customer", order?.customer?._id] });
+      router.push(`/dashboard/orders/${orderId}`);
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Failed to finalize order");
+    } finally {
+      setIsFinalizing(false);
     }
   };
 
@@ -136,11 +189,11 @@ export default function EditOrderPage() {
     );
   }
 
-  if (order && order.status !== "pending") {
+  if (order && order.status !== "pending" && order.status !== "draft") {
     return (
       <div className="min-h-screen bg-gray-50 py-6">
         <div className="container mx-auto px-4 max-w-xl text-center">
-          <p className="text-gray-600 mb-4">Only pending orders can be updated. This order is {order.status}.</p>
+          <p className="text-gray-600 mb-4">Only pending orders or drafts can be updated. This order is {order.status}.</p>
           <Link href={`/dashboard/orders/${orderId}`}>
             <Button variant="outline">Back to Order</Button>
           </Link>
@@ -165,8 +218,12 @@ export default function EditOrderPage() {
               <PencilLine className="h-6 w-6 text-blue-600" />
             </div>
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">Update Order</h1>
-              <p className="text-gray-600">Edit products, quantities, and prices for this pending order</p>
+              <h1 className="text-3xl font-bold text-gray-900">{isDraft ? "Edit Draft" : "Update Order"}</h1>
+              <p className="text-gray-600">
+                {isDraft
+                  ? "Edit products, quantities, and prices, then save or finalize this draft"
+                  : "Edit products, quantities, and prices for this pending order"}
+              </p>
             </div>
           </div>
         </div>
@@ -257,25 +314,45 @@ export default function EditOrderPage() {
                 </div>
               </div>
 
-              <div className="flex gap-3 pt-4">
-                <Link href={`/dashboard/orders/${orderId}`} className="flex-1">
+              <div className="flex flex-col sm:flex-row gap-3 pt-4">
+                <Link href={`/dashboard/orders/${orderId}`} className="sm:flex-1">
                   <Button type="button" variant="outline" className="w-full">
                     Cancel
                   </Button>
                 </Link>
-                <Button type="submit" disabled={isSubmitting} className="flex-1 bg-blue-600 hover:bg-blue-700">
+                <Button type="submit" disabled={isSubmitting || isFinalizing} className="sm:flex-1 bg-blue-600 hover:bg-blue-700">
                   {isSubmitting ? (
                     <span className="flex items-center gap-2">
                       <Loader2 className="animate-spin h-4 w-4" />
-                      Updating Order...
+                      {isDraft ? "Saving Draft..." : "Updating Order..."}
                     </span>
                   ) : (
                     <span className="flex items-center gap-2">
                       <PencilLine className="h-4 w-4" />
-                      Update Order
+                      {isDraft ? "Save Draft" : "Update Order"}
                     </span>
                   )}
                 </Button>
+                {isDraft && (
+                  <Button
+                    type="button"
+                    onClick={handleFinalize}
+                    disabled={isSubmitting || isFinalizing}
+                    className="sm:flex-1 bg-green-600 hover:bg-green-700"
+                  >
+                    {isFinalizing ? (
+                      <span className="flex items-center gap-2">
+                        <Loader2 className="animate-spin h-4 w-4" />
+                        Finalizing...
+                      </span>
+                    ) : (
+                      <span className="flex items-center gap-2">
+                        <CheckCircle className="h-4 w-4" />
+                        Finalize Order
+                      </span>
+                    )}
+                  </Button>
+                )}
               </div>
             </form>
           </CardContent>

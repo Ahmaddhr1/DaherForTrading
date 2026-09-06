@@ -78,6 +78,19 @@ export default function AllOrders() {
   }, [statusFilter, searchTerm, sortBy, pageSize]);
 
   const handleAction = async (action, orderId) => {
+    if (action === "delete" && !window.confirm("Undo this order? Stock will be restored and the customer's debt reduced.")) {
+      return;
+    }
+    if (action === "markPaid" && !window.confirm("Mark this order as fully paid?")) {
+      return;
+    }
+    if (action === "deleteDraft" && !window.confirm("Delete this draft? This cannot be undone.")) {
+      return;
+    }
+    if (action === "finalize" && !window.confirm("Finalize this draft into a real order? This will deduct stock and add to the customer's debt.")) {
+      return;
+    }
+
     try {
       setActionLoading(true);
       if (action === "markPaid") {
@@ -85,17 +98,23 @@ export default function AllOrders() {
         toast.success("Order marked as paid!");
         queryClient.invalidateQueries(["orders", "all"]);
         queryClient.invalidateQueries(["payments-history"]);
-      } else if (action === "delete") {
+      } else if (action === "delete" || action === "deleteDraft") {
         const res = await axios.delete(`/api/orders/${orderId}`);
-        toast.success(res.data?.message || "Order reverted.");
+        toast.success(res.data?.message || (action === "deleteDraft" ? "Draft deleted." : "Order reverted."));
+        queryClient.invalidateQueries(["orders", "all"]);
+      } else if (action === "finalize") {
+        await axios.put(`/api/orders/${orderId}/finalize`);
+        toast.success("Order finalized!");
         queryClient.invalidateQueries(["orders", "all"]);
       } else if (action === "pay") {
         router.push(`/dashboard/orders/${orderId}`);
+      } else if (action === "continueEditing") {
+        router.push(`/dashboard/orders/${orderId}/edit`);
       } else if (action === "view") {
         router.push(`/dashboard/invoices/${orderId}`);
       }
-    } catch {
-      toast.error("Action failed.");
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Action failed.");
     } finally {
       setActionLoading(false);
     }
@@ -104,7 +123,7 @@ export default function AllOrders() {
   const orders = data?.orders || [];
   const totalPages = data?.totalPages || 1;
   const totalCount = data?.total || 0;
-  const counts = data?.counts || { pending: 0, partiallyPaid: 0, paid: 0 };
+  const counts = data?.counts || { draft: 0, pending: 0, partiallyPaid: 0, paid: 0 };
   const activeFilterCount = [
     searchTerm,
     statusFilter !== "all" ? statusFilter : "",
@@ -119,10 +138,12 @@ export default function AllOrders() {
           ? "bg-green-100 text-green-800"
           : status === "partiallyPaid"
           ? "bg-yellow-100 text-yellow-800"
+          : status === "draft"
+          ? "bg-slate-200 text-slate-800"
           : ""
       }
     >
-      {status === "paid" ? "Paid" : status === "partiallyPaid" ? "Partially Paid" : "Pending"}
+      {status === "paid" ? "Paid" : status === "partiallyPaid" ? "Partially Paid" : status === "draft" ? "Draft" : "Pending"}
     </Badge>
   );
 
@@ -134,25 +155,41 @@ export default function AllOrders() {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
-        <DropdownMenuItem onClick={() => handleAction("view", order._id)}>
-          View Invoice
-        </DropdownMenuItem>
-        {order.status === "pending" && (
-          <DropdownMenuItem onClick={() => router.push(`/dashboard/orders/${order._id}/edit`)}>
-            Update Order
-          </DropdownMenuItem>
-        )}
-        {order.status !== "paid" && (
+        {order.status === "draft" ? (
           <>
-            <DropdownMenuItem onClick={() => handleAction("pay", order._id)}>
-              Make Payment
+            <DropdownMenuItem onClick={() => handleAction("continueEditing", order._id)}>
+              Continue Editing
             </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => handleAction("markPaid", order._id)}>
-              Mark as Paid
+            <DropdownMenuItem onClick={() => handleAction("finalize", order._id)}>
+              Finalize Order
             </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => handleAction("delete", order._id)}>
-              Undo Order
+            <DropdownMenuItem onClick={() => handleAction("deleteDraft", order._id)}>
+              Delete Draft
             </DropdownMenuItem>
+          </>
+        ) : (
+          <>
+            <DropdownMenuItem onClick={() => handleAction("view", order._id)}>
+              View Invoice
+            </DropdownMenuItem>
+            {order.status === "pending" && (
+              <DropdownMenuItem onClick={() => router.push(`/dashboard/orders/${order._id}/edit`)}>
+                Update Order
+              </DropdownMenuItem>
+            )}
+            {order.status !== "paid" && (
+              <>
+                <DropdownMenuItem onClick={() => handleAction("pay", order._id)}>
+                  Make Payment
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => handleAction("markPaid", order._id)}>
+                  Mark as Paid
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => handleAction("delete", order._id)}>
+                  Undo Order
+                </DropdownMenuItem>
+              </>
+            )}
           </>
         )}
       </DropdownMenuContent>
@@ -189,6 +226,15 @@ export default function AllOrders() {
               >
                 All
                 <Badge variant="secondary" className="ml-1">{totalCount}</Badge>
+              </Button>
+              <Button
+                variant={statusFilter === "draft" ? "default" : "outline"}
+                size="sm"
+                onClick={() => setStatusFilter("draft")}
+                className="w-full sm:w-auto justify-center"
+              >
+                Draft
+                <Badge variant="secondary" className="ml-1">{counts.draft}</Badge>
               </Button>
               <Button
                 variant={statusFilter === "pending" ? "default" : "outline"}

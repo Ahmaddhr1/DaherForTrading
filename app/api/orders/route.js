@@ -26,7 +26,7 @@ export async function GET(req) {
 
     const query = {};
 
-    if (status && ["pending", "partiallyPaid", "paid"].includes(status)) {
+    if (status && ["draft", "pending", "partiallyPaid", "paid"].includes(status)) {
       query.status = status;
     }
 
@@ -61,7 +61,7 @@ export async function GET(req) {
     const statusCounts = await Order.aggregate([
       { $group: { _id: "$status", count: { $sum: 1 } } },
     ]);
-    const counts = { pending: 0, partiallyPaid: 0, paid: 0 };
+    const counts = { draft: 0, pending: 0, partiallyPaid: 0, paid: 0 };
     statusCounts.forEach((s) => {
       if (counts[s._id] !== undefined) counts[s._id] = s.count;
     });

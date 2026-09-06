@@ -17,7 +17,7 @@ export async function GET(_, { params }) {
       return NextResponse.json({ message: "Customer not found" }, { status: 404 });
     }
 
-    const orders = await Order.find({ customer: customer._id })
+    const orders = await Order.find({ customer: customer._id, status: { $ne: "draft" } })
       .select("total amountpaid remainingBalance status createdAt")
       .sort({ createdAt: -1 });
 

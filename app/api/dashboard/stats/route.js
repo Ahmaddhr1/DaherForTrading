@@ -36,8 +36,11 @@ export async function GET(req) {
     const endOfLastMonth = new Date(now.getFullYear(), now.getMonth(), 0);
     endOfLastMonth.setHours(23, 59, 59, 999);
 
+    const nonDraft = { status: { $ne: "draft" } };
+
     // Get monthly data (last 6 months)
     const monthlyData = await Order.aggregate([
+      { $match: nonDraft },
       {
         $group: {
           _id: {
@@ -72,14 +75,15 @@ export async function GET(req) {
     ] = await Promise.all([
       // All-time counts
       Product.countDocuments(),
-      Order.countDocuments(),
+      Order.countDocuments(nonDraft),
       Category.countDocuments(),
       Customer.countDocuments(),
 
       // Today counts
-      Order.countDocuments({ createdAt: { $gte: startOfToday } }),
+      Order.countDocuments({ ...nonDraft, createdAt: { $gte: startOfToday } }),
       // Last week counts
       Order.countDocuments({
+        ...nonDraft,
         createdAt: {
           $gte: startOfLastWeek,
           $lte: endOfLastWeek
@@ -87,6 +91,7 @@ export async function GET(req) {
       }),
       // Last month counts
       Order.countDocuments({
+        ...nonDraft,
         createdAt: {
           $gte: startOfLastMonth,
           $lte: endOfLastMonth
@@ -124,7 +129,7 @@ export async function GET(req) {
       }),
 
       // Counts for the currently selected filter range
-      Order.countDocuments({ createdAt: { $gte: selectedStart, $lte: selectedEnd } }),
+      Order.countDocuments({ ...nonDraft, createdAt: { $gte: selectedStart, $lte: selectedEnd } }),
       Customer.countDocuments({ createdAt: { $gte: selectedStart, $lte: selectedEnd } }),
       Product.countDocuments({ createdAt: { $gte: selectedStart, $lte: selectedEnd } }),
     ]);

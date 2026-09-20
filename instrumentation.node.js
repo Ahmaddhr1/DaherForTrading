@@ -5,8 +5,16 @@
 // relied on to keep ticking; Vercel Cron (vercel.json) handles that case
 // instead. See app/api/cron/backup/route.js for the full picture.
 if (!process.env.VERCEL) {
-  const { startScheduledBackup } = require("./lib/scheduledBackup.js");
-  startScheduledBackup();
+  // Dynamic import rather than require(): lib/scheduledBackup.js pulls in
+  // node-cron, an ESM-only package that webpack can only load via an async
+  // import() under the hood, which makes scheduledBackup.js itself an
+  // async module. require()-ing an async module synchronously hands back
+  // exports that haven't been populated yet (startScheduledBackup was
+  // `undefined`, crashing every request at server startup) - import()
+  // correctly waits for it to finish evaluating first.
+  import("./lib/scheduledBackup.js").then(({ startScheduledBackup }) => {
+    startScheduledBackup();
+  });
 }
 
 module.exports = {};

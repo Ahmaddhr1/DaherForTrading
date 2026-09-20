@@ -4,10 +4,10 @@
 // exact if/else-on-NEXT_RUNTIME shape to correctly drop the Node-only
 // scheduled-backup code out of the Edge bundle at build time - see
 // https://nextjs.org/docs/app/api-reference/file-conventions/instrumentation#specifying-the-runtime
-export function register() {
+export async function register() {
   if (process.env.NEXT_RUNTIME === "edge") {
-    return require("./instrumentation.edge.js");
+    await import("./instrumentation.edge.js");
   } else {
-    return require("./instrumentation.node.js");
+    await import("./instrumentation.node.js");
   }
 }

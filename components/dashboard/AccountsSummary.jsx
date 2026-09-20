@@ -18,7 +18,11 @@ export default function AccountsSummary() {
   });
 
   const accounts = (data?.accounts || []).filter((a) => a.active);
-  const totalBalance = data?.totalBalance || 0;
+  // Sum only the active accounts actually listed below - the API's
+  // totalBalance includes inactive accounts too, which would make this
+  // figure not match what's shown when an inactive account still carries
+  // a nonzero computed balance.
+  const totalBalance = accounts.reduce((sum, a) => sum + (a.balance || 0), 0);
 
   if (error) return null;
 

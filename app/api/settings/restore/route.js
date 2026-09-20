@@ -9,6 +9,10 @@ import Company from "@/models/Company";
 import Purchase from "@/models/Purchase";
 import Payment from "@/models/Payment";
 import Disbursement from "@/models/Disbursement";
+import Account from "@/models/Account";
+import SupplierPayment from "@/models/SupplierPayment";
+import StockAdjustment from "@/models/StockAdjustment";
+import AppSettings from "@/models/AppSettings";
 
 // Deliberately excludes Admin and LoginAttempt - restoring business data
 // must never touch login credentials or rate-limit state.
@@ -21,6 +25,10 @@ const COLLECTION_MODELS = {
   purchases: Purchase,
   payments: Payment,
   disbursements: Disbursement,
+  accounts: Account,
+  supplierPayments: SupplierPayment,
+  stockAdjustments: StockAdjustment,
+  appSettings: AppSettings,
 };
 
 export async function POST(req) {

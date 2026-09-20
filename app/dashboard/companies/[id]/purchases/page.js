@@ -14,7 +14,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { FiltersPanel } from "@/components/ui/filters-panel";
-import { ArrowLeft, ChevronLeft, ChevronRight, Plus, History, DollarSign, Package } from "lucide-react";
+import { ArrowLeft, ChevronLeft, ChevronRight, Plus, History, DollarSign, Package, Eye } from "lucide-react";
 import { TableSkeleton } from "@/components/ui/skeleton-patterns";
 import { format } from "date-fns";
 import { useRouter, useParams } from "next/navigation";
@@ -164,7 +164,7 @@ export default function CompanyPurchasesPage() {
         </FiltersPanel>
 
         {isLoading ? (
-          <TableSkeleton rows={limit} cols={7} />
+          <TableSkeleton rows={limit} cols={8} />
         ) : isError ? (
           <div className="text-center py-10 text-red-600">Failed to load purchases.</div>
         ) : (
@@ -180,12 +180,13 @@ export default function CompanyPurchasesPage() {
                   <TableHead className="text-center">Total</TableHead>
                   <TableHead className="text-center">Status</TableHead>
                   <TableHead>Date</TableHead>
+                  <TableHead className="text-right">Receipt</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {purchases.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={7} className="text-center py-6">
+                    <TableCell colSpan={8} className="text-center py-6">
                       No purchases found.
                     </TableCell>
                   </TableRow>
@@ -204,6 +205,14 @@ export default function CompanyPurchasesPage() {
                       </TableCell>
                       <TableCell className="text-gray-500 text-sm">
                         {format(new Date(purchase.createdAt), "MMM d, yyyy HH:mm")}
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <Link href={`/dashboard/companies/${id}/purchases/${purchase._id}`}>
+                          <Button variant="ghost" size="sm" className="flex items-center gap-1">
+                            <Eye className="h-3.5 w-3.5" />
+                            View
+                          </Button>
+                        </Link>
                       </TableCell>
                     </TableRow>
                   ))

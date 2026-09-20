@@ -3,16 +3,22 @@ import Admin from '@/models/Admin'
 import bcrypt from 'bcryptjs'
 import { NextResponse } from 'next/server'
 
+// Owner-only (enforced in middleware.js). Creates a new admin account -
+// "owner" or "employee", defaulting to "employee" so a mistyped/omitted
+// role never accidentally grants full access.
 export async function POST(req) {
   try {
-    const { adminname, password } = await req.json()
+    const { adminname, password, role } = await req.json()
 
-    console.log("ADMIN NAMEE: "+adminname)
-
-    // Validate input
     if (!adminname || !password) {
       return NextResponse.json({ error: 'Admin name and password are required' }, { status: 400 })
     }
+
+    if (password.length < 8) {
+      return NextResponse.json({ error: 'Password must be at least 8 characters' }, { status: 400 })
+    }
+
+    const resolvedRole = role === 'owner' ? 'owner' : 'employee'
 
     await connectToDB()
 
@@ -29,11 +35,24 @@ export async function POST(req) {
     const newAdmin = new Admin({
       adminname,
       password: hashedPassword,
+      role: resolvedRole,
+      active: true,
     })
 
     await newAdmin.save()
 
-    return NextResponse.json({ message: 'Admin created successfully' }, { status: 201 })
+    return NextResponse.json(
+      {
+        message: 'Admin created successfully',
+        admin: {
+          id: newAdmin._id,
+          adminname: newAdmin.adminname,
+          role: newAdmin.role,
+          active: newAdmin.active,
+        },
+      },
+      { status: 201 }
+    )
   } catch (error) {
     console.error('Error creating admin:', error)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })

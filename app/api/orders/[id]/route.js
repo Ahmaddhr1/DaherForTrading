@@ -3,12 +3,14 @@ import Customer from "@/models/Customers";
 import Order from "@/models/Orders";
 import Product from "@/models/Products";
 import { NextResponse } from "next/server";
+import { getUserFromCookie } from "@/lib/auth";
+import { logActivity } from "@/lib/activityLog";
 
 // GET one
 export async function GET(_, { params }) {
   await connectToDB();
   try {
-    
+
     const {id} = await params;
     const order = await Order.findById(id)
       .populate("customer")
@@ -29,7 +31,7 @@ export async function DELETE(request, { params }) {
   await connectToDB();
 
   try {
-    const { id } = params; 
+    const { id } = params;
     console.log("Deleting order with ID:", id);
 
     const order = await Order.findById(id);
@@ -70,6 +72,14 @@ export async function DELETE(request, { params }) {
     // Delete the order itself
     await Order.findByIdAndDelete(id);
 
+    await logActivity({
+      admin: await getUserFromCookie(),
+      action: "order.delete",
+      entityType: "Order",
+      entityId: id,
+      summary: `Deleted ${order.status === "draft" ? "a draft" : "an order"} worth $${order.total}`,
+    });
+
     return NextResponse.json(
       { message: "Order deleted successfully" },
       { status: 200 }
@@ -83,7 +93,70 @@ export async function DELETE(request, { params }) {
   }
 }
 
-// Edit the products/quantities/prices of a draft or still-pending order.
+// Builds the enriched line items plus subtotal/discount/tax/total/profit for
+// a set of { productId, price, quantity, discount? } inputs. Shared by
+// create, draft-edit, and pending-edit below so the money math (discount
+// reduces both the customer's charge and the recorded profit; tax is added
+// on top of the discounted subtotal and never counted as profit) stays in
+// exactly one place.
+async function priceOrderItems(products, taxRate) {
+  const enrichedProducts = [];
+  const productLookups = [];
+  let subtotal = 0;
+  let discountTotal = 0;
+  let totalProfit = 0;
+
+  for (const item of products) {
+    const product = await Product.findById(item.productId);
+    if (!product) {
+      throw new PricingError(`Product with ID ${item.productId} not found.`, 404);
+    }
+    if (typeof item.price !== "number" || isNaN(item.price)) {
+      throw new PricingError(`Invalid price for product ${product.name}`, 400);
+    }
+
+    const lineSubtotal = item.price * item.quantity;
+    const rawDiscount = Number(item.discount) || 0;
+    const discount = Math.max(0, Math.min(rawDiscount, lineSubtotal));
+
+    subtotal += lineSubtotal;
+    discountTotal += discount;
+
+    const itemProfit =
+      item.price !== product.price
+        ? (item.price - product.initialPrice) * item.quantity
+        : (product.price - product.initialPrice) * item.quantity;
+    totalProfit += itemProfit;
+
+    enrichedProducts.push({
+      productId: item.productId,
+      name: product.name,
+      quantity: item.quantity,
+      price: item.price,
+      discount,
+    });
+    productLookups.push(product);
+  }
+
+  const afterDiscount = subtotal - discountTotal;
+  const safeTaxRate = Math.max(0, Number(taxRate) || 0);
+  const taxAmount = afterDiscount * (safeTaxRate / 100);
+  const total = afterDiscount + taxAmount;
+  // Discounts come straight out of margin; tax is collected on the
+  // customer's behalf and never counted as profit.
+  const profit = totalProfit - discountTotal;
+
+  return { enrichedProducts, subtotal, discountTotal, taxRate: safeTaxRate, taxAmount, total, profit, productLookups };
+}
+
+class PricingError extends Error {
+  constructor(message, status) {
+    super(message);
+    this.status = status;
+  }
+}
+
+// Edit the products/quantities/prices/discounts/tax of a draft or still-pending order.
 // A draft never touched stock or debt, so it's just overwritten in place. A
 // pending order rebuilds its line items from scratch: stock and nbOfOrders
 // are computed as a net delta against the order's current items (so
@@ -95,7 +168,7 @@ export async function PUT(req, { params }) {
 
   try {
     const { id } = await params;
-    const { products } = await req.json();
+    const { products, taxRate } = await req.json();
 
     if (!products?.length) {
       return NextResponse.json(
@@ -116,41 +189,34 @@ export async function PUT(req, { params }) {
       );
     }
 
+    const effectiveTaxRate = taxRate !== undefined ? taxRate : order.taxRate;
+
     if (order.status === "draft") {
-      const enrichedProducts = [];
-      let totalProfit = 0;
-      let total = 0;
-
-      for (const item of products) {
-        const product = await Product.findById(item.productId);
-        if (!product) {
-          return NextResponse.json(
-            { message: `Product with ID ${item.productId} not found.` },
-            { status: 404 }
-          );
+      let priced;
+      try {
+        priced = await priceOrderItems(products, effectiveTaxRate);
+      } catch (err) {
+        if (err instanceof PricingError) {
+          return NextResponse.json({ message: err.message }, { status: err.status });
         }
-        if (typeof item.price !== "number" || isNaN(item.price)) {
-          return NextResponse.json(
-            { message: `Invalid price for product ${product.name}` },
-            { status: 400 }
-          );
-        }
-
-        totalProfit += (item.price - product.initialPrice) * item.quantity;
-        total += item.price * item.quantity;
-
-        enrichedProducts.push({
-          productId: item.productId,
-          name: product.name,
-          quantity: item.quantity,
-          price: item.price,
-        });
+        throw err;
       }
 
-      order.products = enrichedProducts;
-      order.total = total;
-      order.profit = totalProfit;
+      order.products = priced.enrichedProducts;
+      order.total = priced.total;
+      order.discountTotal = priced.discountTotal;
+      order.taxRate = priced.taxRate;
+      order.taxAmount = priced.taxAmount;
+      order.profit = priced.profit;
       await order.save();
+
+      await logActivity({
+        admin: await getUserFromCookie(),
+        action: "order.edit",
+        entityType: "Order",
+        entityId: order._id,
+        summary: `Edited a draft order (now $${priced.total.toFixed(3)})`,
+      });
 
       return NextResponse.json(
         { message: "Draft updated successfully", order },
@@ -172,10 +238,7 @@ export async function PUT(req, { params }) {
       );
     }
 
-    const enrichedProducts = [];
-    let totalProfit = 0;
-    let total = 0;
-
+    // Stock check happens against the net delta before pricing runs.
     for (const item of products) {
       const product = await Product.findById(item.productId);
       if (!product) {
@@ -184,14 +247,6 @@ export async function PUT(req, { params }) {
           { status: 404 }
         );
       }
-
-      if (typeof item.price !== "number" || isNaN(item.price)) {
-        return NextResponse.json(
-          { message: `Invalid price for product ${product.name}` },
-          { status: 400 }
-        );
-      }
-
       const availableStock = product.quantity + (oldQtyByProduct.get(item.productId) || 0);
       if (availableStock < newQtyByProduct.get(item.productId)) {
         return NextResponse.json(
@@ -201,17 +256,16 @@ export async function PUT(req, { params }) {
           { status: 400 }
         );
       }
+    }
 
-      const itemProfit = (item.price - product.initialPrice) * item.quantity;
-      totalProfit += itemProfit;
-      total += item.price * item.quantity;
-
-      enrichedProducts.push({
-        productId: item.productId,
-        name: product.name,
-        quantity: item.quantity,
-        price: item.price,
-      });
+    let priced;
+    try {
+      priced = await priceOrderItems(products, effectiveTaxRate);
+    } catch (err) {
+      if (err instanceof PricingError) {
+        return NextResponse.json({ message: err.message }, { status: err.status });
+      }
+      throw err;
     }
 
     const touchedProductIds = new Set([
@@ -235,16 +289,29 @@ export async function PUT(req, { params }) {
     });
     await Product.bulkWrite(productUpdates);
 
-    const debtDelta = total - order.total;
+    const debtDelta = priced.total - order.total;
+    const previousTotal = order.total;
 
-    order.products = enrichedProducts;
-    order.total = total;
-    order.profit = totalProfit;
-    order.remainingBalance = total - (order.amountpaid || 0);
+    order.products = priced.enrichedProducts;
+    order.total = priced.total;
+    order.discountTotal = priced.discountTotal;
+    order.taxRate = priced.taxRate;
+    order.taxAmount = priced.taxAmount;
+    order.profit = priced.profit;
+    order.remainingBalance = priced.total - (order.amountpaid || 0);
     await order.save();
 
     await Customer.findByIdAndUpdate(order.customer, {
       $inc: { debt: debtDelta },
+    });
+
+    await logActivity({
+      admin: await getUserFromCookie(),
+      action: "order.edit",
+      entityType: "Order",
+      entityId: order._id,
+      summary: `Edited order (total changed from $${previousTotal.toFixed(3)} to $${priced.total.toFixed(3)})`,
+      metadata: { before: previousTotal, after: priced.total },
     });
 
     return NextResponse.json(
@@ -264,7 +331,7 @@ export async function POST(req, { params }) {
 
   try {
     const customerId = params.id;
-    const { products, total, asDraft } = await req.json();
+    const { products, taxRate, asDraft } = await req.json();
 
     if (!products?.length) {
       return NextResponse.json(
@@ -273,87 +340,69 @@ export async function POST(req, { params }) {
       );
     }
 
-    const enrichedProducts = [];
-    const productUpdates = [];
-    let totalProfit = 0; // Track total profit
-
-    for (const item of products) {
-      const product = await Product.findById(item.productId);
-      if (!product) {
-        return NextResponse.json(
-          { message: `Product with ID ${item.productId} not found.` },
-          { status: 404 }
-        );
+    let priced;
+    try {
+      priced = await priceOrderItems(products, taxRate);
+    } catch (err) {
+      if (err instanceof PricingError) {
+        return NextResponse.json({ message: err.message }, { status: err.status });
       }
+      throw err;
+    }
 
-      // Validate price
-      if (typeof item.price !== "number" || isNaN(item.price)) {
-        return NextResponse.json(
-          { message: `Invalid price for product ${product.name}` },
-          { status: 400 }
-        );
-      }
-
-      // A draft doesn't touch stock, so it's exempt from the stock check -
-      // it's only enforced once the draft is finalized into a real order.
-      if (!asDraft && product.quantity < item.quantity) {
-        return NextResponse.json(
-          {
-            message: `Insufficient stock for "${product.name}". Available: ${product.quantity}, requested: ${item.quantity}`,
-          },
-          { status: 400 }
-        );
-      }
-
-      // Calculate profit: If sent price differs from current product price
-      let itemProfit = 0;
-      if (item.price !== product.price) {
-        // Subtract sent price from initial price * quantity
-        itemProfit = (item.price - product.initialPrice) * item.quantity;
-      } else {
-        itemProfit = (product.price - product.initialPrice) * item.quantity;
-      }
-      totalProfit += itemProfit;
-
-      enrichedProducts.push({
-        productId: item.productId,
-        name: product.name,
-        quantity: item.quantity,
-        price: item.price,
-      });
-
-      if (!asDraft) {
-        productUpdates.push({
-          updateOne: {
-            filter: { _id: product._id },
-            update: {
-              $inc: {
-                quantity: -item.quantity,
-                nbOfOrders: item.quantity,
-              },
+    // A draft doesn't touch stock, so it's exempt from the stock check -
+    // it's only enforced once the draft is finalized into a real order.
+    if (!asDraft) {
+      for (let i = 0; i < priced.enrichedProducts.length; i++) {
+        const item = priced.enrichedProducts[i];
+        const product = priced.productLookups[i];
+        if (product.quantity < item.quantity) {
+          return NextResponse.json(
+            {
+              message: `Insufficient stock for "${product.name}". Available: ${product.quantity}, requested: ${item.quantity}`,
             },
-          },
-        });
+            { status: 400 }
+          );
+        }
       }
     }
 
     const newOrder = await Order.create({
       customer: customerId,
-      products: enrichedProducts,
-      total,
+      products: priced.enrichedProducts,
+      total: priced.total,
+      discountTotal: priced.discountTotal,
+      taxRate: priced.taxRate,
+      taxAmount: priced.taxAmount,
       status: asDraft ? "draft" : "pending",
-      remainingBalance: asDraft ? undefined : total,
-      profit: totalProfit, // store calculated profit
+      remainingBalance: asDraft ? undefined : priced.total,
+      profit: priced.profit,
     });
 
     // A draft never reserves stock or counts toward debt until finalized.
     if (!asDraft) {
+      const productUpdates = priced.enrichedProducts.map((item) => ({
+        updateOne: {
+          filter: { _id: item.productId },
+          update: { $inc: { quantity: -item.quantity, nbOfOrders: item.quantity } },
+        },
+      }));
       await Product.bulkWrite(productUpdates);
     }
 
     await Customer.findByIdAndUpdate(customerId, {
       $push: { orders: newOrder._id },
       ...(asDraft ? {} : { $inc: { debt: newOrder.total } }),
+    });
+
+    await logActivity({
+      admin: await getUserFromCookie(),
+      action: "order.create",
+      entityType: "Order",
+      entityId: newOrder._id,
+      summary: asDraft
+        ? `Saved a draft order worth $${priced.total.toFixed(3)}`
+        : `Created an order worth $${priced.total.toFixed(3)}`,
     });
 
     return NextResponse.json(
@@ -368,4 +417,3 @@ export async function POST(req, { params }) {
     );
   }
 }
-

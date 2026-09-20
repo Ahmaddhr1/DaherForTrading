@@ -1,8 +1,8 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { useParams, useRouter } from "next/navigation";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -13,16 +13,24 @@ import { toast } from "sonner";
 import { Loader2, ShoppingBag, ArrowLeft, Plus, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { useMutation, useQuery } from "@tanstack/react-query";
+import { useSettings, formatLL } from "@/lib/currency";
 
 let nextRowId = 1;
-const emptyRow = () => ({ id: nextRowId++, productId: "", unitPrice: "", quantity: "1" });
+const emptyRow = () => ({ id: nextRowId++, productId: "", unitPrice: "", quantity: "1", discount: "" });
 
 const NewPurchasePage = () => {
   const { id: companyId } = useParams();
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const preselectedProductId = searchParams.get("productId");
+
+  const { data: settings } = useSettings();
 
   const [rows, setRows] = useState([emptyRow()]);
   const [paid, setPaid] = useState(true);
+  const [taxRate, setTaxRate] = useState("");
+  const [taxRateTouched, setTaxRateTouched] = useState(false);
+  const [prefilled, setPrefilled] = useState(false);
 
   const { data: company } = useQuery({
     queryKey: ["company", companyId],
@@ -40,6 +48,26 @@ const NewPurchasePage = () => {
       return res.data;
     },
   });
+
+  // Pre-fill the tax rate from business settings once, unless the user has
+  // already changed it for this purchase.
+  useEffect(() => {
+    if (settings && !taxRateTouched) {
+      setTaxRate(settings.taxRate?.toString() || "0");
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [settings]);
+
+  // Coming from a product's "Reorder from supplier" link - pre-select that
+  // product in the first row once the product list has loaded.
+  useEffect(() => {
+    if (prefilled || !preselectedProductId || products.length === 0) return;
+    const product = products.find((p) => p._id === preselectedProductId);
+    if (product) {
+      setRows([{ id: nextRowId++, productId: product._id, unitPrice: product.initialPrice?.toString() || "", quantity: "1", discount: "" }]);
+    }
+    setPrefilled(true);
+  }, [preselectedProductId, products, prefilled]);
 
   const addRow = () => setRows((prev) => [...prev, emptyRow()]);
   const removeRow = (id) => setRows((prev) => (prev.length > 1 ? prev.filter((r) => r.id !== id) : prev));
@@ -59,6 +87,11 @@ const NewPurchasePage = () => {
     );
   };
 
+  const rowSubtotal = (row) => (parseFloat(row.unitPrice) || 0) * (parseInt(row.quantity, 10) || 0);
+  const rowAfterDiscount = (row) => Math.max(0, rowSubtotal(row) - (parseFloat(row.discount) || 0));
+  const rowTax = (row) => rowAfterDiscount(row) * ((parseFloat(taxRate) || 0) / 100);
+  const rowTotal = (row) => rowAfterDiscount(row) + rowTax(row);
+
   const mutation = useMutation({
     mutationFn: async () => {
       // Each row is its own Purchase record - post them one at a time so a
@@ -69,6 +102,8 @@ const NewPurchasePage = () => {
           productId: row.productId,
           unitPrice: parseFloat(row.unitPrice),
           quantity: parseInt(row.quantity, 10),
+          discount: parseFloat(row.discount) || 0,
+          taxRate: parseFloat(taxRate) || 0,
           paid,
         });
       }
@@ -100,6 +135,10 @@ const NewPurchasePage = () => {
         toast.error("Quantity must be at least 1 for every row");
         return;
       }
+      if (row.discount && parseFloat(row.discount) > rowSubtotal(row)) {
+        toast.error("A line's discount can't be more than its own subtotal");
+        return;
+      }
     }
 
     if (!window.confirm(`Record ${rows.length > 1 ? "these purchases" : "this purchase"} for $${total.toFixed(3)}? Stock will increase and the company's balance will be updated.`)) {
@@ -109,10 +148,10 @@ const NewPurchasePage = () => {
     mutation.mutate();
   };
 
-  const total = rows.reduce(
-    (sum, row) => sum + (parseFloat(row.unitPrice) || 0) * (parseInt(row.quantity, 10) || 0),
-    0
-  );
+  const subtotal = rows.reduce((sum, row) => sum + rowSubtotal(row), 0);
+  const discountTotal = rows.reduce((sum, row) => sum + (parseFloat(row.discount) || 0), 0);
+  const taxAmountTotal = rows.reduce((sum, row) => sum + rowTax(row), 0);
+  const total = rows.reduce((sum, row) => sum + rowTotal(row), 0);
 
   return (
     <div className="min-h-screen bg-gray-50 py-6">
@@ -179,7 +218,7 @@ const NewPurchasePage = () => {
                         ))}
                       </select>
 
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <div className="space-y-2">
                           <Label className="text-sm font-medium">Unit Price ($) *</Label>
                           <Input
@@ -207,6 +246,17 @@ const NewPurchasePage = () => {
                             required
                           />
                         </div>
+
+                        <div className="space-y-2">
+                          <Label className="text-sm font-medium">Discount ($)</Label>
+                          <Input
+                            type="text"
+                            inputMode="decimal"
+                            placeholder="0.00"
+                            value={row.discount}
+                            onChange={(e) => updateRow(row.id, "discount", e.target.value.replace(/[^0-9.]/g, ""))}
+                          />
+                        </div>
                       </div>
                     </div>
                   );
@@ -224,6 +274,22 @@ const NewPurchasePage = () => {
               </Button>
 
               <Separator />
+
+              <div className="space-y-2 max-w-xs">
+                <Label htmlFor="tax-rate" className="text-sm font-medium">
+                  Tax Rate (%)
+                </Label>
+                <Input
+                  id="tax-rate"
+                  type="text"
+                  value={taxRate}
+                  onChange={(e) => {
+                    setTaxRateTouched(true);
+                    setTaxRate(e.target.value.replace(/[^0-9.]/g, ""));
+                  }}
+                  placeholder="0"
+                />
+              </div>
 
               <div className="flex items-center gap-3">
                 <input
@@ -243,13 +309,35 @@ const NewPurchasePage = () => {
                 </p>
               )}
 
-              <div className="bg-blue-50 rounded-lg p-4 border border-blue-200">
-                <div className="flex justify-between items-center">
+              <div className="bg-blue-50 rounded-lg p-4 border border-blue-200 space-y-2">
+                <div className="flex justify-between items-center text-sm text-blue-900/80">
+                  <span>Subtotal</span>
+                  <span>${subtotal.toFixed(3)}</span>
+                </div>
+                {discountTotal > 0 && (
+                  <div className="flex justify-between items-center text-sm text-amber-700">
+                    <span>Discount</span>
+                    <span>-${discountTotal.toFixed(3)}</span>
+                  </div>
+                )}
+                {taxAmountTotal > 0 && (
+                  <div className="flex justify-between items-center text-sm text-blue-900/80">
+                    <span>Tax ({parseFloat(taxRate) || 0}%)</span>
+                    <span>+${taxAmountTotal.toFixed(3)}</span>
+                  </div>
+                )}
+                <div className="flex justify-between items-center pt-2 border-t border-blue-200">
                   <span className="text-lg font-semibold text-blue-900">Total Amount:</span>
                   <span className="text-2xl font-bold text-blue-900">${total.toFixed(3)}</span>
                 </div>
+                {settings?.dollarRate > 0 && (
+                  <div className="flex justify-between items-center text-sm text-blue-900/70">
+                    <span>≈</span>
+                    <span>{formatLL(total, settings.dollarRate)}</span>
+                  </div>
+                )}
                 {!paid && (
-                  <div className="flex justify-between items-center mt-2 text-sm">
+                  <div className="flex justify-between items-center pt-2 text-sm">
                     <span className="text-amber-700">Added to company debt</span>
                     <Badge variant="destructive">+${total.toFixed(3)}</Badge>
                   </div>

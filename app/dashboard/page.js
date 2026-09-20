@@ -3,6 +3,7 @@
 
 import React, { useState } from "react";
 import SummaryCards from "@/components/dashboard/SummaryCards";
+import LowStockAlerts from "@/components/dashboard/LowStockAlerts";
 import DebtCard from "@/components/dashboard/DebtCard";
 import OrdersBreakdown from "@/components/dashboard/OrdersBreakdown";
 import ProfitChart from "@/components/dashboard/ProfitChart";
@@ -53,6 +54,9 @@ export default function DashboardPage() {
           startDate={rangeStart}
           endDate={rangeEnd}
         />
+
+        {/* Low Stock Alerts */}
+        <LowStockAlerts />
 
         {/* Debt and Orders */}
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 mb-8">

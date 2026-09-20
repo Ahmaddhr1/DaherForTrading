@@ -8,7 +8,7 @@ import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import axios from "axios";
-import { Loader2, PackagePlus, ArrowLeft, DollarSign, Tag, Package, TrendingUp, Box } from "lucide-react";
+import { Loader2, PackagePlus, ArrowLeft, DollarSign, Tag, Package, TrendingUp, Box, Ruler, AlertTriangle, Truck } from "lucide-react";
 import React, { useState } from "react";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
@@ -18,6 +18,15 @@ const fetchCategories = async () => {
   return data;
 };
 
+const fetchCompanies = async () => {
+  const { data } = await axios.get("/api/companies", { params: { limit: 200 } });
+  return data;
+};
+
+// Common unit-of-measure suggestions - the field itself stays freeform text
+// since businesses vary in what they stock.
+const UNIT_SUGGESTIONS = ["pcs", "kg", "g", "box", "carton", "liter", "ml", "meter", "pack", "bag"];
+
 const Page = () => {
   const router = useRouter();
 
@@ -26,11 +35,20 @@ const Page = () => {
     queryFn: fetchCategories,
   });
 
+  const { data: companiesData } = useQuery({
+    queryKey: ["companies", "for-supplier-select"],
+    queryFn: fetchCompanies,
+  });
+  const companies = companiesData?.companies || companiesData || [];
+
   const [form, setForm] = useState({
     name: "",
     price: "",
     initialPrice: "",
     category: "",
+    unit: "pcs",
+    lowStockThreshold: "5",
+    defaultSupplier: "",
   });
 
   const mutation = useMutation({
@@ -46,6 +64,9 @@ const Page = () => {
         initialPrice,
         profit,
         category: form.category,
+        unit: form.unit,
+        lowStockThreshold: form.lowStockThreshold,
+        defaultSupplier: form.defaultSupplier || null,
       };
 
       const { data } = await axios.post("/api/products/create", payload);
@@ -192,6 +213,79 @@ const Page = () => {
                           ))}
                         </select>
                       </div>
+                    </div>
+                  </div>
+
+                  <Separator />
+
+                  {/* Inventory Details Section */}
+                  <div className="space-y-4">
+                    <div className="flex items-center gap-2 text-sm font-medium text-gray-500 uppercase tracking-wide">
+                      <div className="w-1 h-4 bg-purple-600 rounded"></div>
+                      Inventory Details
+                    </div>
+
+                    <div className="grid gap-4 sm:grid-cols-2">
+                      <div className="space-y-2">
+                        <Label htmlFor="unit" className="text-sm font-medium flex items-center gap-2">
+                          <Ruler className="h-4 w-4" />
+                          Unit of Measure
+                        </Label>
+                        <Input
+                          id="unit"
+                          list="unit-suggestions"
+                          placeholder="pcs"
+                          name="unit"
+                          value={form.unit}
+                          onChange={handleChange}
+                          className="focus:border-purple-500 transition-colors"
+                        />
+                        <datalist id="unit-suggestions">
+                          {UNIT_SUGGESTIONS.map((u) => (
+                            <option key={u} value={u} />
+                          ))}
+                        </datalist>
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor="lowStockThreshold" className="text-sm font-medium flex items-center gap-2">
+                          <AlertTriangle className="h-4 w-4" />
+                          Low Stock Threshold
+                        </Label>
+                        <Input
+                          id="lowStockThreshold"
+                          type="number"
+                          min="0"
+                          placeholder="5"
+                          name="lowStockThreshold"
+                          value={form.lowStockThreshold}
+                          onChange={handleChange}
+                          className="focus:border-purple-500 transition-colors"
+                        />
+                        <p className="text-xs text-gray-500">Alerts you when stock falls to or below this number</p>
+                      </div>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="defaultSupplier" className="text-sm font-medium flex items-center gap-2">
+                        <Truck className="h-4 w-4" />
+                        Default Supplier
+                      </Label>
+                      <select
+                        id="defaultSupplier"
+                        name="defaultSupplier"
+                        value={form.defaultSupplier}
+                        onChange={handleChange}
+                        className="w-full p-2 border border-gray-300 rounded-md focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-colors"
+                      >
+                        <option value="">No default supplier</option>
+                        {companies.map((c) => (
+                          <option key={c._id} value={c._id}>
+                            {c.name}
+                          </option>
+                        ))}
+                      </select>
+                      <p className="text-xs text-gray-500">Lets you quickly reorder this product from a supplier later</p>
                     </div>
                   </div>
 

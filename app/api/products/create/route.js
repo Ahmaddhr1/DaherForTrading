@@ -2,6 +2,8 @@ import { connectToDB } from "@/lib/connectDb";
 import Product from "@/models/Products";
 import Category from "@/models/Category"; // import category model
 import { NextResponse } from "next/server";
+import { getUserFromCookie } from "@/lib/auth";
+import { logActivity } from "@/lib/activityLog";
 
 export async function POST(req) {
   await connectToDB();
@@ -14,6 +16,9 @@ export async function POST(req) {
       initialPrice,
       profit,
       category,
+      unit,
+      lowStockThreshold,
+      defaultSupplier,
     } = await req.json();
 
     if (!name?.trim() || price == null) {
@@ -55,6 +60,24 @@ export async function POST(req) {
       );
     }
 
+    // Unit of measure - freeform, defaults to "pcs" if left blank.
+    const parsedUnit = typeof unit === "string" && unit.trim() ? unit.trim() : "pcs";
+
+    // Low stock threshold - defaults to 5, must not be negative.
+    let parsedLowStockThreshold = 5;
+    if (lowStockThreshold !== undefined && lowStockThreshold !== null && lowStockThreshold !== "") {
+      parsedLowStockThreshold = parseInt(lowStockThreshold, 10);
+      if (isNaN(parsedLowStockThreshold) || parsedLowStockThreshold < 0) {
+        return NextResponse.json(
+          { error: "Low stock threshold must be a number ≥ 0." },
+          { status: 400 }
+        );
+      }
+    }
+
+    // Default supplier - optional ObjectId, normalize blank to null.
+    const parsedDefaultSupplier = defaultSupplier && defaultSupplier !== "" ? defaultSupplier : null;
+
     // Create the product
     const product = new Product({
       name: name.trim(),
@@ -63,6 +86,9 @@ export async function POST(req) {
       initialPrice: parsedInitialPrice,
       profit: parsedProfit,
       category,
+      unit: parsedUnit,
+      lowStockThreshold: parsedLowStockThreshold,
+      defaultSupplier: parsedDefaultSupplier,
     });
 
     await product.save();
@@ -73,6 +99,14 @@ export async function POST(req) {
         $push: { products: product._id },
       });
     }
+
+    await logActivity({
+      admin: await getUserFromCookie(),
+      action: "product.create",
+      entityType: "Product",
+      entityId: product._id,
+      summary: `Created product "${product.name}"`,
+    });
 
     return NextResponse.json(product, { status: 201 });
   } catch (error) {

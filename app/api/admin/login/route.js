@@ -34,10 +34,20 @@ export async function POST(req) {
     return NextResponse.json({ error: "Invalid credentials" }, { status: 401 });
   }
 
+  if (admin.active === false) {
+    // Don't record this as a failed attempt for rate-limiting purposes -
+    // the credentials were correct, the account is just deactivated.
+    return NextResponse.json({ error: "This account has been deactivated" }, { status: 403 });
+  }
+
   await clearLoginAttempts(rateLimitKey);
 
+  // role is embedded here (rather than looked up per-request) so
+  // middleware.js can gate owner-only routes on the Edge runtime without a
+  // DB round-trip. A role/active change takes effect on this admin's next
+  // login, not on their current session.
   const token = jwt.sign(
-    { id: admin._id, adminname: admin.adminname },
+    { id: admin._id, adminname: admin.adminname, role: admin.role || "employee" },
     process.env.JWT_SECRET,
     { expiresIn: "7d" }
   );

@@ -1,6 +1,8 @@
 import { connectToDB } from "@/lib/connectDb";
 import Disbursement from "@/models/Disbursement";
 import { NextResponse } from "next/server";
+import { getUserFromCookie } from "@/lib/auth";
+import { logActivity } from "@/lib/activityLog";
 
 export async function POST(req) {
   await connectToDB();
@@ -23,6 +25,14 @@ export async function POST(req) {
       description: description.trim(),
       amount: numericAmount,
       category: category || "Other",
+    });
+
+    await logActivity({
+      admin: await getUserFromCookie(),
+      action: "disbursement.create",
+      entityType: "Disbursement",
+      entityId: disbursement._id,
+      summary: `Recorded a $${numericAmount} disbursement (${disbursement.category}): ${disbursement.description}`,
     });
 
     return NextResponse.json(

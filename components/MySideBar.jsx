@@ -4,6 +4,8 @@ import { useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
 import { LogOut, ListCollapse } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import axios from "axios";
 import tabs from "@/lib/SideBarTabs";
 import { toast } from "sonner";
 
@@ -13,6 +15,16 @@ export function MySideBar() {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const pathname = usePathname();
   const router = useRouter();
+
+  // Drives which ownerOnly tabs (Admins, Activity Log) are shown - the
+  // real enforcement is server-side in middleware.js, this is just so an
+  // employee doesn't see a link that would 403.
+  const { data: me } = useQuery({
+    queryKey: ["admin", "me"],
+    queryFn: async () => (await axios.get("/api/admin/me")).data,
+  });
+  const isOwner = me?.role === "owner";
+  const visibleTabs = tabs.filter((tab) => !tab.ownerOnly || isOwner);
 
   const toggleCollapse = () => setIsCollapsed(!isCollapsed);
 
@@ -66,7 +78,7 @@ export function MySideBar() {
         {/* Navigation */}
         <nav className="flex-1 overflow-y-auto py-4">
           <div className="space-y-2">
-            {tabs.map((tab, index) => renderLink(tab, index))}
+            {visibleTabs.map((tab, index) => renderLink(tab, index))}
           </div>
         </nav>
 

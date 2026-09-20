@@ -2,6 +2,8 @@ import { connectToDB } from "@/lib/connectDb";
 import Company from "@/models/Company";
 import Purchase from "@/models/Purchase";
 import { NextResponse } from "next/server";
+import { getUserFromCookie } from "@/lib/auth";
+import { logActivity } from "@/lib/activityLog";
 
 // GET one company
 export async function GET(req, { params }) {
@@ -36,6 +38,15 @@ export async function PUT(req, { params }) {
     if (!updatedCompany) {
       return NextResponse.json({ message: "Company not found" }, { status: 404 });
     }
+
+    await logActivity({
+      admin: await getUserFromCookie(),
+      action: "company.edit",
+      entityType: "Company",
+      entityId: updatedCompany._id,
+      summary: `Edited supplier "${updatedCompany.name}"`,
+    });
+
     return NextResponse.json(
       { message: "Company updated successfully", company: updatedCompany },
       { status: 200 }
@@ -58,6 +69,15 @@ export async function DELETE(req, { params }) {
       return NextResponse.json({ message: "Company not found" }, { status: 404 });
     }
     await Purchase.deleteMany({ company: id });
+
+    await logActivity({
+      admin: await getUserFromCookie(),
+      action: "company.delete",
+      entityType: "Company",
+      entityId: id,
+      summary: `Deleted supplier "${deletedCompany.name}" (and their purchase history)`,
+    });
+
     return NextResponse.json(
       { message: "Company deleted successfully" },
       { status: 200 }

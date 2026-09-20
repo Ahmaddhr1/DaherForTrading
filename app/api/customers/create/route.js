@@ -1,6 +1,8 @@
 import { connectToDB } from "@/lib/connectDb";
 import Customer from "@/models/Customers";
 import { NextResponse } from "next/server";
+import { getUserFromCookie } from "@/lib/auth";
+import { logActivity } from "@/lib/activityLog";
 
 export async function POST(req) {
   await connectToDB();
@@ -27,6 +29,15 @@ export async function POST(req) {
       debt,
     });
     await newCustomer.save();
+
+    await logActivity({
+      admin: await getUserFromCookie(),
+      action: "customer.create",
+      entityType: "Customer",
+      entityId: newCustomer._id,
+      summary: `Created customer "${newCustomer.fullName}"`,
+    });
+
     return NextResponse.json(
       { message: "Customer created successfully" },
       { status: 201 }

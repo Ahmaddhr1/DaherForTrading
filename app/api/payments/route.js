@@ -3,6 +3,8 @@ import { connectToDB } from "@/lib/connectDb";
 import Customer from "@/models/Customers";
 import Payment from "@/models/Payment";
 import { NextResponse } from "next/server";
+import { getUserFromCookie } from "@/lib/auth";
+import { logActivity } from "@/lib/activityLog";
 
 // Create a payment against a customer's outstanding debt.
 export async function POST(req) {
@@ -46,6 +48,15 @@ export async function POST(req) {
       amount: paymentAmount,
       previousDebt,
       newDebt,
+    });
+
+    await logActivity({
+      admin: await getUserFromCookie(),
+      action: "payment.create",
+      entityType: "Payment",
+      entityId: payment._id,
+      summary: `Recorded a $${paymentAmount} payment from ${customer.fullName}`,
+      metadata: { customerId, previousDebt, newDebt },
     });
 
     return NextResponse.json(

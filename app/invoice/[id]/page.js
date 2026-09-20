@@ -15,6 +15,7 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
+import { formatLL } from "@/lib/currency";
 
 const fetchPublicOrder = async (id) => {
   const res = await fetch(`/api/public/orders/${id}`);
@@ -97,16 +98,22 @@ export default function PublicInvoicePage() {
                   <TableRow>
                     <TableHead>Product</TableHead>
                     <TableHead className="text-center">Qty</TableHead>
-                    <TableHead className="text-right">Price</TableHead>
+                    <TableHead className="text-center">Discount</TableHead>
+                    <TableHead className="text-right">Total</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {order.products.map((item, index) => (
                     <TableRow key={index}>
                       <TableCell className="font-medium">{item.name}</TableCell>
-                      <TableCell className="text-center">{item.quantity}</TableCell>
+                      <TableCell className="text-center">
+                        {item.quantity} x ${item.price.toFixed(3)}
+                      </TableCell>
+                      <TableCell className="text-center text-amber-700">
+                        {item.discount ? `-$${item.discount.toFixed(3)}` : "—"}
+                      </TableCell>
                       <TableCell className="text-right">
-                        ${(item.price * item.quantity).toFixed(3)}
+                        ${(item.price * item.quantity - (item.discount || 0)).toFixed(3)}
                       </TableCell>
                     </TableRow>
                   ))}
@@ -117,10 +124,28 @@ export default function PublicInvoicePage() {
             <Separator />
 
             <div className="space-y-2">
+              {order.discountTotal > 0 && (
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Discount</span>
+                  <span className="text-amber-700 font-medium">-${order.discountTotal.toFixed(3)}</span>
+                </div>
+              )}
+              {order.taxAmount > 0 && (
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Tax ({order.taxRate}%)</span>
+                  <span className="text-gray-900 font-medium">+${order.taxAmount.toFixed(3)}</span>
+                </div>
+              )}
               <div className="flex justify-between">
                 <span className="text-gray-600">Total</span>
                 <span className="font-semibold text-gray-900">${order.total.toFixed(3)}</span>
               </div>
+              {order.dollarRate > 0 && (
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-400">≈</span>
+                  <span className="text-gray-500">{formatLL(order.total, order.dollarRate)}</span>
+                </div>
+              )}
               <div className="flex justify-between">
                 <span className="text-gray-600">Paid</span>
                 <span className="text-green-600 font-medium">${order.amountpaid.toFixed(3)}</span>

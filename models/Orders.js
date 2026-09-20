@@ -26,11 +26,33 @@ const orderSchema = new mongoose.Schema(
           type: Number,
           required: true,
         },
+        // Fixed $ discount off this line's (price * quantity) subtotal.
+        discount: {
+          type: Number,
+          default: 0,
+        },
       },
     ],
     total: {
       type: Number,
       required: true,
+    },
+    // Sum of every line item's discount - kept alongside `total` so the
+    // receipt/UI don't have to re-derive it from the line items.
+    discountTotal: {
+      type: Number,
+      default: 0,
+    },
+    // Tax rate (%) applied to this order, snapshotted from AppSettings (or
+    // overridden) at creation time so a later change to the default rate
+    // never rewrites historical orders.
+    taxRate: {
+      type: Number,
+      default: 0,
+    },
+    taxAmount: {
+      type: Number,
+      default: 0,
     },
     status: {
       type: String,

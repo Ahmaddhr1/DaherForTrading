@@ -5,36 +5,11 @@ import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
 import { Home, ShoppingCart, Wallet, Boxes, MoreHorizontal, LogOut, X } from "lucide-react";
 import { toast } from "sonner";
+import { useQuery } from "@tanstack/react-query";
+import axios from "axios";
 import tabs from "@/lib/SideBarTabs";
 
 const findTab = (label) => tabs.find((tab) => tab.label === label);
-
-// Groups the sidebar's 9 tabs into a handful of bottom-bar slots - a flat
-// row of 9 icons doesn't fit on a phone screen. Dashboard and Orders (the
-// most frequently used) get their own direct slot; everything else is
-// grouped into a section that opens a small sheet listing its tabs.
-const SECTIONS = [
-  { key: "dashboard", label: "Home", icon: <Home size={20} />, path: "/dashboard" },
-  { key: "orders", label: "Orders", icon: <ShoppingCart size={20} />, path: "/dashboard/orders" },
-  {
-    key: "sales",
-    label: "Sales",
-    icon: <Wallet size={20} />,
-    items: ["Customers", "Payments", "Disbursements"].map(findTab).filter(Boolean),
-  },
-  {
-    key: "inventory",
-    label: "Stock",
-    icon: <Boxes size={20} />,
-    items: ["Products", "Categories", "Companies"].map(findTab).filter(Boolean),
-  },
-  {
-    key: "more",
-    label: "More",
-    icon: <MoreHorizontal size={20} />,
-    items: ["Settings"].map(findTab).filter(Boolean),
-  },
-];
 
 // Mobile-only bottom navigation bar - see MySideBar for the desktop (lg+)
 // sidebar it replaces below that breakpoint.
@@ -42,6 +17,42 @@ export function MobileBottomBar() {
   const pathname = usePathname();
   const router = useRouter();
   const [openSection, setOpenSection] = useState(null);
+
+  // Drives whether Admins/Activity Log show up in the "More" sheet - the
+  // real enforcement is server-side in middleware.js, this just keeps an
+  // employee from seeing a link that would 403 (same as MySideBar).
+  const { data: me } = useQuery({
+    queryKey: ["admin", "me"],
+    queryFn: async () => (await axios.get("/api/admin/me")).data,
+  });
+  const isOwner = me?.role === "owner";
+
+  // Groups the sidebar's tabs into a handful of bottom-bar slots - a flat
+  // row of icons doesn't fit on a phone screen. Dashboard and Orders (the
+  // most frequently used) get their own direct slot; everything else is
+  // grouped into a section that opens a small sheet listing its tabs.
+  const SECTIONS = [
+    { key: "dashboard", label: "Home", icon: <Home size={20} />, path: "/dashboard" },
+    { key: "orders", label: "Orders", icon: <ShoppingCart size={20} />, path: "/dashboard/orders" },
+    {
+      key: "sales",
+      label: "Sales",
+      icon: <Wallet size={20} />,
+      items: ["Customers", "Payments", "Disbursements"].map(findTab).filter(Boolean),
+    },
+    {
+      key: "inventory",
+      label: "Stock",
+      icon: <Boxes size={20} />,
+      items: ["Products", "Categories", "Companies"].map(findTab).filter(Boolean),
+    },
+    {
+      key: "more",
+      label: "More",
+      icon: <MoreHorizontal size={20} />,
+      items: ["Settings", ...(isOwner ? ["Admins", "Activity Log"] : [])].map(findTab).filter(Boolean),
+    },
+  ];
 
   const handleLogout = async () => {
     try {

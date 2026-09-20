@@ -23,6 +23,7 @@ import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { PageHeaderSkeleton, TableSkeleton } from "@/components/ui/skeleton-patterns";
+import { useSettings, formatLL } from "@/lib/currency";
 
 const fetchOrder = async (id) => {
   const res = await fetch(`/api/orders/${id}`);
@@ -38,6 +39,8 @@ export default function OrderDetailsPage() {
     queryFn: () => fetchOrder(id),
     enabled: !!id,
   });
+
+  const { data: settings } = useSettings();
 
   // Cleans up the thermal-print body class if the user cancels the print
   // dialog instead of completing it.
@@ -168,6 +171,7 @@ export default function OrderDetailsPage() {
                       <TableHead className="font-semibold text-gray-700">Product</TableHead>
                       <TableHead className="text-center font-semibold text-gray-700">Quantity</TableHead>
                       <TableHead className="text-center font-semibold text-gray-700">Unit Price</TableHead>
+                      <TableHead className="text-center font-semibold text-gray-700">Discount</TableHead>
                       <TableHead className="text-right font-semibold text-gray-700">Total</TableHead>
                     </TableRow>
                   </TableHeader>
@@ -179,8 +183,11 @@ export default function OrderDetailsPage() {
                         <TableCell className="text-center text-gray-600">
                           ${item.price.toFixed(3)}
                         </TableCell>
+                        <TableCell className="text-center text-amber-700">
+                          {item.discount ? `-$${item.discount.toFixed(3)}` : "—"}
+                        </TableCell>
                         <TableCell className="text-right font-medium text-gray-900">
-                          ${(item.price * item.quantity).toFixed(3)}
+                          ${(item.price * item.quantity - (item.discount || 0)).toFixed(3)}
                         </TableCell>
                       </TableRow>
                     ))}
@@ -224,8 +231,35 @@ export default function OrderDetailsPage() {
               <CardContent className="space-y-4">
                 <div className="flex justify-between items-center">
                   <span className="text-gray-600">Subtotal</span>
-                  <span className="font-medium text-gray-900">${Number(order.total).toFixed(3)}</span>
+                  <span className="font-medium text-gray-900">
+                    ${order.products.reduce((s, i) => s + i.price * i.quantity, 0).toFixed(3)}
+                  </span>
                 </div>
+
+                {order.discountTotal > 0 && (
+                  <div className="flex justify-between items-center">
+                    <span className="text-gray-600">Discount</span>
+                    <span className="text-amber-700 font-medium">-${order.discountTotal.toFixed(3)}</span>
+                  </div>
+                )}
+
+                {order.taxAmount > 0 && (
+                  <div className="flex justify-between items-center">
+                    <span className="text-gray-600">Tax ({order.taxRate}%)</span>
+                    <span className="text-gray-900 font-medium">+${order.taxAmount.toFixed(3)}</span>
+                  </div>
+                )}
+
+                <div className="flex justify-between items-center pt-2 border-t">
+                  <span className="text-gray-600 font-medium">Grand Total</span>
+                  <span className="font-semibold text-gray-900">${Number(order.total).toFixed(3)}</span>
+                </div>
+                {settings?.dollarRate > 0 && (
+                  <div className="flex justify-between items-center text-sm">
+                    <span className="text-gray-400">≈</span>
+                    <span className="text-gray-500">{formatLL(order.total, settings.dollarRate)}</span>
+                  </div>
+                )}
 
                 <div className="flex justify-between items-center pt-2 border-t">
                   <span className="text-gray-600">Amount Paid</span>
@@ -250,6 +284,15 @@ export default function OrderDetailsPage() {
                     {status.label}
                   </Badge>
                 </div>
+
+                {typeof order.customer?.debt === "number" && (
+                  <div className="flex justify-between items-center pt-2 border-t">
+                    <span className="text-gray-600">Customer&apos;s Total Debt</span>
+                    <span className={`font-semibold ${order.customer.debt > 0 ? "text-red-600" : "text-gray-900"}`}>
+                      ${order.customer.debt.toFixed(3)}
+                    </span>
+                  </div>
+                )}
               </CardContent>
             </Card>
           </div>

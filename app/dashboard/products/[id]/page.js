@@ -13,8 +13,10 @@ import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { FormSkeleton, PageHeaderSkeleton } from "@/components/ui/skeleton-patterns";
-import { Loader2, Package, ArrowLeft, DollarSign, Tag, Box, TrendingUp, PackageCheck } from "lucide-react";
+import { Loader2, Package, ArrowLeft, DollarSign, Tag, Box, TrendingUp, PackageCheck, Ruler, AlertTriangle, Truck } from "lucide-react";
+import Link from "next/link";
 import ProductHistory from "./ProductHistory";
+import StockAdjustments from "./StockAdjustments";
 
 const fetchProduct = async (id) => {
   const res = await axios.get(`/api/products/${id}`);
@@ -25,6 +27,13 @@ const fetchCategories = async () => {
   const res = await axios.get("/api/categories", { params: { all: true } });
   return res.data;
 };
+
+const fetchCompanies = async () => {
+  const res = await axios.get("/api/companies", { params: { limit: 200 } });
+  return res.data;
+};
+
+const UNIT_SUGGESTIONS = ["pcs", "kg", "g", "box", "carton", "liter", "ml", "meter", "pack", "bag"];
 
 const EditProductPage = () => {
   const router = useRouter();
@@ -42,12 +51,21 @@ const EditProductPage = () => {
     queryFn: fetchCategories,
   });
 
+  const { data: companiesData } = useQuery({
+    queryKey: ["companies", "for-supplier-select"],
+    queryFn: fetchCompanies,
+  });
+  const companies = companiesData?.companies || companiesData || [];
+
   const [form, setForm] = useState({
     name: "",
     quantity: "",
     price: "",
     initialPrice: "",
     category: "",
+    unit: "pcs",
+    lowStockThreshold: "5",
+    defaultSupplier: "",
   });
 
   // Sync product data into form
@@ -59,6 +77,9 @@ const EditProductPage = () => {
         price: product.price?.toString() || "",
         initialPrice: product.initialPrice?.toString() || "",
         category: product.category || "",
+        unit: product.unit || "pcs",
+        lowStockThreshold: product.lowStockThreshold?.toString() ?? "5",
+        defaultSupplier: product.defaultSupplier || "",
       });
     }
   }, [product]);
@@ -71,6 +92,7 @@ const EditProductPage = () => {
         initialPrice: parseFloat(form.initialPrice),
         profit: parseFloat(form.price) - parseFloat(form.initialPrice),
         quantity: parseInt(form.quantity, 10),
+        defaultSupplier: form.defaultSupplier || null,
       };
       const res = await axios.put(`/api/products/${id}`, payload);
       return res.data;
@@ -287,6 +309,86 @@ const EditProductPage = () => {
 
                   <Separator />
 
+                  {/* Inventory Details Section */}
+                  <div className="space-y-4">
+                    <div className="flex items-center gap-2 text-sm font-medium text-gray-500 uppercase tracking-wide">
+                      <div className="w-1 h-4 bg-purple-600 rounded"></div>
+                      Inventory Details
+                    </div>
+
+                    <div className="grid gap-4 sm:grid-cols-2">
+                      <div className="space-y-2">
+                        <Label htmlFor="unit" className="text-sm font-medium flex items-center gap-2">
+                          <Ruler className="h-4 w-4" />
+                          Unit of Measure
+                        </Label>
+                        <Input
+                          id="unit"
+                          list="unit-suggestions"
+                          placeholder="pcs"
+                          name="unit"
+                          value={form.unit}
+                          onChange={handleChange}
+                          className="focus:border-purple-500 transition-colors"
+                        />
+                        <datalist id="unit-suggestions">
+                          {UNIT_SUGGESTIONS.map((u) => (
+                            <option key={u} value={u} />
+                          ))}
+                        </datalist>
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor="lowStockThreshold" className="text-sm font-medium flex items-center gap-2">
+                          <AlertTriangle className="h-4 w-4" />
+                          Low Stock Threshold
+                        </Label>
+                        <Input
+                          id="lowStockThreshold"
+                          type="number"
+                          min="0"
+                          placeholder="5"
+                          name="lowStockThreshold"
+                          value={form.lowStockThreshold}
+                          onChange={handleChange}
+                          className="focus:border-purple-500 transition-colors"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="defaultSupplier" className="text-sm font-medium flex items-center gap-2">
+                        <Truck className="h-4 w-4" />
+                        Default Supplier
+                      </Label>
+                      <select
+                        id="defaultSupplier"
+                        name="defaultSupplier"
+                        value={form.defaultSupplier}
+                        onChange={handleChange}
+                        className="w-full p-2 border border-gray-300 rounded-md focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-colors"
+                      >
+                        <option value="">No default supplier</option>
+                        {companies.map((c) => (
+                          <option key={c._id} value={c._id}>
+                            {c.name}
+                          </option>
+                        ))}
+                      </select>
+                      {form.defaultSupplier && (
+                        <Link
+                          href={`/dashboard/companies/${form.defaultSupplier}/addpurchase?productId=${id}`}
+                          className="text-xs text-purple-600 hover:text-purple-800 hover:underline inline-flex items-center gap-1 mt-1"
+                        >
+                          <Truck className="h-3 w-3" />
+                          Reorder from {companies.find((c) => c._id === form.defaultSupplier)?.name || "supplier"}
+                        </Link>
+                      )}
+                    </div>
+                  </div>
+
+                  <Separator />
+
                   {/* Pricing Information Section */}
                   <div className="space-y-4">
                     <div className="flex items-center gap-2 text-sm font-medium text-gray-500 uppercase tracking-wide">
@@ -491,6 +593,8 @@ const EditProductPage = () => {
             </Card>
           </div>
         </div>
+
+        <StockAdjustments productId={id} currentQuantity={product?.quantity} unit={product?.unit} />
 
         <ProductHistory productId={id} />
       </div>

@@ -3,6 +3,8 @@ import Company from "@/models/Company";
 import Product from "@/models/Products";
 import Purchase from "@/models/Purchase";
 import { NextResponse } from "next/server";
+import { getUserFromCookie } from "@/lib/auth";
+import { logActivity } from "@/lib/activityLog";
 
 // GET paginated purchase history for a company
 export async function GET(req, { params }) {
@@ -74,7 +76,7 @@ export async function POST(req, { params }) {
   await connectToDB();
   try {
     const { id } = params;
-    const { productId, unitPrice, quantity, paid } = await req.json();
+    const { productId, unitPrice, quantity, discount, taxRate, paid } = await req.json();
 
     if (!productId || !unitPrice || !quantity) {
       return NextResponse.json(
@@ -93,6 +95,13 @@ export async function POST(req, { params }) {
       );
     }
 
+    const lineSubtotal = numericUnitPrice * numericQuantity;
+    const numericDiscount = Math.max(0, Math.min(parseFloat(discount) || 0, lineSubtotal));
+    const numericTaxRate = Math.max(0, parseFloat(taxRate) || 0);
+    const afterDiscount = lineSubtotal - numericDiscount;
+    const numericTaxAmount = afterDiscount * (numericTaxRate / 100);
+    const total = afterDiscount + numericTaxAmount;
+
     const company = await Company.findById(id);
     if (!company) {
       return NextResponse.json({ message: "Company not found" }, { status: 404 });
@@ -103,7 +112,6 @@ export async function POST(req, { params }) {
       return NextResponse.json({ message: "Product not found" }, { status: 404 });
     }
 
-    const total = numericUnitPrice * numericQuantity;
     const isPaid = !!paid;
 
     const purchase = await Purchase.create({
@@ -112,6 +120,9 @@ export async function POST(req, { params }) {
       productName: product.name,
       unitPrice: numericUnitPrice,
       quantity: numericQuantity,
+      discount: numericDiscount,
+      taxRate: numericTaxRate,
+      taxAmount: numericTaxAmount,
       total,
       paid: isPaid,
     });
@@ -126,6 +137,15 @@ export async function POST(req, { params }) {
     await Company.findByIdAndUpdate(id, {
       $push: { purchases: purchase._id },
       $inc: { debt: isPaid ? 0 : total },
+    });
+
+    await logActivity({
+      admin: await getUserFromCookie(),
+      action: "purchase.create",
+      entityType: "Purchase",
+      entityId: purchase._id,
+      summary: `Recorded a purchase of ${numericQuantity} x "${product.name}" from ${company.name} for $${total.toFixed(3)}`,
+      metadata: { companyId: id, productId, unitPrice: numericUnitPrice, quantity: numericQuantity, discount: numericDiscount, taxRate: numericTaxRate, paid: isPaid },
     });
 
     return NextResponse.json(

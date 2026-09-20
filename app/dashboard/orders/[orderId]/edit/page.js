@@ -12,6 +12,7 @@ import { PageHeaderSkeleton, ListSkeleton } from "@/components/ui/skeleton-patte
 import { toast } from "sonner";
 import { Loader2, Plus, Trash2, PencilLine, ArrowLeft, CheckCircle } from "lucide-react";
 import Link from "next/link";
+import { useSettings, formatLL } from "@/lib/currency";
 
 let rowIdCounter = 1;
 
@@ -20,8 +21,11 @@ export default function EditOrderPage() {
   const router = useRouter();
   const queryClient = useQueryClient();
 
+  const { data: settings } = useSettings();
+
   const [products, setProducts] = useState([]);
   const [orderRows, setOrderRows] = useState([]);
+  const [taxRate, setTaxRate] = useState("0");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isFinalizing, setIsFinalizing] = useState(false);
 
@@ -54,13 +58,15 @@ export default function EditOrderPage() {
           productId: p.productId?._id || p.productId,
           quantity: p.quantity,
           price: p.price.toString(),
+          discount: p.discount ? p.discount.toString() : "",
         }))
       );
+      setTaxRate(order.taxRate?.toString() || "0");
     }
   }, [order]);
 
   const addProductRow = () => {
-    setOrderRows((rows) => [...rows, { id: rowIdCounter++, productId: "", quantity: 1, price: "" }]);
+    setOrderRows((rows) => [...rows, { id: rowIdCounter++, productId: "", quantity: 1, price: "", discount: "" }]);
   };
 
   const removeProductRow = (id) => {
@@ -80,14 +86,21 @@ export default function EditOrderPage() {
           updatedRow.quantity = parseInt(value) || 1;
         } else if (field === "price") {
           updatedRow.price = value.replace(/[^0-9.]/g, "");
+        } else if (field === "discount") {
+          updatedRow.discount = value.replace(/[^0-9.]/g, "");
         }
         return updatedRow;
       })
     );
   };
 
-  const calculateTotal = () =>
+  const calculateSubtotal = () =>
     orderRows.reduce((total, row) => total + ((parseFloat(row.price) || 0) * (row.quantity || 0)), 0);
+  const calculateDiscountTotal = () =>
+    orderRows.reduce((total, row) => total + (parseFloat(row.discount) || 0), 0);
+  const calculateAfterDiscount = () => Math.max(0, calculateSubtotal() - calculateDiscountTotal());
+  const calculateTaxAmount = () => calculateAfterDiscount() * ((parseFloat(taxRate) || 0) / 100);
+  const calculateTotal = () => calculateAfterDiscount() + calculateTaxAmount();
 
   const isDraft = order?.status === "draft";
 
@@ -127,7 +140,9 @@ export default function EditOrderPage() {
           productId: row.productId,
           quantity: row.quantity,
           price: parseFloat(row.price),
+          discount: parseFloat(row.discount) || 0,
         })),
+        taxRate: parseFloat(taxRate) || 0,
       });
 
       toast.success(isDraft ? "Draft saved!" : "Order updated successfully!");
@@ -156,7 +171,9 @@ export default function EditOrderPage() {
           productId: row.productId,
           quantity: row.quantity,
           price: parseFloat(row.price),
+          discount: parseFloat(row.discount) || 0,
         })),
+        taxRate: parseFloat(taxRate) || 0,
       });
       await axios.put(`/api/orders/${orderId}/finalize`);
 
@@ -269,7 +286,7 @@ export default function EditOrderPage() {
                       ))}
                     </select>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                       <div className="space-y-2">
                         <Label htmlFor={`price-${row.id}`} className="text-sm font-medium">
                           Price ($)
@@ -297,6 +314,19 @@ export default function EditOrderPage() {
                           required
                         />
                       </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor={`discount-${row.id}`} className="text-sm font-medium">
+                          Discount ($)
+                        </Label>
+                        <Input
+                          id={`discount-${row.id}`}
+                          type="text"
+                          value={row.discount}
+                          onChange={(e) => handleRowChange(row.id, "discount", e.target.value)}
+                          placeholder="0.00"
+                        />
+                      </div>
                     </div>
                   </div>
                 ))}
@@ -307,11 +337,46 @@ export default function EditOrderPage() {
                 Add Another Product
               </Button>
 
-              <div className="bg-blue-50 rounded-lg p-4 border border-blue-200">
-                <div className="flex justify-between items-center">
+              <div className="space-y-2 max-w-xs">
+                <Label htmlFor="tax-rate" className="text-sm font-medium">
+                  Tax Rate (%)
+                </Label>
+                <Input
+                  id="tax-rate"
+                  type="text"
+                  value={taxRate}
+                  onChange={(e) => setTaxRate(e.target.value.replace(/[^0-9.]/g, ""))}
+                  placeholder="0"
+                />
+              </div>
+
+              <div className="bg-blue-50 rounded-lg p-4 border border-blue-200 space-y-2">
+                <div className="flex justify-between items-center text-sm text-blue-900/80">
+                  <span>Subtotal</span>
+                  <span>${calculateSubtotal().toFixed(3)}</span>
+                </div>
+                {calculateDiscountTotal() > 0 && (
+                  <div className="flex justify-between items-center text-sm text-amber-700">
+                    <span>Discount</span>
+                    <span>-${calculateDiscountTotal().toFixed(3)}</span>
+                  </div>
+                )}
+                {calculateTaxAmount() > 0 && (
+                  <div className="flex justify-between items-center text-sm text-blue-900/80">
+                    <span>Tax ({parseFloat(taxRate) || 0}%)</span>
+                    <span>+${calculateTaxAmount().toFixed(3)}</span>
+                  </div>
+                )}
+                <div className="flex justify-between items-center pt-2 border-t border-blue-200">
                   <span className="text-lg font-semibold text-blue-900">Total Amount:</span>
                   <span className="text-2xl font-bold text-blue-900">${calculateTotal().toFixed(3)}</span>
                 </div>
+                {settings?.dollarRate > 0 && (
+                  <div className="flex justify-between items-center text-sm text-blue-900/70">
+                    <span>≈</span>
+                    <span>{formatLL(calculateTotal(), settings.dollarRate)}</span>
+                  </div>
+                )}
               </div>
 
               <div className="flex flex-col sm:flex-row gap-3 pt-4">

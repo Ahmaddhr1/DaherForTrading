@@ -2,6 +2,8 @@ import { connectToDB } from "@/lib/connectDb";
 import Company from "@/models/Company";
 import Purchase from "@/models/Purchase";
 import { NextResponse } from "next/server";
+import { getUserFromCookie } from "@/lib/auth";
+import { logActivity } from "@/lib/activityLog";
 
 export async function POST(req) {
   await connectToDB();
@@ -19,6 +21,14 @@ export async function POST(req) {
 
     const company = await new Company({ name, phoneNumber, address });
     await company.save();
+
+    await logActivity({
+      admin: await getUserFromCookie(),
+      action: "company.create",
+      entityType: "Company",
+      entityId: company._id,
+      summary: `Created supplier "${company.name}"`,
+    });
 
     return NextResponse.json(
       { message: "Company created successfully", company },
@@ -44,6 +54,7 @@ export async function GET(req) {
   const startDateParam = searchParams.get("startDate");
   const endDateParam = searchParams.get("endDate");
 
+  const all = searchParams.get("all") === "true";
   const skip = (page - 1) * limit;
 
   const SORT_MAP = {
@@ -66,6 +77,13 @@ export async function GET(req) {
       query.debt = { $gt: 0 };
     } else if (debtFilter === "noDebt") {
       query.debt = { $lte: 0 };
+    }
+
+    // Some callers (e.g. the default-supplier dropdown) need the full
+    // unpaginated list rather than a page of results.
+    if (all) {
+      const companies = await Company.find(query).sort({ name: 1 });
+      return NextResponse.json(companies, { status: 200 });
     }
 
     const total = await Company.countDocuments(query);

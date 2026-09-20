@@ -35,8 +35,10 @@ import {
   X,
   Trash2,
   TrendingDown,
+  Eye,
 } from "lucide-react";
 import { format } from "date-fns";
+import Link from "next/link";
 
 const CATEGORY_OPTIONS = ["Salaries", "Rent", "Utilities", "Maintenance", "Transport", "Other"];
 
@@ -316,14 +318,22 @@ export default function DisbursementsPage() {
                       {format(new Date(item.createdAt), "MMM d, yyyy HH:mm")}
                     </TableCell>
                     <TableCell className="text-right">
-                      <Button
-                        variant="destructive"
-                        size="sm"
-                        onClick={() => handleDelete(item._id, item.description)}
-                        disabled={deleteMutation.isPending}
-                      >
-                        <Trash2 className="h-3 w-3" />
-                      </Button>
+                      <div className="flex justify-end gap-2">
+                        <Link href={`/dashboard/disbursements/${item._id}`}>
+                          <Button variant="ghost" size="sm" className="flex items-center gap-1">
+                            <Eye className="h-3.5 w-3.5" />
+                            View
+                          </Button>
+                        </Link>
+                        <Button
+                          variant="destructive"
+                          size="sm"
+                          onClick={() => handleDelete(item._id, item.description)}
+                          disabled={deleteMutation.isPending}
+                        >
+                          <Trash2 className="h-3 w-3" />
+                        </Button>
+                      </div>
                     </TableCell>
                   </TableRow>
                 ))}

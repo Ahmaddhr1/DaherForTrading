@@ -3,6 +3,8 @@ import Customer from "@/models/Customers";
 import Order from "@/models/Orders";
 import Payment from "@/models/Payment";
 import { NextResponse } from "next/server";
+import { getUserFromCookie } from "@/lib/auth";
+import { logActivity } from "@/lib/activityLog";
 
 // GET one customer
 export async function GET(req, { params }) {
@@ -49,6 +51,15 @@ export async function PUT(req, { params }) {
         { status: 404 }
       );
     }
+
+    await logActivity({
+      admin: await getUserFromCookie(),
+      action: "customer.edit",
+      entityType: "Customer",
+      entityId: updatedCustomer._id,
+      summary: `Edited customer "${updatedCustomer.fullName}"`,
+    });
+
     return NextResponse.json(
       { message: "Customer updated successfully" },
       { status: 200 }
@@ -75,6 +86,15 @@ export async function DELETE(req, { params }) {
     }
     await Order.deleteMany({ customer: id });
     await Payment.deleteMany({ customer: id });
+
+    await logActivity({
+      admin: await getUserFromCookie(),
+      action: "customer.delete",
+      entityType: "Customer",
+      entityId: id,
+      summary: `Deleted customer "${deletedCustomer.fullName}" (and their orders/payments)`,
+    });
+
     return NextResponse.json(
       { message: "Customer deleted successfully" },
       { status: 200 }

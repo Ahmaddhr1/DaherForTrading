@@ -20,7 +20,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Search, Package, Plus, Edit, Trash2, ChevronLeft, ChevronRight, Loader2, DollarSign, Box, TrendingUp, Wallet } from "lucide-react";
+import { Search, Package, Plus, Edit, Trash2, ChevronLeft, ChevronRight, Loader2, DollarSign, Box, TrendingUp, Wallet, AlertTriangle } from "lucide-react";
 
 export default function ProductsPage() {
   // State for search and pagination
@@ -88,6 +88,8 @@ export default function ProductsPage() {
     stockValueSelling: 0,
     potentialProfit: 0,
     totalUnits: 0,
+    lowStockCount: 0,
+    outOfStockCount: 0,
   };
 
   return (
@@ -117,7 +119,7 @@ export default function ProductsPage() {
         </div>
 
         {/* Stock value / potential profit summary */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        <div className="grid grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
           <Card className="shadow-sm border-gray-200">
             <CardContent className="p-4 flex flex-col gap-1">
               <span className="flex items-center gap-1.5 text-xs font-medium text-gray-500">
@@ -160,6 +162,20 @@ export default function ProductsPage() {
               <span className="text-lg font-bold text-gray-900">
                 {summary.totalUnits.toLocaleString()}
               </span>
+            </CardContent>
+          </Card>
+          <Card className="shadow-sm border-gray-200">
+            <CardContent className="p-4 flex flex-col gap-1">
+              <span className="flex items-center gap-1.5 text-xs font-medium text-gray-500">
+                <AlertTriangle className="h-3.5 w-3.5" />
+                Low Stock
+              </span>
+              <span className={`text-lg font-bold ${summary.lowStockCount > 0 ? "text-yellow-600" : "text-gray-900"}`}>
+                {summary.lowStockCount.toLocaleString()}
+              </span>
+              {summary.outOfStockCount > 0 && (
+                <span className="text-xs text-red-600">{summary.outOfStockCount} out of stock</span>
+              )}
             </CardContent>
           </Card>
         </div>
@@ -273,14 +289,14 @@ export default function ProductsPage() {
                         {/* Stock */}
                         <TableCell className="text-center">
                           <div className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
-                            product.quantity > 10 
-                              ? "bg-green-100 text-green-800" 
-                              : product.quantity > 0 
-                                ? "bg-yellow-100 text-yellow-800" 
+                            product.quantity > (product.lowStockThreshold ?? 5)
+                              ? "bg-green-100 text-green-800"
+                              : product.quantity > 0
+                                ? "bg-yellow-100 text-yellow-800"
                                 : "bg-red-100 text-red-800"
                           }`}>
                             <Box className="h-3 w-3 mr-1" />
-                            {product?.quantity} in stock
+                            {product?.quantity} {product.unit || "pcs"} in stock
                           </div>
                         </TableCell>
                         

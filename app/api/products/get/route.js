@@ -34,15 +34,44 @@ export async function GET(req) {
           stockValueCost: { $sum: { $multiply: ["$quantity", "$initialPrice"] } },
           stockValueSelling: { $sum: { $multiply: ["$quantity", "$price"] } },
           totalUnits: { $sum: "$quantity" },
+          // $ifNull covers products saved before the lowStockThreshold field
+          // existed (or created via a raw insert), which is why we don't
+          // rely on the schema default here - Mongoose defaults only apply
+          // on hydration, not inside an aggregation pipeline.
+          lowStockCount: {
+            $sum: {
+              $cond: [
+                {
+                  $and: [
+                    { $gt: ["$quantity", 0] },
+                    { $lte: ["$quantity", { $ifNull: ["$lowStockThreshold", 5] }] },
+                  ],
+                },
+                1,
+                0,
+              ],
+            },
+          },
+          outOfStockCount: {
+            $sum: { $cond: [{ $eq: ["$quantity", 0] }, 1, 0] },
+          },
         },
       },
     ]);
-    const summaryRow = summaryAgg[0] || { stockValueCost: 0, stockValueSelling: 0, totalUnits: 0 };
+    const summaryRow = summaryAgg[0] || {
+      stockValueCost: 0,
+      stockValueSelling: 0,
+      totalUnits: 0,
+      lowStockCount: 0,
+      outOfStockCount: 0,
+    };
     const summary = {
       stockValueCost: summaryRow.stockValueCost,
       stockValueSelling: summaryRow.stockValueSelling,
       potentialProfit: summaryRow.stockValueSelling - summaryRow.stockValueCost,
       totalUnits: summaryRow.totalUnits,
+      lowStockCount: summaryRow.lowStockCount,
+      outOfStockCount: summaryRow.outOfStockCount,
     };
 
     return NextResponse.json(

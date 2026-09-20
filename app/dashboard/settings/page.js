@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useRef, useState } from "react";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import React, { useEffect, useRef, useState } from "react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -19,7 +19,14 @@ import {
   Upload,
   FileJson,
   AlertTriangle,
+  DollarSign,
+  Percent,
+  Mail,
+  CheckCircle2,
+  XCircle,
+  Send,
 } from "lucide-react";
+import { useSettings } from "@/lib/currency";
 
 const RESTORE_WARNING =
   "This will permanently replace all current customers, orders, products, categories, companies, purchases, payments, and disbursements with the contents of this file. This cannot be undone. Continue?";
@@ -27,15 +34,78 @@ const RESTORE_WARNING =
 export default function SettingsPage() {
   const queryClient = useQueryClient();
 
+  // Backup/restore is owner-only server-side (middleware.js) - this just
+  // avoids showing an employee controls they'd get a 403 from.
+  const { data: me } = useQuery({
+    queryKey: ["admin", "me"],
+    queryFn: async () => (await axios.get("/api/admin/me")).data,
+  });
+  const isOwner = me?.role === "owner";
+
   const [passwordForm, setPasswordForm] = useState({
     currentPassword: "",
     newPassword: "",
     confirmPassword: "",
   });
+
+  // Business settings (Dollar Rate / default Tax Rate)
+  const { data: settings, isLoading: settingsLoading } = useSettings();
+  const [dollarRate, setDollarRate] = useState("");
+  const [taxRate, setTaxRate] = useState("");
+
+  useEffect(() => {
+    if (settings) {
+      setDollarRate(settings.dollarRate?.toString() ?? "");
+      setTaxRate(settings.taxRate?.toString() ?? "");
+    }
+  }, [settings]);
+
+  const settingsMutation = useMutation({
+    mutationFn: async () => {
+      const res = await axios.put("/api/settings/business", {
+        dollarRate: parseFloat(dollarRate),
+        taxRate: parseFloat(taxRate),
+      });
+      return res.data;
+    },
+    onSuccess: () => {
+      toast.success("Business settings updated");
+      queryClient.invalidateQueries({ queryKey: ["settings", "business"] });
+    },
+    onError: (error) => {
+      toast.error(error.response?.data?.error || "Failed to update settings");
+    },
+  });
+
+  const handleSettingsSubmit = (e) => {
+    e.preventDefault();
+    const rate = parseFloat(dollarRate);
+    const tax = parseFloat(taxRate);
+    if (!rate || rate <= 0) {
+      toast.error("Enter a valid Dollar Rate greater than 0");
+      return;
+    }
+    if (isNaN(tax) || tax < 0 || tax > 100) {
+      toast.error("Enter a valid Tax Rate between 0 and 100");
+      return;
+    }
+    settingsMutation.mutate();
+  };
   const [isDownloading, setIsDownloading] = useState(false);
   const [restoreFile, setRestoreFile] = useState(null);
   const [restoreSummary, setRestoreSummary] = useState(null);
   const fileInputRef = useRef(null);
+
+  const sendTestBackupMutation = useMutation({
+    mutationFn: async () => (await axios.post("/api/settings/backup/send-test")).data,
+    onSuccess: (data) => {
+      toast.success(`Backup emailed to ${data.to}`);
+      queryClient.invalidateQueries({ queryKey: ["settings", "business"] });
+    },
+    onError: (error) => {
+      toast.error(error.response?.data?.error || "Failed to send backup email");
+    },
+  });
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -169,6 +239,84 @@ export default function SettingsPage() {
           </div>
         </div>
 
+        {/* Business Settings: Dollar Rate + default Tax Rate */}
+        <Card className="shadow-sm border-gray-200 mb-6">
+          <CardHeader>
+            <CardTitle className="text-lg flex items-center gap-2">
+              <DollarSign className="h-5 w-5 text-green-600" />
+              Business Settings
+            </CardTitle>
+            <CardDescription>
+              Used to show an LL equivalent on receipts and order/purchase forms, and to
+              pre-fill tax on new orders and purchases
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            {settingsLoading ? (
+              <p className="text-sm text-gray-500">Loading...</p>
+            ) : (
+              <form onSubmit={handleSettingsSubmit} className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="dollarRate" className="flex items-center gap-2">
+                    <DollarSign className="h-4 w-4" />
+                    Dollar Rate (LL per $1)
+                  </Label>
+                  <Input
+                    id="dollarRate"
+                    type="number"
+                    min="0"
+                    step="1"
+                    value={dollarRate}
+                    onChange={(e) => setDollarRate(e.target.value)}
+                    placeholder="90000"
+                  />
+                  <p className="text-xs text-gray-500">
+                    e.g. 90000 means $1 = 90,000 LL. Update this whenever the rate moves.
+                  </p>
+                </div>
+
+                <Separator />
+
+                <div className="space-y-2">
+                  <Label htmlFor="taxRate" className="flex items-center gap-2">
+                    <Percent className="h-4 w-4" />
+                    Default Tax Rate (%)
+                  </Label>
+                  <Input
+                    id="taxRate"
+                    type="number"
+                    min="0"
+                    max="100"
+                    step="0.01"
+                    value={taxRate}
+                    onChange={(e) => setTaxRate(e.target.value)}
+                    placeholder="0"
+                  />
+                  <p className="text-xs text-gray-500">
+                    Pre-fills the tax field when creating an order or purchase - it can
+                    still be changed per transaction.
+                  </p>
+                </div>
+
+                <Button
+                  type="submit"
+                  disabled={settingsMutation.isPending}
+                  className="bg-green-600 hover:bg-green-700"
+                >
+                  {settingsMutation.isPending ? (
+                    <span className="flex items-center gap-2">
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                      Saving...
+                    </span>
+                  ) : (
+                    "Save Business Settings"
+                  )}
+                </Button>
+              </form>
+            )}
+          </CardContent>
+        </Card>
+
         {/* Change Password */}
         <Card className="shadow-sm border-gray-200 mb-6">
           <CardHeader>
@@ -240,123 +388,208 @@ export default function SettingsPage() {
           </CardContent>
         </Card>
 
-        {/* Database Backup */}
-        <Card className="shadow-sm border-gray-200 mb-6">
-          <CardHeader>
-            <CardTitle className="text-lg flex items-center gap-2">
-              <DatabaseBackup className="h-5 w-5 text-green-600" />
-              Database Backup
-            </CardTitle>
-            <CardDescription>
-              Download a full copy of your business data (customers, orders, products,
-              categories, companies, purchases, payments, and disbursements) as a JSON file
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Button
-              onClick={handleDownloadBackup}
-              disabled={isDownloading}
-              variant="outline"
-              className="flex items-center gap-2"
-            >
-              {isDownloading ? (
-                <>
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                  Preparing Backup...
-                </>
-              ) : (
-                <>
-                  <DatabaseBackup className="h-4 w-4" />
-                  Download Backup
-                </>
-              )}
-            </Button>
-            <p className="text-xs text-gray-500 mt-3 flex items-start gap-1">
-              <ShieldCheck className="h-3.5 w-3.5 shrink-0 mt-0.5 text-gray-400" />
-              Login credentials are never included in this backup file.
-            </p>
-          </CardContent>
-        </Card>
-
-        {/* Import / Restore Backup */}
-        <Card className="shadow-sm border-amber-200">
-          <CardHeader>
-            <CardTitle className="text-lg flex items-center gap-2">
-              <Upload className="h-5 w-5 text-amber-600" />
-              Import Backup
-            </CardTitle>
-            <CardDescription>
-              Restore your business data from a previously downloaded backup file. This
-              replaces all current data.
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 flex items-start gap-2">
-              <AlertTriangle className="h-4 w-4 text-amber-600 shrink-0 mt-0.5" />
-              <p className="text-xs text-amber-800">{RESTORE_WARNING}</p>
-            </div>
-
-            <div className="space-y-2">
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept=".json,application/json"
-                onChange={handleFileSelect}
-                className="hidden"
-                id="restore-file-input"
-              />
-              <div className="flex items-center gap-3 flex-wrap">
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => fileInputRef.current?.click()}
-                  className="flex items-center gap-2"
-                >
-                  <FileJson className="h-4 w-4" />
-                  Choose Backup File
-                </Button>
-                {restoreFile && (
-                  <Badge variant="outline" className="flex items-center gap-1">
-                    <FileJson className="h-3 w-3" />
-                    {restoreFile.name}
-                  </Badge>
+        {/* Database Backup - owner only (see middleware.js) */}
+        {isOwner && (
+          <Card className="shadow-sm border-gray-200 mb-6">
+            <CardHeader>
+              <CardTitle className="text-lg flex items-center gap-2">
+                <DatabaseBackup className="h-5 w-5 text-green-600" />
+                Database Backup
+              </CardTitle>
+              <CardDescription>
+                Download a full copy of your business data (customers, orders, products,
+                categories, companies, purchases, payments, and disbursements) as a JSON file
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Button
+                onClick={handleDownloadBackup}
+                disabled={isDownloading}
+                variant="outline"
+                className="flex items-center gap-2"
+              >
+                {isDownloading ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    Preparing Backup...
+                  </>
+                ) : (
+                  <>
+                    <DatabaseBackup className="h-4 w-4" />
+                    Download Backup
+                  </>
                 )}
-              </div>
-            </div>
+              </Button>
+              <p className="text-xs text-gray-500 mt-3 flex items-start gap-1">
+                <ShieldCheck className="h-3.5 w-3.5 shrink-0 mt-0.5 text-gray-400" />
+                Login credentials are never included in this backup file.
+              </p>
+            </CardContent>
+          </Card>
+        )}
 
-            <Button
-              onClick={handleRestore}
-              disabled={!restoreFile || restoreMutation.isPending}
-              variant="destructive"
-              className="flex items-center gap-2"
-            >
-              {restoreMutation.isPending ? (
-                <>
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                  Restoring...
-                </>
+        {/* Automated Backups - owner only (see middleware.js) */}
+        {isOwner && (
+          <Card className="shadow-sm border-gray-200 mb-6">
+            <CardHeader>
+              <CardTitle className="text-lg flex items-center gap-2">
+                <Mail className="h-5 w-5 text-blue-600" />
+                Automated Backups
+              </CardTitle>
+              <CardDescription>
+                A copy of the same backup above, emailed automatically on a schedule
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {settings?.lastScheduledBackupAt ? (
+                <div
+                  className={`rounded-lg p-3 flex items-start gap-2 border ${
+                    settings.lastScheduledBackupStatus === "failed"
+                      ? "bg-red-50 border-red-200"
+                      : "bg-green-50 border-green-200"
+                  }`}
+                >
+                  {settings.lastScheduledBackupStatus === "failed" ? (
+                    <XCircle className="h-4 w-4 text-red-600 shrink-0 mt-0.5" />
+                  ) : (
+                    <CheckCircle2 className="h-4 w-4 text-green-600 shrink-0 mt-0.5" />
+                  )}
+                  <div className="text-xs">
+                    <p
+                      className={
+                        settings.lastScheduledBackupStatus === "failed"
+                          ? "text-red-800 font-medium"
+                          : "text-green-800 font-medium"
+                      }
+                    >
+                      Last backup email {settings.lastScheduledBackupStatus === "failed" ? "failed" : "sent"}
+                      {" - "}
+                      {new Date(settings.lastScheduledBackupAt).toLocaleString()}
+                    </p>
+                    {settings.lastScheduledBackupStatus === "failed" && settings.lastScheduledBackupError && (
+                      <p className="text-red-700 mt-1">{settings.lastScheduledBackupError}</p>
+                    )}
+                  </div>
+                </div>
               ) : (
-                <>
-                  <Upload className="h-4 w-4" />
-                  Restore from Backup
-                </>
+                <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 flex items-start gap-2">
+                  <AlertTriangle className="h-4 w-4 text-amber-600 shrink-0 mt-0.5" />
+                  <p className="text-xs text-amber-800">
+                    No automated backup has run yet. Once the schedule is configured on the
+                    server (see below), or you send a test email, it will show up here.
+                  </p>
+                </div>
               )}
-            </Button>
 
-            {restoreSummary && (
-              <div className="bg-green-50 border border-green-200 rounded-lg p-3">
-                <p className="text-sm font-medium text-green-800 mb-2">Restored:</p>
-                <div className="flex flex-wrap gap-2">
-                  {Object.entries(restoreSummary).map(([key, count]) => (
-                    <Badge key={key} variant="outline" className="bg-white">
-                      {key}: {count}
+              <Button
+                onClick={() => sendTestBackupMutation.mutate()}
+                disabled={sendTestBackupMutation.isPending}
+                variant="outline"
+                className="flex items-center gap-2"
+              >
+                {sendTestBackupMutation.isPending ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    Sending...
+                  </>
+                ) : (
+                  <>
+                    <Send className="h-4 w-4" />
+                    Send Backup Email Now
+                  </>
+                )}
+              </Button>
+
+              <p className="text-xs text-gray-500">
+                Runs automatically once a day. This needs a few things set up on the server
+                once (SMTP credentials for sending mail, a recipient address, and a schedule
+                secret) - ask your developer if the status above says a backup email failed.
+              </p>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Import / Restore Backup - owner only (see middleware.js) */}
+        {isOwner && (
+          <Card className="shadow-sm border-amber-200">
+            <CardHeader>
+              <CardTitle className="text-lg flex items-center gap-2">
+                <Upload className="h-5 w-5 text-amber-600" />
+                Import Backup
+              </CardTitle>
+              <CardDescription>
+                Restore your business data from a previously downloaded backup file. This
+                replaces all current data.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 flex items-start gap-2">
+                <AlertTriangle className="h-4 w-4 text-amber-600 shrink-0 mt-0.5" />
+                <p className="text-xs text-amber-800">{RESTORE_WARNING}</p>
+              </div>
+
+              <div className="space-y-2">
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept=".json,application/json"
+                  onChange={handleFileSelect}
+                  className="hidden"
+                  id="restore-file-input"
+                />
+                <div className="flex items-center gap-3 flex-wrap">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => fileInputRef.current?.click()}
+                    className="flex items-center gap-2"
+                  >
+                    <FileJson className="h-4 w-4" />
+                    Choose Backup File
+                  </Button>
+                  {restoreFile && (
+                    <Badge variant="outline" className="flex items-center gap-1">
+                      <FileJson className="h-3 w-3" />
+                      {restoreFile.name}
                     </Badge>
-                  ))}
+                  )}
                 </div>
               </div>
-            )}
-          </CardContent>
-        </Card>
+
+              <Button
+                onClick={handleRestore}
+                disabled={!restoreFile || restoreMutation.isPending}
+                variant="destructive"
+                className="flex items-center gap-2"
+              >
+                {restoreMutation.isPending ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    Restoring...
+                  </>
+                ) : (
+                  <>
+                    <Upload className="h-4 w-4" />
+                    Restore from Backup
+                  </>
+                )}
+              </Button>
+
+              {restoreSummary && (
+                <div className="bg-green-50 border border-green-200 rounded-lg p-3">
+                  <p className="text-sm font-medium text-green-800 mb-2">Restored:</p>
+                  <div className="flex flex-wrap gap-2">
+                    {Object.entries(restoreSummary).map(([key, count]) => (
+                      <Badge key={key} variant="outline" className="bg-white">
+                        {key}: {count}
+                      </Badge>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        )}
       </div>
     </div>
   );

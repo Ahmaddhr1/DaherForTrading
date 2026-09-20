@@ -12,21 +12,36 @@ import { ListSkeleton, PageHeaderSkeleton } from "@/components/ui/skeleton-patte
 import { toast } from "sonner";
 import { Loader2, Plus, Trash2, ShoppingCart, ArrowLeft, Save } from "lucide-react";
 import Link from "next/link";
+import { useSettings, formatLL } from "@/lib/currency";
 
 const MakeOrderPage = () => {
   const { id: customerId } = useParams();
   const router = useRouter();
 
+  const { data: settings } = useSettings();
+
   const [products, setProducts] = useState([]);
-  const [orderRows, setOrderRows] = useState([{ 
-    id: 1, 
-    productId: "", 
-    quantity: 1, 
-    price: "" 
+  const [orderRows, setOrderRows] = useState([{
+    id: 1,
+    productId: "",
+    quantity: 1,
+    price: "",
+    discount: "",
   }]);
+  const [taxRate, setTaxRate] = useState("");
+  const [taxRateTouched, setTaxRateTouched] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSavingDraft, setIsSavingDraft] = useState(false);
+
+  // Pre-fill the tax rate from business settings once, unless the user has
+  // already changed it for this order.
+  useEffect(() => {
+    if (settings && !taxRateTouched) {
+      setTaxRate(settings.taxRate?.toString() || "0");
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [settings]);
 
   // Load products
   useEffect(() => {
@@ -47,11 +62,12 @@ const MakeOrderPage = () => {
   // Add new product row
   const addProductRow = () => {
     const newId = orderRows.length + 1;
-    setOrderRows([...orderRows, { 
-      id: newId, 
-      productId: "", 
-      quantity: 1, 
-      price: "" 
+    setOrderRows([...orderRows, {
+      id: newId,
+      productId: "",
+      quantity: 1,
+      price: "",
+      discount: "",
     }]);
   };
 
@@ -83,19 +99,34 @@ const MakeOrderPage = () => {
       else if (field === "price") {
         updatedRow.price = value.replace(/[^0-9.]/g, "");
       }
+      else if (field === "discount") {
+        updatedRow.discount = value.replace(/[^0-9.]/g, "");
+      }
 
       return updatedRow;
     }));
   };
 
-  // Calculate total order amount
-  const calculateTotal = () => {
+  // Subtotal before any discount
+  const calculateSubtotal = () => {
     return orderRows.reduce((total, row) => {
       const price = parseFloat(row.price) || 0;
       const quantity = row.quantity || 0;
       return total + (price * quantity);
     }, 0);
   };
+
+  const calculateDiscountTotal = () => {
+    return orderRows.reduce((total, row) => total + (parseFloat(row.discount) || 0), 0);
+  };
+
+  const calculateAfterDiscount = () => Math.max(0, calculateSubtotal() - calculateDiscountTotal());
+
+  const calculateTaxAmount = () => calculateAfterDiscount() * ((parseFloat(taxRate) || 0) / 100);
+
+  // Grand total = what the customer actually owes (used for the order's
+  // `total` and added to their debt)
+  const calculateTotal = () => calculateAfterDiscount() + calculateTaxAmount();
 
   // Get product name by ID
   const getProductName = (productId) => {
@@ -115,6 +146,11 @@ const MakeOrderPage = () => {
       }
       if (!row.price || parseFloat(row.price) <= 0) {
         toast.error("Please enter a valid price");
+        return false;
+      }
+      const lineSubtotal = (parseFloat(row.price) || 0) * (row.quantity || 0);
+      if (row.discount && parseFloat(row.discount) > lineSubtotal) {
+        toast.error("A line's discount can't be more than its own subtotal");
         return false;
       }
     }
@@ -137,9 +173,10 @@ const MakeOrderPage = () => {
         products: orderRows.map(row => ({
           productId: row.productId,
           quantity: row.quantity,
-          price: parseFloat(row.price)
+          price: parseFloat(row.price),
+          discount: parseFloat(row.discount) || 0,
         })),
-        total: calculateTotal()
+        taxRate: parseFloat(taxRate) || 0,
       };
 
       await axios.post(`/api/orders/${customerId}`, orderData);
@@ -165,9 +202,10 @@ const MakeOrderPage = () => {
         products: orderRows.map(row => ({
           productId: row.productId,
           quantity: row.quantity,
-          price: parseFloat(row.price)
+          price: parseFloat(row.price),
+          discount: parseFloat(row.discount) || 0,
         })),
-        total: calculateTotal(),
+        taxRate: parseFloat(taxRate) || 0,
         asDraft: true,
       };
 
@@ -265,7 +303,7 @@ const MakeOrderPage = () => {
                       ))}
                     </select>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                       {/* Price */}
                       <div className="space-y-2">
                         <Label htmlFor={`price-${row.id}`} className="text-sm font-medium">
@@ -295,6 +333,20 @@ const MakeOrderPage = () => {
                           required
                         />
                       </div>
+
+                      {/* Discount */}
+                      <div className="space-y-2">
+                        <Label htmlFor={`discount-${row.id}`} className="text-sm font-medium">
+                          Discount ($)
+                        </Label>
+                        <Input
+                          id={`discount-${row.id}`}
+                          type="text"
+                          value={row.discount}
+                          onChange={(e) => handleRowChange(row.id, "discount", e.target.value)}
+                          placeholder="0.00"
+                        />
+                      </div>
                     </div>
                   </div>
                 ))}
@@ -311,14 +363,53 @@ const MakeOrderPage = () => {
                 Add Another Product
               </Button>
 
+              {/* Tax Rate */}
+              <div className="space-y-2 max-w-xs">
+                <Label htmlFor="tax-rate" className="text-sm font-medium">
+                  Tax Rate (%)
+                </Label>
+                <Input
+                  id="tax-rate"
+                  type="text"
+                  value={taxRate}
+                  onChange={(e) => {
+                    setTaxRateTouched(true);
+                    setTaxRate(e.target.value.replace(/[^0-9.]/g, ""));
+                  }}
+                  placeholder="0"
+                />
+              </div>
+
               {/* Total Amount */}
-              <div className="bg-blue-50 rounded-lg p-4 border border-blue-200">
-                <div className="flex justify-between items-center">
+              <div className="bg-blue-50 rounded-lg p-4 border border-blue-200 space-y-2">
+                <div className="flex justify-between items-center text-sm text-blue-900/80">
+                  <span>Subtotal</span>
+                  <span>${calculateSubtotal().toFixed(3)}</span>
+                </div>
+                {calculateDiscountTotal() > 0 && (
+                  <div className="flex justify-between items-center text-sm text-amber-700">
+                    <span>Discount</span>
+                    <span>-${calculateDiscountTotal().toFixed(3)}</span>
+                  </div>
+                )}
+                {calculateTaxAmount() > 0 && (
+                  <div className="flex justify-between items-center text-sm text-blue-900/80">
+                    <span>Tax ({parseFloat(taxRate) || 0}%)</span>
+                    <span>+${calculateTaxAmount().toFixed(3)}</span>
+                  </div>
+                )}
+                <div className="flex justify-between items-center pt-2 border-t border-blue-200">
                   <span className="text-lg font-semibold text-blue-900">Total Amount:</span>
                   <span className="text-2xl font-bold text-blue-900">
                     ${calculateTotal().toFixed(3)}
                   </span>
                 </div>
+                {settings?.dollarRate > 0 && (
+                  <div className="flex justify-between items-center text-sm text-blue-900/70">
+                    <span>≈</span>
+                    <span>{formatLL(calculateTotal(), settings.dollarRate)}</span>
+                  </div>
+                )}
               </div>
 
               {/* Submit Buttons */}

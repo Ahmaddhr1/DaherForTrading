@@ -38,7 +38,7 @@ export function MobileBottomBar() {
       key: "sales",
       label: "Sales",
       icon: <Wallet size={20} />,
-      items: ["Customers", "Payments", "Disbursements"].map(findTab).filter(Boolean),
+      items: ["Customers", "Payments", "Disbursements", "Accounts"].map(findTab).filter(Boolean),
     },
     {
       key: "inventory",

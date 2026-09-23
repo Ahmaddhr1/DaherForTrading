@@ -14,6 +14,7 @@ import { Loader2, ShoppingBag, ArrowLeft, Plus, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useSettings, formatLL } from "@/lib/currency";
+import { Combobox } from "@/components/ui/combobox";
 
 let nextRowId = 1;
 const emptyRow = () => ({ id: nextRowId++, productId: "", unitPrice: "", quantity: "1", discount: "" });
@@ -141,7 +142,7 @@ const NewPurchasePage = () => {
       }
     }
 
-    if (!window.confirm(`Record ${rows.length > 1 ? "these purchases" : "this purchase"} for $${total.toFixed(3)}? Stock will increase and the company's balance will be updated.`)) {
+    if (!window.confirm(`Record ${rows.length > 1 ? "these purchases" : "this purchase"} for $${total.toFixed(2)}? Stock will increase and the company's balance will be updated.`)) {
       return;
     }
 
@@ -203,20 +204,19 @@ const NewPurchasePage = () => {
                         </Button>
                       </div>
 
-                      <select
+                      <Combobox
+                        options={products}
                         value={row.productId}
-                        onChange={(e) => updateRow(row.id, "productId", e.target.value)}
-                        className="w-full p-2 border rounded-md focus:border-blue-500"
+                        onChange={(value) => updateRow(row.id, "productId", value)}
+                        placeholder="Select a product"
                         disabled={productsLoading}
-                        required
-                      >
-                        <option value="">Select a product</option>
-                        {products.map((product) => (
-                          <option key={product._id} value={product._id}>
-                            {product.name} (current stock: {product.quantity})
-                          </option>
-                        ))}
-                      </select>
+                        renderOption={(product) => (
+                          <span>
+                            {product.name}{" "}
+                            <span className="text-gray-400">(current stock: {product.quantity})</span>
+                          </span>
+                        )}
+                      />
 
                       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <div className="space-y-2">
@@ -231,7 +231,7 @@ const NewPurchasePage = () => {
                           />
                           {rowProduct && (
                             <p className="text-xs text-gray-500">
-                              Current cost on file: ${rowProduct.initialPrice?.toFixed(3)}
+                              Current cost on file: ${rowProduct.initialPrice?.toFixed(2)}
                             </p>
                           )}
                         </div>
@@ -312,23 +312,23 @@ const NewPurchasePage = () => {
               <div className="bg-blue-50 rounded-lg p-4 border border-blue-200 space-y-2">
                 <div className="flex justify-between items-center text-sm text-blue-900/80">
                   <span>Subtotal</span>
-                  <span>${subtotal.toFixed(3)}</span>
+                  <span>${subtotal.toFixed(2)}</span>
                 </div>
                 {discountTotal > 0 && (
                   <div className="flex justify-between items-center text-sm text-amber-700">
                     <span>Discount</span>
-                    <span>-${discountTotal.toFixed(3)}</span>
+                    <span>-${discountTotal.toFixed(2)}</span>
                   </div>
                 )}
                 {taxAmountTotal > 0 && (
                   <div className="flex justify-between items-center text-sm text-blue-900/80">
                     <span>Tax ({parseFloat(taxRate) || 0}%)</span>
-                    <span>+${taxAmountTotal.toFixed(3)}</span>
+                    <span>+${taxAmountTotal.toFixed(2)}</span>
                   </div>
                 )}
                 <div className="flex justify-between items-center pt-2 border-t border-blue-200">
                   <span className="text-lg font-semibold text-blue-900">Total Amount:</span>
-                  <span className="text-2xl font-bold text-blue-900">${total.toFixed(3)}</span>
+                  <span className="text-2xl font-bold text-blue-900">${total.toFixed(2)}</span>
                 </div>
                 {settings?.dollarRate > 0 && (
                   <div className="flex justify-between items-center text-sm text-blue-900/70">
@@ -339,7 +339,7 @@ const NewPurchasePage = () => {
                 {!paid && (
                   <div className="flex justify-between items-center pt-2 text-sm">
                     <span className="text-amber-700">Added to company debt</span>
-                    <Badge variant="destructive">+${total.toFixed(3)}</Badge>
+                    <Badge variant="destructive">+${total.toFixed(2)}</Badge>
                   </div>
                 )}
               </div>

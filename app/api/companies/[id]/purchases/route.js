@@ -144,7 +144,7 @@ export async function POST(req, { params }) {
       action: "purchase.create",
       entityType: "Purchase",
       entityId: purchase._id,
-      summary: `Recorded a purchase of ${numericQuantity} x "${product.name}" from ${company.name} for $${total.toFixed(3)}`,
+      summary: `Recorded a purchase of ${numericQuantity} x "${product.name}" from ${company.name} for $${total.toFixed(2)}`,
       metadata: { companyId: id, productId, unitPrice: numericUnitPrice, quantity: numericQuantity, discount: numericDiscount, taxRate: numericTaxRate, paid: isPaid },
     });
 

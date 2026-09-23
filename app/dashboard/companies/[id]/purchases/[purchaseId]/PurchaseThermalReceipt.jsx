@@ -47,10 +47,10 @@ export default function PurchaseThermalReceipt({ purchase }) {
           </div>
           <div className="flex justify-between">
             <span>
-              {purchase.quantity} x ${Number(purchase.unitPrice).toFixed(3)}
-              {discount > 0 ? ` - $${discount.toFixed(3)}` : ""}
+              {purchase.quantity} x ${Number(purchase.unitPrice).toFixed(2)}
+              {discount > 0 ? ` - $${discount.toFixed(2)}` : ""}
             </span>
-            <span>${(lineSubtotal - discount).toFixed(3)}</span>
+            <span>${(lineSubtotal - discount).toFixed(2)}</span>
           </div>
         </div>
 
@@ -58,24 +58,24 @@ export default function PurchaseThermalReceipt({ purchase }) {
 
         <div className="flex justify-between">
           <span>Subtotal</span>
-          <span>${lineSubtotal.toFixed(3)}</span>
+          <span>${lineSubtotal.toFixed(2)}</span>
         </div>
         {discount > 0 && (
           <div className="flex justify-between">
             <span>Discount</span>
-            <span>-${discount.toFixed(3)}</span>
+            <span>-${discount.toFixed(2)}</span>
           </div>
         )}
         {taxAmount > 0 && (
           <div className="flex justify-between">
             <span>Tax ({taxRate}%)</span>
-            <span>+${taxAmount.toFixed(3)}</span>
+            <span>+${taxAmount.toFixed(2)}</span>
           </div>
         )}
 
         <div className="flex justify-between font-bold">
           <span>TOTAL</span>
-          <span>${Number(purchase.total).toFixed(3)}</span>
+          <span>${Number(purchase.total).toFixed(2)}</span>
         </div>
         {dollarRate > 0 && (
           <div className="flex justify-between">
@@ -93,7 +93,7 @@ export default function PurchaseThermalReceipt({ purchase }) {
             <div className="border-t border-dashed border-black my-1" />
             <div className="flex justify-between font-bold">
               <span>Supplier Total Debt</span>
-              <span>${companyDebt.toFixed(3)}</span>
+              <span>${companyDebt.toFixed(2)}</span>
             </div>
           </>
         )}

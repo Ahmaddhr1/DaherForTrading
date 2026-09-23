@@ -82,12 +82,32 @@ export async function GET(req) {
           _id: null,
           totalAmount: { $sum: "$total" },
           totalProfit: { $sum: { $ifNull: ["$profit", 0] } },
+          // Actual cash collected within the current filters: the full
+          // total for fully paid orders, plus just the amount paid so far
+          // for partially paid ones (not their full total, since the rest
+          // is still owed).
+          collectedAmount: {
+            $sum: {
+              $cond: [
+                { $eq: ["$status", "paid"] },
+                "$total",
+                {
+                  $cond: [
+                    { $eq: ["$status", "partiallyPaid"] },
+                    { $ifNull: ["$amountpaid", 0] },
+                    0,
+                  ],
+                },
+              ],
+            },
+          },
         },
       },
     ]);
     const totals = {
       totalAmount: totalsResult?.totalAmount || 0,
       totalProfit: totalsResult?.totalProfit || 0,
+      collectedAmount: totalsResult?.collectedAmount || 0,
     };
 
     return NextResponse.json(

@@ -13,7 +13,7 @@ import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { FormSkeleton, PageHeaderSkeleton } from "@/components/ui/skeleton-patterns";
-import { Loader2, Package, ArrowLeft, DollarSign, Tag, Box, TrendingUp, PackageCheck, Ruler, AlertTriangle, Truck } from "lucide-react";
+import { Loader2, Package, ArrowLeft, DollarSign, Tag, Box, TrendingUp, PackageCheck, Ruler, AlertTriangle, Truck, Layers } from "lucide-react";
 import Link from "next/link";
 import ProductHistory from "./ProductHistory";
 import StockAdjustments from "./StockAdjustments";
@@ -61,6 +61,9 @@ const EditProductPage = () => {
     name: "",
     quantity: "",
     price: "",
+    priceWholesale: "",
+    priceDistributor: "",
+    priceVip: "",
     initialPrice: "",
     category: "",
     unit: "pcs",
@@ -75,6 +78,9 @@ const EditProductPage = () => {
         name: product.name || "",
         quantity: product.quantity?.toString() || "",
         price: product.price?.toString() || "",
+        priceWholesale: product.priceWholesale?.toString() || "",
+        priceDistributor: product.priceDistributor?.toString() || "",
+        priceVip: product.priceVip?.toString() || "",
         initialPrice: product.initialPrice?.toString() || "",
         category: product.category || "",
         unit: product.unit || "pcs",
@@ -116,7 +122,7 @@ const EditProductPage = () => {
     let cleanValue = value;
 
     if (name === "quantity") cleanValue = value.replace(/\D/g, "");
-    if (name === "price" || name === "initialPrice")
+    if (["price", "initialPrice", "priceWholesale", "priceDistributor", "priceVip"].includes(name))
       cleanValue = value.replace(/[^0-9.]/g, "").replace(/(\..*?)\..*/g, "$1");
 
     setForm((prev) => ({ ...prev, [name]: cleanValue }));
@@ -437,6 +443,70 @@ const EditProductPage = () => {
 
                   <Separator />
 
+                  {/* Price Tiers Section */}
+                  <div className="space-y-4">
+                    <div className="flex items-center gap-2 text-sm font-medium text-gray-500 uppercase tracking-wide">
+                      <div className="w-1 h-4 bg-teal-600 rounded"></div>
+                      Price Tiers
+                    </div>
+                    <p className="text-xs text-gray-500 -mt-2">
+                      Selling Price above is the Retail price. Set different prices for other customer
+                      tiers here, or leave a field blank to use the Retail price for that tier.
+                    </p>
+
+                    <div className="grid gap-4 sm:grid-cols-3">
+                      <div className="space-y-2">
+                        <Label htmlFor="priceWholesale" className="text-sm font-medium flex items-center gap-2">
+                          <Layers className="h-4 w-4" />
+                          Wholesale
+                        </Label>
+                        <Input
+                          id="priceWholesale"
+                          placeholder={form.price || "0.00"}
+                          name="priceWholesale"
+                          value={form.priceWholesale}
+                          onChange={handleChange}
+                          inputMode="decimal"
+                          className="focus:border-teal-500 transition-colors"
+                        />
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor="priceDistributor" className="text-sm font-medium flex items-center gap-2">
+                          <Layers className="h-4 w-4" />
+                          Distributor
+                        </Label>
+                        <Input
+                          id="priceDistributor"
+                          placeholder={form.price || "0.00"}
+                          name="priceDistributor"
+                          value={form.priceDistributor}
+                          onChange={handleChange}
+                          inputMode="decimal"
+                          className="focus:border-teal-500 transition-colors"
+                        />
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor="priceVip" className="text-sm font-medium flex items-center gap-2">
+                          <Layers className="h-4 w-4" />
+                          VIP
+                        </Label>
+                        <Input
+                          id="priceVip"
+                          placeholder={form.price || "0.00"}
+                          name="priceVip"
+                          value={form.priceVip}
+                          onChange={handleChange}
+                          inputMode="decimal"
+                          className="focus:border-teal-500 transition-colors"
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  <Separator />
+
                   {/* Submit Button */}
                   <div className="flex gap-3 pt-2">
                     <Button
@@ -519,12 +589,12 @@ const EditProductPage = () => {
                   <div className="space-y-2">
                     <div className="flex justify-between items-center">
                       <span className="text-sm text-gray-600">Cost Price</span>
-                      <span className="font-medium text-gray-900">${costPrice.toFixed(3)}</span>
+                      <span className="font-medium text-gray-900">${costPrice.toFixed(2)}</span>
                     </div>
                     
                     <div className="flex justify-between items-center">
                       <span className="text-sm text-gray-600">Selling Price</span>
-                      <span className="font-medium text-gray-900">${sellingPrice.toFixed(3)}</span>
+                      <span className="font-medium text-gray-900">${sellingPrice.toFixed(2)}</span>
                     </div>
                   </div>
                 </div>
@@ -542,7 +612,7 @@ const EditProductPage = () => {
                     <div className="flex justify-between items-center mb-1">
                       <span className="text-sm font-medium text-green-800">Profit per Unit</span>
                       <Badge variant={profit >= 0 ? "default" : "destructive"} className="bg-green-100 text-green-800">
-                        ${Math.abs(profit).toFixed(3)}
+                        ${Math.abs(profit).toFixed(2)}
                       </Badge>
                     </div>
                     
@@ -556,7 +626,7 @@ const EditProductPage = () => {
                     <div className="pt-2 border-t border-green-200">
                       <div className="flex justify-between items-center">
                         <span className="text-xs text-green-700">Total Inventory Value</span>
-                        <span className="text-sm font-bold text-green-900">${totalValue.toFixed(3)}</span>
+                        <span className="text-sm font-bold text-green-900">${totalValue.toFixed(2)}</span>
                       </div>
                     </div>
                   </div>
@@ -567,7 +637,7 @@ const EditProductPage = () => {
                       <div className="flex justify-between items-center">
                         <span className="text-sm font-medium text-blue-800">Profit Change</span>
                         <Badge variant={profitChange >= 0 ? "default" : "destructive"} className={profitChange >= 0 ? 'bg-blue-100 text-blue-800' : ''}>
-                          {profitChange >= 0 ? '+' : ''}{profitChange.toFixed(3)}$
+                          {profitChange >= 0 ? '+' : ''}{profitChange.toFixed(2)}$
                         </Badge>
                       </div>
                       <p className="text-xs text-blue-700 mt-1">

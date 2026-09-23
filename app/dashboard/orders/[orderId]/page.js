@@ -67,7 +67,7 @@ export default function OrderDetailsPage() {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!amountPaid || Number(amountPaid) <= 0) return toast.error("Please enter a valid amount");
-    if (!window.confirm(`Record a payment of $${Number(amountPaid).toFixed(3)} for this order?`)) return;
+    if (!window.confirm(`Record a payment of $${Number(amountPaid).toFixed(2)} for this order?`)) return;
     mutation.mutate(amountPaid);
   };
 
@@ -102,7 +102,7 @@ export default function OrderDetailsPage() {
   });
 
   const handleFinalize = () => {
-    if (!window.confirm(`Finalize this draft into a real order for $${order?.total.toFixed(3)}? This will deduct stock and add to the customer's debt.`)) return;
+    if (!window.confirm(`Finalize this draft into a real order for $${order?.total.toFixed(2)}? This will deduct stock and add to the customer's debt.`)) return;
     finalizeMutation.mutate();
   };
 
@@ -153,15 +153,15 @@ export default function OrderDetailsPage() {
           <div className="space-y-1">
             <p>
               <span className="font-medium">Total:</span> $
-              {order.total.toFixed(3)}
+              {order.total.toFixed(2)}
             </p>
             <p>
               <span className="font-medium">Paid:</span> $
-              {order.amountpaid?.toFixed(3) || 0}
+              {order.amountpaid?.toFixed(2) || 0}
             </p>
             <p>
               <span className="font-medium">Remaining:</span> $
-              {remainingBalance.toFixed(3)}
+              {remainingBalance.toFixed(2)}
             </p>
             <p>
               <span className="font-medium">Status:</span>

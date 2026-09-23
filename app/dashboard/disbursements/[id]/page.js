@@ -144,7 +144,7 @@ export default function DisbursementDetailsPage() {
             <Separator />
             <div className="flex justify-between items-center pt-2">
               <span className="text-lg font-semibold text-gray-900">Amount</span>
-              <span className="text-2xl font-bold text-red-600">-${disbursement.amount.toFixed(3)}</span>
+              <span className="text-2xl font-bold text-red-600">-${disbursement.amount.toFixed(2)}</span>
             </div>
             {settings?.dollarRate > 0 && (
               <div className="flex justify-between items-center text-sm">

@@ -29,14 +29,15 @@ import {
   Filter,
   ArrowUpDown,
   Package,
-  Receipt,
-  TrendingUp,
 } from "lucide-react";
 import { format } from "date-fns";
 import { useRouter } from "next/navigation";
 import axios from "axios";
 import { toast } from "sonner";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { localDayStartISO, localDayEndISO } from "@/lib/dateUtils";
+import { DateRangeFilter } from "./DateRangeFilter";
+import { OrdersTotalsCard } from "./OrdersTotalsCard";
 
 const SORT_OPTIONS = [
   { value: "newest", label: "Newest First" },
@@ -56,10 +57,12 @@ export default function AllOrders() {
   const [statusFilter, setStatusFilter] = useState("all");
   const [searchTerm, setSearchTerm] = useState("");
   const [sortBy, setSortBy] = useState("newest");
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
   const [actionLoading, setActionLoading] = useState(false);
 
   const { data, isLoading, isError } = useQuery({
-    queryKey: ["orders", "all", page, pageSize, statusFilter, searchTerm, sortBy],
+    queryKey: ["orders", "all", page, pageSize, statusFilter, searchTerm, sortBy, startDate, endDate],
     queryFn: async () => {
       const res = await axios.get("/api/orders", {
         params: {
@@ -68,6 +71,8 @@ export default function AllOrders() {
           status: statusFilter !== "all" ? statusFilter : undefined,
           search: searchTerm || undefined,
           sort: sortBy,
+          startDate: localDayStartISO(startDate),
+          endDate: localDayEndISO(endDate),
         },
       });
       return res.data;
@@ -77,7 +82,7 @@ export default function AllOrders() {
   useEffect(() => {
     const timer = setTimeout(() => setPage(1), 500);
     return () => clearTimeout(timer);
-  }, [statusFilter, searchTerm, sortBy, pageSize]);
+  }, [statusFilter, searchTerm, sortBy, pageSize, startDate, endDate]);
 
   const handleAction = async (action, orderId) => {
     if (action === "delete" && !window.confirm("Undo this order? Stock will be restored and the customer's debt reduced.")) {
@@ -126,11 +131,13 @@ export default function AllOrders() {
   const totalPages = data?.totalPages || 1;
   const totalCount = data?.total || 0;
   const counts = data?.counts || { draft: 0, pending: 0, partiallyPaid: 0, paid: 0 };
-  const totals = data?.totals || { totalAmount: 0, totalProfit: 0 };
+  const totals = data?.totals || { totalAmount: 0, totalProfit: 0, collectedAmount: 0 };
   const activeFilterCount = [
     searchTerm,
     statusFilter !== "all" ? statusFilter : "",
     sortBy !== "newest" ? sortBy : "",
+    startDate,
+    endDate,
   ].filter(Boolean).length;
 
   const statusBadge = (status) => (
@@ -201,29 +208,14 @@ export default function AllOrders() {
 
   return (
     <div className="space-y-4">
-      {/* Totals for the current filter scope (drafts excluded until finalized) */}
-      <Card className="shadow-sm border-gray-200">
-        <CardContent className="p-4 grid grid-cols-2 gap-4">
-          <div className="flex flex-col items-center sm:items-start gap-1">
-            <span className="flex items-center gap-1.5 text-xs font-medium text-gray-500">
-              <Receipt className="h-3.5 w-3.5" />
-              Total of All Orders
-            </span>
-            <span className="text-lg font-bold text-gray-900">
-              ${totals.totalAmount.toLocaleString()}
-            </span>
-          </div>
-          <div className="flex flex-col items-center sm:items-start gap-1">
-            <span className="flex items-center gap-1.5 text-xs font-medium text-gray-500">
-              <TrendingUp className="h-3.5 w-3.5" />
-              Profit Made
-            </span>
-            <span className={`text-lg font-bold ${totals.totalProfit >= 0 ? "text-green-600" : "text-red-600"}`}>
-              ${totals.totalProfit.toLocaleString()}
-            </span>
-          </div>
-        </CardContent>
-      </Card>
+      {/* Totals for the current filter scope, including the date range below
+          (drafts excluded until finalized) */}
+      <OrdersTotalsCard
+        totalAmount={totals.totalAmount}
+        totalProfit={totals.totalProfit}
+        collectedAmount={totals.collectedAmount}
+        label="Total of All Orders"
+      />
 
       {/* Filters */}
       <FiltersPanel activeCount={activeFilterCount}>
@@ -293,6 +285,12 @@ export default function AllOrders() {
             </div>
 
             <div className="flex flex-col sm:flex-row sm:flex-wrap sm:items-center gap-3 sm:gap-4">
+              <DateRangeFilter
+                startDate={startDate}
+                endDate={endDate}
+                onStartDateChange={setStartDate}
+                onEndDateChange={setEndDate}
+              />
               <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-2">
                 <span className="flex items-center gap-1.5 text-sm font-medium text-gray-700">
                   <ArrowUpDown className="h-4 w-4 text-gray-500" />
@@ -358,7 +356,7 @@ export default function AllOrders() {
                   <div className="flex items-center justify-between mt-3">
                     {statusBadge(order.status)}
                     <span className="font-semibold text-gray-900">
-                      ${Number(order.total).toFixed(3)}
+                      ${Number(order.total).toFixed(2)}
                     </span>
                   </div>
                 </CardContent>
@@ -389,7 +387,7 @@ export default function AllOrders() {
                     <TableCell className="font-medium text-gray-900">
                       {order.customer?.fullName || "Deleted Customer"}
                     </TableCell>
-                    <TableCell className="text-center font-medium">${Number(order.total).toFixed(3)}</TableCell>
+                    <TableCell className="text-center font-medium">${Number(order.total).toFixed(2)}</TableCell>
                     <TableCell className="text-center">{statusBadge(order.status)}</TableCell>
                     <TableCell className="text-gray-500 text-sm">
                       {format(new Date(order.createdAt), "MMM d, yyyy HH:mm")}

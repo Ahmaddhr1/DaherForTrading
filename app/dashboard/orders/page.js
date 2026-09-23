@@ -1,9 +1,11 @@
 "use client";
 
 import React, { useState } from "react";
+import axios from "axios";
+import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Package, Clock, DollarSign, ListOrdered } from "lucide-react";
+import { Package, Clock, DollarSign, ListOrdered, Receipt } from "lucide-react";
 import AllOrders from "./components/AllOrders";
 import TodaysOrders from "./components/TodaysOrders";
 import PendingOrders from "./components/PendingOrders";
@@ -11,6 +13,15 @@ import PartiallyPaidOrders from "./components/PartiallyPaidOrders";
 
 const OrdersPage = () => {
   const [activeTab, setActiveTab] = useState("all");
+
+  // Lifetime total sales - unfiltered, so it stays the same no matter which
+  // tab/status/search filter is active below. Separate from the "Total of
+  // All Orders" figure inside the All Orders tab, which reflects whatever
+  // filters are currently applied there.
+  const { data: totals } = useQuery({
+    queryKey: ["orders", "totals"],
+    queryFn: async () => (await axios.get("/api/orders/totals")).data,
+  });
 
   const renderActiveComponent = () => {
     switch (activeTab) {
@@ -40,6 +51,21 @@ const OrdersPage = () => {
               <p className="text-gray-600">View and manage all customer orders</p>
             </div>
           </div>
+
+          <Card className="shadow-sm border-gray-200 mt-4">
+            <CardContent className="p-4 flex items-center gap-3">
+              <div className="p-2 bg-green-100 rounded-lg shrink-0">
+                <Receipt className="h-5 w-5 text-green-700" />
+              </div>
+              <div>
+                <p className="text-xs font-medium text-gray-500">Total Sales</p>
+                <p className="text-2xl font-bold text-gray-900">
+                  ${(totals?.totalSales || 0).toLocaleString(undefined, { maximumFractionDigits: 2 })}
+                </p>
+                <p className="text-xs text-gray-400">Across all finalized orders, all time</p>
+              </div>
+            </CardContent>
+          </Card>
         </div>
 
         <Card className="shadow-sm border-gray-200">

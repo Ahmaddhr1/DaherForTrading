@@ -57,10 +57,10 @@ export default function ThermalReceipt({ order }) {
               </div>
               <div className="flex justify-between">
                 <span>
-                  {item.quantity} x ${Number(item.price).toFixed(3)}
-                  {lineDiscount > 0 ? ` - $${lineDiscount.toFixed(3)}` : ""}
+                  {item.quantity} x ${Number(item.price).toFixed(2)}
+                  {lineDiscount > 0 ? ` - $${lineDiscount.toFixed(2)}` : ""}
                 </span>
-                <span>${lineTotal.toFixed(3)}</span>
+                <span>${lineTotal.toFixed(2)}</span>
               </div>
             </div>
           );
@@ -70,24 +70,24 @@ export default function ThermalReceipt({ order }) {
 
         <div className="flex justify-between">
           <span>Subtotal</span>
-          <span>${subtotal.toFixed(3)}</span>
+          <span>${subtotal.toFixed(2)}</span>
         </div>
         {discountTotal > 0 && (
           <div className="flex justify-between">
             <span>Discount</span>
-            <span>-${discountTotal.toFixed(3)}</span>
+            <span>-${discountTotal.toFixed(2)}</span>
           </div>
         )}
         {taxAmount > 0 && (
           <div className="flex justify-between">
             <span>Tax ({taxRate}%)</span>
-            <span>+${taxAmount.toFixed(3)}</span>
+            <span>+${taxAmount.toFixed(2)}</span>
           </div>
         )}
 
         <div className="flex justify-between font-bold">
           <span>TOTAL</span>
-          <span>${Number(order.total).toFixed(3)}</span>
+          <span>${Number(order.total).toFixed(2)}</span>
         </div>
         {dollarRate > 0 && (
           <div className="flex justify-between">
@@ -97,11 +97,11 @@ export default function ThermalReceipt({ order }) {
         )}
         <div className="flex justify-between">
           <span>Paid</span>
-          <span>${Number(order.amountpaid || 0).toFixed(3)}</span>
+          <span>${Number(order.amountpaid || 0).toFixed(2)}</span>
         </div>
         <div className="flex justify-between">
           <span>Remaining</span>
-          <span>${Number(order.remainingBalance || 0).toFixed(3)}</span>
+          <span>${Number(order.remainingBalance || 0).toFixed(2)}</span>
         </div>
         <div className="flex justify-between font-bold">
           <span>Status</span>
@@ -113,7 +113,7 @@ export default function ThermalReceipt({ order }) {
             <div className="border-t border-dashed border-black my-1" />
             <div className="flex justify-between font-bold">
               <span>Customer Total Debt</span>
-              <span>${customerDebt.toFixed(3)}</span>
+              <span>${customerDebt.toFixed(2)}</span>
             </div>
           </>
         )}

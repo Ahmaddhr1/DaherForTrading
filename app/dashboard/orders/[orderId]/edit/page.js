@@ -10,9 +10,11 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Label } from "@/components/ui/label";
 import { PageHeaderSkeleton, ListSkeleton } from "@/components/ui/skeleton-patterns";
 import { toast } from "sonner";
-import { Loader2, Plus, Trash2, PencilLine, ArrowLeft, CheckCircle } from "lucide-react";
+import { Loader2, Plus, Trash2, PencilLine, ArrowLeft, CheckCircle, Layers, Gift, PackagePlus } from "lucide-react";
 import Link from "next/link";
 import { useSettings, formatLL } from "@/lib/currency";
+import { Combobox } from "@/components/ui/combobox";
+import { getTierPrice, getTierLabel } from "@/lib/priceTiers";
 
 let rowIdCounter = 1;
 
@@ -22,6 +24,15 @@ export default function EditOrderPage() {
   const queryClient = useQueryClient();
 
   const { data: settings } = useSettings();
+
+  // Only an owner can price a catalog product away from its tier price or
+  // price a custom item at all - see priceOrderItems in the orders API,
+  // which enforces this server-side too, not just here.
+  const { data: me } = useQuery({
+    queryKey: ["admin", "me"],
+    queryFn: async () => (await axios.get("/api/admin/me")).data,
+  });
+  const isOwner = me?.role === "owner";
 
   const [products, setProducts] = useState([]);
   const [orderRows, setOrderRows] = useState([]);
@@ -50,15 +61,20 @@ export default function EditOrderPage() {
     if (productsData) setProducts(productsData);
   }, [productsData]);
 
+  const priceTier = order?.customer?.priceTier || 1;
+
   useEffect(() => {
     if (order?.products?.length) {
       setOrderRows(
         order.products.map((p) => ({
           id: rowIdCounter++,
-          productId: p.productId?._id || p.productId,
+          isCustom: !!p.isCustom,
+          productId: p.productId?._id || p.productId || "",
+          customName: p.isCustom ? p.name : "",
           quantity: p.quantity,
           price: p.price.toString(),
           discount: p.discount ? p.discount.toString() : "",
+          free: !!p.free,
         }))
       );
       setTaxRate(order.taxRate?.toString() || "0");
@@ -66,7 +82,19 @@ export default function EditOrderPage() {
   }, [order]);
 
   const addProductRow = () => {
-    setOrderRows((rows) => [...rows, { id: rowIdCounter++, productId: "", quantity: 1, price: "", discount: "" }]);
+    setOrderRows((rows) => [
+      ...rows,
+      { id: rowIdCounter++, isCustom: false, productId: "", customName: "", quantity: 1, price: "", discount: "", free: false },
+    ]);
+  };
+
+  // Employees can only ever add a custom item as a giveaway (free) - pricing
+  // something outside the catalog is owner-only, enforced again server-side.
+  const addCustomRow = () => {
+    setOrderRows((rows) => [
+      ...rows,
+      { id: rowIdCounter++, isCustom: true, productId: "", customName: "", quantity: 1, price: "", discount: "", free: !isOwner },
+    ]);
   };
 
   const removeProductRow = (id) => {
@@ -81,13 +109,26 @@ export default function EditOrderPage() {
         if (field === "productId") {
           updatedRow.productId = value;
           const selectedProduct = products.find((p) => p._id === value);
-          if (selectedProduct) updatedRow.price = selectedProduct.price.toString();
+          if (selectedProduct && !updatedRow.free) updatedRow.price = getTierPrice(selectedProduct, priceTier).toString();
+        } else if (field === "customName") {
+          updatedRow.customName = value;
         } else if (field === "quantity") {
           updatedRow.quantity = parseInt(value) || 1;
         } else if (field === "price") {
+          if (!isOwner) return row; // price is locked for employees
           updatedRow.price = value.replace(/[^0-9.]/g, "");
         } else if (field === "discount") {
           updatedRow.discount = value.replace(/[^0-9.]/g, "");
+        } else if (field === "free") {
+          updatedRow.free = value;
+          if (value) {
+            updatedRow.price = "0";
+          } else if (!updatedRow.isCustom) {
+            const selectedProduct = products.find((p) => p._id === updatedRow.productId);
+            updatedRow.price = selectedProduct ? getTierPrice(selectedProduct, priceTier).toString() : "";
+          } else {
+            updatedRow.price = "";
+          }
         }
         return updatedRow;
       })
@@ -106,7 +147,12 @@ export default function EditOrderPage() {
 
   const validateRows = () => {
     for (const row of orderRows) {
-      if (!row.productId) {
+      if (row.isCustom) {
+        if (!row.customName.trim()) {
+          toast.error("Please name every custom item");
+          return false;
+        }
+      } else if (!row.productId) {
         toast.error("Please select a product for all items");
         return false;
       }
@@ -114,13 +160,28 @@ export default function EditOrderPage() {
         toast.error("Quantity must be at least 1");
         return false;
       }
-      if (!row.price || parseFloat(row.price) <= 0) {
-        toast.error("Please enter a valid price");
+      if (!row.free && (row.price === "" || parseFloat(row.price) <= 0)) {
+        toast.error(
+          row.isCustom
+            ? "Please enter a price for every custom item, or mark it Free"
+            : "Please enter a valid price"
+        );
         return false;
       }
     }
     return true;
   };
+
+  const buildProductsPayload = () =>
+    orderRows.map((row) => ({
+      productId: row.isCustom ? undefined : row.productId,
+      name: row.isCustom ? row.customName.trim() : undefined,
+      isCustom: row.isCustom,
+      quantity: row.quantity,
+      price: parseFloat(row.price) || 0,
+      discount: parseFloat(row.discount) || 0,
+      free: row.free,
+    }));
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -129,19 +190,14 @@ export default function EditOrderPage() {
     // A draft is just a scratchpad, so it's saved without asking - but a
     // pending order already reserves stock and counts toward debt, so
     // changing its line items is confirmed first.
-    if (!isDraft && !window.confirm(`Update this order to $${calculateTotal().toFixed(3)}? Stock and the customer's debt will be adjusted for the difference.`)) {
+    if (!isDraft && !window.confirm(`Update this order to $${calculateTotal().toFixed(2)}? Stock and the customer's debt will be adjusted for the difference.`)) {
       return;
     }
 
     setIsSubmitting(true);
     try {
       await axios.put(`/api/orders/${orderId}`, {
-        products: orderRows.map((row) => ({
-          productId: row.productId,
-          quantity: row.quantity,
-          price: parseFloat(row.price),
-          discount: parseFloat(row.discount) || 0,
-        })),
+        products: buildProductsPayload(),
         taxRate: parseFloat(taxRate) || 0,
       });
 
@@ -159,7 +215,7 @@ export default function EditOrderPage() {
 
   const handleFinalize = async () => {
     if (!validateRows()) return;
-    if (!window.confirm(`Finalize this draft into a real order for $${calculateTotal().toFixed(3)}? This will deduct stock and add to the customer's debt.`)) {
+    if (!window.confirm(`Finalize this draft into a real order for $${calculateTotal().toFixed(2)}? This will deduct stock and add to the customer's debt.`)) {
       return;
     }
 
@@ -167,12 +223,7 @@ export default function EditOrderPage() {
     try {
       // Save any in-progress edits first, then finalize.
       await axios.put(`/api/orders/${orderId}`, {
-        products: orderRows.map((row) => ({
-          productId: row.productId,
-          quantity: row.quantity,
-          price: parseFloat(row.price),
-          discount: parseFloat(row.discount) || 0,
-        })),
+        products: buildProductsPayload(),
         taxRate: parseFloat(taxRate) || 0,
       });
       await axios.put(`/api/orders/${orderId}/finalize`);
@@ -243,6 +294,17 @@ export default function EditOrderPage() {
               </p>
             </div>
           </div>
+          {order?.customer && (
+            <p className="flex items-center gap-1.5 text-sm text-gray-500 mt-1">
+              <Layers className="h-3.5 w-3.5" />
+              Pricing for {order.customer.fullName}: <span className="font-medium text-gray-700">{getTierLabel(priceTier)}</span>
+            </p>
+          )}
+          {!isOwner && (
+            <p className="text-xs text-gray-500 mt-1">
+              Prices are set automatically for your account. Ask an owner to override a price or price a custom item.
+            </p>
+          )}
         </div>
 
         <Card className="shadow-sm border-gray-200">
@@ -257,7 +319,7 @@ export default function EditOrderPage() {
                   <div key={row.id} className="p-4 border rounded-lg bg-gray-50 space-y-4">
                     <div className="flex items-center justify-between">
                       <Label htmlFor={`product-${row.id}`} className="text-sm font-medium">
-                        Product {index + 1}
+                        {row.isCustom ? "Custom Item" : "Product"} {index + 1}
                       </Label>
                       <Button
                         type="button"
@@ -271,20 +333,31 @@ export default function EditOrderPage() {
                       </Button>
                     </div>
 
-                    <select
-                      id={`product-${row.id}`}
-                      value={row.productId}
-                      onChange={(e) => handleRowChange(row.id, "productId", e.target.value)}
-                      className="w-full p-2 border rounded-md focus:border-blue-500"
-                      required
-                    >
-                      <option value="">Select a product</option>
-                      {products.map((product) => (
-                        <option key={product._id} value={product._id}>
-                          {product.name}
-                        </option>
-                      ))}
-                    </select>
+                    {row.isCustom ? (
+                      <Input
+                        type="text"
+                        value={row.customName}
+                        onChange={(e) => handleRowChange(row.id, "customName", e.target.value)}
+                        placeholder="Item name (not in inventory)"
+                        required
+                      />
+                    ) : (
+                      <Combobox
+                        id={`product-${row.id}`}
+                        options={products}
+                        value={row.productId}
+                        onChange={(value) => handleRowChange(row.id, "productId", value)}
+                        placeholder="Select a product"
+                        renderOption={(product) => (
+                          <span>
+                            {product.name}{" "}
+                            <span className="text-gray-400">
+                              (${getTierPrice(product, priceTier).toFixed(2)} · stock: {product.quantity})
+                            </span>
+                          </span>
+                        )}
+                      />
+                    )}
 
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                       <div className="space-y-2">
@@ -294,9 +367,11 @@ export default function EditOrderPage() {
                         <Input
                           id={`price-${row.id}`}
                           type="text"
-                          value={row.price}
+                          value={row.free ? "0" : row.price}
                           onChange={(e) => handleRowChange(row.id, "price", e.target.value)}
-                          placeholder="0.00"
+                          placeholder={row.isCustom ? "0.00" : "Select a product"}
+                          disabled={row.free || !isOwner}
+                          className={row.free || !isOwner ? "bg-gray-100 text-gray-500" : ""}
                           required
                         />
                       </div>
@@ -323,19 +398,38 @@ export default function EditOrderPage() {
                           id={`discount-${row.id}`}
                           type="text"
                           value={row.discount}
+                          disabled={row.free}
                           onChange={(e) => handleRowChange(row.id, "discount", e.target.value)}
                           placeholder="0.00"
                         />
                       </div>
                     </div>
+
+                    <label className="flex items-center gap-2 text-sm text-gray-700 cursor-pointer w-fit">
+                      <input
+                        type="checkbox"
+                        checked={row.free}
+                        disabled={row.isCustom && !isOwner}
+                        onChange={(e) => handleRowChange(row.id, "free", e.target.checked)}
+                        className="h-4 w-4 rounded border-gray-300 text-green-600 focus:ring-green-500"
+                      />
+                      <Gift className="h-3.5 w-3.5 text-green-600" />
+                      Free (offer)
+                    </label>
                   </div>
                 ))}
               </div>
 
-              <Button type="button" variant="outline" onClick={addProductRow} className="flex items-center gap-2">
-                <Plus className="h-4 w-4" />
-                Add Another Product
-              </Button>
+              <div className="flex flex-wrap gap-3">
+                <Button type="button" variant="outline" onClick={addProductRow} className="flex items-center gap-2">
+                  <Plus className="h-4 w-4" />
+                  Add Another Product
+                </Button>
+                <Button type="button" variant="outline" onClick={addCustomRow} className="flex items-center gap-2">
+                  <PackagePlus className="h-4 w-4" />
+                  Add Custom Item
+                </Button>
+              </div>
 
               <div className="space-y-2 max-w-xs">
                 <Label htmlFor="tax-rate" className="text-sm font-medium">
@@ -353,23 +447,23 @@ export default function EditOrderPage() {
               <div className="bg-blue-50 rounded-lg p-4 border border-blue-200 space-y-2">
                 <div className="flex justify-between items-center text-sm text-blue-900/80">
                   <span>Subtotal</span>
-                  <span>${calculateSubtotal().toFixed(3)}</span>
+                  <span>${calculateSubtotal().toFixed(2)}</span>
                 </div>
                 {calculateDiscountTotal() > 0 && (
                   <div className="flex justify-between items-center text-sm text-amber-700">
                     <span>Discount</span>
-                    <span>-${calculateDiscountTotal().toFixed(3)}</span>
+                    <span>-${calculateDiscountTotal().toFixed(2)}</span>
                   </div>
                 )}
                 {calculateTaxAmount() > 0 && (
                   <div className="flex justify-between items-center text-sm text-blue-900/80">
                     <span>Tax ({parseFloat(taxRate) || 0}%)</span>
-                    <span>+${calculateTaxAmount().toFixed(3)}</span>
+                    <span>+${calculateTaxAmount().toFixed(2)}</span>
                   </div>
                 )}
                 <div className="flex justify-between items-center pt-2 border-t border-blue-200">
                   <span className="text-lg font-semibold text-blue-900">Total Amount:</span>
-                  <span className="text-2xl font-bold text-blue-900">${calculateTotal().toFixed(3)}</span>
+                  <span className="text-2xl font-bold text-blue-900">${calculateTotal().toFixed(2)}</span>
                 </div>
                 {settings?.dollarRate > 0 && (
                   <div className="flex justify-between items-center text-sm text-blue-900/70">

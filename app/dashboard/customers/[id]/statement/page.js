@@ -68,13 +68,13 @@ export default function CustomerStatementPage() {
         meta: format(new Date(), "MMM d, yyyy h:mm a"),
         rows: statement.orders.map((order) => ({
           label: format(new Date(order.createdAt), "MMM d, yyyy"),
-          amount: `$${order.total.toFixed(3)}`,
-          sub: `Paid $${order.amountpaid.toFixed(3)}  Rem $${order.remainingBalance.toFixed(3)}  [${(statusConfig[order.status] || statusConfig.pending).label}]`,
+          amount: `$${order.total.toFixed(2)}`,
+          sub: `Paid $${order.amountpaid.toFixed(2)}  Rem $${order.remainingBalance.toFixed(2)}  [${(statusConfig[order.status] || statusConfig.pending).label}]`,
         })),
         totals: [
-          { label: "Total Billed", value: `$${statement.totals.totalAmount.toFixed(3)}` },
-          { label: "Total Paid", value: `$${statement.totals.totalPaid.toFixed(3)}` },
-          { label: "Total Owed", value: `$${statement.totals.totalRemaining.toFixed(3)}`, bold: true },
+          { label: "Total Billed", value: `$${statement.totals.totalAmount.toFixed(2)}` },
+          { label: "Total Paid", value: `$${statement.totals.totalPaid.toFixed(2)}` },
+          { label: "Total Owed", value: `$${statement.totals.totalRemaining.toFixed(2)}`, bold: true },
         ],
         footer: "Powered by Ahmad Daher",
       });
@@ -185,10 +185,10 @@ export default function CustomerStatementPage() {
                         <TableCell className="text-gray-600 text-sm whitespace-nowrap">
                           {format(new Date(order.createdAt), "MMM d, yyyy HH:mm")}
                         </TableCell>
-                        <TableCell className="text-right font-medium text-gray-900 whitespace-nowrap">${order.total.toFixed(3)}</TableCell>
-                        <TableCell className="text-right text-green-600 font-medium whitespace-nowrap">${order.amountpaid.toFixed(3)}</TableCell>
+                        <TableCell className="text-right font-medium text-gray-900 whitespace-nowrap">${order.total.toFixed(2)}</TableCell>
+                        <TableCell className="text-right text-green-600 font-medium whitespace-nowrap">${order.amountpaid.toFixed(2)}</TableCell>
                         <TableCell className={`text-right font-medium whitespace-nowrap ${order.remainingBalance > 0 ? "text-red-600" : "text-gray-900"}`}>
-                          ${order.remainingBalance.toFixed(3)}
+                          ${order.remainingBalance.toFixed(2)}
                         </TableCell>
                         <TableCell className="text-center whitespace-nowrap">
                           <Badge className={status.color}>{status.label}</Badge>
@@ -209,16 +209,16 @@ export default function CustomerStatementPage() {
           <CardContent className="space-y-3">
             <div className="flex justify-between items-center">
               <span className="text-gray-600">Total Billed</span>
-              <span className="font-medium text-gray-900">${totals.totalAmount.toFixed(3)}</span>
+              <span className="font-medium text-gray-900">${totals.totalAmount.toFixed(2)}</span>
             </div>
             <div className="flex justify-between items-center pt-2 border-t">
               <span className="text-gray-600">Total Paid</span>
-              <span className="text-green-600 font-medium">${totals.totalPaid.toFixed(3)}</span>
+              <span className="text-green-600 font-medium">${totals.totalPaid.toFixed(2)}</span>
             </div>
             <div className="flex justify-between items-center pt-2 border-t">
               <span className="font-semibold text-gray-900">Total Remaining (Debt)</span>
               <span className={`font-semibold ${totals.totalRemaining > 0 ? "text-red-600" : "text-gray-900"}`}>
-                ${totals.totalRemaining.toFixed(3)}
+                ${totals.totalRemaining.toFixed(2)}
               </span>
             </div>
           </CardContent>

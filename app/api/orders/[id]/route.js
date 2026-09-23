@@ -5,6 +5,7 @@ import Product from "@/models/Products";
 import { NextResponse } from "next/server";
 import { getUserFromCookie } from "@/lib/auth";
 import { logActivity } from "@/lib/activityLog";
+import { getTierPrice } from "@/lib/priceTiers";
 
 // GET one
 export async function GET(_, { params }) {
@@ -51,6 +52,9 @@ export async function DELETE(request, { params }) {
     // just detach it from the customer and remove it.
     if (order.status === "pending") {
       for (const item of order.products) {
+        // A custom line never touched inventory, so there's no stock to
+        // restore for it.
+        if (item.isCustom) continue;
         await Product.findByIdAndUpdate(item.productId, {
           $inc: {
             quantity: item.quantity,
@@ -94,12 +98,18 @@ export async function DELETE(request, { params }) {
 }
 
 // Builds the enriched line items plus subtotal/discount/tax/total/profit for
-// a set of { productId, price, quantity, discount? } inputs. Shared by
-// create, draft-edit, and pending-edit below so the money math (discount
-// reduces both the customer's charge and the recorded profit; tax is added
-// on top of the discounted subtotal and never counted as profit) stays in
-// exactly one place.
-async function priceOrderItems(products, taxRate) {
+// a set of { productId, price, quantity, discount?, isCustom?, free? }
+// inputs. Shared by create, draft-edit, and pending-edit below so the money
+// math (discount reduces both the customer's charge and the recorded
+// profit; tax is added on top of the discounted subtotal and never counted
+// as profit) stays in exactly one place.
+//
+// `role`/`priceTier` are also enforced here, not just hidden in the UI - an
+// employee's submitted price is only ever trusted for a "Free" line; every
+// other line is repriced server-side from the product's own tier price (or,
+// for a custom item, rejected outright - only an owner can price something
+// outside the catalog).
+async function priceOrderItems(products, taxRate, { role, priceTier } = {}) {
   const enrichedProducts = [];
   const productLookups = [];
   let subtotal = 0;
@@ -107,35 +117,66 @@ async function priceOrderItems(products, taxRate) {
   let totalProfit = 0;
 
   for (const item of products) {
-    const product = await Product.findById(item.productId);
-    if (!product) {
-      throw new PricingError(`Product with ID ${item.productId} not found.`, 404);
-    }
-    if (typeof item.price !== "number" || isNaN(item.price)) {
-      throw new PricingError(`Invalid price for product ${product.name}`, 400);
+    const isCustom = !!item.isCustom;
+    const isFree = !!item.free;
+    const isOwner = role === "owner";
+
+    let product = null;
+    if (!isCustom) {
+      product = await Product.findById(item.productId);
+      if (!product) {
+        throw new PricingError(`Product with ID ${item.productId} not found.`, 404);
+      }
+    } else if (!item.name?.trim()) {
+      throw new PricingError("A custom item needs a name.", 400);
     }
 
-    const lineSubtotal = item.price * item.quantity;
+    let effectivePrice;
+    if (isFree) {
+      // Anyone can mark a line free for a promotion - it always wins over
+      // whatever price was submitted.
+      effectivePrice = 0;
+    } else if (isCustom) {
+      if (!isOwner) {
+        throw new PricingError("Only an owner can set a price for a custom item.", 403);
+      }
+      effectivePrice = Number(item.price);
+    } else if (!isOwner) {
+      // Ignore whatever price an employee submitted for a catalog product -
+      // always re-derive it from the product's own tier price.
+      effectivePrice = getTierPrice(product, priceTier);
+    } else {
+      effectivePrice = Number(item.price);
+    }
+
+    if (typeof effectivePrice !== "number" || isNaN(effectivePrice) || effectivePrice < 0) {
+      throw new PricingError(`Invalid price for ${isCustom ? item.name : product.name}`, 400);
+    }
+
+    const lineSubtotal = effectivePrice * item.quantity;
     const rawDiscount = Number(item.discount) || 0;
     const discount = Math.max(0, Math.min(rawDiscount, lineSubtotal));
 
     subtotal += lineSubtotal;
     discountTotal += discount;
 
-    const itemProfit =
-      item.price !== product.price
-        ? (item.price - product.initialPrice) * item.quantity
-        : (product.price - product.initialPrice) * item.quantity;
+    // A custom item has no tracked cost basis (it's not in inventory), so
+    // its full line revenue counts toward profit.
+    const itemProfit = isCustom
+      ? effectivePrice * item.quantity
+      : (effectivePrice - product.initialPrice) * item.quantity;
     totalProfit += itemProfit;
 
     enrichedProducts.push({
-      productId: item.productId,
-      name: product.name,
+      productId: isCustom ? undefined : item.productId,
+      name: isCustom ? item.name.trim() : product.name,
       quantity: item.quantity,
-      price: item.price,
+      price: effectivePrice,
       discount,
+      isCustom,
+      free: isFree,
     });
-    productLookups.push(product);
+    productLookups.push(isCustom ? null : product);
   }
 
   const afterDiscount = subtotal - discountTotal;
@@ -191,10 +232,16 @@ export async function PUT(req, { params }) {
 
     const effectiveTaxRate = taxRate !== undefined ? taxRate : order.taxRate;
 
+    // Needed to re-derive the correct price for a non-owner's submitted
+    // line items - see priceOrderItems.
+    const user = await getUserFromCookie();
+    const orderCustomer = await Customer.findById(order.customer);
+    const pricingContext = { role: user?.role, priceTier: orderCustomer?.priceTier || 1 };
+
     if (order.status === "draft") {
       let priced;
       try {
-        priced = await priceOrderItems(products, effectiveTaxRate);
+        priced = await priceOrderItems(products, effectiveTaxRate, pricingContext);
       } catch (err) {
         if (err instanceof PricingError) {
           return NextResponse.json({ message: err.message }, { status: err.status });
@@ -215,7 +262,7 @@ export async function PUT(req, { params }) {
         action: "order.edit",
         entityType: "Order",
         entityId: order._id,
-        summary: `Edited a draft order (now $${priced.total.toFixed(3)})`,
+        summary: `Edited a draft order (now $${priced.total.toFixed(2)})`,
       });
 
       return NextResponse.json(
@@ -224,14 +271,18 @@ export async function PUT(req, { params }) {
       );
     }
 
+    // Custom lines never touched inventory, so they're excluded from every
+    // stock computation below - only real catalog products participate.
     const oldQtyByProduct = new Map();
     for (const item of order.products) {
+      if (item.isCustom || !item.productId) continue;
       const key = item.productId.toString();
       oldQtyByProduct.set(key, (oldQtyByProduct.get(key) || 0) + item.quantity);
     }
 
     const newQtyByProduct = new Map();
     for (const item of products) {
+      if (item.isCustom) continue;
       newQtyByProduct.set(
         item.productId,
         (newQtyByProduct.get(item.productId) || 0) + item.quantity
@@ -240,6 +291,7 @@ export async function PUT(req, { params }) {
 
     // Stock check happens against the net delta before pricing runs.
     for (const item of products) {
+      if (item.isCustom) continue;
       const product = await Product.findById(item.productId);
       if (!product) {
         return NextResponse.json(
@@ -260,7 +312,7 @@ export async function PUT(req, { params }) {
 
     let priced;
     try {
-      priced = await priceOrderItems(products, effectiveTaxRate);
+      priced = await priceOrderItems(products, effectiveTaxRate, pricingContext);
     } catch (err) {
       if (err instanceof PricingError) {
         return NextResponse.json({ message: err.message }, { status: err.status });
@@ -310,7 +362,7 @@ export async function PUT(req, { params }) {
       action: "order.edit",
       entityType: "Order",
       entityId: order._id,
-      summary: `Edited order (total changed from $${previousTotal.toFixed(3)} to $${priced.total.toFixed(3)})`,
+      summary: `Edited order (total changed from $${previousTotal.toFixed(2)} to $${priced.total.toFixed(2)})`,
       metadata: { before: previousTotal, after: priced.total },
     });
 
@@ -340,9 +392,20 @@ export async function POST(req, { params }) {
       );
     }
 
+    // Needed to re-derive the correct price for a non-owner's submitted
+    // line items - see priceOrderItems.
+    const user = await getUserFromCookie();
+    const customer = await Customer.findById(customerId);
+    if (!customer) {
+      return NextResponse.json({ message: "Customer not found" }, { status: 404 });
+    }
+
     let priced;
     try {
-      priced = await priceOrderItems(products, taxRate);
+      priced = await priceOrderItems(products, taxRate, {
+        role: user?.role,
+        priceTier: customer.priceTier || 1,
+      });
     } catch (err) {
       if (err instanceof PricingError) {
         return NextResponse.json({ message: err.message }, { status: err.status });
@@ -352,9 +415,11 @@ export async function POST(req, { params }) {
 
     // A draft doesn't touch stock, so it's exempt from the stock check -
     // it's only enforced once the draft is finalized into a real order.
+    // Custom lines never touched inventory, so they're skipped here too.
     if (!asDraft) {
       for (let i = 0; i < priced.enrichedProducts.length; i++) {
         const item = priced.enrichedProducts[i];
+        if (item.isCustom) continue;
         const product = priced.productLookups[i];
         if (product.quantity < item.quantity) {
           return NextResponse.json(
@@ -380,14 +445,19 @@ export async function POST(req, { params }) {
     });
 
     // A draft never reserves stock or counts toward debt until finalized.
+    // Custom lines are excluded - there's no stock to deduct for them.
     if (!asDraft) {
-      const productUpdates = priced.enrichedProducts.map((item) => ({
-        updateOne: {
-          filter: { _id: item.productId },
-          update: { $inc: { quantity: -item.quantity, nbOfOrders: item.quantity } },
-        },
-      }));
-      await Product.bulkWrite(productUpdates);
+      const productUpdates = priced.enrichedProducts
+        .filter((item) => !item.isCustom)
+        .map((item) => ({
+          updateOne: {
+            filter: { _id: item.productId },
+            update: { $inc: { quantity: -item.quantity, nbOfOrders: item.quantity } },
+          },
+        }));
+      if (productUpdates.length) {
+        await Product.bulkWrite(productUpdates);
+      }
     }
 
     await Customer.findByIdAndUpdate(customerId, {
@@ -401,8 +471,8 @@ export async function POST(req, { params }) {
       entityType: "Order",
       entityId: newOrder._id,
       summary: asDraft
-        ? `Saved a draft order worth $${priced.total.toFixed(3)}`
-        : `Created an order worth $${priced.total.toFixed(3)}`,
+        ? `Saved a draft order worth $${priced.total.toFixed(2)}`
+        : `Created an order worth $${priced.total.toFixed(2)}`,
     });
 
     return NextResponse.json(

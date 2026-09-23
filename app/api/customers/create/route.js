@@ -1,13 +1,11 @@
 import { connectToDB } from "@/lib/connectDb";
 import Customer from "@/models/Customers";
 import { NextResponse } from "next/server";
-import { getUserFromCookie } from "@/lib/auth";
-import { logActivity } from "@/lib/activityLog";
 
 export async function POST(req) {
   await connectToDB();
   try {
-    const { fullName, phoneNumber, debt } = await req.json();
+    const { fullName, phoneNumber, debt, priceTier } = await req.json();
 
     if (!fullName || !phoneNumber) {
       return NextResponse.json(
@@ -15,6 +13,12 @@ export async function POST(req) {
         { status: 400 }
       );
     }
+
+    // Which of the product's 4 price tiers this customer buys at - defaults
+    // to 1 (Retail) when omitted or invalid.
+    const parsedPriceTier = [1, 2, 3, 4].includes(parseInt(priceTier, 10))
+      ? parseInt(priceTier, 10)
+      : 1;
 
     const existingPhoneNumber = await Customer.findOne({ phoneNumber });
     if (existingPhoneNumber) {
@@ -27,17 +31,9 @@ export async function POST(req) {
       fullName,
       phoneNumber,
       debt,
+      priceTier: parsedPriceTier,
     });
     await newCustomer.save();
-
-    await logActivity({
-      admin: await getUserFromCookie(),
-      action: "customer.create",
-      entityType: "Customer",
-      entityId: newCustomer._id,
-      summary: `Created customer "${newCustomer.fullName}"`,
-    });
-
     return NextResponse.json(
       { message: "Customer created successfully" },
       { status: 201 }

@@ -9,10 +9,13 @@ const orderSchema = new mongoose.Schema(
     },
     products: [
       {
+        // Absent for a custom/ad-hoc line item (isCustom: true) - those
+        // aren't tied to a real Product in inventory, so there's nothing to
+        // reference, deduct stock from, or restock on delete/cancel.
         productId: {
           type: mongoose.Types.ObjectId,
           ref: "Product",
-          required: true,
+          required: false,
         },
         name: {
           type: String,
@@ -30,6 +33,19 @@ const orderSchema = new mongoose.Schema(
         discount: {
           type: Number,
           default: 0,
+        },
+        // A one-off item typed in at order time instead of picked from the
+        // product catalog - e.g. something not normally stocked. Doesn't
+        // touch inventory (no stock check/deduction for these lines).
+        isCustom: {
+          type: Boolean,
+          default: false,
+        },
+        // Marked as a giveaway/promo item - price is forced to 0 regardless
+        // of what was submitted (see priceOrderItems in the orders API).
+        free: {
+          type: Boolean,
+          default: false,
         },
       },
     ],

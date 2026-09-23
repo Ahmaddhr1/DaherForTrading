@@ -102,13 +102,13 @@ export default function PublicPurchaseReceiptPage() {
                   <TableRow>
                     <TableCell className="font-medium">{purchase.productName}</TableCell>
                     <TableCell className="text-center">
-                      {purchase.quantity} x ${purchase.unitPrice.toFixed(3)}
+                      {purchase.quantity} x ${purchase.unitPrice.toFixed(2)}
                     </TableCell>
                     <TableCell className="text-center text-amber-700">
-                      {purchase.discount ? `-$${purchase.discount.toFixed(3)}` : "—"}
+                      {purchase.discount ? `-$${purchase.discount.toFixed(2)}` : "—"}
                     </TableCell>
                     <TableCell className="text-right">
-                      ${(lineSubtotal - (purchase.discount || 0)).toFixed(3)}
+                      ${(lineSubtotal - (purchase.discount || 0)).toFixed(2)}
                     </TableCell>
                   </TableRow>
                 </TableBody>
@@ -121,18 +121,18 @@ export default function PublicPurchaseReceiptPage() {
               {purchase.discount > 0 && (
                 <div className="flex justify-between">
                   <span className="text-gray-600">Discount</span>
-                  <span className="text-amber-700 font-medium">-${purchase.discount.toFixed(3)}</span>
+                  <span className="text-amber-700 font-medium">-${purchase.discount.toFixed(2)}</span>
                 </div>
               )}
               {purchase.taxAmount > 0 && (
                 <div className="flex justify-between">
                   <span className="text-gray-600">Tax ({purchase.taxRate}%)</span>
-                  <span className="text-gray-900 font-medium">+${purchase.taxAmount.toFixed(3)}</span>
+                  <span className="text-gray-900 font-medium">+${purchase.taxAmount.toFixed(2)}</span>
                 </div>
               )}
               <div className="flex justify-between">
                 <span className="text-gray-600">Total</span>
-                <span className="font-semibold text-gray-900">${purchase.total.toFixed(3)}</span>
+                <span className="font-semibold text-gray-900">${purchase.total.toFixed(2)}</span>
               </div>
             </div>
           </CardContent>

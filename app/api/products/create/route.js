@@ -19,6 +19,9 @@ export async function POST(req) {
       unit,
       lowStockThreshold,
       defaultSupplier,
+      priceWholesale,
+      priceDistributor,
+      priceVip,
     } = await req.json();
 
     if (!name?.trim() || price == null) {
@@ -78,11 +81,35 @@ export async function POST(req) {
     // Default supplier - optional ObjectId, normalize blank to null.
     const parsedDefaultSupplier = defaultSupplier && defaultSupplier !== "" ? defaultSupplier : null;
 
+    // Wholesale/Distributor/VIP tier prices - each optional; a blank/omitted
+    // one defaults to the Retail price so every tier is priced from the
+    // start (lib/priceTiers.js also falls back to `price` at read time, so
+    // this is a convenience default, not something other code depends on).
+    const parseTierPrice = (value, label) => {
+      if (value === undefined || value === null || value === "") return parsedPrice;
+      const parsed = parseFloat(value);
+      if (isNaN(parsed) || parsed < 0) {
+        throw new Error(`${label} price must be a number ≥ 0.`);
+      }
+      return parsed;
+    };
+    let parsedPriceWholesale, parsedPriceDistributor, parsedPriceVip;
+    try {
+      parsedPriceWholesale = parseTierPrice(priceWholesale, "Wholesale");
+      parsedPriceDistributor = parseTierPrice(priceDistributor, "Distributor");
+      parsedPriceVip = parseTierPrice(priceVip, "VIP");
+    } catch (err) {
+      return NextResponse.json({ error: err.message }, { status: 400 });
+    }
+
     // Create the product
     const product = new Product({
       name: name.trim(),
       quantity: parsedQuantity,
       price: parsedPrice,
+      priceWholesale: parsedPriceWholesale,
+      priceDistributor: parsedPriceDistributor,
+      priceVip: parsedPriceVip,
       initialPrice: parsedInitialPrice,
       profit: parsedProfit,
       category,

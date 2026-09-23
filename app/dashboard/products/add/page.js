@@ -8,7 +8,7 @@ import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import axios from "axios";
-import { Loader2, PackagePlus, ArrowLeft, DollarSign, Tag, Package, TrendingUp, Box, Ruler, AlertTriangle, Truck } from "lucide-react";
+import { Loader2, PackagePlus, ArrowLeft, DollarSign, Tag, Package, TrendingUp, Box, Ruler, AlertTriangle, Truck, Layers } from "lucide-react";
 import React, { useState } from "react";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
@@ -44,6 +44,9 @@ const Page = () => {
   const [form, setForm] = useState({
     name: "",
     price: "",
+    priceWholesale: "",
+    priceDistributor: "",
+    priceVip: "",
     initialPrice: "",
     category: "",
     unit: "pcs",
@@ -61,6 +64,9 @@ const Page = () => {
         name: form.name,
         quantity: 0,
         price,
+        priceWholesale: form.priceWholesale,
+        priceDistributor: form.priceDistributor,
+        priceVip: form.priceVip,
         initialPrice,
         profit,
         category: form.category,
@@ -103,7 +109,7 @@ const Page = () => {
     const { name, value } = e.target;
     let cleanValue = value;
 
-    if (name === "price" || name === "initialPrice") {
+    if (["price", "initialPrice", "priceWholesale", "priceDistributor", "priceVip"].includes(name)) {
       cleanValue = value.replace(/[^0-9.]/g, "").replace(/(\..*?)\..*/g, "$1");
     }
 
@@ -339,6 +345,70 @@ const Page = () => {
 
                   <Separator />
 
+                  {/* Price Tiers Section */}
+                  <div className="space-y-4">
+                    <div className="flex items-center gap-2 text-sm font-medium text-gray-500 uppercase tracking-wide">
+                      <div className="w-1 h-4 bg-teal-600 rounded"></div>
+                      Price Tiers
+                    </div>
+                    <p className="text-xs text-gray-500 -mt-2">
+                      Selling Price above is the Retail price. Set different prices for other customer
+                      tiers here, or leave a field blank to use the Retail price for that tier.
+                    </p>
+
+                    <div className="grid gap-4 sm:grid-cols-3">
+                      <div className="space-y-2">
+                        <Label htmlFor="priceWholesale" className="text-sm font-medium flex items-center gap-2">
+                          <Layers className="h-4 w-4" />
+                          Wholesale
+                        </Label>
+                        <Input
+                          id="priceWholesale"
+                          placeholder={form.price || "0.00"}
+                          name="priceWholesale"
+                          value={form.priceWholesale}
+                          onChange={handleChange}
+                          inputMode="decimal"
+                          className="focus:border-teal-500 transition-colors"
+                        />
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor="priceDistributor" className="text-sm font-medium flex items-center gap-2">
+                          <Layers className="h-4 w-4" />
+                          Distributor
+                        </Label>
+                        <Input
+                          id="priceDistributor"
+                          placeholder={form.price || "0.00"}
+                          name="priceDistributor"
+                          value={form.priceDistributor}
+                          onChange={handleChange}
+                          inputMode="decimal"
+                          className="focus:border-teal-500 transition-colors"
+                        />
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor="priceVip" className="text-sm font-medium flex items-center gap-2">
+                          <Layers className="h-4 w-4" />
+                          VIP
+                        </Label>
+                        <Input
+                          id="priceVip"
+                          placeholder={form.price || "0.00"}
+                          name="priceVip"
+                          value={form.priceVip}
+                          onChange={handleChange}
+                          inputMode="decimal"
+                          className="focus:border-teal-500 transition-colors"
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  <Separator />
+
                   {/* Submit Button */}
                   <div className="flex gap-3 pt-2">
                     <Button
@@ -407,12 +477,12 @@ const Page = () => {
                   <div className="space-y-2">
                     <div className="flex justify-between items-center">
                       <span className="text-sm text-gray-600">Cost Price</span>
-                      <span className="font-medium text-gray-900">${costPrice.toFixed(3)}</span>
+                      <span className="font-medium text-gray-900">${costPrice.toFixed(2)}</span>
                     </div>
                     
                     <div className="flex justify-between items-center">
                       <span className="text-sm text-gray-600">Selling Price</span>
-                      <span className="font-medium text-gray-900">${sellingPrice.toFixed(3)}</span>
+                      <span className="font-medium text-gray-900">${sellingPrice.toFixed(2)}</span>
                     </div>
                   </div>
                 </div>
@@ -430,7 +500,7 @@ const Page = () => {
                     <div className="flex justify-between items-center mb-1">
                       <span className="text-sm font-medium text-green-800">Profit per Unit</span>
                       <Badge variant={profit >= 0 ? "default" : "destructive"} className="bg-green-100 text-green-800">
-                        ${Math.abs(profit).toFixed(3)}
+                        ${Math.abs(profit).toFixed(2)}
                       </Badge>
                     </div>
                     

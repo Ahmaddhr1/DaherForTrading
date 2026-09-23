@@ -66,6 +66,23 @@ export async function PUT(req, { params }) {
       body.unit = "pcs";
     }
 
+    // Wholesale/Distributor/VIP tier prices - a blank string means "use the
+    // Retail price", same convenience default as on creation.
+    for (const field of ["priceWholesale", "priceDistributor", "priceVip"]) {
+      if (body[field] === "" || body[field] === undefined || body[field] === null) {
+        body[field] = body.price !== undefined ? body.price : beforeUpdate.price;
+      } else {
+        const parsed = parseFloat(body[field]);
+        if (isNaN(parsed) || parsed < 0) {
+          return NextResponse.json(
+            { error: `${field.replace("price", "")} price must be a number ≥ 0.` },
+            { status: 400 }
+          );
+        }
+        body[field] = parsed;
+      }
+    }
+
     const updatedProduct = await Product.findByIdAndUpdate(id, body, {
       new: true,
     });

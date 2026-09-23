@@ -9,8 +9,6 @@ import Company from "@/models/Company";
 import Purchase from "@/models/Purchase";
 import Payment from "@/models/Payment";
 import Disbursement from "@/models/Disbursement";
-import Account from "@/models/Account";
-import SupplierPayment from "@/models/SupplierPayment";
 import StockAdjustment from "@/models/StockAdjustment";
 import AppSettings from "@/models/AppSettings";
 
@@ -25,8 +23,6 @@ const COLLECTION_MODELS = {
   purchases: Purchase,
   payments: Payment,
   disbursements: Disbursement,
-  accounts: Account,
-  supplierPayments: SupplierPayment,
   stockAdjustments: StockAdjustment,
   appSettings: AppSettings,
 };

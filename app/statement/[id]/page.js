@@ -110,10 +110,10 @@ export default function PublicStatementPage() {
                             <TableCell className="text-gray-600 text-sm whitespace-nowrap">
                               {format(new Date(order.createdAt), "MMM d, yyyy")}
                             </TableCell>
-                            <TableCell className="text-right whitespace-nowrap">${order.total.toFixed(3)}</TableCell>
-                            <TableCell className="text-right text-green-600 whitespace-nowrap">${order.amountpaid.toFixed(3)}</TableCell>
+                            <TableCell className="text-right whitespace-nowrap">${order.total.toFixed(2)}</TableCell>
+                            <TableCell className="text-right text-green-600 whitespace-nowrap">${order.amountpaid.toFixed(2)}</TableCell>
                             <TableCell className={`text-right whitespace-nowrap ${order.remainingBalance > 0 ? "text-red-600" : ""}`}>
-                              ${order.remainingBalance.toFixed(3)}
+                              ${order.remainingBalance.toFixed(2)}
                             </TableCell>
                             <TableCell className="text-center whitespace-nowrap">
                               <Badge className={status.color}>{status.label}</Badge>
@@ -132,16 +132,16 @@ export default function PublicStatementPage() {
             <div className="space-y-2">
               <div className="flex justify-between">
                 <span className="text-gray-600">Total Billed</span>
-                <span className="font-semibold text-gray-900">${totals.totalAmount.toFixed(3)}</span>
+                <span className="font-semibold text-gray-900">${totals.totalAmount.toFixed(2)}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-600">Total Paid</span>
-                <span className="text-green-600 font-medium">${totals.totalPaid.toFixed(3)}</span>
+                <span className="text-green-600 font-medium">${totals.totalPaid.toFixed(2)}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-600 font-medium">Total Remaining (Debt)</span>
                 <span className={`font-semibold ${totals.totalRemaining > 0 ? "text-red-600" : "text-gray-900"}`}>
-                  ${totals.totalRemaining.toFixed(3)}
+                  ${totals.totalRemaining.toFixed(2)}
                 </span>
               </div>
             </div>

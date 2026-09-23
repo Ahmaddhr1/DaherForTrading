@@ -415,7 +415,7 @@ function AddDisbursementForm({ onSuccess }) {
       toast.error("Enter a valid amount");
       return;
     }
-    if (!window.confirm(`Record a disbursement of $${parseFloat(amount).toFixed(3)} for "${description}"?`)) {
+    if (!window.confirm(`Record a disbursement of $${parseFloat(amount).toFixed(2)} for "${description}"?`)) {
       return;
     }
     mutation.mutate();

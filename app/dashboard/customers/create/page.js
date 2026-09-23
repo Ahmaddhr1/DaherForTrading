@@ -9,9 +9,10 @@ import { Badge } from "@/components/ui/badge";
 import React, { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import axios from "axios";
-import { Loader2, UserPlus, ArrowLeft, DollarSign, Phone, User, Scale } from "lucide-react";
+import { Loader2, UserPlus, ArrowLeft, DollarSign, Phone, User, Scale, Layers } from "lucide-react";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import { PRICE_TIERS } from "@/lib/priceTiers";
 
 const AddCustomerPage = () => {
   const router = useRouter();
@@ -19,6 +20,7 @@ const AddCustomerPage = () => {
     fullName: "",
     phoneNumber: "",
     debt: "",
+    priceTier: "1",
   });
 
   const handleChange = (e) => {
@@ -155,6 +157,39 @@ const AddCustomerPage = () => {
                           required
                         />
                       </div>
+                    </div>
+                  </div>
+
+                  <Separator />
+
+                  {/* Pricing Section */}
+                  <div className="space-y-4">
+                    <div className="flex items-center gap-2 text-sm font-medium text-gray-500 uppercase tracking-wide">
+                      <div className="w-1 h-4 bg-teal-600 rounded"></div>
+                      Pricing
+                    </div>
+
+                    <div className="space-y-2 max-w-xs">
+                      <Label htmlFor="priceTier" className="text-sm font-medium flex items-center gap-2">
+                        <Layers className="h-4 w-4" />
+                        Price Tier
+                      </Label>
+                      <select
+                        id="priceTier"
+                        name="priceTier"
+                        value={form.priceTier}
+                        onChange={handleChange}
+                        className="w-full p-2 border border-gray-300 rounded-md focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-colors"
+                      >
+                        {PRICE_TIERS.map((tier) => (
+                          <option key={tier.value} value={tier.value}>
+                            {tier.label}
+                          </option>
+                        ))}
+                      </select>
+                      <p className="text-xs text-gray-500">
+                        Which product price this customer is charged when creating an order
+                      </p>
                     </div>
                   </div>
 

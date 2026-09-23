@@ -27,6 +27,9 @@ export async function PUT(_, { params }) {
 
     const productUpdates = [];
     for (const item of order.products) {
+      // A custom line never touched inventory, so there's nothing to check
+      // or deduct for it.
+      if (item.isCustom) continue;
       const product = await Product.findById(item.productId);
       if (!product) {
         return NextResponse.json(
@@ -50,7 +53,9 @@ export async function PUT(_, { params }) {
       });
     }
 
-    await Product.bulkWrite(productUpdates);
+    if (productUpdates.length) {
+      await Product.bulkWrite(productUpdates);
+    }
 
     order.status = "pending";
     order.remainingBalance = order.total;

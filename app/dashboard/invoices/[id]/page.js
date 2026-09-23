@@ -181,13 +181,13 @@ export default function OrderDetailsPage() {
                         <TableCell className="font-medium text-gray-900">{item.name}</TableCell>
                         <TableCell className="text-center text-gray-600">{item.quantity}</TableCell>
                         <TableCell className="text-center text-gray-600">
-                          ${item.price.toFixed(3)}
+                          ${item.price.toFixed(2)}
                         </TableCell>
                         <TableCell className="text-center text-amber-700">
-                          {item.discount ? `-$${item.discount.toFixed(3)}` : "—"}
+                          {item.discount ? `-$${item.discount.toFixed(2)}` : "—"}
                         </TableCell>
                         <TableCell className="text-right font-medium text-gray-900">
-                          ${(item.price * item.quantity - (item.discount || 0)).toFixed(3)}
+                          ${(item.price * item.quantity - (item.discount || 0)).toFixed(2)}
                         </TableCell>
                       </TableRow>
                     ))}
@@ -232,27 +232,27 @@ export default function OrderDetailsPage() {
                 <div className="flex justify-between items-center">
                   <span className="text-gray-600">Subtotal</span>
                   <span className="font-medium text-gray-900">
-                    ${order.products.reduce((s, i) => s + i.price * i.quantity, 0).toFixed(3)}
+                    ${order.products.reduce((s, i) => s + i.price * i.quantity, 0).toFixed(2)}
                   </span>
                 </div>
 
                 {order.discountTotal > 0 && (
                   <div className="flex justify-between items-center">
                     <span className="text-gray-600">Discount</span>
-                    <span className="text-amber-700 font-medium">-${order.discountTotal.toFixed(3)}</span>
+                    <span className="text-amber-700 font-medium">-${order.discountTotal.toFixed(2)}</span>
                   </div>
                 )}
 
                 {order.taxAmount > 0 && (
                   <div className="flex justify-between items-center">
                     <span className="text-gray-600">Tax ({order.taxRate}%)</span>
-                    <span className="text-gray-900 font-medium">+${order.taxAmount.toFixed(3)}</span>
+                    <span className="text-gray-900 font-medium">+${order.taxAmount.toFixed(2)}</span>
                   </div>
                 )}
 
                 <div className="flex justify-between items-center pt-2 border-t">
                   <span className="text-gray-600 font-medium">Grand Total</span>
-                  <span className="font-semibold text-gray-900">${Number(order.total).toFixed(3)}</span>
+                  <span className="font-semibold text-gray-900">${Number(order.total).toFixed(2)}</span>
                 </div>
                 {settings?.dollarRate > 0 && (
                   <div className="flex justify-between items-center text-sm">
@@ -264,7 +264,7 @@ export default function OrderDetailsPage() {
                 <div className="flex justify-between items-center pt-2 border-t">
                   <span className="text-gray-600">Amount Paid</span>
                   <span className="text-green-600 font-medium">
-                    ${Number(order.amountpaid || 0).toFixed(3)}
+                    ${Number(order.amountpaid || 0).toFixed(2)}
                   </span>
                 </div>
 
@@ -272,7 +272,7 @@ export default function OrderDetailsPage() {
                   <span className="text-gray-600">Remaining Balance</span>
                   <span className={`font-medium ${Number(order.remainingBalance || 0) > 0 ? "text-red-600" : "text-gray-900"
                     }`}>
-                    ${Number(order.remainingBalance || 0).toFixed(3)}
+                    ${Number(order.remainingBalance || 0).toFixed(2)}
                   </span>
                 </div>
 
@@ -289,7 +289,7 @@ export default function OrderDetailsPage() {
                   <div className="flex justify-between items-center pt-2 border-t">
                     <span className="text-gray-600">Customer&apos;s Total Debt</span>
                     <span className={`font-semibold ${order.customer.debt > 0 ? "text-red-600" : "text-gray-900"}`}>
-                      ${order.customer.debt.toFixed(3)}
+                      ${order.customer.debt.toFixed(2)}
                     </span>
                   </div>
                 )}

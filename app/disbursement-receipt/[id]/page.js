@@ -77,7 +77,7 @@ export default function PublicDisbursementReceiptPage() {
 
             <div className="flex justify-between">
               <span className="text-gray-600">Amount</span>
-              <span className="font-semibold text-gray-900">${disbursement.amount.toFixed(3)}</span>
+              <span className="font-semibold text-gray-900">${disbursement.amount.toFixed(2)}</span>
             </div>
             {disbursement.dollarRate > 0 && (
               <div className="flex justify-between text-sm">

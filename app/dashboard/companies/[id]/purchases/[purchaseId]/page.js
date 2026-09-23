@@ -173,12 +173,12 @@ export default function PurchaseDetailsPage() {
                     <TableRow>
                       <TableCell className="font-medium text-gray-900">{purchase.productName}</TableCell>
                       <TableCell className="text-center text-gray-600">{purchase.quantity}</TableCell>
-                      <TableCell className="text-center text-gray-600">${purchase.unitPrice.toFixed(3)}</TableCell>
+                      <TableCell className="text-center text-gray-600">${purchase.unitPrice.toFixed(2)}</TableCell>
                       <TableCell className="text-center text-amber-700">
-                        {purchase.discount ? `-$${purchase.discount.toFixed(3)}` : "—"}
+                        {purchase.discount ? `-$${purchase.discount.toFixed(2)}` : "—"}
                       </TableCell>
                       <TableCell className="text-right font-medium text-gray-900">
-                        ${(lineSubtotal - (purchase.discount || 0)).toFixed(3)}
+                        ${(lineSubtotal - (purchase.discount || 0)).toFixed(2)}
                       </TableCell>
                     </TableRow>
                   </TableBody>
@@ -215,23 +215,23 @@ export default function PurchaseDetailsPage() {
               <CardContent className="space-y-4">
                 <div className="flex justify-between items-center">
                   <span className="text-gray-600">Subtotal</span>
-                  <span className="font-medium text-gray-900">${lineSubtotal.toFixed(3)}</span>
+                  <span className="font-medium text-gray-900">${lineSubtotal.toFixed(2)}</span>
                 </div>
                 {purchase.discount > 0 && (
                   <div className="flex justify-between items-center">
                     <span className="text-gray-600">Discount</span>
-                    <span className="text-amber-700 font-medium">-${purchase.discount.toFixed(3)}</span>
+                    <span className="text-amber-700 font-medium">-${purchase.discount.toFixed(2)}</span>
                   </div>
                 )}
                 {purchase.taxAmount > 0 && (
                   <div className="flex justify-between items-center">
                     <span className="text-gray-600">Tax ({purchase.taxRate}%)</span>
-                    <span className="text-gray-900 font-medium">+${purchase.taxAmount.toFixed(3)}</span>
+                    <span className="text-gray-900 font-medium">+${purchase.taxAmount.toFixed(2)}</span>
                   </div>
                 )}
                 <div className="flex justify-between items-center pt-2 border-t">
                   <span className="text-gray-600 font-medium">Grand Total</span>
-                  <span className="font-semibold text-gray-900">${purchase.total.toFixed(3)}</span>
+                  <span className="font-semibold text-gray-900">${purchase.total.toFixed(2)}</span>
                 </div>
                 {settings?.dollarRate > 0 && (
                   <div className="flex justify-between items-center text-sm">
@@ -250,7 +250,7 @@ export default function PurchaseDetailsPage() {
                   <div className="flex justify-between items-center pt-2 border-t">
                     <span className="text-gray-600">Supplier&apos;s Total Debt</span>
                     <span className={`font-semibold ${purchase.company.debt > 0 ? "text-red-600" : "text-gray-900"}`}>
-                      ${purchase.company.debt.toFixed(3)}
+                      ${purchase.company.debt.toFixed(2)}
                     </span>
                   </div>
                 )}

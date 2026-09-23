@@ -41,15 +41,15 @@ export default function DisbursementThermalReceipt({ disbursement }) {
           <span>{disbursement.description}</span>
         </div>
         <div className="flex justify-between">
-          <span>1 x ${Number(disbursement.amount).toFixed(3)}</span>
-          <span>${Number(disbursement.amount).toFixed(3)}</span>
+          <span>1 x ${Number(disbursement.amount).toFixed(2)}</span>
+          <span>${Number(disbursement.amount).toFixed(2)}</span>
         </div>
 
         <div className="border-t border-dashed border-black my-1" />
 
         <div className="flex justify-between font-bold">
           <span>TOTAL</span>
-          <span>${Number(disbursement.amount).toFixed(3)}</span>
+          <span>${Number(disbursement.amount).toFixed(2)}</span>
         </div>
         {dollarRate > 0 && (
           <div className="flex justify-between">

@@ -362,7 +362,7 @@ export default function CustomerOrdersTable() {
                     <TableCell className="font-medium text-gray-500">
                       {(page - 1) * pageSize + index + 1}
                     </TableCell>
-                    <TableCell className="font-medium">${Number(order.total).toFixed(3)}</TableCell>
+                    <TableCell className="font-medium">${Number(order.total).toFixed(2)}</TableCell>
                     <TableCell className="text-gray-500 text-sm">
                       {format(new Date(order.createdAt), "yyyy-MM-dd HH:mm")}
                     </TableCell>

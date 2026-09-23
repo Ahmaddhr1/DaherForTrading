@@ -102,7 +102,7 @@ export default function PublicCompanyStatementPage() {
                             {format(new Date(purchase.createdAt), "MMM d, yyyy")}
                           </TableCell>
                           <TableCell className="whitespace-nowrap">{purchase.productName}</TableCell>
-                          <TableCell className="text-right whitespace-nowrap">${purchase.total.toFixed(3)}</TableCell>
+                          <TableCell className="text-right whitespace-nowrap">${purchase.total.toFixed(2)}</TableCell>
                           <TableCell className="text-center whitespace-nowrap">
                             <Badge className={purchase.paid ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"}>
                               {purchase.paid ? "Paid" : "Unpaid"}
@@ -121,16 +121,16 @@ export default function PublicCompanyStatementPage() {
             <div className="space-y-2">
               <div className="flex justify-between">
                 <span className="text-gray-600">Total Purchased</span>
-                <span className="font-semibold text-gray-900">${totals.totalPurchased.toFixed(3)}</span>
+                <span className="font-semibold text-gray-900">${totals.totalPurchased.toFixed(2)}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-600">Total Paid</span>
-                <span className="text-green-600 font-medium">${totals.totalPaid.toFixed(3)}</span>
+                <span className="text-green-600 font-medium">${totals.totalPaid.toFixed(2)}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-600 font-medium">Total Owed</span>
                 <span className={`font-semibold ${totals.totalOwed > 0 ? "text-red-600" : "text-gray-900"}`}>
-                  ${totals.totalOwed.toFixed(3)}
+                  ${totals.totalOwed.toFixed(2)}
                 </span>
               </div>
             </div>

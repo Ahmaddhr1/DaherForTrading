@@ -8,7 +8,7 @@ import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { FormSkeleton, PageHeaderSkeleton } from "@/components/ui/skeleton-patterns";
-import { Eye, Loader2, User, Phone, DollarSign, ArrowLeft, UserCog, Package, PhoneCall, Lock, FileText } from "lucide-react";
+import { Eye, Loader2, User, Phone, DollarSign, ArrowLeft, UserCog, Package, PhoneCall, Lock, FileText, Layers } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -16,6 +16,7 @@ import axios from "axios";
 import { toast } from "sonner";
 import { useParams } from "next/navigation";
 import Link from "next/link";
+import { PRICE_TIERS } from "@/lib/priceTiers";
 
 const EditCustomerPage = () => {
   const router = useRouter();
@@ -26,6 +27,7 @@ const EditCustomerPage = () => {
     fullName: "",
     phoneNumber: "",
     debt: "",
+    priceTier: "1",
     orders: [],
   });
 
@@ -45,6 +47,7 @@ const EditCustomerPage = () => {
         fullName: data.fullName || "",
         phoneNumber: data.phoneNumber || "",
         debt: data.debt?.toString() || "",
+        priceTier: data.priceTier?.toString() || "1",
         orders: data?.orders || [],
       });
     }
@@ -98,8 +101,10 @@ const EditCustomerPage = () => {
       return;
     }
 
-    // Debt is not editable from this form; it's managed separately.
-    const { debt, ...editableFields } = form;
+    // Debt and orders aren't editable from this form - debt is managed
+    // separately, and `orders` here is just the populated list this page
+    // fetched to show the order count/summary, not something to write back.
+    const { debt, orders, ...editableFields } = form;
     mutation.mutate(editableFields);
   };
 
@@ -269,6 +274,39 @@ const EditCustomerPage = () => {
                           required
                         />
                       </div>
+                    </div>
+                  </div>
+
+                  <Separator />
+
+                  {/* Pricing Section */}
+                  <div className="space-y-4">
+                    <div className="flex items-center gap-2 text-sm font-medium text-gray-500 uppercase tracking-wide">
+                      <div className="w-1 h-4 bg-teal-600 rounded"></div>
+                      Pricing
+                    </div>
+
+                    <div className="space-y-2 max-w-xs">
+                      <Label htmlFor="priceTier" className="text-sm font-medium flex items-center gap-2">
+                        <Layers className="h-4 w-4" />
+                        Price Tier
+                      </Label>
+                      <select
+                        id="priceTier"
+                        name="priceTier"
+                        value={form.priceTier}
+                        onChange={handleChange}
+                        className="w-full p-2 border border-gray-300 rounded-md focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-colors"
+                      >
+                        {PRICE_TIERS.map((tier) => (
+                          <option key={tier.value} value={tier.value}>
+                            {tier.label}
+                          </option>
+                        ))}
+                      </select>
+                      <p className="text-xs text-gray-500">
+                        Which product price this customer is charged when creating an order
+                      </p>
                     </div>
                   </div>
 

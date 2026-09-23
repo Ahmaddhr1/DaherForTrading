@@ -61,13 +61,13 @@ export default function CompanyStatementPage() {
         meta: format(new Date(), "MMM d, yyyy h:mm a"),
         rows: statement.purchases.map((purchase) => ({
           label: format(new Date(purchase.createdAt), "MMM d, yyyy"),
-          amount: `$${purchase.total.toFixed(3)}`,
+          amount: `$${purchase.total.toFixed(2)}`,
           sub: `${purchase.productName}  [${purchase.paid ? "Paid" : "Unpaid"}]`,
         })),
         totals: [
-          { label: "Total Purchased", value: `$${statement.totals.totalPurchased.toFixed(3)}` },
-          { label: "Total Paid", value: `$${statement.totals.totalPaid.toFixed(3)}` },
-          { label: "Total Owed", value: `$${statement.totals.totalOwed.toFixed(3)}`, bold: true },
+          { label: "Total Purchased", value: `$${statement.totals.totalPurchased.toFixed(2)}` },
+          { label: "Total Paid", value: `$${statement.totals.totalPaid.toFixed(2)}` },
+          { label: "Total Owed", value: `$${statement.totals.totalOwed.toFixed(2)}`, bold: true },
         ],
         footer: "Powered by Ahmad Daher",
       });
@@ -176,7 +176,7 @@ export default function CompanyStatementPage() {
                         {format(new Date(purchase.createdAt), "MMM d, yyyy HH:mm")}
                       </TableCell>
                       <TableCell className="font-medium text-gray-900 whitespace-nowrap">{purchase.productName}</TableCell>
-                      <TableCell className="text-right font-medium text-gray-900 whitespace-nowrap">${purchase.total.toFixed(3)}</TableCell>
+                      <TableCell className="text-right font-medium text-gray-900 whitespace-nowrap">${purchase.total.toFixed(2)}</TableCell>
                       <TableCell className="text-center whitespace-nowrap">
                         <Badge className={purchase.paid ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"}>
                           {purchase.paid ? "Paid" : "Unpaid"}
@@ -197,16 +197,16 @@ export default function CompanyStatementPage() {
           <CardContent className="space-y-3">
             <div className="flex justify-between items-center">
               <span className="text-gray-600">Total Purchased</span>
-              <span className="font-medium text-gray-900">${totals.totalPurchased.toFixed(3)}</span>
+              <span className="font-medium text-gray-900">${totals.totalPurchased.toFixed(2)}</span>
             </div>
             <div className="flex justify-between items-center pt-2 border-t">
               <span className="text-gray-600">Total Paid</span>
-              <span className="text-green-600 font-medium">${totals.totalPaid.toFixed(3)}</span>
+              <span className="text-green-600 font-medium">${totals.totalPaid.toFixed(2)}</span>
             </div>
             <div className="flex justify-between items-center pt-2 border-t">
               <span className="font-semibold text-gray-900">Total Owed</span>
               <span className={`font-semibold ${totals.totalOwed > 0 ? "text-red-600" : "text-gray-900"}`}>
-                ${totals.totalOwed.toFixed(3)}
+                ${totals.totalOwed.toFixed(2)}
               </span>
             </div>
           </CardContent>

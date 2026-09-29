@@ -6,8 +6,10 @@ import axios from "axios";
 import { format } from "date-fns";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { History, TrendingUp, TrendingDown, ShoppingCart, Truck } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { History, TrendingUp, TrendingDown, ShoppingCart, Truck, ListOrdered } from "lucide-react";
 import { localDayStartISO, localDayEndISO } from "@/lib/dateUtils";
+import Link from "next/link";
 
 export default function ProductHistory({ productId }) {
   const [startDate, setStartDate] = useState("");
@@ -32,11 +34,17 @@ export default function ProductHistory({ productId }) {
 
   return (
     <Card className="shadow-sm border-gray-200 mt-6">
-      <CardHeader className="pb-4">
+      <CardHeader className="pb-4 flex-row items-center justify-between space-y-0">
         <CardTitle className="text-lg flex items-center gap-2">
           <History className="h-5 w-5 text-blue-600" />
           Sales vs Purchases History
         </CardTitle>
+        <Button asChild variant="outline" size="sm" className="flex items-center gap-1.5">
+          <Link href={`/dashboard/products/${productId}/history`}>
+            <ListOrdered className="h-3.5 w-3.5" />
+            Full Stock Ledger
+          </Link>
+        </Button>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">

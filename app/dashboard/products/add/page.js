@@ -43,6 +43,7 @@ const Page = () => {
 
   const [form, setForm] = useState({
     name: "",
+    quantity: "",
     price: "",
     priceWholesale: "",
     priceDistributor: "",
@@ -85,7 +86,7 @@ const Page = () => {
 
       const payload = {
         name: form.name,
-        quantity: 0,
+        quantity: form.quantity === "" ? 0 : parseInt(form.quantity, 10),
         price,
         priceWholesale: form.priceWholesale,
         priceDistributor: form.priceDistributor,
@@ -135,6 +136,9 @@ const Page = () => {
 
     if (["price", "initialPrice", "priceWholesale", "priceDistributor", "priceVip"].includes(name)) {
       cleanValue = value.replace(/[^0-9.]/g, "").replace(/(\..*?)\..*/g, "$1");
+    }
+    if (name === "quantity") {
+      cleanValue = value.replace(/\D/g, "");
     }
 
     setForm((prev) => ({
@@ -242,6 +246,23 @@ const Page = () => {
                             </option>
                           ))}
                         </select>
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor="quantity" className="text-sm font-medium flex items-center gap-2">
+                          <Package className="h-4 w-4" />
+                          Quantity in Stock (optional)
+                        </Label>
+                        <Input
+                          id="quantity"
+                          placeholder="0"
+                          name="quantity"
+                          value={form.quantity}
+                          onChange={handleChange}
+                          inputMode="numeric"
+                          className="focus:border-blue-500 transition-colors"
+                        />
+                        <p className="text-xs text-gray-500">Leave blank to start at 0 and add stock later via a purchase</p>
                       </div>
 
                       <div className="space-y-2">

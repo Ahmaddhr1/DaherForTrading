@@ -28,6 +28,13 @@ export async function GET(req) {
 
     if (status && ["draft", "pending", "partiallyPaid", "paid"].includes(status)) {
       query.status = status;
+    } else {
+      // No explicit status requested (the "All Orders" view) - a draft
+      // isn't a real order yet (no stock/debt impact, no customer
+      // required), so it's excluded here same as from the totals below.
+      // Drafts have their own dedicated page/view
+      // (app/dashboard/drafts) that explicitly requests status=draft.
+      query.status = { $ne: "draft" };
     }
 
     if (search) {
@@ -73,16 +80,11 @@ export async function GET(req) {
     });
 
     // Sum of order value and real profit across every order matching the
-    // current filters (not just the current page). Drafts never count
-    // toward either figure since they haven't been finalized - unless the
-    // status filter is explicitly "draft", in which case that's exactly
-    // what's being viewed.
-    const totalsMatch = { ...query };
-    if (!totalsMatch.status) {
-      totalsMatch.status = { $ne: "draft" };
-    }
+    // current filters (not just the current page). query.status already
+    // excludes drafts unless the status filter is explicitly "draft", in
+    // which case that's exactly what's being viewed.
     const [totalsResult] = await Order.aggregate([
-      { $match: totalsMatch },
+      { $match: query },
       {
         $group: {
           _id: null,

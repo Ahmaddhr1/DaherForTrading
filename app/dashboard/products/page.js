@@ -20,8 +20,9 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Search, Package, Plus, Edit, Trash2, ChevronLeft, ChevronRight, Loader2, DollarSign, Box, TrendingUp, Wallet, AlertTriangle, LayoutList, LayoutGrid } from "lucide-react";
+import { Search, Package, Plus, Edit, Trash2, ChevronLeft, ChevronRight, Loader2, DollarSign, Box, TrendingUp, Wallet, AlertTriangle, LayoutList, LayoutGrid, FileDown } from "lucide-react";
 import ProductGridView from "./ProductGridView";
+import GeneratePdfModal from "./GeneratePdfModal";
 import { useCart } from "@/lib/cartContext";
 
 export default function ProductsPage() {
@@ -30,6 +31,7 @@ export default function ProductsPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [deletingId, setDeletingId] = useState(null);
   const [viewMode, setViewMode] = useState("list"); // "list" | "grid"
+  const [pdfModalOpen, setPdfModalOpen] = useState(false);
   const { addToCart } = useCart();
   const queryClient = useQueryClient();
 
@@ -118,12 +120,22 @@ export default function ProductsPage() {
               </div>
             </div>
 
-            <Link href="/dashboard/products/add">
-              <Button className="bg-blue-600 hover:bg-blue-700 flex items-center gap-2 shrink-0">
-                <Plus className="h-4 w-4" />
-                <span className="hidden sm:inline">Add Product</span>
+            <div className="flex items-center gap-2 shrink-0">
+              <Button
+                variant="outline"
+                onClick={() => setPdfModalOpen(true)}
+                className="flex items-center gap-2"
+              >
+                <FileDown className="h-4 w-4" />
+                <span className="hidden sm:inline">Generate PDF</span>
               </Button>
-            </Link>
+              <Link href="/dashboard/products/add">
+                <Button className="bg-blue-600 hover:bg-blue-700 flex items-center gap-2">
+                  <Plus className="h-4 w-4" />
+                  <span className="hidden sm:inline">Add Product</span>
+                </Button>
+              </Link>
+            </div>
           </div>
         </div>
 
@@ -430,6 +442,8 @@ export default function ProductsPage() {
           </div>
         )}
       </div>
+
+      <GeneratePdfModal open={pdfModalOpen} onClose={() => setPdfModalOpen(false)} />
     </div>
   );
 }

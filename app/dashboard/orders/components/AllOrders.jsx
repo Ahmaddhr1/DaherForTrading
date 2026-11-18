@@ -92,12 +92,6 @@ export default function AllOrders() {
     if (action === "markPaid" && !window.confirm("Mark this order as fully paid?")) {
       return;
     }
-    if (action === "deleteDraft" && !window.confirm("Delete this draft? This cannot be undone.")) {
-      return;
-    }
-    if (action === "finalize" && !window.confirm("Finalize this draft into a real order? This will deduct stock and add to the customer's debt.")) {
-      return;
-    }
 
     try {
       setActionLoading(true);
@@ -106,18 +100,12 @@ export default function AllOrders() {
         toast.success("Order marked as paid!");
         queryClient.invalidateQueries(["orders", "all"]);
         queryClient.invalidateQueries(["payments-history"]);
-      } else if (action === "delete" || action === "deleteDraft") {
+      } else if (action === "delete") {
         const res = await axios.delete(`/api/orders/${orderId}`);
-        toast.success(res.data?.message || (action === "deleteDraft" ? "Draft deleted." : "Order reverted."));
-        queryClient.invalidateQueries(["orders", "all"]);
-      } else if (action === "finalize") {
-        await axios.put(`/api/orders/${orderId}/finalize`);
-        toast.success("Order finalized!");
+        toast.success(res.data?.message || "Order reverted.");
         queryClient.invalidateQueries(["orders", "all"]);
       } else if (action === "pay") {
         router.push(`/dashboard/orders/${orderId}`);
-      } else if (action === "continueEditing") {
-        router.push(`/dashboard/orders/${orderId}/edit`);
       } else if (action === "view") {
         router.push(`/dashboard/invoices/${orderId}`);
       }
@@ -149,15 +137,16 @@ export default function AllOrders() {
           ? "bg-green-100 text-green-800"
           : status === "partiallyPaid"
           ? "bg-yellow-100 text-yellow-800"
-          : status === "draft"
-          ? "bg-slate-200 text-slate-800"
           : ""
       }
     >
-      {status === "paid" ? "Paid" : status === "partiallyPaid" ? "Partially Paid" : status === "draft" ? "Draft" : "Pending"}
+      {status === "paid" ? "Paid" : status === "partiallyPaid" ? "Partially Paid" : "Pending"}
     </Badge>
   );
 
+  // Drafts never appear in this list (see /api/orders - the default query
+  // excludes them; they live on their own page at /dashboard/drafts), so
+  // every order here is always pending/partiallyPaid/paid.
   const actionsMenu = (order) => (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -166,41 +155,25 @@ export default function AllOrders() {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
-        {order.status === "draft" ? (
+        <DropdownMenuItem onClick={() => handleAction("view", order._id)}>
+          View Invoice
+        </DropdownMenuItem>
+        {order.status === "pending" && (
+          <DropdownMenuItem onClick={() => router.push(`/dashboard/orders/${order._id}/edit`)}>
+            Update Order
+          </DropdownMenuItem>
+        )}
+        {order.status !== "paid" && (
           <>
-            <DropdownMenuItem onClick={() => handleAction("continueEditing", order._id)}>
-              Continue Editing
+            <DropdownMenuItem onClick={() => handleAction("pay", order._id)}>
+              Make Payment
             </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => handleAction("finalize", order._id)}>
-              Finalize Order
+            <DropdownMenuItem onClick={() => handleAction("markPaid", order._id)}>
+              Mark as Paid
             </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => handleAction("deleteDraft", order._id)}>
-              Delete Draft
+            <DropdownMenuItem onClick={() => handleAction("delete", order._id)}>
+              Undo Order
             </DropdownMenuItem>
-          </>
-        ) : (
-          <>
-            <DropdownMenuItem onClick={() => handleAction("view", order._id)}>
-              View Invoice
-            </DropdownMenuItem>
-            {order.status === "pending" && (
-              <DropdownMenuItem onClick={() => router.push(`/dashboard/orders/${order._id}/edit`)}>
-                Update Order
-              </DropdownMenuItem>
-            )}
-            {order.status !== "paid" && (
-              <>
-                <DropdownMenuItem onClick={() => handleAction("pay", order._id)}>
-                  Make Payment
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => handleAction("markPaid", order._id)}>
-                  Mark as Paid
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => handleAction("delete", order._id)}>
-                  Undo Order
-                </DropdownMenuItem>
-              </>
-            )}
           </>
         )}
       </DropdownMenuContent>
@@ -246,15 +219,6 @@ export default function AllOrders() {
               >
                 All
                 <Badge variant="secondary" className="ml-1">{totalCount}</Badge>
-              </Button>
-              <Button
-                variant={statusFilter === "draft" ? "default" : "outline"}
-                size="sm"
-                onClick={() => setStatusFilter("draft")}
-                className="w-full sm:w-auto justify-center"
-              >
-                Draft
-                <Badge variant="secondary" className="ml-1">{counts.draft}</Badge>
               </Button>
               <Button
                 variant={statusFilter === "pending" ? "default" : "outline"}

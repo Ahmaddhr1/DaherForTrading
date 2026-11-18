@@ -1,8 +1,11 @@
 import { MySideBar } from "@/components/MySideBar";
 import { MobileBottomBar } from "@/components/MobileBottomBar";
+import { CartProvider } from "@/lib/cartContext";
+import CartDrawer from "@/app/dashboard/products/CartDrawer";
 
 export default function RootLayout({ children }) {
   return (
+    <CartProvider>
       <div className={"flex min-h-screen antialiased"}>
         <div className="w-fit">
           <MySideBar />
@@ -11,6 +14,8 @@ export default function RootLayout({ children }) {
           {children}
         </main>
         <MobileBottomBar />
+        <CartDrawer />
       </div>
+    </CartProvider>
   );
 }

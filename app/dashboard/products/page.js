@@ -22,7 +22,7 @@ import {
 } from "@/components/ui/table";
 import { Search, Package, Plus, Edit, Trash2, ChevronLeft, ChevronRight, Loader2, DollarSign, Box, TrendingUp, Wallet, AlertTriangle, LayoutList, LayoutGrid } from "lucide-react";
 import ProductGridView from "./ProductGridView";
-import CartDrawer from "./CartDrawer";
+import { useCart } from "@/lib/cartContext";
 
 export default function ProductsPage() {
   // State for search and pagination
@@ -30,32 +30,12 @@ export default function ProductsPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [deletingId, setDeletingId] = useState(null);
   const [viewMode, setViewMode] = useState("list"); // "list" | "grid"
-  const [cart, setCart] = useState([]); // { productId, name, price, quantity }
+  const { addToCart } = useCart();
   const queryClient = useQueryClient();
 
   const handleAddToCart = (product) => {
-    setCart((prev) => {
-      const existing = prev.find((item) => item.productId === product._id);
-      if (existing) {
-        return prev.map((item) =>
-          item.productId === product._id ? { ...item, quantity: item.quantity + 1 } : item
-        );
-      }
-      return [...prev, { productId: product._id, name: product.name, price: product.price, quantity: 1 }];
-    });
+    addToCart(product);
     toast.success(`Added "${product.name}" to cart`);
-  };
-
-  const handleUpdateCartQty = (productId, delta) => {
-    setCart((prev) =>
-      prev
-        .map((item) => (item.productId === productId ? { ...item, quantity: item.quantity + delta } : item))
-        .filter((item) => item.quantity > 0)
-    );
-  };
-
-  const handleRemoveFromCart = (productId) => {
-    setCart((prev) => prev.filter((item) => item.productId !== productId));
   };
 
   // Fetch products data
@@ -450,13 +430,6 @@ export default function ProductsPage() {
           </div>
         )}
       </div>
-
-      <CartDrawer
-        cart={cart}
-        onUpdateQty={handleUpdateCartQty}
-        onRemove={handleRemoveFromCart}
-        onClear={() => setCart([])}
-      />
     </div>
   );
 }

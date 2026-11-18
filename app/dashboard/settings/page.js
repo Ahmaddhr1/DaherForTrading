@@ -166,7 +166,7 @@ export default function SettingsPage() {
       window.URL.revokeObjectURL(url);
 
       toast.success("Backup downloaded successfully");
-    } catch (error) {
+    } catch {
       toast.error("Failed to download backup");
     } finally {
       setIsDownloading(false);

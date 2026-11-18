@@ -19,9 +19,7 @@ import {
 } from "@/components/ui/table";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
-import { Skeleton } from "@/components/ui/skeleton";
 import { PageHeaderSkeleton, TableSkeleton } from "@/components/ui/skeleton-patterns";
 
 const fetchStatement = async (id) => {
@@ -80,7 +78,7 @@ export default function CustomerStatementPage() {
       });
       const result = await sharePdfOrDownload(blob, `statement-${statement.fullName?.replace(/\s+/g, "-") || id}.pdf`);
       if (result === "downloaded") toast.success("Statement PDF downloaded");
-    } catch (error) {
+    } catch {
       toast.error("Failed to generate PDF");
     } finally {
       setIsSharingPdf(false);

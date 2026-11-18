@@ -20,7 +20,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { ArrowLeft, Folder, Eye, Loader2, Trash2, Package, Edit, AlertTriangle } from "lucide-react";
+import { ArrowLeft, Folder, Eye, Loader2, Trash2, Package, Edit } from "lucide-react";
 
 const EditCategoryPage = () => {
   const { id } = useParams();

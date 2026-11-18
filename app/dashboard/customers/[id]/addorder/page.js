@@ -86,8 +86,7 @@ const MakeOrderPage = () => {
       try {
         const response = await axios.get("/api/products");
         setProducts(response.data);
-      } catch (error) {
-        toast.error("Failed to load products");
+      } catch {
       } finally {
         setIsLoadingProducts(false);
       }

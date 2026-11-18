@@ -64,7 +64,7 @@ export default function DisbursementThermalReceipt({ disbursement }) {
 
         <div className="border-t border-dashed border-black my-1" />
 
-        <p className="text-center mt-2">Daher For Trading</p>
+        <p className="text-center mt-2">For internal records</p>
       </div>
     </div>,
     document.body

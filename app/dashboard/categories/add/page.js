@@ -11,7 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
-import { ArrowLeft, FolderPlus, Loader2, Tag, FileText } from "lucide-react";
+import { ArrowLeft, FolderPlus, Loader2, Tag } from "lucide-react";
 
 export default function AddCategoryPage() {
   const router = useRouter();

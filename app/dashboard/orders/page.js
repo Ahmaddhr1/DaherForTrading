@@ -1,29 +1,18 @@
 "use client";
 
-import React, { Suspense, useState } from "react";
+import React, { useState } from "react";
 import axios from "axios";
 import { useQuery } from "@tanstack/react-query";
-import { useSearchParams } from "next/navigation";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Package, Clock, DollarSign, ListOrdered, Receipt, FileText } from "lucide-react";
+import { Package, Clock, DollarSign, ListOrdered, Receipt } from "lucide-react";
 import AllOrders from "./components/AllOrders";
 import TodaysOrders from "./components/TodaysOrders";
 import PendingOrders from "./components/PendingOrders";
 import PartiallyPaidOrders from "./components/PartiallyPaidOrders";
-import DraftOrders from "./components/DraftOrders";
 
-const VALID_TABS = ["all", "today", "pending", "partially-paid", "drafts"];
-
-const OrdersPageContent = () => {
-  const searchParams = useSearchParams();
-  // Lets a link (e.g. the "Drafts" shortcut in the mobile bottom nav) land
-  // directly on a specific tab via ?tab=drafts instead of always opening
-  // on "All Orders".
-  const tabParam = searchParams.get("tab");
-  const [activeTab, setActiveTab] = useState(
-    VALID_TABS.includes(tabParam) ? tabParam : "all"
-  );
+const OrdersPage = () => {
+  const [activeTab, setActiveTab] = useState("all");
 
   // Lifetime total sales - unfiltered, so it stays the same no matter which
   // tab/status/search filter is active below. Separate from the "Total of
@@ -44,8 +33,6 @@ const OrdersPageContent = () => {
         return <PendingOrders />;
       case "partially-paid":
         return <PartiallyPaidOrders />;
-      case "drafts":
-        return <DraftOrders />;
       default:
         return <AllOrders />;
     }
@@ -90,7 +77,7 @@ const OrdersPageContent = () => {
           </CardHeader>
           <CardContent>
             <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-6">
-              <TabsList className="grid grid-cols-2 sm:grid-cols-5 gap-1 w-full h-auto p-1">
+              <TabsList className="grid grid-cols-2 sm:grid-cols-4 gap-1 w-full h-auto p-1">
                 <TabsTrigger
                   value="all"
                   className="flex flex-col sm:flex-row items-center justify-center gap-1 h-14 sm:h-9 px-1 text-xs sm:text-sm whitespace-normal sm:whitespace-nowrap"
@@ -119,13 +106,6 @@ const OrdersPageContent = () => {
                   <DollarSign className="h-4 w-4" />
                   Partially Paid
                 </TabsTrigger>
-                <TabsTrigger
-                  value="drafts"
-                  className="flex flex-col sm:flex-row items-center justify-center gap-1 h-14 sm:h-9 px-1 text-xs sm:text-sm whitespace-normal sm:whitespace-nowrap"
-                >
-                  <FileText className="h-4 w-4" />
-                  Drafts
-                </TabsTrigger>
               </TabsList>
             </Tabs>
 
@@ -136,11 +116,5 @@ const OrdersPageContent = () => {
     </div>
   );
 };
-
-const OrdersPage = () => (
-  <Suspense fallback={null}>
-    <OrdersPageContent />
-  </Suspense>
-);
 
 export default OrdersPage;

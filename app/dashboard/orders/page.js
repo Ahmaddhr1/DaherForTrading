@@ -5,11 +5,12 @@ import axios from "axios";
 import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Package, Clock, DollarSign, ListOrdered, Receipt } from "lucide-react";
+import { Package, Clock, DollarSign, ListOrdered, Receipt, FileText } from "lucide-react";
 import AllOrders from "./components/AllOrders";
 import TodaysOrders from "./components/TodaysOrders";
 import PendingOrders from "./components/PendingOrders";
 import PartiallyPaidOrders from "./components/PartiallyPaidOrders";
+import DraftOrders from "./components/DraftOrders";
 
 const OrdersPage = () => {
   const [activeTab, setActiveTab] = useState("all");
@@ -33,6 +34,8 @@ const OrdersPage = () => {
         return <PendingOrders />;
       case "partially-paid":
         return <PartiallyPaidOrders />;
+      case "drafts":
+        return <DraftOrders />;
       default:
         return <AllOrders />;
     }
@@ -77,7 +80,7 @@ const OrdersPage = () => {
           </CardHeader>
           <CardContent>
             <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-6">
-              <TabsList className="grid grid-cols-2 sm:grid-cols-4 gap-1 w-full h-auto p-1">
+              <TabsList className="grid grid-cols-2 sm:grid-cols-5 gap-1 w-full h-auto p-1">
                 <TabsTrigger
                   value="all"
                   className="flex flex-col sm:flex-row items-center justify-center gap-1 h-14 sm:h-9 px-1 text-xs sm:text-sm whitespace-normal sm:whitespace-nowrap"
@@ -105,6 +108,13 @@ const OrdersPage = () => {
                 >
                   <DollarSign className="h-4 w-4" />
                   Partially Paid
+                </TabsTrigger>
+                <TabsTrigger
+                  value="drafts"
+                  className="flex flex-col sm:flex-row items-center justify-center gap-1 h-14 sm:h-9 px-1 text-xs sm:text-sm whitespace-normal sm:whitespace-nowrap"
+                >
+                  <FileText className="h-4 w-4" />
+                  Drafts
                 </TabsTrigger>
               </TabsList>
             </Tabs>

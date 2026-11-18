@@ -30,6 +30,7 @@ const productSchema = new mongoose.Schema(
     // Supplier to quick-reorder from (see the "Reorder from supplier" link
     // on the product edit page, which pre-fills a purchase form).
     defaultSupplier: { type: mongoose.Types.ObjectId, ref: "Company", default: null },
+    img: { type: [String], default: [] },
   },
   { timestamps: true }
 );

@@ -34,7 +34,13 @@ export async function GET(req) {
       const matchingCustomers = await Customer.find({
         fullName: { $regex: new RegExp(search, "i") },
       }).select("_id");
-      query.customer = { $in: matchingCustomers.map((c) => c._id) };
+      // Also match a draft's hand-typed name (customerNameText) - it has no
+      // linked customer yet, so the customer-id match above alone would
+      // never find it.
+      query.$or = [
+        { customer: { $in: matchingCustomers.map((c) => c._id) } },
+        { customerNameText: { $regex: new RegExp(search, "i") } },
+      ];
     }
 
     if (startDateParam || endDateParam) {

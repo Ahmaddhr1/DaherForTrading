@@ -2,10 +2,19 @@ import mongoose from "mongoose";
 
 const orderSchema = new mongoose.Schema(
   {
+    // Required for every real order; left unset on a draft created from the
+    // product-grid cart before a real customer has been picked/linked (see
+    // customerNameText below and PATCH /api/orders/[id]/link-customer).
     customer: {
       type: mongoose.Types.ObjectId,
       ref: "Customer",
-      required: true,
+      required: false,
+    },
+    // Hand-typed customer name, used only while a draft has no real
+    // `customer` linked yet. Ignored once `customer` is set.
+    customerNameText: {
+      type: String,
+      trim: true,
     },
     products: [
       {

@@ -35,7 +35,7 @@ export async function POST(req) {
     });
     await newCustomer.save();
     return NextResponse.json(
-      { message: "Customer created successfully" },
+      { message: "Customer created successfully", customer: newCustomer },
       { status: 201 }
     );
   } catch (error) {

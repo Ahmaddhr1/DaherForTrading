@@ -13,7 +13,7 @@ import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { FormSkeleton, PageHeaderSkeleton } from "@/components/ui/skeleton-patterns";
-import { Loader2, Package, ArrowLeft, DollarSign, Tag, Box, TrendingUp, PackageCheck, Ruler, AlertTriangle, Truck, Layers } from "lucide-react";
+import { Loader2, Package, ArrowLeft, DollarSign, Tag, Box, TrendingUp, PackageCheck, Ruler, AlertTriangle, Truck, Layers, ImagePlus, X } from "lucide-react";
 import Link from "next/link";
 import ProductHistory from "./ProductHistory";
 import StockAdjustments from "./StockAdjustments";
@@ -71,6 +71,11 @@ const EditProductPage = () => {
     defaultSupplier: "",
   });
 
+  const [existingImageUrl, setExistingImageUrl] = useState(null);
+  const [imageFile, setImageFile] = useState(null);
+  const [imagePreview, setImagePreview] = useState(null);
+  const [imageRemoved, setImageRemoved] = useState(false);
+
   // Sync product data into form
   useEffect(() => {
     if (product) {
@@ -87,11 +92,40 @@ const EditProductPage = () => {
         lowStockThreshold: product.lowStockThreshold?.toString() ?? "5",
         defaultSupplier: product.defaultSupplier || "",
       });
+      setExistingImageUrl(product.img?.[0] || null);
+      setImageFile(null);
+      setImagePreview(null);
+      setImageRemoved(false);
     }
   }, [product]);
 
+  const handleImageChange = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setImageFile(file);
+    setImagePreview(URL.createObjectURL(file));
+    setImageRemoved(false);
+  };
+
+  const handleRemoveImage = () => {
+    setImageFile(null);
+    setImagePreview(null);
+    setExistingImageUrl(null);
+    setImageRemoved(true);
+  };
+
   const mutation = useMutation({
     mutationFn: async () => {
+      let img;
+      if (imageFile) {
+        const uploadData = new FormData();
+        uploadData.append("file", imageFile);
+        const { data: uploadResult } = await axios.post("/api/products/upload-image", uploadData);
+        img = [uploadResult.url];
+      } else if (imageRemoved) {
+        img = [];
+      }
+
       const payload = {
         ...form,
         price: parseFloat(form.price),
@@ -99,6 +133,7 @@ const EditProductPage = () => {
         profit: parseFloat(form.price) - parseFloat(form.initialPrice),
         quantity: parseInt(form.quantity, 10),
         defaultSupplier: form.defaultSupplier || null,
+        ...(img !== undefined ? { img } : {}),
       };
       const res = await axios.put(`/api/products/${id}`, payload);
       return res.data;
@@ -309,6 +344,34 @@ const EditProductPage = () => {
                           className="focus:border-blue-500 transition-colors"
                           required
                         />
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor="productImage" className="text-sm font-medium flex items-center gap-2">
+                          <ImagePlus className="h-4 w-4" />
+                          Product Image (optional)
+                        </Label>
+                        {imagePreview || existingImageUrl ? (
+                          <div className="flex items-center gap-3">
+                            <img
+                              src={imagePreview || existingImageUrl}
+                              alt="Preview"
+                              className="h-20 w-20 rounded-md border border-gray-200 object-cover"
+                            />
+                            <Button type="button" variant="outline" size="sm" onClick={handleRemoveImage} className="flex items-center gap-1">
+                              <X className="h-3.5 w-3.5" />
+                              Remove
+                            </Button>
+                          </div>
+                        ) : (
+                          <Input
+                            id="productImage"
+                            type="file"
+                            accept="image/*"
+                            onChange={handleImageChange}
+                            className="focus:border-blue-500 transition-colors"
+                          />
+                        )}
                       </div>
                     </div>
                   </div>

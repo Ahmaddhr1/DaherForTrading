@@ -22,6 +22,7 @@ export async function POST(req) {
       priceWholesale,
       priceDistributor,
       priceVip,
+      img,
     } = await req.json();
 
     if (!name?.trim() || price == null) {
@@ -116,6 +117,7 @@ export async function POST(req) {
       unit: parsedUnit,
       lowStockThreshold: parsedLowStockThreshold,
       defaultSupplier: parsedDefaultSupplier,
+      img: Array.isArray(img) ? img.filter((url) => typeof url === "string" && url) : [],
     });
 
     await product.save();

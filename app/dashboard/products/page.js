@@ -20,14 +20,43 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Search, Package, Plus, Edit, Trash2, ChevronLeft, ChevronRight, Loader2, DollarSign, Box, TrendingUp, Wallet, AlertTriangle } from "lucide-react";
+import { Search, Package, Plus, Edit, Trash2, ChevronLeft, ChevronRight, Loader2, DollarSign, Box, TrendingUp, Wallet, AlertTriangle, LayoutList, LayoutGrid } from "lucide-react";
+import ProductGridView from "./ProductGridView";
+import CartDrawer from "./CartDrawer";
 
 export default function ProductsPage() {
   // State for search and pagination
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [deletingId, setDeletingId] = useState(null);
+  const [viewMode, setViewMode] = useState("list"); // "list" | "grid"
+  const [cart, setCart] = useState([]); // { productId, name, price, quantity }
   const queryClient = useQueryClient();
+
+  const handleAddToCart = (product) => {
+    setCart((prev) => {
+      const existing = prev.find((item) => item.productId === product._id);
+      if (existing) {
+        return prev.map((item) =>
+          item.productId === product._id ? { ...item, quantity: item.quantity + 1 } : item
+        );
+      }
+      return [...prev, { productId: product._id, name: product.name, price: product.price, quantity: 1 }];
+    });
+    toast.success(`Added "${product.name}" to cart`);
+  };
+
+  const handleUpdateCartQty = (productId, delta) => {
+    setCart((prev) =>
+      prev
+        .map((item) => (item.productId === productId ? { ...item, quantity: item.quantity + delta } : item))
+        .filter((item) => item.quantity > 0)
+    );
+  };
+
+  const handleRemoveFromCart = (productId) => {
+    setCart((prev) => prev.filter((item) => item.productId !== productId));
+  };
 
   // Fetch products data
   const { data, isLoading, error } = useQuery({
@@ -180,9 +209,9 @@ export default function ProductsPage() {
           </Card>
         </div>
 
-        {/* Search Bar */}
-        <div className="mb-6">
-          <div className="relative max-w-md">
+        {/* Search Bar + View toggle */}
+        <div className="mb-6 flex items-center justify-between gap-3">
+          <div className="relative max-w-md flex-1">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
             <Input
               type="text"
@@ -191,6 +220,26 @@ export default function ProductsPage() {
               onChange={(e) => setSearchTerm(e.target.value)}
               className="pl-10"
             />
+          </div>
+          <div className="flex items-center gap-1 border rounded-md p-1 shrink-0">
+            <Button
+              variant={viewMode === "list" ? "default" : "ghost"}
+              size="sm"
+              onClick={() => setViewMode("list")}
+              className="flex items-center gap-1.5"
+            >
+              <LayoutList className="h-4 w-4" />
+              <span className="hidden sm:inline">List</span>
+            </Button>
+            <Button
+              variant={viewMode === "grid" ? "default" : "ghost"}
+              size="sm"
+              onClick={() => setViewMode("grid")}
+              className="flex items-center gap-1.5"
+            >
+              <LayoutGrid className="h-4 w-4" />
+              <span className="hidden sm:inline">Grid</span>
+            </Button>
           </div>
         </div>
 
@@ -220,8 +269,13 @@ export default function ProductsPage() {
           </Card>
         )}
 
+        {/* Products Grid */}
+        {!isLoading && !error && viewMode === "grid" && (
+          <ProductGridView products={products} onAddToCart={handleAddToCart} />
+        )}
+
         {/* Products Table */}
-        {!isLoading && !error && (
+        {!isLoading && !error && viewMode === "list" && (
           <Card>
             <Table>
               <TableCaption>
@@ -394,6 +448,13 @@ export default function ProductsPage() {
           </div>
         )}
       </div>
+
+      <CartDrawer
+        cart={cart}
+        onUpdateQty={handleUpdateCartQty}
+        onRemove={handleRemoveFromCart}
+        onClear={() => setCart([])}
+      />
     </div>
   );
 }

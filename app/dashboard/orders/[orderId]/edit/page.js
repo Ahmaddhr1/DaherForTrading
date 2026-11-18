@@ -15,6 +15,7 @@ import Link from "next/link";
 import { useSettings, formatLL } from "@/lib/currency";
 import { Combobox } from "@/components/ui/combobox";
 import { getTierPrice, getTierLabel } from "@/lib/priceTiers";
+import OrderCustomerName from "../../components/OrderCustomerName";
 
 let rowIdCounter = 1;
 
@@ -294,12 +295,17 @@ export default function EditOrderPage() {
               </p>
             </div>
           </div>
-          {order?.customer && (
+          {order?.customer ? (
             <p className="flex items-center gap-1.5 text-sm text-gray-500 mt-1">
               <Layers className="h-3.5 w-3.5" />
               Pricing for {order.customer.fullName}: <span className="font-medium text-gray-700">{getTierLabel(priceTier)}</span>
             </p>
-          )}
+          ) : order?.customerNameText ? (
+            <p className="flex items-center gap-1.5 text-sm text-gray-500 mt-1">
+              <Layers className="h-3.5 w-3.5" />
+              <OrderCustomerName order={order} />
+            </p>
+          ) : null}
           {!isOwner && (
             <p className="text-xs text-gray-500 mt-1">
               Prices are set automatically for your account. Ask an owner to override a price or price a custom item.

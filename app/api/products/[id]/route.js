@@ -65,6 +65,9 @@ export async function PUT(req, { params }) {
     if (typeof body.unit === "string" && !body.unit.trim()) {
       body.unit = "pcs";
     }
+    if (body.img !== undefined) {
+      body.img = Array.isArray(body.img) ? body.img.filter((url) => typeof url === "string" && url) : [];
+    }
 
     // Wholesale/Distributor/VIP tier prices - a blank string means "use the
     // Retail price", same convenience default as on creation.

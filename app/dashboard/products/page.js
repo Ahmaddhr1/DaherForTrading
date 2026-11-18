@@ -147,7 +147,8 @@ export default function ProductsPage() {
           </div>
         </div>
 
-        {/* Stock value / potential profit summary */}
+        {/* Stock value / potential profit summary - hidden in grid view to keep that layout focused on the products */}
+        {viewMode === "list" && (
         <div className="grid grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
           <Card className="shadow-sm border-gray-200">
             <CardContent className="p-4 flex flex-col gap-1">
@@ -208,6 +209,7 @@ export default function ProductsPage() {
             </CardContent>
           </Card>
         </div>
+        )}
 
         {/* Search Bar + View toggle */}
         <div className="mb-6 flex items-center justify-between gap-3">

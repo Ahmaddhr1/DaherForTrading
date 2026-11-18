@@ -1,7 +1,7 @@
 "use client";
 
-import { Suspense, useState } from "react";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { useState } from "react";
+import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
 import { Home, ClipboardList, ShoppingCart, Wallet, Boxes, MoreHorizontal, LogOut, X, FileText } from "lucide-react";
 import { toast } from "sonner";
@@ -12,21 +12,10 @@ import { useCart } from "@/lib/cartContext";
 
 const findTab = (label) => tabs.find((tab) => tab.label === label);
 
-// Wrapped in Suspense because the inner component reads useSearchParams()
-// (to know whether the Drafts tab is active) - without it, every
-// statically-rendered dashboard page that includes this bar in its layout
-// fails to prerender.
+// Mobile-only bottom navigation bar - see MySideBar for the desktop (lg+)
+// sidebar it replaces below that breakpoint.
 export function MobileBottomBar() {
-  return (
-    <Suspense fallback={null}>
-      <MobileBottomBarContent />
-    </Suspense>
-  );
-}
-
-function MobileBottomBarContent() {
   const pathname = usePathname();
-  const searchParams = useSearchParams();
   const router = useRouter();
   const [openSection, setOpenSection] = useState(null);
   const { itemCount, openCart } = useCart();
@@ -40,9 +29,6 @@ function MobileBottomBarContent() {
   });
   const isOwner = me?.role === "owner";
 
-  const onOrdersPage = pathname === "/dashboard/orders";
-  const onDraftsTab = onOrdersPage && searchParams.get("tab") === "drafts";
-
   // Groups the sidebar's tabs into a handful of bottom-bar slots - a flat
   // row of icons doesn't fit on a phone screen. Dashboard, Orders, Drafts,
   // and Cart (the most frequently used) each get their own direct slot;
@@ -50,20 +36,8 @@ function MobileBottomBarContent() {
   // listing its tabs.
   const SECTIONS = [
     { key: "dashboard", label: "Home", icon: <Home size={20} />, path: "/dashboard" },
-    {
-      key: "orders",
-      label: "Orders",
-      icon: <ClipboardList size={20} />,
-      path: "/dashboard/orders",
-      isActive: () => onOrdersPage && !onDraftsTab,
-    },
-    {
-      key: "drafts",
-      label: "Drafts",
-      icon: <FileText size={20} />,
-      path: "/dashboard/orders?tab=drafts",
-      isActive: () => onDraftsTab,
-    },
+    { key: "orders", label: "Orders", icon: <ClipboardList size={20} />, path: "/dashboard/orders" },
+    { key: "drafts", label: "Drafts", icon: <FileText size={20} />, path: "/dashboard/drafts" },
     {
       key: "cart",
       label: "Cart",

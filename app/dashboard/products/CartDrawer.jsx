@@ -65,7 +65,7 @@ export default function CartDrawer() {
       onClear();
       queryClient.invalidateQueries({ queryKey: ["orders", "draft"] });
       handleClose();
-      router.push("/dashboard/orders");
+      router.push("/dashboard/drafts");
     } catch (err) {
       toast.error(err.response?.data?.message || "Failed to create draft order");
     } finally {
@@ -89,7 +89,7 @@ export default function CartDrawer() {
       onClear();
       queryClient.invalidateQueries({ queryKey: ["orders", "draft"] });
       handleClose();
-      router.push("/dashboard/orders");
+      router.push("/dashboard/drafts");
     } catch (err) {
       toast.error(err.response?.data?.message || "Failed to create draft order");
     } finally {

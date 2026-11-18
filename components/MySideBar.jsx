@@ -40,21 +40,26 @@ export function MySideBar() {
 
   };
 
-  const renderLink = (tab, index) => {
+  const renderLink = (tab, isChild = false) => {
     const isActive = pathname === tab.path;
     return (
       <Link
-        key={index}
+        key={tab.label}
         href={tab.path}
-        className={`flex items-center p-4 transition-colors ${
-          isActive ? "bg-primary text-white" : "hover:bg-primary hover:text-white"
-        } ${isCollapsed ? "justify-center" : ""}`}
+        className={`flex items-center transition-colors ${
+          isChild ? "py-2 text-sm" : "p-4"
+        } ${isActive ? "bg-primary text-white" : "hover:bg-primary hover:text-white"} ${
+          isCollapsed ? "justify-center" : isChild ? "pl-10 pr-4" : ""
+        }`}
       >
-        <span>{tab.icon}</span>
+        <span className={isChild ? "[&_svg]:h-4 [&_svg]:w-4" : ""}>{tab.icon}</span>
         {!isCollapsed && <span className="ml-3">{tab.label}</span>}
       </Link>
     );
   };
+
+  const topLevelTabs = visibleTabs.filter((tab) => !tab.parent);
+  const childrenOf = (label) => visibleTabs.filter((tab) => tab.parent === label);
 
   return (
     <aside
@@ -78,7 +83,12 @@ export function MySideBar() {
         {/* Navigation */}
         <nav className="flex-1 overflow-y-auto py-4">
           <div className="space-y-2">
-            {visibleTabs.map((tab, index) => renderLink(tab, index))}
+            {topLevelTabs.map((tab) => (
+              <div key={tab.label}>
+                {renderLink(tab)}
+                {childrenOf(tab.label).map((child) => renderLink(child, true))}
+              </div>
+            ))}
           </div>
         </nav>
 

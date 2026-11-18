@@ -1,22 +1,35 @@
 "use client";
 
-import { useState } from "react";
-import { usePathname, useRouter } from "next/navigation";
+import { Suspense, useState } from "react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { Home, ShoppingCart, Wallet, Boxes, MoreHorizontal, LogOut, X } from "lucide-react";
+import { Home, ClipboardList, ShoppingCart, Wallet, Boxes, MoreHorizontal, LogOut, X, FileText } from "lucide-react";
 import { toast } from "sonner";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import tabs from "@/lib/SideBarTabs";
+import { useCart } from "@/lib/cartContext";
 
 const findTab = (label) => tabs.find((tab) => tab.label === label);
 
-// Mobile-only bottom navigation bar - see MySideBar for the desktop (lg+)
-// sidebar it replaces below that breakpoint.
+// Wrapped in Suspense because the inner component reads useSearchParams()
+// (to know whether the Drafts tab is active) - without it, every
+// statically-rendered dashboard page that includes this bar in its layout
+// fails to prerender.
 export function MobileBottomBar() {
+  return (
+    <Suspense fallback={null}>
+      <MobileBottomBarContent />
+    </Suspense>
+  );
+}
+
+function MobileBottomBarContent() {
   const pathname = usePathname();
+  const searchParams = useSearchParams();
   const router = useRouter();
   const [openSection, setOpenSection] = useState(null);
+  const { itemCount, openCart } = useCart();
 
   // Drives whether Admins/Activity Log show up in the "More" sheet - the
   // real enforcement is server-side in middleware.js, this just keeps an
@@ -27,13 +40,37 @@ export function MobileBottomBar() {
   });
   const isOwner = me?.role === "owner";
 
+  const onOrdersPage = pathname === "/dashboard/orders";
+  const onDraftsTab = onOrdersPage && searchParams.get("tab") === "drafts";
+
   // Groups the sidebar's tabs into a handful of bottom-bar slots - a flat
-  // row of icons doesn't fit on a phone screen. Dashboard and Orders (the
-  // most frequently used) get their own direct slot; everything else is
-  // grouped into a section that opens a small sheet listing its tabs.
+  // row of icons doesn't fit on a phone screen. Dashboard, Orders, Drafts,
+  // and Cart (the most frequently used) each get their own direct slot;
+  // everything else is grouped into a section that opens a small sheet
+  // listing its tabs.
   const SECTIONS = [
     { key: "dashboard", label: "Home", icon: <Home size={20} />, path: "/dashboard" },
-    { key: "orders", label: "Orders", icon: <ShoppingCart size={20} />, path: "/dashboard/orders" },
+    {
+      key: "orders",
+      label: "Orders",
+      icon: <ClipboardList size={20} />,
+      path: "/dashboard/orders",
+      isActive: () => onOrdersPage && !onDraftsTab,
+    },
+    {
+      key: "drafts",
+      label: "Drafts",
+      icon: <FileText size={20} />,
+      path: "/dashboard/orders?tab=drafts",
+      isActive: () => onDraftsTab,
+    },
+    {
+      key: "cart",
+      label: "Cart",
+      icon: <ShoppingCart size={20} />,
+      action: openCart,
+      badge: itemCount,
+    },
     {
       key: "sales",
       label: "Sales",
@@ -64,27 +101,48 @@ export function MobileBottomBar() {
     }
   };
 
-  const isSectionActive = (section) =>
-    section.path
-      ? pathname === section.path
-      : section.items.some((tab) => pathname === tab.path);
+  const isSectionActive = (section) => {
+    if (section.isActive) return section.isActive();
+    if (section.path) return pathname === section.path;
+    if (section.items) return section.items.some((tab) => pathname === tab.path);
+    return false;
+  };
 
   const activeSheet = SECTIONS.find((section) => section.key === openSection);
 
   return (
     <>
       <nav className="lg:hidden fixed bottom-0 inset-x-0 z-40 bg-sidebar border-t border-sidebar-border pb-[env(safe-area-inset-bottom)]">
-        <div className="grid grid-cols-5">
+        <div className="grid grid-cols-7">
           {SECTIONS.map((section) => {
             const active = isSectionActive(section);
             const className = `flex flex-col items-center justify-center gap-1 py-2.5 text-[11px] font-medium ${
               active ? "text-primary" : "text-gray-500"
             }`;
+            const iconWithBadge = (
+              <span className="relative">
+                {section.icon}
+                {section.badge > 0 && (
+                  <span className="absolute -top-1.5 -right-2 bg-red-600 text-white text-[10px] font-bold rounded-full h-4 min-w-4 px-1 flex items-center justify-center">
+                    {section.badge}
+                  </span>
+                )}
+              </span>
+            );
+
+            if (section.action) {
+              return (
+                <button key={section.key} type="button" onClick={section.action} className={className}>
+                  {iconWithBadge}
+                  {section.label}
+                </button>
+              );
+            }
 
             if (section.path) {
               return (
                 <Link key={section.key} href={section.path} className={className}>
-                  {section.icon}
+                  {iconWithBadge}
                   {section.label}
                 </Link>
               );
@@ -97,7 +155,7 @@ export function MobileBottomBar() {
                 onClick={() => setOpenSection(section.key)}
                 className={className}
               >
-                {section.icon}
+                {iconWithBadge}
                 {section.label}
               </button>
             );

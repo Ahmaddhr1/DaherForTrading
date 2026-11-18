@@ -1,8 +1,9 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { Suspense, useState } from "react";
 import axios from "axios";
 import { useQuery } from "@tanstack/react-query";
+import { useSearchParams } from "next/navigation";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Package, Clock, DollarSign, ListOrdered, Receipt, FileText } from "lucide-react";
@@ -12,8 +13,17 @@ import PendingOrders from "./components/PendingOrders";
 import PartiallyPaidOrders from "./components/PartiallyPaidOrders";
 import DraftOrders from "./components/DraftOrders";
 
-const OrdersPage = () => {
-  const [activeTab, setActiveTab] = useState("all");
+const VALID_TABS = ["all", "today", "pending", "partially-paid", "drafts"];
+
+const OrdersPageContent = () => {
+  const searchParams = useSearchParams();
+  // Lets a link (e.g. the "Drafts" shortcut in the mobile bottom nav) land
+  // directly on a specific tab via ?tab=drafts instead of always opening
+  // on "All Orders".
+  const tabParam = searchParams.get("tab");
+  const [activeTab, setActiveTab] = useState(
+    VALID_TABS.includes(tabParam) ? tabParam : "all"
+  );
 
   // Lifetime total sales - unfiltered, so it stays the same no matter which
   // tab/status/search filter is active below. Separate from the "Total of
@@ -126,5 +136,11 @@ const OrdersPage = () => {
     </div>
   );
 };
+
+const OrdersPage = () => (
+  <Suspense fallback={null}>
+    <OrdersPageContent />
+  </Suspense>
+);
 
 export default OrdersPage;

@@ -10,11 +10,12 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { ShoppingCart, Minus, Plus, Trash2, Search, Loader2, User, X } from "lucide-react";
+import { useCart } from "@/lib/cartContext";
 
-export default function CartDrawer({ cart, onUpdateQty, onRemove, onClear }) {
+export default function CartDrawer() {
   const router = useRouter();
   const queryClient = useQueryClient();
-  const [open, setOpen] = useState(false);
+  const { cart, updateQty: onUpdateQty, removeFromCart: onRemove, clearCart: onClear, itemCount, open, openCart, closeCart } = useCart();
   const [checkingOut, setCheckingOut] = useState(false);
   const [checkoutMode, setCheckoutMode] = useState(null); // null | "search" | "type"
   const [searchTerm, setSearchTerm] = useState("");
@@ -22,7 +23,6 @@ export default function CartDrawer({ cart, onUpdateQty, onRemove, onClear }) {
   const [typedName, setTypedName] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
-  const itemCount = cart.reduce((sum, item) => sum + item.quantity, 0);
   const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
 
   const { data: searchData, isLoading: searching } = useQuery({
@@ -46,7 +46,7 @@ export default function CartDrawer({ cart, onUpdateQty, onRemove, onClear }) {
   };
 
   const handleClose = () => {
-    setOpen(false);
+    closeCart();
     resetCheckout();
   };
 
@@ -99,9 +99,11 @@ export default function CartDrawer({ cart, onUpdateQty, onRemove, onClear }) {
 
   return (
     <>
+      {/* Desktop-only floating button - on mobile the Cart tab in the
+          bottom nav (MobileBottomBar) opens this same drawer instead. */}
       <Button
-        onClick={() => setOpen(true)}
-        className="fixed bottom-6 right-6 z-40 h-14 w-14 rounded-full shadow-lg bg-blue-600 hover:bg-blue-700 p-0 flex items-center justify-center"
+        onClick={openCart}
+        className="hidden lg:flex fixed bottom-6 right-6 z-40 h-14 w-14 rounded-full shadow-lg bg-blue-600 hover:bg-blue-700 p-0 items-center justify-center"
       >
         <ShoppingCart className="h-6 w-6" />
         {itemCount > 0 && (

@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
-import { Home, ClipboardList, ShoppingCart, Wallet, Boxes, MoreHorizontal, LogOut, X, FileText } from "lucide-react";
+import { Home, ClipboardList, ShoppingCart, Wallet, Boxes, MoreHorizontal, LogOut, X } from "lucide-react";
 import { toast } from "sonner";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
@@ -30,14 +30,19 @@ export function MobileBottomBar() {
   const isOwner = me?.role === "owner";
 
   // Groups the sidebar's tabs into a handful of bottom-bar slots - a flat
-  // row of icons doesn't fit on a phone screen. Dashboard, Orders, Drafts,
-  // and Cart (the most frequently used) each get their own direct slot;
-  // everything else is grouped into a section that opens a small sheet
-  // listing its tabs.
+  // row of icons doesn't fit on a phone screen. Dashboard and Cart (the
+  // most frequently used) each get their own direct slot; everything else
+  // is grouped into a section that opens a small sheet listing its tabs -
+  // Orders groups "Orders" and its sub-tab "Drafts" (see SideBarTabs.js),
+  // the same pattern Sales/Stock already use for their own tabs.
   const SECTIONS = [
     { key: "dashboard", label: "Home", icon: <Home size={20} />, path: "/dashboard" },
-    { key: "orders", label: "Orders", icon: <ClipboardList size={20} />, path: "/dashboard/orders" },
-    { key: "drafts", label: "Drafts", icon: <FileText size={20} />, path: "/dashboard/drafts" },
+    {
+      key: "orders",
+      label: "Orders",
+      icon: <ClipboardList size={20} />,
+      items: ["Orders", "Drafts"].map(findTab).filter(Boolean),
+    },
     {
       key: "cart",
       label: "Cart",
@@ -87,7 +92,7 @@ export function MobileBottomBar() {
   return (
     <>
       <nav className="lg:hidden fixed bottom-0 inset-x-0 z-40 bg-sidebar border-t border-sidebar-border pb-[env(safe-area-inset-bottom)]">
-        <div className="grid grid-cols-7">
+        <div className="grid grid-cols-6">
           {SECTIONS.map((section) => {
             const active = isSectionActive(section);
             const className = `flex flex-col items-center justify-center gap-1 py-2.5 text-[11px] font-medium ${

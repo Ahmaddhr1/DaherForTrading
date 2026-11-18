@@ -15,11 +15,11 @@ export default function ProductGridView({ products, onAddToCart }) {
   }
 
   return (
-    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
       {products.map((product) => {
         const outOfStock = !product.quantity || product.quantity <= 0;
         return (
-          <Card key={product._id} className="shadow-sm border-gray-200 overflow-hidden">
+          <Card key={product._id} className="shadow-sm border-gray-200 overflow-hidden py-0 gap-0">
             <div className="aspect-square bg-gray-100 flex items-center justify-center">
               {product.img?.[0] ? (
                 <img
@@ -42,18 +42,17 @@ export default function ProductGridView({ products, onAddToCart }) {
                   )}
                 </p>
               </div>
-              <div className="flex items-center justify-between">
-                <span className="font-semibold text-green-600">${Number(product.price).toFixed(2)}</span>
-                <Button
-                  size="sm"
-                  disabled={outOfStock}
-                  onClick={() => onAddToCart(product)}
-                  className="flex items-center gap-1"
-                >
-                  <ShoppingCart className="h-3.5 w-3.5" />
-                  Add
-                </Button>
-              </div>
+              <span className="block font-semibold text-green-600 text-lg">
+                ${Number(product.price).toFixed(2)}
+              </span>
+              <Button
+                disabled={outOfStock}
+                onClick={() => onAddToCart(product)}
+                className="w-full flex items-center justify-center gap-1.5"
+              >
+                <ShoppingCart className="h-4 w-4" />
+                Add to Cart
+              </Button>
             </CardContent>
           </Card>
         );

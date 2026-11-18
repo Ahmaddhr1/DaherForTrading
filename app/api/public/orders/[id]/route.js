@@ -43,7 +43,7 @@ export async function GET(req, { params }) {
       },
       { status: 200 }
     );
-  } catch (error) {
+  } catch {
     return NextResponse.json({ message: "Order not found" }, { status: 404 });
   }
 }

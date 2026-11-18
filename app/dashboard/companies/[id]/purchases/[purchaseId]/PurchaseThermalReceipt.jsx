@@ -100,7 +100,7 @@ export default function PurchaseThermalReceipt({ purchase }) {
 
         <div className="border-t border-dashed border-black my-1" />
 
-        <p className="text-center mt-2">Thank you!</p>
+        <p className="text-center mt-2">Thank you for your business!</p>
       </div>
     </div>,
     document.body

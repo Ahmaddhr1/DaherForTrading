@@ -54,7 +54,7 @@ export async function GET(req) {
 
     // Process all orders
     allOrders.forEach((order) => {
-      const { status, profit, amountpaid, total, remainingBalance, createdAt } = order;
+      const { status, profit, amountpaid, total, createdAt } = order;
       const isToday = createdAt >= startOfToday;
       const isLastWeek = createdAt >= startOfLastWeek && createdAt <= endOfLastWeek;
       const isLastMonth = createdAt >= startOfLastMonth && createdAt <= endOfLastMonth;

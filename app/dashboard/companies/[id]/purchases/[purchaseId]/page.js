@@ -5,14 +5,12 @@ import { useQuery } from "@tanstack/react-query";
 import { useParams } from "next/navigation";
 import { format } from "date-fns";
 import { Package, Building2, Calendar, Printer, MessageCircle, Receipt, ArrowLeft } from "lucide-react";
-import { toast } from "sonner";
 import Link from "next/link";
 import PurchaseThermalReceipt from "./PurchaseThermalReceipt";
 
 import {
   Table,
   TableBody,
-  TableCaption,
   TableCell,
   TableHead,
   TableHeader,
@@ -257,6 +255,10 @@ export default function PurchaseDetailsPage() {
               </CardContent>
             </Card>
           </div>
+        </div>
+
+        <div className="mt-12 pt-6 border-t border-gray-200 text-center">
+          <p className="text-gray-500 text-sm">Order management system • Powered by Ahmad Daher</p>
         </div>
       </div>
     </div>

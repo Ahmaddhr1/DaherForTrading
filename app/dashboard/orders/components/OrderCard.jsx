@@ -2,6 +2,7 @@
 
 import { Card, CardContent } from "@/components/ui/card";
 import OrderActions from "./OrderActions";
+import OrderCustomerName from "./OrderCustomerName";
 
 const OrderCard = ({ order, borderColor = "border-gray-200", onStatusUpdate }) => {
   const getStatusColor = (status) => {
@@ -37,7 +38,7 @@ const OrderCard = ({ order, borderColor = "border-gray-200", onStatusUpdate }) =
           <div className="flex-1">
             <div className="flex items-center gap-2 mb-2">
               <h3 className="font-semibold text-gray-900">
-                {order.customer?.fullName}
+                <OrderCustomerName order={order} />
               </h3>
               {order.orderNumber && (
                 <span className="text-sm text-gray-500">#{order.orderNumber}</span>

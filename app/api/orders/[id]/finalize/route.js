@@ -25,6 +25,13 @@ export async function PUT(_, { params }) {
       );
     }
 
+    if (!order.customer) {
+      return NextResponse.json(
+        { message: "Link a customer before finalizing this draft." },
+        { status: 400 }
+      );
+    }
+
     const productUpdates = [];
     for (const item of order.products) {
       // A custom line never touched inventory, so there's nothing to check

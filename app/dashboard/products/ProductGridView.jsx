@@ -1,0 +1,63 @@
+"use client";
+
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Package, ShoppingCart } from "lucide-react";
+
+export default function ProductGridView({ products, onAddToCart }) {
+  if (products.length === 0) {
+    return (
+      <div className="text-center py-12 text-gray-500">
+        <Package className="h-12 w-12 mx-auto mb-2 text-gray-300" />
+        <p>No products found</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+      {products.map((product) => {
+        const outOfStock = !product.quantity || product.quantity <= 0;
+        return (
+          <Card key={product._id} className="shadow-sm border-gray-200 overflow-hidden">
+            <div className="aspect-square bg-gray-100 flex items-center justify-center">
+              {product.img?.[0] ? (
+                <img
+                  src={product.img[0]}
+                  alt={product.name}
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <Package className="h-10 w-10 text-gray-400" />
+              )}
+            </div>
+            <CardContent className="p-3 space-y-2">
+              <div>
+                <p className="font-medium text-gray-900 truncate">{product.name}</p>
+                <p className="text-sm text-gray-500">
+                  {outOfStock ? (
+                    <span className="text-red-600">Out of stock</span>
+                  ) : (
+                    `${product.quantity} ${product.unit || "pcs"} in stock`
+                  )}
+                </p>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="font-semibold text-green-600">${Number(product.price).toFixed(2)}</span>
+                <Button
+                  size="sm"
+                  disabled={outOfStock}
+                  onClick={() => onAddToCart(product)}
+                  className="flex items-center gap-1"
+                >
+                  <ShoppingCart className="h-3.5 w-3.5" />
+                  Add
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        );
+      })}
+    </div>
+  );
+}

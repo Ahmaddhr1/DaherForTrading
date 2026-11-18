@@ -8,7 +8,7 @@ import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import axios from "axios";
-import { Loader2, PackagePlus, ArrowLeft, DollarSign, Tag, Package, TrendingUp, Box, Ruler, AlertTriangle, Truck, Layers } from "lucide-react";
+import { Loader2, PackagePlus, ArrowLeft, DollarSign, Tag, Package, TrendingUp, Box, Ruler, AlertTriangle, Truck, Layers, ImagePlus, X } from "lucide-react";
 import React, { useState } from "react";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
@@ -54,11 +54,34 @@ const Page = () => {
     defaultSupplier: "",
   });
 
+  const [imageFile, setImageFile] = useState(null);
+  const [imagePreview, setImagePreview] = useState(null);
+
+  const handleImageChange = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setImageFile(file);
+    setImagePreview(URL.createObjectURL(file));
+  };
+
+  const handleRemoveImage = () => {
+    setImageFile(null);
+    setImagePreview(null);
+  };
+
   const mutation = useMutation({
     mutationFn: async () => {
       const price = parseFloat(form.price);
       const initialPrice = parseFloat(form.initialPrice);
       const profit = price - initialPrice;
+
+      let img = [];
+      if (imageFile) {
+        const uploadData = new FormData();
+        uploadData.append("file", imageFile);
+        const { data: uploadResult } = await axios.post("/api/products/upload-image", uploadData);
+        img = [uploadResult.url];
+      }
 
       const payload = {
         name: form.name,
@@ -73,6 +96,7 @@ const Page = () => {
         unit: form.unit,
         lowStockThreshold: form.lowStockThreshold,
         defaultSupplier: form.defaultSupplier || null,
+        img,
       };
 
       const { data } = await axios.post("/api/products/create", payload);
@@ -218,6 +242,34 @@ const Page = () => {
                             </option>
                           ))}
                         </select>
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor="productImage" className="text-sm font-medium flex items-center gap-2">
+                          <ImagePlus className="h-4 w-4" />
+                          Product Image (optional)
+                        </Label>
+                        {imagePreview ? (
+                          <div className="flex items-center gap-3">
+                            <img
+                              src={imagePreview}
+                              alt="Preview"
+                              className="h-20 w-20 rounded-md border border-gray-200 object-cover"
+                            />
+                            <Button type="button" variant="outline" size="sm" onClick={handleRemoveImage} className="flex items-center gap-1">
+                              <X className="h-3.5 w-3.5" />
+                              Remove
+                            </Button>
+                          </div>
+                        ) : (
+                          <Input
+                            id="productImage"
+                            type="file"
+                            accept="image/*"
+                            onChange={handleImageChange}
+                            className="focus:border-blue-500 transition-colors"
+                          />
+                        )}
                       </div>
                     </div>
                   </div>

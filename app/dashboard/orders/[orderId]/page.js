@@ -12,6 +12,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { FormSkeleton } from "@/components/ui/skeleton-patterns";
 import { Loader2, CheckCircle, PencilLine, Trash2 } from "lucide-react";
 import Link from "next/link";
+import OrderCustomerName from "../components/OrderCustomerName";
 
 export default function OrderDetailsPage() {
   const { orderId } = useParams();
@@ -94,7 +95,7 @@ export default function OrderDetailsPage() {
     },
     onSuccess: () => {
       toast.success("Draft deleted");
-      router.push(`/dashboard/customers/${order?.customer?._id}`);
+      router.push(order?.customer?._id ? `/dashboard/customers/${order.customer._id}` : "/dashboard/orders");
     },
     onError: (err) => {
       toast.error(err.response?.data?.message || "Failed to delete draft");
@@ -146,7 +147,7 @@ export default function OrderDetailsPage() {
         <CardHeader>
           <CardTitle className="text-lg">Order Summary</CardTitle>
           <CardDescription>
-            {order.customer?.fullName || "N/A"}
+            <OrderCustomerName order={order} />
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">

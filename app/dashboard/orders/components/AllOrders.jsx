@@ -38,6 +38,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { localDayStartISO, localDayEndISO } from "@/lib/dateUtils";
 import { DateRangeFilter } from "./DateRangeFilter";
 import { OrdersTotalsCard } from "./OrdersTotalsCard";
+import OrderCustomerName from "./OrderCustomerName";
 
 const SORT_OPTIONS = [
   { value: "newest", label: "Newest First" },
@@ -345,7 +346,7 @@ export default function AllOrders() {
                         #{(page - 1) * pageSize + index + 1}
                       </p>
                       <p className="font-medium text-gray-900 truncate">
-                        {order.customer?.fullName || "Deleted Customer"}
+                        <OrderCustomerName order={order} />
                       </p>
                       <p className="text-xs text-gray-500 mt-0.5">
                         {format(new Date(order.createdAt), "MMM d, yyyy HH:mm")}
@@ -385,7 +386,7 @@ export default function AllOrders() {
                       {(page - 1) * pageSize + index + 1}
                     </TableCell>
                     <TableCell className="font-medium text-gray-900">
-                      {order.customer?.fullName || "Deleted Customer"}
+                      <OrderCustomerName order={order} />
                     </TableCell>
                     <TableCell className="text-center font-medium">${Number(order.total).toFixed(2)}</TableCell>
                     <TableCell className="text-center">{statusBadge(order.status)}</TableCell>

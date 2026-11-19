@@ -22,6 +22,8 @@ function isPublicApiPath(pathname) {
 // Exact paths: the path itself, not anything nested under it.
 const OWNER_ONLY_EXACT_PATHS = [
   '/api/admin', // GET: list admins
+  '/api/orders/totals', // lifetime sales figure shown only on the owner-only Total Sales card
+  '/dashboard', // the stats/charts overview page
   '/dashboard/admins',
   '/dashboard/activity',
 ]
@@ -31,6 +33,7 @@ const OWNER_ONLY_PATH_PREFIXES = [
   '/api/settings/backup',
   '/api/settings/restore',
   '/api/activity',
+  '/api/dashboard', // backs the stats/charts overview page - see '/dashboard' above
 ]
 const MONGO_ID = /^[0-9a-fA-F]{24}$/
 
@@ -75,12 +78,21 @@ async function verifySession(request) {
   }
 }
 
+// Where a logged-in admin lands when redirected away from a page they
+// can't use - the root '/' redirect for any already-logged-in admin, and
+// the fallback when an employee is bounced off an owner-only page (now
+// including '/dashboard' itself, so that fallback can no longer be
+// '/dashboard' without looping).
+function landingPathFor(user) {
+  return user.role === 'owner' ? '/dashboard' : '/dashboard/orders'
+}
+
 export async function middleware(request) {
   const { pathname } = request.nextUrl
   const user = await verifySession(request)
 
   if (user && pathname === '/') {
-    return NextResponse.redirect(new URL('/dashboard', request.url))
+    return NextResponse.redirect(new URL(landingPathFor(user), request.url))
   }
 
   if (!user && pathname.startsWith('/dashboard')) {
@@ -98,7 +110,7 @@ export async function middleware(request) {
     if (pathname.startsWith('/api')) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
     }
-    return NextResponse.redirect(new URL('/dashboard', request.url))
+    return NextResponse.redirect(new URL(landingPathFor(user), request.url))
   }
 
   return NextResponse.next()

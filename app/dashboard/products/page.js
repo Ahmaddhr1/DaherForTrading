@@ -24,6 +24,7 @@ import { Search, Package, Plus, Edit, Trash2, ChevronLeft, ChevronRight, Loader2
 import ProductGridView from "./ProductGridView";
 import GeneratePdfModal from "./GeneratePdfModal";
 import { useCart } from "@/lib/cartContext";
+import { useIsOwner } from "@/lib/useIsOwner";
 
 export default function ProductsPage() {
   // State for search and pagination
@@ -33,6 +34,7 @@ export default function ProductsPage() {
   const [viewMode, setViewMode] = useState("list"); // "list" | "grid"
   const [pdfModalOpen, setPdfModalOpen] = useState(false);
   const { addToCart } = useCart();
+  const { isOwner } = useIsOwner();
   const queryClient = useQueryClient();
 
   const handleAddToCart = (product) => {
@@ -64,8 +66,8 @@ export default function ProductsPage() {
       toast.success("Product deleted successfully");
       queryClient.invalidateQueries(["products"]);
     },
-    onError: () => {
-      toast.error("Failed to delete product");
+    onError: (error) => {
+      toast.error(error.response?.data?.message || "Failed to delete product");
     },
   });
 
@@ -140,7 +142,7 @@ export default function ProductsPage() {
         </div>
 
         {/* Stock value / potential profit summary - hidden in grid view to keep that layout focused on the products */}
-        {viewMode === "list" && (
+        {isOwner && viewMode === "list" && (
         <div className="grid grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
           <Card className="shadow-sm border-gray-200">
             <CardContent className="p-4 flex flex-col gap-1">

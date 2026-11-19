@@ -166,8 +166,8 @@ export default function ProductStockHistoryPage() {
         </div>
 
         <Card className="shadow-sm border-gray-200 mb-6">
-          <CardContent className="p-4 flex flex-wrap items-center gap-3">
-            <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-2">
+          <CardContent className="p-4 flex flex-col sm:flex-row sm:flex-wrap sm:items-center gap-3">
+            <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-2 w-full sm:w-auto">
               <span className="text-sm font-medium text-gray-700">From</span>
               <input
                 type="date"
@@ -179,7 +179,7 @@ export default function ProductStockHistoryPage() {
                 className="w-full sm:w-auto border rounded-md text-sm px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
-            <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-2">
+            <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-2 w-full sm:w-auto">
               <span className="text-sm font-medium text-gray-700">To</span>
               <input
                 type="date"
@@ -192,12 +192,12 @@ export default function ProductStockHistoryPage() {
               />
             </div>
             {hasDateFilter && (
-              <Button variant="ghost" size="sm" onClick={clearFilter} className="text-gray-500">
+              <Button variant="ghost" size="sm" onClick={clearFilter} className="text-gray-500 self-start sm:self-auto">
                 Clear
               </Button>
             )}
             {product && (
-              <div className="ml-auto text-sm text-gray-600">
+              <div className="sm:ml-auto text-sm text-gray-600">
                 Current stock: <span className="font-semibold text-gray-900">{product.quantity} {product.unit}</span>
               </div>
             )}

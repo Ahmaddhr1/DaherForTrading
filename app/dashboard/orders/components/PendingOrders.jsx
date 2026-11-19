@@ -82,7 +82,7 @@ const PendingOrders = () => {
       )}
 
       <Card className="shadow-sm border-gray-200">
-        <CardContent className="p-4 flex flex-wrap items-center gap-3">
+        <CardContent className="p-4 flex flex-col sm:flex-row sm:flex-wrap sm:items-center gap-3">
           <DateRangeFilter
             startDate={startDate}
             endDate={endDate}
@@ -90,7 +90,7 @@ const PendingOrders = () => {
             onEndDateChange={setEndDate}
           />
           {hasDateFilter && (
-            <Button variant="ghost" size="sm" onClick={clearDateFilter} className="flex items-center gap-1 text-gray-500">
+            <Button variant="ghost" size="sm" onClick={clearDateFilter} className="flex items-center gap-1 text-gray-500 self-start sm:self-auto">
               <X className="h-3.5 w-3.5" />
               Clear
             </Button>

@@ -121,14 +121,14 @@ export default function ActivityPage() {
           </div>
         </Modal>
 
-        <div className="flex flex-wrap gap-3 mb-6">
+        <div className="flex flex-col sm:flex-row sm:flex-wrap sm:items-center gap-3 mb-6">
           <select
             value={adminFilter}
             onChange={(e) => {
               setAdminFilter(e.target.value);
               setPage(1);
             }}
-            className="border-input h-9 rounded-md border bg-transparent px-3 text-sm shadow-xs"
+            className="border-input h-9 rounded-md border bg-transparent px-3 text-sm shadow-xs w-full sm:w-auto"
           >
             <option value="">All admins</option>
             {admins.map((name) => (
@@ -144,7 +144,7 @@ export default function ActivityPage() {
               setEntityTypeFilter(e.target.value);
               setPage(1);
             }}
-            className="border-input h-9 rounded-md border bg-transparent px-3 text-sm shadow-xs"
+            className="border-input h-9 rounded-md border bg-transparent px-3 text-sm shadow-xs w-full sm:w-auto"
           >
             <option value="">All types</option>
             {ENTITY_TYPES.map((type) => (

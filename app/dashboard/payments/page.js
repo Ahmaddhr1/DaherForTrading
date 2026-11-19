@@ -126,7 +126,7 @@ export default function PaymentsPage() {
               </div>
             </div>
 
-            <Button onClick={() => setIsModalOpen(true)} className="bg-blue-600 hover:bg-blue-700 flex items-center gap-2 shrink-0">
+            <Button onClick={() => setIsModalOpen(true)} className="flex items-center gap-2 shrink-0">
               <Plus className="h-4 w-4" />
               <span className="hidden sm:inline">Make a Payment</span>
             </Button>
@@ -538,7 +538,7 @@ function MakePaymentForm({ onSuccess }) {
               <Button
                 type="submit"
                 disabled={paymentMutation.isPending || !isValidAmount}
-                className="w-full bg-blue-600 hover:bg-blue-700"
+                className="w-full"
               >
                 {paymentMutation.isPending ? (
                   <span className="flex items-center gap-2">

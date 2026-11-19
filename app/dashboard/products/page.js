@@ -148,7 +148,7 @@ export default function ProductsPage() {
                 <span className="hidden sm:inline">Generate PDF</span>
               </Button>
               <Link href="/dashboard/products/add">
-                <Button className="bg-blue-600 hover:bg-blue-700 flex items-center gap-2">
+                <Button className="flex items-center gap-2">
                   <Plus className="h-4 w-4" />
                   <span className="hidden sm:inline">Add Product</span>
                 </Button>

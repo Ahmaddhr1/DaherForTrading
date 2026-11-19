@@ -136,7 +136,7 @@ export default function CompaniesPage() {
             </div>
 
             <Link href="/dashboard/companies/create">
-              <Button className="bg-blue-600 hover:bg-blue-700 flex items-center gap-2 shrink-0">
+              <Button className="flex items-center gap-2 shrink-0">
                 <Plus className="h-4 w-4" />
                 <span className="hidden sm:inline">Add Company</span>
               </Button>

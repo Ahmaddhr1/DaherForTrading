@@ -70,7 +70,7 @@ const CategoriesPage = () => {
             </div>
 
             <Link href="/dashboard/categories/add">
-              <Button className="bg-blue-600 hover:bg-blue-700 flex items-center gap-2 shrink-0">
+              <Button className="flex items-center gap-2 shrink-0">
                 <Plus className="h-4 w-4" />
                 <span className="hidden sm:inline">Add Category</span>
               </Button>
@@ -135,7 +135,7 @@ const CategoriesPage = () => {
               </p>
               {!searchTerm && (
                 <Link href="/dashboard/categories/add">
-                  <Button className="bg-blue-600 hover:bg-blue-700">
+                  <Button>
                     <Plus className="h-4 w-4 mr-2" />
                     Create First Category
                   </Button>

@@ -373,7 +373,6 @@ export default function SettingsPage() {
               <Button
                 type="submit"
                 disabled={changePasswordMutation.isPending}
-                className="bg-blue-600 hover:bg-blue-700"
               >
                 {changePasswordMutation.isPending ? (
                   <span className="flex items-center gap-2">

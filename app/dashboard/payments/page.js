@@ -52,25 +52,33 @@ export default function PaymentsPage() {
   // History filters
   const [searchInput, setSearchInput] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
-  const [startDate, setStartDate] = useState(getTodayDateString());
-  const [endDate, setEndDate] = useState(getTodayDateString());
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
   const [sortBy, setSortBy] = useState("newest");
   const [pageSize, setPageSize] = useState(10);
   const [currentPage, setCurrentPage] = useState(1);
+  // Stays false until the user actually touches a filter. While false, the
+  // list is scoped to today behind the scenes (effectiveStartDate/EndDate
+  // below) without that showing up as an "active filter" - the date boxes
+  // themselves stay empty and Clear Filters stays hidden.
+  const [hasInteracted, setHasInteracted] = useState(false);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const queryClient = useQueryClient();
 
+  const effectiveStartDate = hasInteracted ? startDate : getTodayDateString();
+  const effectiveEndDate = hasInteracted ? endDate : getTodayDateString();
+
   const { data, isLoading, error } = useQuery({
-    queryKey: ["payments-history", currentPage, pageSize, searchTerm, startDate, endDate, sortBy],
+    queryKey: ["payments-history", currentPage, pageSize, searchTerm, effectiveStartDate, effectiveEndDate, sortBy],
     queryFn: async () => {
       const params = {
         page: currentPage,
         limit: pageSize,
         search: searchTerm || undefined,
-        startDate: localDayStartISO(startDate),
-        endDate: localDayEndISO(endDate),
+        startDate: localDayStartISO(effectiveStartDate),
+        endDate: localDayEndISO(effectiveEndDate),
         sort: sortBy,
       };
       Object.keys(params).forEach((key) => params[key] === undefined && delete params[key]);
@@ -88,13 +96,34 @@ export default function PaymentsPage() {
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [searchTerm, startDate, endDate, sortBy, pageSize]);
+  }, [searchTerm, effectiveStartDate, effectiveEndDate, sortBy, pageSize]);
 
   useEffect(() => {
     if (error) toast.error("Failed to load payment history");
   }, [error]);
 
+  const handleSearchInputChange = (value) => {
+    setHasInteracted(true);
+    setSearchInput(value);
+  };
+
+  const handleStartDateChange = (value) => {
+    setHasInteracted(true);
+    setStartDate(value);
+  };
+
+  const handleEndDateChange = (value) => {
+    setHasInteracted(true);
+    setEndDate(value);
+  };
+
+  const handleSortChange = (value) => {
+    setHasInteracted(true);
+    setSortBy(value);
+  };
+
   const handleClearFilters = () => {
+    setHasInteracted(true);
     setSearchInput("");
     setSearchTerm("");
     setStartDate("");
@@ -156,6 +185,12 @@ export default function PaymentsPage() {
           </CardContent>
         </Card>
 
+        {!hasInteracted && (
+          <p className="text-sm text-gray-500 mb-4">
+            Showing today&apos;s payments only. Pick a date range below to see more.
+          </p>
+        )}
+
         {/* Filters */}
         <FiltersPanel activeCount={activeFilterCount}>
           <Card className="shadow-sm border-gray-200 mb-6">
@@ -166,7 +201,7 @@ export default function PaymentsPage() {
                   type="text"
                   placeholder="Search by customer name..."
                   value={searchInput}
-                  onChange={(e) => setSearchInput(e.target.value)}
+                  onChange={(e) => handleSearchInputChange(e.target.value)}
                   className="pl-10"
                 />
               </div>
@@ -180,7 +215,7 @@ export default function PaymentsPage() {
                   <input
                     type="date"
                     value={startDate}
-                    onChange={(e) => setStartDate(e.target.value)}
+                    onChange={(e) => handleStartDateChange(e.target.value)}
                     className="w-full sm:w-auto border rounded-md text-sm px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
@@ -189,7 +224,7 @@ export default function PaymentsPage() {
                   <input
                     type="date"
                     value={endDate}
-                    onChange={(e) => setEndDate(e.target.value)}
+                    onChange={(e) => handleEndDateChange(e.target.value)}
                     className="w-full sm:w-auto border rounded-md text-sm px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
@@ -201,7 +236,7 @@ export default function PaymentsPage() {
                   </span>
                   <select
                     value={sortBy}
-                    onChange={(e) => setSortBy(e.target.value)}
+                    onChange={(e) => handleSortChange(e.target.value)}
                     className="w-full sm:w-auto border rounded-md text-sm px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   >
                     {SORT_OPTIONS.map((option) => (

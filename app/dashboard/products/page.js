@@ -24,7 +24,6 @@ import { Search, Package, Plus, Edit, Trash2, ChevronLeft, ChevronRight, Loader2
 import ProductGridView from "./ProductGridView";
 import GeneratePdfModal from "./GeneratePdfModal";
 import CategoryFilterModal from "./CategoryFilterModal";
-import { Combobox } from "@/components/ui/combobox";
 import { useCart } from "@/lib/cartContext";
 import { useIsOwner } from "@/lib/useIsOwner";
 
@@ -32,7 +31,9 @@ export default function ProductsPage() {
   // State for search and pagination
   const [searchInput, setSearchInput] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
-  const [categoryFilter, setCategoryFilter] = useState("");
+  // Several categories can be checked at once on desktop - an empty array
+  // means "all categories" (no filter applied).
+  const [categoryFilters, setCategoryFilters] = useState([]);
   const [categoryModalOpen, setCategoryModalOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [deletingId, setDeletingId] = useState(null);
@@ -51,18 +52,29 @@ export default function ProductsPage() {
     queryKey: ["categories"],
     queryFn: async () => (await axios.get("/api/categories", { params: { all: true } })).data,
   });
-  const selectedCategoryName = categories.find((c) => c._id === categoryFilter)?.name;
+  const selectedCategoryLabel =
+    categoryFilters.length === 0
+      ? "All Categories"
+      : categoryFilters.length === 1
+        ? categories.find((c) => c._id === categoryFilters[0])?.name || "All Categories"
+        : `${categoryFilters.length} categories selected`;
+
+  const toggleCategory = (id) => {
+    setCategoryFilters((prev) =>
+      prev.includes(id) ? prev.filter((c) => c !== id) : [...prev, id]
+    );
+  };
 
   // Fetch products data
   const { data, isLoading, error } = useQuery({
-    queryKey: ["products", currentPage, searchTerm, categoryFilter],
+    queryKey: ["products", currentPage, searchTerm, categoryFilters],
     queryFn: async () => {
       const response = await axios.get("/api/products/get", {
         params: {
           page: currentPage,
           limit: 20,
           search: searchTerm,
-          category: categoryFilter || undefined,
+          category: categoryFilters.length > 0 ? categoryFilters.join(",") : undefined,
         }
       });
       return response.data;
@@ -96,7 +108,7 @@ export default function ProductsPage() {
   // Category filter takes effect immediately, no debounce needed
   useEffect(() => {
     setCurrentPage(1);
-  }, [categoryFilter]);
+  }, [categoryFilters]);
 
   // Handle delete product
   const handleDelete = async (productId, productName) => {
@@ -224,15 +236,42 @@ export default function ProductsPage() {
         )}
 
         {/* Category filter + Search Bar + View toggle - stacked full-width on phone, inline row from lg up */}
-        <div className="mb-6 flex flex-col lg:flex-row lg:items-center gap-3">
-          {/* Desktop: searchable inline dropdown, positioned on the left */}
-          <div className="hidden lg:block w-56 shrink-0">
-            <Combobox
-              options={categories}
-              value={categoryFilter}
-              onChange={setCategoryFilter}
-              placeholder="All Categories"
-            />
+        <div className="mb-6 flex flex-col lg:flex-row lg:items-start gap-3">
+          {/* Desktop: always-visible checkbox list, several categories can be
+              checked at once - no selection means "all categories". */}
+          <div className="hidden lg:flex lg:flex-col w-56 shrink-0 border rounded-md bg-white">
+            <div className="flex items-center justify-between px-3 py-2 border-b">
+              <span className="text-sm font-medium text-gray-700">Categories</span>
+              {categoryFilters.length > 0 && (
+                <button
+                  type="button"
+                  onClick={() => setCategoryFilters([])}
+                  className="text-xs text-gray-500 hover:text-gray-700"
+                >
+                  Clear
+                </button>
+              )}
+            </div>
+            <div className="max-h-64 overflow-y-auto p-2 space-y-0.5">
+              {categories.length === 0 ? (
+                <p className="text-sm text-gray-400 px-2 py-1">No categories yet</p>
+              ) : (
+                categories.map((cat) => (
+                  <label
+                    key={cat._id}
+                    className="flex items-center gap-2 px-2 py-1.5 rounded hover:bg-gray-50 cursor-pointer text-sm text-gray-700"
+                  >
+                    <input
+                      type="checkbox"
+                      checked={categoryFilters.includes(cat._id)}
+                      onChange={() => toggleCategory(cat._id)}
+                      className="h-4 w-4 rounded border-gray-300 accent-primary"
+                    />
+                    <span className="truncate">{cat.name}</span>
+                  </label>
+                ))
+              )}
+            </div>
           </div>
 
           {/* Mobile: button opening a searchable list modal */}
@@ -242,7 +281,7 @@ export default function ProductsPage() {
             className="lg:hidden w-full flex items-center gap-2"
           >
             <Filter className="h-4 w-4 shrink-0" />
-            <span className="truncate">{selectedCategoryName || "All Categories"}</span>
+            <span className="truncate">{selectedCategoryLabel}</span>
           </Button>
 
           <div className="relative w-full lg:max-w-md lg:flex-1">
@@ -488,8 +527,8 @@ export default function ProductsPage() {
         open={categoryModalOpen}
         onClose={() => setCategoryModalOpen(false)}
         categories={categories}
-        value={categoryFilter}
-        onChange={setCategoryFilter}
+        value={categoryFilters.length === 1 ? categoryFilters[0] : ""}
+        onChange={(id) => setCategoryFilters(id ? [id] : [])}
       />
     </div>
   );

@@ -10,6 +10,8 @@ export async function GET(req) {
   const page = parseInt(searchParams.get("page")) || 1;
   const limit = parseInt(searchParams.get("limit")) || 20;
   const search = searchParams.get("search")?.toLowerCase() || "";
+  // Comma-separated category ids - the Products page lets several
+  // categories be checked at once, so this matches ANY of them.
   const category = searchParams.get("category") || "";
 
   const skip = (page - 1) * limit;
@@ -17,7 +19,10 @@ export async function GET(req) {
   try {
     const query = {};
     if (search) query.name = { $regex: new RegExp(search, "i") };
-    if (category) query.category = category;
+    if (category) {
+      const categoryIds = category.split(",").filter(Boolean);
+      if (categoryIds.length > 0) query.category = { $in: categoryIds };
+    }
 
     const total = await Product.countDocuments(query);
     const products = await Product.find(query)

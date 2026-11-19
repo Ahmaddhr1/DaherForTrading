@@ -4,28 +4,10 @@
 import React, { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
-import {
-  ComposedChart,
-  BarChart,
-  Bar,
-  Line,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  Legend,
-  ResponsiveContainer,
-} from "recharts";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { BarChart3, ShoppingCart } from "lucide-react";
-
-// Fixed categorical slots from the palette — never cycled or reassigned.
-const COLOR_SALES = "#2a78d6"; // slot 1 — blue
-const COLOR_PURCHASES = "#eb6834"; // slot 2 — orange
-const COLOR_PROFIT = "#1baf7a"; // slot 3 — aqua
-const GRID_COLOR = "#e1e0d9";
-const AXIS_COLOR = "#898781";
+import { BarChart } from "@/components/ui/charts/bar-chart";
 
 const GRANULARITY_OPTIONS = [
   { value: "day", label: "Daily" },
@@ -47,33 +29,8 @@ function formatPeriodLabel(period, granularity) {
   return date.toLocaleDateString("en-US", { month: "short", day: "numeric" });
 }
 
-const CurrencyTooltip = ({ active, payload, label }) => {
-  if (!active || !payload?.length) return null;
-  return (
-    <div className="bg-white border border-gray-200 rounded-lg shadow-md p-3 text-sm">
-      <p className="font-medium text-gray-900 mb-1">{label}</p>
-      {payload.map((entry) => (
-        <p key={entry.dataKey} style={{ color: entry.color }} className="flex justify-between gap-4">
-          <span>{entry.name}:</span>
-          <span className="font-semibold">${entry.value.toLocaleString()}</span>
-        </p>
-      ))}
-    </div>
-  );
-};
-
-const CountTooltip = ({ active, payload, label }) => {
-  if (!active || !payload?.length) return null;
-  return (
-    <div className="bg-white border border-gray-200 rounded-lg shadow-md p-3 text-sm">
-      <p className="font-medium text-gray-900 mb-1">{label}</p>
-      <p style={{ color: COLOR_SALES }} className="flex justify-between gap-4">
-        <span>Orders:</span>
-        <span className="font-semibold">{payload[0].value.toLocaleString()}</span>
-      </p>
-    </div>
-  );
-};
+const currencyFormatter = (value) => `$${value.toLocaleString()}`;
+const countFormatter = (value) => value.toLocaleString();
 
 export default function SalesTrendsChart() {
   const [granularity, setGranularity] = useState("month");
@@ -92,16 +49,19 @@ export default function SalesTrendsChart() {
   const trends = (data?.trends || []).map((t) => ({
     ...t,
     label: formatPeriodLabel(t.period, granularity),
+    Sales: t.salesTotal,
+    Purchases: t.purchasesTotal,
+    Orders: t.ordersCount,
   }));
 
   return (
     <div className="grid grid-cols-1 xl:grid-cols-2 gap-8 mb-8">
-      {/* Sales vs Purchases vs Profit */}
+      {/* Sales vs Purchases */}
       <Card className="shadow-sm border-gray-200">
         <CardHeader className="flex flex-row items-center justify-between flex-wrap gap-3">
           <CardTitle className="flex items-center gap-2 text-lg font-medium">
             <BarChart3 className="h-5 w-5 text-blue-600" />
-            Sales vs Purchases &amp; Profit
+            Sales vs Purchases
           </CardTitle>
           <div className="flex items-center gap-2">
             <select
@@ -132,18 +92,14 @@ export default function SalesTrendsChart() {
           ) : trends.length === 0 ? (
             <div className="text-gray-500 text-center py-10">No data yet for this range</div>
           ) : (
-            <ResponsiveContainer width="100%" height={300}>
-              <ComposedChart data={trends} margin={{ top: 8, right: 8, left: 8, bottom: 8 }}>
-                <CartesianGrid stroke={GRID_COLOR} vertical={false} />
-                <XAxis dataKey="label" stroke={AXIS_COLOR} tick={{ fontSize: 12 }} tickLine={false} axisLine={{ stroke: AXIS_COLOR }} />
-                <YAxis stroke={AXIS_COLOR} tick={{ fontSize: 12 }} tickLine={false} axisLine={false} tickFormatter={(v) => `$${v}`} />
-                <Tooltip content={<CurrencyTooltip />} />
-                <Legend wrapperStyle={{ fontSize: 12 }} />
-                <Bar dataKey="salesTotal" name="Sales" fill={COLOR_SALES} radius={[4, 4, 0, 0]} maxBarSize={28} />
-                <Bar dataKey="purchasesTotal" name="Purchases" fill={COLOR_PURCHASES} radius={[4, 4, 0, 0]} maxBarSize={28} />
-                <Line dataKey="profit" name="Profit" stroke={COLOR_PROFIT} strokeWidth={2} dot={{ r: 3 }} />
-              </ComposedChart>
-            </ResponsiveContainer>
+            <BarChart
+              data={trends}
+              index="label"
+              categories={["Sales", "Purchases"]}
+              colors={["blue", "amber"]}
+              valueFormatter={currencyFormatter}
+              className="h-72"
+            />
           )}
         </CardContent>
       </Card>
@@ -164,15 +120,16 @@ export default function SalesTrendsChart() {
           ) : trends.length === 0 ? (
             <div className="text-gray-500 text-center py-10">No data yet for this range</div>
           ) : (
-            <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={trends} margin={{ top: 8, right: 8, left: 8, bottom: 8 }}>
-                <CartesianGrid stroke={GRID_COLOR} vertical={false} />
-                <XAxis dataKey="label" stroke={AXIS_COLOR} tick={{ fontSize: 12 }} tickLine={false} axisLine={{ stroke: AXIS_COLOR }} />
-                <YAxis stroke={AXIS_COLOR} tick={{ fontSize: 12 }} tickLine={false} axisLine={false} allowDecimals={false} />
-                <Tooltip content={<CountTooltip />} />
-                <Bar dataKey="ordersCount" name="Orders" fill={COLOR_SALES} radius={[4, 4, 0, 0]} maxBarSize={28} />
-              </BarChart>
-            </ResponsiveContainer>
+            <BarChart
+              data={trends}
+              index="label"
+              categories={["Orders"]}
+              colors={["blue"]}
+              valueFormatter={countFormatter}
+              showLegend={false}
+              allowDecimals={false}
+              className="h-72"
+            />
           )}
         </CardContent>
       </Card>

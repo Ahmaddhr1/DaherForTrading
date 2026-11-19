@@ -6,6 +6,7 @@ import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
+import { BarChart } from "@/components/ui/charts/bar-chart";
 
 const fetchProfitChartData = async (range, startDate, endDate) => {
   const response = await axios.get("/api/dashboard/profit", {
@@ -13,6 +14,8 @@ const fetchProfitChartData = async (range, startDate, endDate) => {
   });
   return response.data;
 };
+
+const currencyFormatter = (value) => `$${value.toLocaleString()}`;
 
 const ProfitChart = ({ range = "all", startDate, endDate }) => {
   const { data, isLoading, error } = useQuery({
@@ -35,13 +38,10 @@ const ProfitChart = ({ range = "all", startDate, endDate }) => {
   // Fixed lookback periods only - the selected-range figure already has its
   // own card in the Profit summary section above, so it isn't repeated here.
   const chartData = [
-    { period: "Today", profit: profitData?.today?.realProfit || 0 },
-    { period: "Last Week", profit: profitData?.lastWeek?.realProfit || 0 },
-    { period: "Last Month", profit: profitData?.lastMonth?.realProfit || 0 },
+    { period: "Today", Profit: profitData?.today?.realProfit || 0 },
+    { period: "Last Week", Profit: profitData?.lastWeek?.realProfit || 0 },
+    { period: "Last Month", Profit: profitData?.lastMonth?.realProfit || 0 },
   ];
-
-  // Simple bar chart using CSS
-  const maxProfit = Math.max(...chartData.map(item => item.profit), 1);
 
   return (
     <Card className="shadow-sm border-gray-200">
@@ -52,28 +52,15 @@ const ProfitChart = ({ range = "all", startDate, endDate }) => {
         {isLoading ? (
           <Skeleton className="h-64 rounded-lg" />
         ) : (
-          <div className="space-y-4">
-            {chartData.map((item, index) => (
-              <div key={index} className="flex items-center gap-4">
-                <div className="w-24 text-sm text-gray-600">{item.period}</div>
-                <div className="flex-1">
-                  <div 
-                    className="bg-green-500 h-6 rounded-full transition-all duration-300"
-                    style={{ width: `${(item.profit / maxProfit) * 100}%` }}
-                  ></div>
-                </div>
-                <div className="w-20 text-right font-medium">
-                  ${item.profit.toLocaleString()}
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-        
-        {!isLoading && (
-          <div className="mt-4 text-sm text-gray-500">
-            Visual representation of profit over different periods
-          </div>
+          <BarChart
+            data={chartData}
+            index="period"
+            categories={["Profit"]}
+            colors={["emerald"]}
+            valueFormatter={currencyFormatter}
+            showLegend={false}
+            className="h-64"
+          />
         )}
       </CardContent>
     </Card>

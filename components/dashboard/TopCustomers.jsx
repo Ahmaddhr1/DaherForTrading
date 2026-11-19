@@ -1,14 +1,17 @@
 // components/dashboard/TopCustomers.jsx
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
-import { Trophy, User } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Trophy, User, ChevronLeft, ChevronRight } from "lucide-react";
+
+const PAGE_SIZE = 3;
 
 const fetchTopCustomers = async (limit, minDebt) => {
   const response = await axios.get("/api/dashboard/top-customers", {
@@ -18,10 +21,19 @@ const fetchTopCustomers = async (limit, minDebt) => {
 };
 
 const TopCustomers = ({ limit = 10, minDebt = 0 }) => {
+  const [page, setPage] = useState(1);
+
   const { data, isLoading, error } = useQuery({
     queryKey: ["dashboard-top-customers", limit, minDebt],
     queryFn: () => fetchTopCustomers(limit, minDebt),
   });
+
+  const topCustomers = data?.topCustomers || [];
+  const totalPages = Math.max(1, Math.ceil(topCustomers.length / PAGE_SIZE));
+
+  useEffect(() => {
+    setPage(1);
+  }, [limit, minDebt]);
 
   if (error) {
     return (
@@ -33,7 +45,7 @@ const TopCustomers = ({ limit = 10, minDebt = 0 }) => {
     );
   }
 
-  const topCustomers = data?.topCustomers || [];
+  const pageItems = topCustomers.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 
   return (
     <Card className="shadow-sm border-gray-200">
@@ -46,7 +58,7 @@ const TopCustomers = ({ limit = 10, minDebt = 0 }) => {
       <CardContent>
         {isLoading ? (
           <div className="space-y-3">
-            {Array.from({ length: 5 }).map((_, i) => (
+            {Array.from({ length: PAGE_SIZE }).map((_, i) => (
               <Skeleton key={i} className="h-14 rounded-lg" />
             ))}
           </div>
@@ -55,29 +67,59 @@ const TopCustomers = ({ limit = 10, minDebt = 0 }) => {
             No customers with outstanding debt
           </div>
         ) : (
-          <div className="space-y-3">
-            {topCustomers.map((customer, index) => (
-              <Link key={customer._id} href={`/dashboard/customers/${customer._id}`}>
-                <div className="flex items-center justify-between bg-gray-50 hover:bg-gray-100 transition-colors rounded-lg p-3">
-                  <div className="flex items-center gap-3">
-                    <Badge className="bg-amber-500 hover:bg-amber-500 w-7 h-7 rounded-full flex items-center justify-center p-0">
-                      {index + 1}
-                    </Badge>
-                    <div className="w-9 h-9 rounded-full bg-red-100 flex items-center justify-center">
-                      <User className="h-4 w-4 text-red-600" />
+          <>
+            <div className="space-y-3">
+              {pageItems.map((customer, index) => (
+                <Link key={customer._id} href={`/dashboard/customers/${customer._id}`}>
+                  <div className="flex items-center justify-between bg-gray-50 hover:bg-gray-100 transition-colors rounded-lg p-3">
+                    <div className="flex items-center gap-3">
+                      <Badge className="bg-amber-500 hover:bg-amber-500 w-7 h-7 rounded-full flex items-center justify-center p-0">
+                        {(page - 1) * PAGE_SIZE + index + 1}
+                      </Badge>
+                      <div className="w-9 h-9 rounded-full bg-red-100 flex items-center justify-center">
+                        <User className="h-4 w-4 text-red-600" />
+                      </div>
+                      <div>
+                        <p className="font-medium text-gray-900">{customer.fullName}</p>
+                        <p className="text-sm text-gray-500">{customer.phoneNumber}</p>
+                      </div>
                     </div>
-                    <div>
-                      <p className="font-medium text-gray-900">{customer.fullName}</p>
-                      <p className="text-sm text-gray-500">{customer.phoneNumber}</p>
+                    <div className="text-right font-semibold text-red-600">
+                      ${customer.debt.toLocaleString()}
                     </div>
                   </div>
-                  <div className="text-right font-semibold text-red-600">
-                    ${customer.debt.toLocaleString()}
-                  </div>
-                </div>
-              </Link>
-            ))}
-          </div>
+                </Link>
+              ))}
+            </div>
+
+            {totalPages > 1 && (
+              <div className="flex items-center justify-center gap-4 pt-4">
+                <Button
+                  onClick={() => setPage((p) => p - 1)}
+                  disabled={page === 1}
+                  variant="outline"
+                  size="sm"
+                  className="flex items-center gap-2"
+                >
+                  <ChevronLeft className="h-4 w-4" />
+                  Previous
+                </Button>
+                <span className="text-sm text-gray-600">
+                  Page {page} of {totalPages}
+                </span>
+                <Button
+                  onClick={() => setPage((p) => p + 1)}
+                  disabled={page === totalPages}
+                  variant="outline"
+                  size="sm"
+                  className="flex items-center gap-2"
+                >
+                  Next
+                  <ChevronRight className="h-4 w-4" />
+                </Button>
+              </div>
+            )}
+          </>
         )}
       </CardContent>
     </Card>

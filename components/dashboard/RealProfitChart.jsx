@@ -4,24 +4,11 @@
 import React, { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
-import {
-  LineChart,
-  Line,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  Legend,
-  ResponsiveContainer,
-} from "recharts";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { TrendingUp } from "lucide-react";
 import { localDayStartISO, localDayEndISO } from "@/lib/dateUtils";
-
-const COLOR_PROFIT = "#1baf7a";
-const GRID_COLOR = "#e1e0d9";
-const AXIS_COLOR = "#898781";
+import { LineChart } from "@/components/ui/charts/line-chart";
 
 const GRANULARITY_OPTIONS = [
   { value: "day", label: "Daily" },
@@ -42,18 +29,7 @@ function formatPeriodLabel(period, granularity) {
   return date.toLocaleDateString("en-US", { month: "short", day: "numeric" });
 }
 
-const ProfitTooltip = ({ active, payload, label }) => {
-  if (!active || !payload?.length) return null;
-  return (
-    <div className="bg-white border border-gray-200 rounded-lg shadow-md p-3 text-sm">
-      <p className="font-medium text-gray-900 mb-1">{label}</p>
-      <p style={{ color: COLOR_PROFIT }} className="flex justify-between gap-4">
-        <span>Real Profit:</span>
-        <span className="font-semibold">${payload[0].value.toLocaleString()}</span>
-      </p>
-    </div>
-  );
-};
+const currencyFormatter = (value) => `$${value.toLocaleString()}`;
 
 export default function RealProfitChart() {
   const [granularity, setGranularity] = useState("month");
@@ -80,6 +56,7 @@ export default function RealProfitChart() {
   const trends = (data?.trends || []).map((t) => ({
     ...t,
     label: formatPeriodLabel(t.period, granularity),
+    "Real Profit": t.realProfit,
   }));
   const totalProfit = trends.reduce((sum, t) => sum + t.realProfit, 0);
 
@@ -158,16 +135,15 @@ export default function RealProfitChart() {
                 ${totalProfit.toLocaleString()}
               </span>
             </div>
-            <ResponsiveContainer width="100%" height={300}>
-              <LineChart data={trends} margin={{ top: 8, right: 8, left: 8, bottom: 8 }}>
-                <CartesianGrid stroke={GRID_COLOR} vertical={false} />
-                <XAxis dataKey="label" stroke={AXIS_COLOR} tick={{ fontSize: 12 }} tickLine={false} axisLine={{ stroke: AXIS_COLOR }} />
-                <YAxis stroke={AXIS_COLOR} tick={{ fontSize: 12 }} tickLine={false} axisLine={false} tickFormatter={(v) => `$${v}`} />
-                <Tooltip content={<ProfitTooltip />} />
-                <Legend wrapperStyle={{ fontSize: 12 }} />
-                <Line dataKey="realProfit" name="Real Profit" stroke={COLOR_PROFIT} strokeWidth={2} dot={{ r: 3 }} />
-              </LineChart>
-            </ResponsiveContainer>
+            <LineChart
+              data={trends}
+              index="label"
+              categories={["Real Profit"]}
+              colors={["emerald"]}
+              valueFormatter={currencyFormatter}
+              showLegend={false}
+              className="h-72"
+            />
           </>
         )}
       </CardContent>

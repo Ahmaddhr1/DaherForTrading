@@ -62,7 +62,7 @@ export function MobileBottomBar() {
       key: "inventory",
       label: "Stock",
       icon: <Boxes size={20} />,
-      items: ["Products", "Categories", "Companies"].map(findTab).filter(Boolean),
+      items: ["Products", "Categories", "Companies", "Stock History"].map(findTab).filter(Boolean),
     },
     {
       key: "more",

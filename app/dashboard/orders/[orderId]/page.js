@@ -13,6 +13,7 @@ import { FormSkeleton } from "@/components/ui/skeleton-patterns";
 import { Loader2, CheckCircle, PencilLine, Trash2 } from "lucide-react";
 import Link from "next/link";
 import OrderCustomerName from "../components/OrderCustomerName";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 
 export default function OrderDetailsPage() {
   const { orderId } = useParams();
@@ -107,9 +108,12 @@ export default function OrderDetailsPage() {
     finalizeMutation.mutate();
   };
 
-  const handleDeleteDraft = () => {
-    if (!window.confirm("Delete this draft? This cannot be undone.")) return;
-    deleteDraftMutation.mutate();
+  const [deleteDraftOpen, setDeleteDraftOpen] = useState(false);
+
+  const handleDeleteDraft = () => setDeleteDraftOpen(true);
+
+  const confirmDeleteDraft = () => {
+    deleteDraftMutation.mutate(undefined, { onSuccess: () => setDeleteDraftOpen(false) });
   };
 
   if (isLoading) {
@@ -285,6 +289,14 @@ export default function OrderDetailsPage() {
           )}
         </CardContent>
       </Card>
+      <ConfirmDialog
+        open={deleteDraftOpen}
+        onClose={() => setDeleteDraftOpen(false)}
+        title="Delete draft?"
+        description="Delete this draft? This cannot be undone."
+        onConfirm={confirmDeleteDraft}
+        loading={deleteDraftMutation.isPending}
+      />
     </div>
   );
 }

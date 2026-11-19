@@ -13,6 +13,7 @@ import { Badge } from "@/components/ui/badge";
 import { Modal } from "@/components/ui/modal";
 import { TableSkeleton } from "@/components/ui/skeleton-patterns";
 import { FiltersPanel } from "@/components/ui/filters-panel";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { getTodayDateString, localDayStartISO, localDayEndISO } from "@/lib/dateUtils";
 import {
   Table,
@@ -150,10 +151,11 @@ export default function DisbursementsPage() {
     setSortBy("newest");
   };
 
-  const handleDelete = (id, description) => {
-    if (window.confirm(`Delete disbursement "${description}"?`)) {
-      deleteMutation.mutate(id);
-    }
+  const [deleteTarget, setDeleteTarget] = useState(null);
+
+  const confirmDelete = () => {
+    if (!deleteTarget) return;
+    deleteMutation.mutate(deleteTarget._id, { onSuccess: () => setDeleteTarget(null) });
   };
 
   const handleCreated = () => {
@@ -375,7 +377,7 @@ export default function DisbursementsPage() {
                         <Button
                           variant="destructive"
                           size="sm"
-                          onClick={() => handleDelete(item._id, item.description)}
+                          onClick={() => setDeleteTarget(item)}
                           disabled={deleteMutation.isPending}
                         >
                           <Trash2 className="h-3 w-3" />
@@ -425,6 +427,14 @@ export default function DisbursementsPage() {
       >
         <AddDisbursementForm onSuccess={handleCreated} />
       </Modal>
+      <ConfirmDialog
+        open={!!deleteTarget}
+        onClose={() => setDeleteTarget(null)}
+        title="Delete disbursement?"
+        description={`Delete disbursement "${deleteTarget?.description}"?`}
+        onConfirm={confirmDelete}
+        loading={deleteMutation.isPending}
+      />
     </div>
   );
 }

@@ -12,6 +12,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { FormSkeleton, ListSkeleton, PageHeaderSkeleton } from "@/components/ui/skeleton-patterns";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import {
   Table,
   TableBody,
@@ -111,15 +112,17 @@ const EditCategoryPage = () => {
     }));
   };
 
-  const handleDelete = () => {
-    const productCount = category?.products?.length || 0;
-    const message = productCount > 0
-      ? `This category contains ${productCount} product(s). Deleting it will remove the category and its products. Are you sure?`
+  const [deleteOpen, setDeleteOpen] = useState(false);
+
+  const deleteMessage =
+    (category?.products?.length || 0) > 0
+      ? `This category contains ${category.products.length} product(s). Deleting it will remove the category and its products. Are you sure?`
       : "Are you sure you want to delete this category?";
 
-    if (window.confirm(message)) {
-      deleteMutation.mutate();
-    }
+  const handleDelete = () => setDeleteOpen(true);
+
+  const confirmDelete = () => {
+    deleteMutation.mutate(undefined, { onSuccess: () => setDeleteOpen(false) });
   };
 
   if (isLoading) {
@@ -361,6 +364,14 @@ const EditCategoryPage = () => {
           </div>
         </div>
       </div>
+      <ConfirmDialog
+        open={deleteOpen}
+        onClose={() => setDeleteOpen(false)}
+        title="Delete category?"
+        description={deleteMessage}
+        onConfirm={confirmDelete}
+        loading={deleteMutation.isPending}
+      />
     </div>
   );
 };

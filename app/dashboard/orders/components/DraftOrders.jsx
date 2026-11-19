@@ -28,6 +28,7 @@ import { toast } from "sonner";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import OrderCustomerName from "./OrderCustomerName";
 import LinkCustomerModal from "./LinkCustomerModal";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 
 const PAGE_SIZE_OPTIONS = [10, 20, 50];
 
@@ -68,14 +69,9 @@ export default function DraftOrders() {
     setPage(1);
   }, [searchTerm, pageSize]);
 
-  const handleAction = async (action, orderId) => {
-    if (action === "delete" && !window.confirm("Delete this draft? This cannot be undone.")) {
-      return;
-    }
-    if (action === "finalize" && !window.confirm("Finalize this draft into a real order? This will deduct stock and add to the customer's debt.")) {
-      return;
-    }
+  const [deleteDraftId, setDeleteDraftId] = useState(null);
 
+  const runAction = async (action, orderId) => {
     try {
       setActionLoading(true);
       if (action === "delete") {
@@ -95,6 +91,23 @@ export default function DraftOrders() {
     } finally {
       setActionLoading(false);
     }
+  };
+
+  const handleAction = async (action, orderId) => {
+    if (action === "delete") {
+      setDeleteDraftId(orderId);
+      return;
+    }
+    if (action === "finalize" && !window.confirm("Finalize this draft into a real order? This will deduct stock and add to the customer's debt.")) {
+      return;
+    }
+    await runAction(action, orderId);
+  };
+
+  const confirmDeleteDraft = async () => {
+    const id = deleteDraftId;
+    setDeleteDraftId(null);
+    await runAction("delete", id);
   };
 
   const orders = data?.orders || [];
@@ -239,6 +252,14 @@ export default function DraftOrders() {
         open={!!linkingOrder}
         onClose={() => setLinkingOrder(null)}
         order={linkingOrder}
+      />
+      <ConfirmDialog
+        open={!!deleteDraftId}
+        onClose={() => setDeleteDraftId(null)}
+        title="Delete draft?"
+        description="Delete this draft? This cannot be undone."
+        onConfirm={confirmDeleteDraft}
+        loading={actionLoading}
       />
     </div>
   );

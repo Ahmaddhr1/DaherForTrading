@@ -20,15 +20,19 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Search, Package, Plus, Edit, Trash2, ChevronLeft, ChevronRight, Loader2, DollarSign, Box, TrendingUp, Wallet, AlertTriangle, LayoutList, LayoutGrid, FileDown } from "lucide-react";
+import { Search, Package, Plus, Edit, Trash2, ChevronLeft, ChevronRight, Loader2, DollarSign, Box, TrendingUp, Wallet, AlertTriangle, LayoutList, LayoutGrid, FileDown, Filter } from "lucide-react";
 import ProductGridView from "./ProductGridView";
 import GeneratePdfModal from "./GeneratePdfModal";
+import CategoryFilterModal from "./CategoryFilterModal";
+import { Combobox } from "@/components/ui/combobox";
 import { useCart } from "@/lib/cartContext";
 import { useIsOwner } from "@/lib/useIsOwner";
 
 export default function ProductsPage() {
   // State for search and pagination
   const [searchTerm, setSearchTerm] = useState("");
+  const [categoryFilter, setCategoryFilter] = useState("");
+  const [categoryModalOpen, setCategoryModalOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [deletingId, setDeletingId] = useState(null);
   const [viewMode, setViewMode] = useState("list"); // "list" | "grid"
@@ -42,15 +46,22 @@ export default function ProductsPage() {
     toast.success(`Added "${product.name}" to cart`);
   };
 
+  const { data: categories = [] } = useQuery({
+    queryKey: ["categories"],
+    queryFn: async () => (await axios.get("/api/categories", { params: { all: true } })).data,
+  });
+  const selectedCategoryName = categories.find((c) => c._id === categoryFilter)?.name;
+
   // Fetch products data
   const { data, isLoading, error } = useQuery({
-    queryKey: ["products", currentPage, searchTerm],
+    queryKey: ["products", currentPage, searchTerm, categoryFilter],
     queryFn: async () => {
       const response = await axios.get("/api/products/get", {
-        params: { 
-          page: currentPage, 
-          limit: 20, 
-          search: searchTerm 
+        params: {
+          page: currentPage,
+          limit: 20,
+          search: searchTerm,
+          category: categoryFilter || undefined,
         }
       });
       return response.data;
@@ -79,6 +90,11 @@ export default function ProductsPage() {
 
     return () => clearTimeout(timer);
   }, [searchTerm]);
+
+  // Category filter takes effect immediately, no debounce needed
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [categoryFilter]);
 
   // Handle delete product
   const handleDelete = async (productId, productName) => {
@@ -205,9 +221,29 @@ export default function ProductsPage() {
         </div>
         )}
 
-        {/* Search Bar + View toggle */}
-        <div className="mb-6 flex items-center justify-between gap-3">
-          <div className="relative max-w-md flex-1">
+        {/* Category filter + Search Bar + View toggle */}
+        <div className="mb-6 flex items-center gap-3 flex-wrap">
+          {/* Desktop: searchable inline dropdown, positioned on the left */}
+          <div className="hidden lg:block w-56 shrink-0">
+            <Combobox
+              options={categories}
+              value={categoryFilter}
+              onChange={setCategoryFilter}
+              placeholder="All Categories"
+            />
+          </div>
+
+          {/* Mobile: button opening a searchable list modal */}
+          <Button
+            variant="outline"
+            onClick={() => setCategoryModalOpen(true)}
+            className="lg:hidden flex items-center gap-2 shrink-0 max-w-[45%]"
+          >
+            <Filter className="h-4 w-4 shrink-0" />
+            <span className="truncate">{selectedCategoryName || "All Categories"}</span>
+          </Button>
+
+          <div className="relative max-w-md flex-1 min-w-[160px]">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
             <Input
               type="text"
@@ -446,6 +482,13 @@ export default function ProductsPage() {
       </div>
 
       <GeneratePdfModal open={pdfModalOpen} onClose={() => setPdfModalOpen(false)} />
+      <CategoryFilterModal
+        open={categoryModalOpen}
+        onClose={() => setCategoryModalOpen(false)}
+        categories={categories}
+        value={categoryFilter}
+        onChange={setCategoryFilter}
+      />
     </div>
   );
 }

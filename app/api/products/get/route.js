@@ -10,13 +10,14 @@ export async function GET(req) {
   const page = parseInt(searchParams.get("page")) || 1;
   const limit = parseInt(searchParams.get("limit")) || 20;
   const search = searchParams.get("search")?.toLowerCase() || "";
+  const category = searchParams.get("category") || "";
 
   const skip = (page - 1) * limit;
 
   try {
-    const query = search
-      ? { name: { $regex: new RegExp(search, "i") } }
-      : {};
+    const query = {};
+    if (search) query.name = { $regex: new RegExp(search, "i") };
+    if (category) query.category = category;
 
     const total = await Product.countDocuments(query);
     const products = await Product.find(query)

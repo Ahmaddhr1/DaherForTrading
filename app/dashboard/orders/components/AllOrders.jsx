@@ -39,6 +39,7 @@ import { localDayStartISO, localDayEndISO } from "@/lib/dateUtils";
 import { DateRangeFilter } from "./DateRangeFilter";
 import { OrdersTotalsCard } from "./OrdersTotalsCard";
 import OrderCustomerName from "./OrderCustomerName";
+import { useIsOwner } from "@/lib/useIsOwner";
 
 const SORT_OPTIONS = [
   { value: "newest", label: "Newest First" },
@@ -52,6 +53,7 @@ const PAGE_SIZE_OPTIONS = [10, 20, 50];
 export default function AllOrders() {
   const router = useRouter();
   const queryClient = useQueryClient();
+  const { isOwner } = useIsOwner();
 
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
@@ -184,12 +186,14 @@ export default function AllOrders() {
     <div className="space-y-4">
       {/* Totals for the current filter scope, including the date range below
           (drafts excluded until finalized) */}
-      <OrdersTotalsCard
-        totalAmount={totals.totalAmount}
-        totalProfit={totals.totalProfit}
-        collectedAmount={totals.collectedAmount}
-        label="Total of All Orders"
-      />
+      {isOwner && (
+        <OrdersTotalsCard
+          totalAmount={totals.totalAmount}
+          totalProfit={totals.totalProfit}
+          collectedAmount={totals.collectedAmount}
+          label="Total of All Orders"
+        />
+      )}
 
       {/* Filters */}
       <FiltersPanel activeCount={activeFilterCount}>

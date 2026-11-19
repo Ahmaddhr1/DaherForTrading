@@ -1,6 +1,7 @@
 import { connectToDB } from "@/lib/connectDb";
 import Product from "@/models/Products";
 import Category from "@/models/Category"; // import your Category model
+import Order from "@/models/Orders";
 import { NextResponse } from "next/server";
 import { getUserFromCookie } from "@/lib/auth";
 import { logActivity } from "@/lib/activityLog";
@@ -126,6 +127,17 @@ export async function DELETE(req, { params }) {
       return NextResponse.json(
         { message: "Product not found" },
         { status: 404 }
+      );
+    }
+
+    // Refuse to delete a product that's referenced in any customer's order
+    // (including drafts) - deleting it would orphan that order's line item
+    // and break its stock-ledger/history trail.
+    const hasBeenOrdered = await Order.exists({ "products.productId": id });
+    if (hasBeenOrdered) {
+      return NextResponse.json(
+        { message: "This product can't be deleted because a customer has already ordered it." },
+        { status: 400 }
       );
     }
 

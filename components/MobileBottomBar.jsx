@@ -36,7 +36,9 @@ export function MobileBottomBar() {
   // Orders groups "Orders" and its sub-tab "Drafts" (see SideBarTabs.js),
   // the same pattern Sales/Stock already use for their own tabs.
   const SECTIONS = [
-    { key: "dashboard", label: "Home", icon: <Home size={20} />, path: "/dashboard" },
+    // The stats/charts overview page is owner-only (see middleware.js) -
+    // an employee gets no "Home" slot at all rather than a dead link.
+    ...(isOwner ? [{ key: "dashboard", label: "Home", icon: <Home size={20} />, path: "/dashboard" }] : []),
     {
       key: "orders",
       label: "Orders",
@@ -92,7 +94,7 @@ export function MobileBottomBar() {
   return (
     <>
       <nav className="lg:hidden fixed bottom-0 inset-x-0 z-40 bg-sidebar border-t border-sidebar-border pb-[env(safe-area-inset-bottom)]">
-        <div className="grid grid-cols-6">
+        <div className={`grid ${isOwner ? "grid-cols-6" : "grid-cols-5"}`}>
           {SECTIONS.map((section) => {
             const active = isSectionActive(section);
             const className = `flex flex-col items-center justify-center gap-1 py-2.5 text-[11px] font-medium ${

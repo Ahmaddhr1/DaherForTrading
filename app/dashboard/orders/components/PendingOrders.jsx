@@ -11,6 +11,7 @@ import { localDayStartISO, localDayEndISO } from "@/lib/dateUtils";
 import { DateRangeFilter } from "./DateRangeFilter";
 import { OrdersTotalsCard } from "./OrdersTotalsCard";
 import OrderCard from "./OrderCard";
+import { useIsOwner } from "@/lib/useIsOwner";
 
 const PendingOrders = () => {
   const [page, setPage] = useState(1);
@@ -18,6 +19,7 @@ const PendingOrders = () => {
   const [endDate, setEndDate] = useState("");
   const limit = 10;
   const queryClient = useQueryClient();
+  const { isOwner } = useIsOwner();
 
   const { data, isLoading, error } = useQuery({
     queryKey: ["orders", "pending", page, startDate, endDate],
@@ -75,7 +77,9 @@ const PendingOrders = () => {
 
   return (
     <div className="space-y-4">
-      <OrdersTotalsCard totalAmount={totals.totalAmount} totalProfit={totals.totalProfit} label="Total Pending" />
+      {isOwner && (
+        <OrdersTotalsCard totalAmount={totals.totalAmount} totalProfit={totals.totalProfit} label="Total Pending" />
+      )}
 
       <Card className="shadow-sm border-gray-200">
         <CardContent className="p-4 flex flex-wrap items-center gap-3">

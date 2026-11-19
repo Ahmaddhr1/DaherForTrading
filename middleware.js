@@ -22,7 +22,6 @@ function isPublicApiPath(pathname) {
 // Exact paths: the path itself, not anything nested under it.
 const OWNER_ONLY_EXACT_PATHS = [
   '/api/admin', // GET: list admins
-  '/api/orders/totals', // lifetime sales figure shown only on the owner-only Total Sales card
   '/dashboard', // the stats/charts overview page
   '/dashboard/admins',
   '/dashboard/activity',

@@ -6,12 +6,15 @@ import axios from "axios";
 import { AlertCircle, Package, ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ListSkeleton } from "@/components/ui/skeleton-patterns";
+import { OrdersTotalsCard } from "./OrdersTotalsCard";
 import OrderCard from "./OrderCard";
+import { useIsOwner } from "@/lib/useIsOwner";
 
 const TodaysOrders = () => {
   const [page, setPage] = useState(1);
   const limit = 10;
   const queryClient = useQueryClient();
+  const { isOwner } = useIsOwner();
 
   const { data, isLoading, error } = useQuery({
     queryKey: ["orders", "today", page],
@@ -49,9 +52,14 @@ const TodaysOrders = () => {
 
   const orders = data?.todayOrders || [];
   const totalPages = data?.totalPages || 1;
+  const totals = data?.totals || { totalAmount: 0, totalProfit: 0 };
 
   return (
     <div className="space-y-4">
+      {isOwner && (
+        <OrdersTotalsCard totalAmount={totals.totalAmount} totalProfit={totals.totalProfit} label="Total Today" />
+      )}
+
       {orders.length === 0 ? (
         <div className="text-center py-12 text-gray-500">
           <Package className="h-12 w-12 mx-auto mb-3" />

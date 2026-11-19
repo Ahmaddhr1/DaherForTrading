@@ -41,6 +41,7 @@ const PAGE_SIZE_OPTIONS = [10, 20, 50];
 
 export default function CustomersPage() {
   // State for search, pagination, sorting and filters
+  const [searchInput, setSearchInput] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(20);
@@ -82,13 +83,14 @@ export default function CustomersPage() {
     },
   });
 
-  // Handle search with delay
+  // Debounce the raw typed input before it drives the request.
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setCurrentPage(1);
-    }, 500);
-
+    const timer = setTimeout(() => setSearchTerm(searchInput), 400);
     return () => clearTimeout(timer);
+  }, [searchInput]);
+
+  useEffect(() => {
+    setCurrentPage(1);
   }, [searchTerm, debtFilter, sortBy, pageSize]);
 
   // Show error message if something went wrong
@@ -159,8 +161,8 @@ export default function CustomersPage() {
               <Input
                 type="text"
                 placeholder="Search customers by name..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
+                value={searchInput}
+                onChange={(e) => setSearchInput(e.target.value)}
                 className="pl-10"
               />
             </div>
@@ -297,6 +299,7 @@ export default function CustomersPage() {
                   <Button
                     variant="outline"
                     onClick={() => {
+                      setSearchInput("");
                       setSearchTerm("");
                       setDebtFilter("all");
                       setSortBy("newest");

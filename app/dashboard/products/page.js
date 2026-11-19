@@ -30,6 +30,7 @@ import { useIsOwner } from "@/lib/useIsOwner";
 
 export default function ProductsPage() {
   // State for search and pagination
+  const [searchInput, setSearchInput] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("");
   const [categoryModalOpen, setCategoryModalOpen] = useState(false);
@@ -82,13 +83,14 @@ export default function ProductsPage() {
     },
   });
 
-  // Handle search with delay
+  // Debounce the raw typed input before it drives the request.
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setCurrentPage(1); // Go back to page 1 when searching
-    }, 500);
-
+    const timer = setTimeout(() => setSearchTerm(searchInput), 400);
     return () => clearTimeout(timer);
+  }, [searchInput]);
+
+  useEffect(() => {
+    setCurrentPage(1); // Go back to page 1 when searching
   }, [searchTerm]);
 
   // Category filter takes effect immediately, no debounce needed
@@ -248,8 +250,8 @@ export default function ProductsPage() {
             <Input
               type="text"
               placeholder="Search products by name..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              value={searchInput}
+              onChange={(e) => setSearchInput(e.target.value)}
               className="pl-10"
             />
           </div>

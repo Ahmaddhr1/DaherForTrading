@@ -37,6 +37,7 @@ export default function DraftOrders() {
 
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
+  const [searchInput, setSearchInput] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const [actionLoading, setActionLoading] = useState(false);
   const [linkingOrder, setLinkingOrder] = useState(null);
@@ -57,9 +58,14 @@ export default function DraftOrders() {
     },
   });
 
+  // Debounce the raw typed input before it drives the request.
   useEffect(() => {
-    const timer = setTimeout(() => setPage(1), 500);
+    const timer = setTimeout(() => setSearchTerm(searchInput), 400);
     return () => clearTimeout(timer);
+  }, [searchInput]);
+
+  useEffect(() => {
+    setPage(1);
   }, [searchTerm, pageSize]);
 
   const handleAction = async (action, orderId) => {
@@ -129,8 +135,8 @@ export default function DraftOrders() {
         <Input
           type="text"
           placeholder="Search by customer name..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
+          value={searchInput}
+          onChange={(e) => setSearchInput(e.target.value)}
           className="pl-10"
         />
       </div>

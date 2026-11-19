@@ -52,6 +52,7 @@ const SORT_OPTIONS = [
 const PAGE_SIZE_OPTIONS = [10, 20, 50];
 
 export default function DisbursementsPage() {
+  const [searchInput, setSearchInput] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const [category, setCategory] = useState("");
   const [startDate, setStartDate] = useState(getTodayDateString());
@@ -92,9 +93,14 @@ export default function DisbursementsPage() {
     onError: () => toast.error("Failed to delete disbursement"),
   });
 
+  // Debounce the raw typed input before it drives the request.
   useEffect(() => {
-    const timer = setTimeout(() => setCurrentPage(1), 500);
+    const timer = setTimeout(() => setSearchTerm(searchInput), 400);
     return () => clearTimeout(timer);
+  }, [searchInput]);
+
+  useEffect(() => {
+    setCurrentPage(1);
   }, [searchTerm, category, startDate, endDate, sortBy, pageSize]);
 
   useEffect(() => {
@@ -102,6 +108,7 @@ export default function DisbursementsPage() {
   }, [error]);
 
   const handleClearFilters = () => {
+    setSearchInput("");
     setSearchTerm("");
     setCategory("");
     setStartDate("");
@@ -182,8 +189,8 @@ export default function DisbursementsPage() {
                 <Input
                   type="text"
                   placeholder="Search by description..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
+                  value={searchInput}
+                  onChange={(e) => setSearchInput(e.target.value)}
                   className="pl-10"
                 />
               </div>

@@ -21,6 +21,7 @@ import {
 } from "lucide-react";
 
 const CategoriesPage = () => {
+  const [searchInput, setSearchInput] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const limit = 12;
@@ -36,9 +37,14 @@ const CategoriesPage = () => {
     },
   });
 
+  // Debounce the raw typed input before it drives the request.
   useEffect(() => {
-    const timer = setTimeout(() => setCurrentPage(1), 500);
+    const timer = setTimeout(() => setSearchTerm(searchInput), 400);
     return () => clearTimeout(timer);
+  }, [searchInput]);
+
+  useEffect(() => {
+    setCurrentPage(1);
   }, [searchTerm]);
 
   // Show error message if something went wrong
@@ -85,8 +91,8 @@ const CategoriesPage = () => {
             <Input
               type="text"
               placeholder="Search categories by name..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              value={searchInput}
+              onChange={(e) => setSearchInput(e.target.value)}
               className="pl-10"
             />
           </div>

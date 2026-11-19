@@ -58,6 +58,7 @@ export default function AllOrders() {
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [statusFilter, setStatusFilter] = useState("all");
+  const [searchInput, setSearchInput] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const [sortBy, setSortBy] = useState("newest");
   const [startDate, setStartDate] = useState("");
@@ -82,9 +83,14 @@ export default function AllOrders() {
     },
   });
 
+  // Debounce the raw typed input before it drives the request.
   useEffect(() => {
-    const timer = setTimeout(() => setPage(1), 500);
+    const timer = setTimeout(() => setSearchTerm(searchInput), 400);
     return () => clearTimeout(timer);
+  }, [searchInput]);
+
+  useEffect(() => {
+    setPage(1);
   }, [statusFilter, searchTerm, sortBy, pageSize, startDate, endDate]);
 
   const handleAction = async (action, orderId) => {
@@ -204,8 +210,8 @@ export default function AllOrders() {
               <Input
                 type="text"
                 placeholder="Search by customer name..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
+                value={searchInput}
+                onChange={(e) => setSearchInput(e.target.value)}
                 className="pl-10"
               />
             </div>

@@ -50,6 +50,7 @@ const PAGE_SIZE_OPTIONS = [10, 20, 50];
 
 export default function PaymentsPage() {
   // History filters
+  const [searchInput, setSearchInput] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const [startDate, setStartDate] = useState(getTodayDateString());
   const [endDate, setEndDate] = useState(getTodayDateString());
@@ -79,9 +80,14 @@ export default function PaymentsPage() {
     },
   });
 
+  // Debounce the raw typed input before it drives the request.
   useEffect(() => {
-    const timer = setTimeout(() => setCurrentPage(1), 500);
+    const timer = setTimeout(() => setSearchTerm(searchInput), 400);
     return () => clearTimeout(timer);
+  }, [searchInput]);
+
+  useEffect(() => {
+    setCurrentPage(1);
   }, [searchTerm, startDate, endDate, sortBy, pageSize]);
 
   useEffect(() => {
@@ -89,6 +95,7 @@ export default function PaymentsPage() {
   }, [error]);
 
   const handleClearFilters = () => {
+    setSearchInput("");
     setSearchTerm("");
     setStartDate("");
     setEndDate("");
@@ -158,8 +165,8 @@ export default function PaymentsPage() {
                 <Input
                   type="text"
                   placeholder="Search by customer name..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
+                  value={searchInput}
+                  onChange={(e) => setSearchInput(e.target.value)}
                   className="pl-10"
                 />
               </div>
@@ -354,9 +361,16 @@ export default function PaymentsPage() {
 }
 
 function MakePaymentForm({ onSuccess }) {
+  const [searchInput, setSearchInput] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCustomer, setSelectedCustomer] = useState(null);
   const [amount, setAmount] = useState("");
+
+  // Debounce the raw typed input before it drives the request.
+  useEffect(() => {
+    const timer = setTimeout(() => setSearchTerm(searchInput), 400);
+    return () => clearTimeout(timer);
+  }, [searchInput]);
 
   const { data: searchData, isLoading: searching } = useQuery({
     queryKey: ["payments-customer-search", searchTerm],
@@ -409,6 +423,7 @@ function MakePaymentForm({ onSuccess }) {
 
   const handleSelectCustomer = (customer) => {
     setSelectedCustomer(customer);
+    setSearchInput("");
     setSearchTerm("");
   };
 
@@ -434,6 +449,7 @@ function MakePaymentForm({ onSuccess }) {
   };
 
   const customers = searchData?.customers || [];
+  const isSearchPending = searchInput.trim() !== searchTerm.trim();
 
   return (
     <div className="space-y-4">
@@ -462,23 +478,23 @@ function MakePaymentForm({ onSuccess }) {
           <Input
             type="text"
             placeholder="Search customers by name..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
+            value={searchInput}
+            onChange={(e) => setSearchInput(e.target.value)}
             className="pl-10"
             autoFocus
           />
 
-          {searchTerm.trim().length > 0 && (
+          {searchInput.trim().length > 0 && (
             <div className="mt-2 border rounded-lg divide-y max-h-64 overflow-y-auto">
-              {searching && (
+              {(searching || isSearchPending) && (
                 <div className="p-4 text-center text-gray-500">
                   <Loader2 className="h-5 w-5 animate-spin mx-auto" />
                 </div>
               )}
-              {!searching && customers.length === 0 && (
+              {!searching && !isSearchPending && customers.length === 0 && (
                 <div className="p-4 text-center text-gray-500 text-sm">No customers found</div>
               )}
-              {!searching &&
+              {!searching && !isSearchPending &&
                 customers.map((customer) => (
                   <button
                     key={customer._id}

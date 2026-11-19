@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
@@ -18,12 +18,19 @@ export default function CartDrawer() {
   const { cart, updateQty: onUpdateQty, removeFromCart: onRemove, clearCart: onClear, itemCount, open, openCart, closeCart } = useCart();
   const [checkingOut, setCheckingOut] = useState(false);
   const [checkoutMode, setCheckoutMode] = useState(null); // null | "search" | "type"
+  const [searchInput, setSearchInput] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCustomer, setSelectedCustomer] = useState(null);
   const [typedName, setTypedName] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
   const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+
+  // Debounce the raw typed input before it drives the request.
+  useEffect(() => {
+    const timer = setTimeout(() => setSearchTerm(searchInput), 400);
+    return () => clearTimeout(timer);
+  }, [searchInput]);
 
   const { data: searchData, isLoading: searching } = useQuery({
     queryKey: ["cart-customer-search", searchTerm],
@@ -36,10 +43,12 @@ export default function CartDrawer() {
     enabled: checkoutMode === "search" && searchTerm.trim().length > 0 && !selectedCustomer,
   });
   const customers = searchData?.customers || [];
+  const isSearchPending = searchInput.trim() !== searchTerm.trim();
 
   const resetCheckout = () => {
     setCheckingOut(false);
     setCheckoutMode(null);
+    setSearchInput("");
     setSearchTerm("");
     setSelectedCustomer(null);
     setTypedName("");
@@ -181,23 +190,23 @@ export default function CartDrawer() {
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 h-4 w-4" />
                   <Input
                     placeholder="Search customers by name..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
+                    value={searchInput}
+                    onChange={(e) => setSearchInput(e.target.value)}
                     className="pl-10"
                     autoFocus
                   />
                 </div>
-                {searchTerm.trim().length > 0 && (
+                {searchInput.trim().length > 0 && (
                   <div className="border rounded-lg divide-y max-h-56 overflow-y-auto">
-                    {searching && (
+                    {(searching || isSearchPending) && (
                       <div className="p-4 text-center text-gray-500">
                         <Loader2 className="h-5 w-5 animate-spin mx-auto" />
                       </div>
                     )}
-                    {!searching && customers.length === 0 && (
+                    {!searching && !isSearchPending && customers.length === 0 && (
                       <div className="p-4 text-center text-gray-500 text-sm">No customers found</div>
                     )}
-                    {!searching &&
+                    {!searching && !isSearchPending &&
                       customers.map((customer) => (
                         <button
                           key={customer._id}

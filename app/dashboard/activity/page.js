@@ -19,7 +19,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Modal } from "@/components/ui/modal";
 import { DateRangeFilter } from "@/app/dashboard/orders/components/DateRangeFilter";
-import { localDayStartISO, localDayEndISO } from "@/lib/dateUtils";
+import { getTodayDateString, localDayStartISO, localDayEndISO } from "@/lib/dateUtils";
 
 const ENTITY_TYPES = ["Order", "Payment", "Product", "Purchase", "Disbursement", "Customer", "Company"];
 
@@ -30,11 +30,18 @@ export default function ActivityPage() {
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [clearOpen, setClearOpen] = useState(false);
+  // Stays false until the user actually touches a filter. While false, the
+  // log is scoped to today behind the scenes (effectiveStartDate/EndDate
+  // below) without the date boxes themselves showing a value.
+  const [hasInteracted, setHasInteracted] = useState(false);
   const limit = 20;
   const queryClient = useQueryClient();
 
+  const effectiveStartDate = hasInteracted ? startDate : getTodayDateString();
+  const effectiveEndDate = hasInteracted ? endDate : getTodayDateString();
+
   const { data, isLoading, error } = useQuery({
-    queryKey: ["activity", page, adminFilter, entityTypeFilter, startDate, endDate],
+    queryKey: ["activity", page, adminFilter, entityTypeFilter, effectiveStartDate, effectiveEndDate],
     queryFn: async () => {
       const response = await axios.get("/api/activity", {
         params: {
@@ -42,8 +49,8 @@ export default function ActivityPage() {
           limit,
           admin: adminFilter,
           entityType: entityTypeFilter,
-          startDate: localDayStartISO(startDate),
-          endDate: localDayEndISO(endDate),
+          startDate: localDayStartISO(effectiveStartDate),
+          endDate: localDayEndISO(effectiveEndDate),
         },
       });
       return response.data;
@@ -121,10 +128,17 @@ export default function ActivityPage() {
           </div>
         </Modal>
 
+        {!hasInteracted && (
+          <p className="text-sm text-gray-500 mb-3">
+            Showing today&apos;s activity only. Pick a date range below to see more.
+          </p>
+        )}
+
         <div className="flex flex-col sm:flex-row sm:flex-wrap sm:items-center gap-3 mb-6">
           <select
             value={adminFilter}
             onChange={(e) => {
+              setHasInteracted(true);
               setAdminFilter(e.target.value);
               setPage(1);
             }}
@@ -141,6 +155,7 @@ export default function ActivityPage() {
           <select
             value={entityTypeFilter}
             onChange={(e) => {
+              setHasInteracted(true);
               setEntityTypeFilter(e.target.value);
               setPage(1);
             }}
@@ -158,10 +173,12 @@ export default function ActivityPage() {
             startDate={startDate}
             endDate={endDate}
             onStartDateChange={(value) => {
+              setHasInteracted(true);
               setStartDate(value);
               setPage(1);
             }}
             onEndDateChange={(value) => {
+              setHasInteracted(true);
               setEndDate(value);
               setPage(1);
             }}

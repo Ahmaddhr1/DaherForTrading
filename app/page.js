@@ -126,7 +126,7 @@ export default function LoginPage() {
                 type="submit"
                 size="lg"
                 disabled={isLoading || !isFormValid}
-                className="w-full bg-blue-600 hover:bg-blue-700"
+                className="w-full"
               >
                 {isLoading ? (
                   <span className="flex items-center gap-2">

@@ -117,7 +117,7 @@ export default function RealProfitChart() {
               onClick={() => setUseCustomRange((v) => !v)}
               className={`text-sm px-2 py-1.5 rounded-md border transition-colors ${
                 useCustomRange
-                  ? "bg-blue-600 text-white border-blue-600"
+                  ? "bg-primary text-primary-foreground border-primary"
                   : "border-gray-300 text-gray-700 hover:bg-gray-50"
               }`}
             >

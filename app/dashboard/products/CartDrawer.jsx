@@ -103,7 +103,7 @@ export default function CartDrawer() {
           bottom nav (MobileBottomBar) opens this same drawer instead. */}
       <Button
         onClick={openCart}
-        className="hidden lg:flex fixed bottom-6 right-6 z-40 h-14 w-14 rounded-full shadow-lg bg-blue-600 hover:bg-blue-700 p-0 items-center justify-center"
+        className="hidden lg:flex fixed bottom-6 right-6 z-40 h-14 w-14 rounded-full shadow-lg p-0 items-center justify-center"
       >
         <ShoppingCart className="h-6 w-6" />
         {itemCount > 0 && (

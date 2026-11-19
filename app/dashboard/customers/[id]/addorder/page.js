@@ -540,7 +540,7 @@ const MakeOrderPage = () => {
                 <Button
                   type="submit"
                   disabled={isSubmitting || isSavingDraft}
-                  className="sm:flex-1 bg-blue-600 hover:bg-blue-700"
+                  className="sm:flex-1"
                 >
                   {isSubmitting ? (
                     <span className="flex items-center gap-2">

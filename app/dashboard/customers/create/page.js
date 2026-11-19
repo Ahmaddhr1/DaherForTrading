@@ -239,7 +239,7 @@ const AddCustomerPage = () => {
                     <Button
                       type="submit"
                       disabled={mutation.isPending}
-                      className="flex-1 bg-blue-600 hover:bg-blue-700"
+                      className="flex-1"
                     >
                       {mutation.isPending ? (
                         <span className="flex items-center gap-2">

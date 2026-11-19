@@ -165,7 +165,7 @@ export default function AdminsPage() {
           </div>
           <Button
             onClick={() => setCreateOpen(true)}
-            className="bg-blue-600 hover:bg-blue-700 flex items-center gap-2 shrink-0"
+            className="flex items-center gap-2 shrink-0"
           >
             <Plus className="h-4 w-4" />
             <span className="hidden sm:inline">Add Admin</span>
@@ -329,7 +329,7 @@ export default function AdminsPage() {
           <Button
             type="submit"
             disabled={createMutation.isPending}
-            className="w-full bg-blue-600 hover:bg-blue-700"
+            className="w-full"
           >
             {createMutation.isPending ? (
               <span className="flex items-center gap-2">
@@ -365,7 +365,7 @@ export default function AdminsPage() {
           <Button
             type="submit"
             disabled={patchMutation.isPending}
-            className="w-full bg-blue-600 hover:bg-blue-700"
+            className="w-full"
           >
             {patchMutation.isPending ? (
               <span className="flex items-center gap-2">

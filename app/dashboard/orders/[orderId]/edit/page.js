@@ -485,7 +485,7 @@ export default function EditOrderPage() {
                     Cancel
                   </Button>
                 </Link>
-                <Button type="submit" disabled={isSubmitting || isFinalizing} className="sm:flex-1 bg-blue-600 hover:bg-blue-700">
+                <Button type="submit" disabled={isSubmitting || isFinalizing} className="sm:flex-1">
                   {isSubmitting ? (
                     <span className="flex items-center gap-2">
                       <Loader2 className="animate-spin h-4 w-4" />

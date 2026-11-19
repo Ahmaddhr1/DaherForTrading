@@ -221,8 +221,8 @@ export default function ProductsPage() {
         </div>
         )}
 
-        {/* Category filter + Search Bar + View toggle */}
-        <div className="mb-6 flex items-center gap-3 flex-wrap">
+        {/* Category filter + Search Bar + View toggle - stacked full-width on phone, inline row from lg up */}
+        <div className="mb-6 flex flex-col lg:flex-row lg:items-center gap-3">
           {/* Desktop: searchable inline dropdown, positioned on the left */}
           <div className="hidden lg:block w-56 shrink-0">
             <Combobox
@@ -237,13 +237,13 @@ export default function ProductsPage() {
           <Button
             variant="outline"
             onClick={() => setCategoryModalOpen(true)}
-            className="lg:hidden flex items-center gap-2 shrink-0 max-w-[45%]"
+            className="lg:hidden w-full flex items-center gap-2"
           >
             <Filter className="h-4 w-4 shrink-0" />
             <span className="truncate">{selectedCategoryName || "All Categories"}</span>
           </Button>
 
-          <div className="relative max-w-md flex-1 min-w-[160px]">
+          <div className="relative w-full lg:max-w-md lg:flex-1">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
             <Input
               type="text"
@@ -253,12 +253,12 @@ export default function ProductsPage() {
               className="pl-10"
             />
           </div>
-          <div className="flex items-center gap-1 border rounded-md p-1 shrink-0">
+          <div className="flex items-center gap-1 border rounded-md p-1 w-full lg:w-auto lg:shrink-0">
             <Button
               variant={viewMode === "list" ? "default" : "ghost"}
               size="sm"
               onClick={() => setViewMode("list")}
-              className="flex items-center gap-1.5"
+              className="flex-1 lg:flex-none flex items-center justify-center gap-1.5"
             >
               <LayoutList className="h-4 w-4" />
               <span className="hidden sm:inline">List</span>
@@ -267,7 +267,7 @@ export default function ProductsPage() {
               variant={viewMode === "grid" ? "default" : "ghost"}
               size="sm"
               onClick={() => setViewMode("grid")}
-              className="flex items-center gap-1.5"
+              className="flex-1 lg:flex-none flex items-center justify-center gap-1.5"
             >
               <LayoutGrid className="h-4 w-4" />
               <span className="hidden sm:inline">Grid</span>

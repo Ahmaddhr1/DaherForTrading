@@ -235,11 +235,22 @@ export default function ProductsPage() {
         </div>
         )}
 
-        {/* Category filter + Search Bar + View toggle - stacked full-width on phone, inline row from lg up */}
-        <div className="mb-6 flex flex-col lg:flex-row lg:items-start gap-3">
-          {/* Desktop: always-visible checkbox list, several categories can be
-              checked at once - no selection means "all categories". */}
-          <div className="hidden lg:flex lg:flex-col w-56 shrink-0 border rounded-md bg-white">
+        {/* Mobile: button opening a searchable list modal - desktop has the
+            persistent checkbox sidebar instead (below). */}
+        <Button
+          variant="outline"
+          onClick={() => setCategoryModalOpen(true)}
+          className="lg:hidden w-full flex items-center gap-2 mb-3"
+        >
+          <Filter className="h-4 w-4 shrink-0" />
+          <span className="truncate">{selectedCategoryLabel}</span>
+        </Button>
+
+        <div className="flex flex-col lg:flex-row gap-6">
+          {/* Desktop: always-visible checkbox list beside the table, several
+              categories can be checked at once - no selection means "all
+              categories". */}
+          <div className="hidden lg:flex lg:flex-col w-56 shrink-0 border rounded-md bg-white h-fit lg:sticky lg:top-6">
             <div className="flex items-center justify-between px-3 py-2 border-b">
               <span className="text-sm font-medium text-gray-700">Categories</span>
               {categoryFilters.length > 0 && (
@@ -252,7 +263,7 @@ export default function ProductsPage() {
                 </button>
               )}
             </div>
-            <div className="max-h-64 overflow-y-auto p-2 space-y-0.5">
+            <div className="max-h-[28rem] overflow-y-auto p-2 space-y-0.5">
               {categories.length === 0 ? (
                 <p className="text-sm text-gray-400 px-2 py-1">No categories yet</p>
               ) : (
@@ -274,82 +285,75 @@ export default function ProductsPage() {
             </div>
           </div>
 
-          {/* Mobile: button opening a searchable list modal */}
-          <Button
-            variant="outline"
-            onClick={() => setCategoryModalOpen(true)}
-            className="lg:hidden w-full flex items-center gap-2"
-          >
-            <Filter className="h-4 w-4 shrink-0" />
-            <span className="truncate">{selectedCategoryLabel}</span>
-          </Button>
+          {/* Main column: search + view toggle, results count, the table/grid, and pagination */}
+          <div className="flex-1 min-w-0">
+            <div className="mb-6 flex flex-col sm:flex-row sm:items-center gap-3">
+              <div className="relative w-full sm:max-w-md sm:flex-1">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+                <Input
+                  type="text"
+                  placeholder="Search products by name..."
+                  value={searchInput}
+                  onChange={(e) => setSearchInput(e.target.value)}
+                  className="pl-10"
+                />
+              </div>
+              <div className="flex items-center gap-1 border rounded-md p-1 w-full sm:w-auto sm:shrink-0">
+                <Button
+                  variant={viewMode === "list" ? "default" : "ghost"}
+                  size="sm"
+                  onClick={() => setViewMode("list")}
+                  className="flex-1 sm:flex-none flex items-center justify-center gap-1.5"
+                >
+                  <LayoutList className="h-4 w-4" />
+                  <span className="hidden sm:inline">List</span>
+                </Button>
+                <Button
+                  variant={viewMode === "grid" ? "default" : "ghost"}
+                  size="sm"
+                  onClick={() => setViewMode("grid")}
+                  className="flex-1 sm:flex-none flex items-center justify-center gap-1.5"
+                >
+                  <LayoutGrid className="h-4 w-4" />
+                  <span className="hidden sm:inline">Grid</span>
+                </Button>
+              </div>
+            </div>
 
-          <div className="relative w-full lg:max-w-md lg:flex-1">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-            <Input
-              type="text"
-              placeholder="Search products by name..."
-              value={searchInput}
-              onChange={(e) => setSearchInput(e.target.value)}
-              className="pl-10"
-            />
-          </div>
-          <div className="flex items-center gap-1 border rounded-md p-1 w-full lg:w-auto lg:shrink-0">
-            <Button
-              variant={viewMode === "list" ? "default" : "ghost"}
-              size="sm"
-              onClick={() => setViewMode("list")}
-              className="flex-1 lg:flex-none flex items-center justify-center gap-1.5"
-            >
-              <LayoutList className="h-4 w-4" />
-              <span className="hidden sm:inline">List</span>
-            </Button>
-            <Button
-              variant={viewMode === "grid" ? "default" : "ghost"}
-              size="sm"
-              onClick={() => setViewMode("grid")}
-              className="flex-1 lg:flex-none flex items-center justify-center gap-1.5"
-            >
-              <LayoutGrid className="h-4 w-4" />
-              <span className="hidden sm:inline">Grid</span>
-            </Button>
-          </div>
-        </div>
+            {/* Results Count */}
+            <div className="mb-4">
+              <p className="text-gray-600">
+                Showing {products.length} of {totalCount} products
+              </p>
+            </div>
 
-        {/* Results Count */}
-        <div className="mb-4">
-          <p className="text-gray-600">
-            Showing {products.length} of {totalCount} products
-          </p>
-        </div>
+            {/* Loading State */}
+            {isLoading && <TableSkeleton rows={8} cols={8} />}
 
-        {/* Loading State */}
-        {isLoading && <TableSkeleton rows={8} cols={8} />}
+            {/* Error State */}
+            {error && !isLoading && (
+              <Card>
+                <CardContent className="pt-6 text-center">
+                  <div className="text-red-500 text-lg mb-2">Error</div>
+                  <p className="text-gray-600">Failed to load products. Please try again.</p>
+                  <Button
+                    onClick={() => queryClient.refetchQueries(["products"])}
+                    className="mt-4"
+                  >
+                    Try Again
+                  </Button>
+                </CardContent>
+              </Card>
+            )}
 
-        {/* Error State */}
-        {error && !isLoading && (
-          <Card>
-            <CardContent className="pt-6 text-center">
-              <div className="text-red-500 text-lg mb-2">Error</div>
-              <p className="text-gray-600">Failed to load products. Please try again.</p>
-              <Button 
-                onClick={() => queryClient.refetchQueries(["products"])}
-                className="mt-4"
-              >
-                Try Again
-              </Button>
-            </CardContent>
-          </Card>
-        )}
+            {/* Products Grid */}
+            {!isLoading && !error && viewMode === "grid" && (
+              <ProductGridView products={products} onAddToCart={handleAddToCart} />
+            )}
 
-        {/* Products Grid */}
-        {!isLoading && !error && viewMode === "grid" && (
-          <ProductGridView products={products} onAddToCart={handleAddToCart} />
-        )}
-
-        {/* Products Table */}
-        {!isLoading && !error && viewMode === "list" && (
-          <Card>
+            {/* Products Table */}
+            {!isLoading && !error && viewMode === "list" && (
+              <Card>
             <Table>
               <TableCaption>
                 {products.length === 0 ? "No products found" : "List of your products"}
@@ -520,6 +524,8 @@ export default function ProductsPage() {
             </Button>
           </div>
         )}
+          </div>
+        </div>
       </div>
 
       <GeneratePdfModal open={pdfModalOpen} onClose={() => setPdfModalOpen(false)} />

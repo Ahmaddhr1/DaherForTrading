@@ -38,6 +38,7 @@ import { toast } from "sonner";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { localDayStartISO, localDayEndISO } from "@/lib/dateUtils";
 import ProductBreakdown from "./ProductBreakdown";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 
 const SORT_OPTIONS = [
   { value: "newest", label: "Newest First" },
@@ -101,20 +102,30 @@ export default function CustomerOrdersTable() {
   };
   const activeFilterCount = [category, startDate, endDate].filter(Boolean).length;
 
+  const [deletePending, setDeletePending] = useState(null); // { action, orderId } | null
+
   const handleAction = async (action, orderId) => {
-    if (action === "delete" && !window.confirm("Undo this order? Stock will be restored and the customer's debt reduced.")) {
+    if (action === "delete" || action === "deleteDraft") {
+      setDeletePending({ action, orderId });
       return;
     }
     if (action === "markPaid" && !window.confirm("Mark this order as fully paid?")) {
       return;
     }
-    if (action === "deleteDraft" && !window.confirm("Delete this draft? This cannot be undone.")) {
-      return;
-    }
     if (action === "finalize" && !window.confirm("Finalize this draft into a real order? This will deduct stock and add to the customer's debt.")) {
       return;
     }
+    await runAction(action, orderId);
+  };
 
+  const confirmDeletePending = async () => {
+    if (!deletePending) return;
+    const { action, orderId } = deletePending;
+    setDeletePending(null);
+    await runAction(action, orderId);
+  };
+
+  const runAction = async (action, orderId) => {
     try {
       setActionLoading(true);
 
@@ -483,6 +494,19 @@ export default function CustomerOrdersTable() {
           </Card>
         )}
       </div>
+      <ConfirmDialog
+        open={!!deletePending}
+        onClose={() => setDeletePending(null)}
+        title={deletePending?.action === "deleteDraft" ? "Delete draft?" : "Undo order?"}
+        description={
+          deletePending?.action === "deleteDraft"
+            ? "Delete this draft? This cannot be undone."
+            : "Undo this order? Stock will be restored and the customer's debt reduced."
+        }
+        confirmLabel={deletePending?.action === "deleteDraft" ? "Delete" : "Undo Order"}
+        onConfirm={confirmDeletePending}
+        loading={actionLoading}
+      />
     </div>
   );
 }

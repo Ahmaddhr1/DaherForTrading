@@ -40,6 +40,7 @@ import { DateRangeFilter } from "./DateRangeFilter";
 import { OrdersTotalsCard } from "./OrdersTotalsCard";
 import OrderCustomerName from "./OrderCustomerName";
 import { useIsOwner } from "@/lib/useIsOwner";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 
 const SORT_OPTIONS = [
   { value: "newest", label: "Newest First" },
@@ -93,14 +94,9 @@ export default function AllOrders() {
     setPage(1);
   }, [statusFilter, searchTerm, sortBy, pageSize, startDate, endDate]);
 
-  const handleAction = async (action, orderId) => {
-    if (action === "delete" && !window.confirm("Undo this order? Stock will be restored and the customer's debt reduced.")) {
-      return;
-    }
-    if (action === "markPaid" && !window.confirm("Mark this order as fully paid?")) {
-      return;
-    }
+  const [deleteOrderId, setDeleteOrderId] = useState(null);
 
+  const runAction = async (action, orderId) => {
     try {
       setActionLoading(true);
       if (action === "markPaid") {
@@ -122,6 +118,23 @@ export default function AllOrders() {
     } finally {
       setActionLoading(false);
     }
+  };
+
+  const handleAction = async (action, orderId) => {
+    if (action === "delete") {
+      setDeleteOrderId(orderId);
+      return;
+    }
+    if (action === "markPaid" && !window.confirm("Mark this order as fully paid?")) {
+      return;
+    }
+    await runAction(action, orderId);
+  };
+
+  const confirmDeleteOrder = async () => {
+    const id = deleteOrderId;
+    setDeleteOrderId(null);
+    await runAction("delete", id);
   };
 
   const orders = data?.orders || [];
@@ -391,6 +404,15 @@ export default function AllOrders() {
           )}
         </>
       )}
+      <ConfirmDialog
+        open={!!deleteOrderId}
+        onClose={() => setDeleteOrderId(null)}
+        title="Undo order?"
+        description="Undo this order? Stock will be restored and the customer's debt reduced."
+        confirmLabel="Undo Order"
+        onConfirm={confirmDeleteOrder}
+        loading={actionLoading}
+      />
     </div>
   );
 }

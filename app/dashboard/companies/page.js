@@ -12,6 +12,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { CardGridSkeleton } from "@/components/ui/skeleton-patterns";
 import { FiltersPanel } from "@/components/ui/filters-panel";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { localDayStartISO, localDayEndISO } from "@/lib/dateUtils";
 import {
   Search,
@@ -98,10 +99,11 @@ export default function CompaniesPage() {
     if (error) toast.error("Failed to load companies");
   }, [error]);
 
-  const handleDelete = (companyId, companyName) => {
-    if (window.confirm(`Are you sure you want to delete ${companyName}?`)) {
-      deleteMutation.mutate(companyId);
-    }
+  const [deleteTarget, setDeleteTarget] = useState(null);
+
+  const confirmDelete = () => {
+    if (!deleteTarget) return;
+    deleteMutation.mutate(deleteTarget._id, { onSuccess: () => setDeleteTarget(null) });
   };
 
   const handleShowTopDebts = () => {
@@ -441,7 +443,7 @@ export default function CompaniesPage() {
                           size="sm"
                           onClick={(e) => {
                             e.preventDefault();
-                            handleDelete(company._id, company.name);
+                            setDeleteTarget(company);
                           }}
                           disabled={deleteMutation.isPending}
                           className="w-full"
@@ -486,6 +488,14 @@ export default function CompaniesPage() {
           </>
         )}
       </div>
+      <ConfirmDialog
+        open={!!deleteTarget}
+        onClose={() => setDeleteTarget(null)}
+        title="Delete company?"
+        description={`Are you sure you want to delete ${deleteTarget?.name}?`}
+        onConfirm={confirmDelete}
+        loading={deleteMutation.isPending}
+      />
     </div>
   );
 }

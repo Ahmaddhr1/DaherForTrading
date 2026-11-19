@@ -1,7 +1,7 @@
 // app/dashboard/products/page.jsx
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { toast } from "sonner";
@@ -24,6 +24,7 @@ import { Search, Package, Plus, Edit, Trash2, ChevronLeft, ChevronRight, Loader2
 import ProductGridView from "./ProductGridView";
 import GeneratePdfModal from "./GeneratePdfModal";
 import CategoryFilterModal from "./CategoryFilterModal";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { useCart } from "@/lib/cartContext";
 import { useIsOwner } from "@/lib/useIsOwner";
 
@@ -42,6 +43,12 @@ export default function ProductsPage() {
   const { addToCart } = useCart();
   const { isOwner } = useIsOwner();
   const queryClient = useQueryClient();
+
+  // The category sidebar's height is capped to match whatever height the
+  // table/grid column actually renders at, so a long category list scrolls
+  // inside the sidebar instead of growing taller than the table.
+  const tableColumnRef = useRef(null);
+  const [sidebarMaxHeight, setSidebarMaxHeight] = useState(null);
 
   const handleAddToCart = (product) => {
     addToCart(product);
@@ -110,15 +117,27 @@ export default function ProductsPage() {
     setCurrentPage(1);
   }, [categoryFilters]);
 
+  useEffect(() => {
+    const el = tableColumnRef.current;
+    if (!el) return;
+    const updateHeight = () => setSidebarMaxHeight(el.offsetHeight);
+    updateHeight();
+    const resizeObserver = new ResizeObserver(updateHeight);
+    resizeObserver.observe(el);
+    return () => resizeObserver.disconnect();
+  }, [data?.products?.length, isLoading, error, viewMode]);
+
   // Handle delete product
-  const handleDelete = async (productId, productName) => {
-    if (window.confirm(`Are you sure you want to delete "${productName}"?`)) {
-      setDeletingId(productId);
-      try {
-        await deleteMutation.mutateAsync(productId);
-      } finally {
-        setDeletingId(null);
-      }
+  const [deleteTarget, setDeleteTarget] = useState(null);
+
+  const confirmDelete = async () => {
+    if (!deleteTarget) return;
+    setDeletingId(deleteTarget._id);
+    try {
+      await deleteMutation.mutateAsync(deleteTarget._id);
+    } finally {
+      setDeletingId(null);
+      setDeleteTarget(null);
     }
   };
 
@@ -246,12 +265,60 @@ export default function ProductsPage() {
           <span className="truncate">{selectedCategoryLabel}</span>
         </Button>
 
-        <div className="flex flex-col lg:flex-row gap-6">
+        {/* Search + view toggle - above both the category sidebar and the table */}
+        <div className="mb-6 flex flex-col sm:flex-row sm:items-center gap-3">
+          <div className="relative w-full sm:max-w-md sm:flex-1">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+            <Input
+              type="text"
+              placeholder="Search products by name..."
+              value={searchInput}
+              onChange={(e) => setSearchInput(e.target.value)}
+              className="pl-10"
+            />
+          </div>
+          <div className="flex items-center gap-1 border rounded-md p-1 w-full sm:w-auto sm:shrink-0">
+            <Button
+              variant={viewMode === "list" ? "default" : "ghost"}
+              size="sm"
+              onClick={() => setViewMode("list")}
+              className="flex-1 sm:flex-none flex items-center justify-center gap-1.5"
+            >
+              <LayoutList className="h-4 w-4" />
+              <span className="hidden sm:inline">List</span>
+            </Button>
+            <Button
+              variant={viewMode === "grid" ? "default" : "ghost"}
+              size="sm"
+              onClick={() => setViewMode("grid")}
+              className="flex-1 sm:flex-none flex items-center justify-center gap-1.5"
+            >
+              <LayoutGrid className="h-4 w-4" />
+              <span className="hidden sm:inline">Grid</span>
+            </Button>
+          </div>
+        </div>
+
+        {/* Results Count */}
+        <div className="mb-4">
+          <p className="text-gray-600">
+            Showing {products.length} of {totalCount} products
+          </p>
+        </div>
+
+        {/* Category sidebar + table/grid row - the sidebar's max-height is
+            measured off the table/grid column (see sidebarMaxHeight above)
+            so a long category list scrolls inside the sidebar instead of
+            growing taller than the table. */}
+        <div className="flex flex-col lg:flex-row gap-6 lg:items-start">
           {/* Desktop: always-visible checkbox list beside the table, several
               categories can be checked at once - no selection means "all
               categories". */}
-          <div className="hidden lg:flex lg:flex-col w-56 shrink-0 border rounded-md bg-white h-fit lg:sticky lg:top-6">
-            <div className="flex items-center justify-between px-3 py-2 border-b">
+          <div
+            className="hidden lg:flex lg:flex-col w-56 shrink-0 min-h-0 border rounded-md bg-white overflow-hidden"
+            style={sidebarMaxHeight ? { maxHeight: `${sidebarMaxHeight}px` } : undefined}
+          >
+            <div className="flex items-center justify-between px-3 py-2 border-b shrink-0">
               <span className="text-sm font-medium text-gray-700">Categories</span>
               {categoryFilters.length > 0 && (
                 <button
@@ -263,7 +330,7 @@ export default function ProductsPage() {
                 </button>
               )}
             </div>
-            <div className="max-h-[28rem] overflow-y-auto p-2 space-y-0.5">
+            <div className="flex-1 min-h-0 overflow-y-auto p-2 space-y-0.5">
               {categories.length === 0 ? (
                 <p className="text-sm text-gray-400 px-2 py-1">No categories yet</p>
               ) : (
@@ -285,48 +352,8 @@ export default function ProductsPage() {
             </div>
           </div>
 
-          {/* Main column: search + view toggle, results count, the table/grid, and pagination */}
-          <div className="flex-1 min-w-0">
-            <div className="mb-6 flex flex-col sm:flex-row sm:items-center gap-3">
-              <div className="relative w-full sm:max-w-md sm:flex-1">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-                <Input
-                  type="text"
-                  placeholder="Search products by name..."
-                  value={searchInput}
-                  onChange={(e) => setSearchInput(e.target.value)}
-                  className="pl-10"
-                />
-              </div>
-              <div className="flex items-center gap-1 border rounded-md p-1 w-full sm:w-auto sm:shrink-0">
-                <Button
-                  variant={viewMode === "list" ? "default" : "ghost"}
-                  size="sm"
-                  onClick={() => setViewMode("list")}
-                  className="flex-1 sm:flex-none flex items-center justify-center gap-1.5"
-                >
-                  <LayoutList className="h-4 w-4" />
-                  <span className="hidden sm:inline">List</span>
-                </Button>
-                <Button
-                  variant={viewMode === "grid" ? "default" : "ghost"}
-                  size="sm"
-                  onClick={() => setViewMode("grid")}
-                  className="flex-1 sm:flex-none flex items-center justify-center gap-1.5"
-                >
-                  <LayoutGrid className="h-4 w-4" />
-                  <span className="hidden sm:inline">Grid</span>
-                </Button>
-              </div>
-            </div>
-
-            {/* Results Count */}
-            <div className="mb-4">
-              <p className="text-gray-600">
-                Showing {products.length} of {totalCount} products
-              </p>
-            </div>
-
+          {/* Main column: the table/grid itself */}
+          <div className="flex-1 min-w-0" ref={tableColumnRef}>
             {/* Loading State */}
             {isLoading && <TableSkeleton rows={8} cols={8} />}
 
@@ -474,7 +501,7 @@ export default function ProductsPage() {
                             <Button
                               variant="destructive"
                               size="sm"
-                              onClick={() => handleDelete(product._id, product.name)}
+                              onClick={() => setDeleteTarget(product)}
                               disabled={deletingId === product._id}
                               className="flex items-center gap-1"
                             >
@@ -495,6 +522,8 @@ export default function ProductsPage() {
             </Table>
           </Card>
         )}
+          </div>
+        </div>
 
         {/* Pagination */}
         {!isLoading && !error && totalPages > 1 && (
@@ -524,11 +553,17 @@ export default function ProductsPage() {
             </Button>
           </div>
         )}
-          </div>
-        </div>
       </div>
 
       <GeneratePdfModal open={pdfModalOpen} onClose={() => setPdfModalOpen(false)} />
+      <ConfirmDialog
+        open={!!deleteTarget}
+        onClose={() => setDeleteTarget(null)}
+        title="Delete product?"
+        description={`Are you sure you want to delete "${deleteTarget?.name}"?`}
+        onConfirm={confirmDelete}
+        loading={deletingId === deleteTarget?._id}
+      />
       <CategoryFilterModal
         open={categoryModalOpen}
         onClose={() => setCategoryModalOpen(false)}

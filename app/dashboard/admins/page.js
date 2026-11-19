@@ -22,6 +22,7 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Modal } from "@/components/ui/modal";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { TableSkeleton } from "@/components/ui/skeleton-patterns";
 import {
   Table,
@@ -124,9 +125,15 @@ export default function AdminsPage() {
     patchMutation.mutate({ id: admin._id, active: nextActive });
   };
 
+  const [deleteTarget, setDeleteTarget] = useState(null);
+
   const handleDelete = (admin) => {
-    if (!window.confirm(`Permanently delete ${admin.adminname}? This can't be undone.`)) return;
-    deleteMutation.mutate(admin._id);
+    setDeleteTarget(admin);
+  };
+
+  const confirmDelete = () => {
+    if (!deleteTarget) return;
+    deleteMutation.mutate(deleteTarget._id, { onSuccess: () => setDeleteTarget(null) });
   };
 
   const handleResetPassword = (e) => {
@@ -377,6 +384,14 @@ export default function AdminsPage() {
           </Button>
         </form>
       </Modal>
+      <ConfirmDialog
+        open={!!deleteTarget}
+        onClose={() => setDeleteTarget(null)}
+        title="Delete admin?"
+        description={`Permanently delete ${deleteTarget?.adminname}? This can't be undone.`}
+        onConfirm={confirmDelete}
+        loading={deleteMutation.isPending}
+      />
     </div>
   );
 }

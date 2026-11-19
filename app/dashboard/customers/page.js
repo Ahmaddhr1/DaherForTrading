@@ -12,6 +12,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { CardGridSkeleton } from "@/components/ui/skeleton-patterns";
 import { FiltersPanel } from "@/components/ui/filters-panel";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import {
   Search,
   User,
@@ -101,10 +102,11 @@ export default function CustomersPage() {
   }, [error]);
 
   // Handle delete customer
-  const handleDelete = (customerId, customerName) => {
-    if (window.confirm(`Are you sure you want to delete ${customerName}?`)) {
-      deleteMutation.mutate(customerId);
-    }
+  const [deleteTarget, setDeleteTarget] = useState(null);
+
+  const confirmDelete = () => {
+    if (!deleteTarget) return;
+    deleteMutation.mutate(deleteTarget._id, { onSuccess: () => setDeleteTarget(null) });
   };
 
   const handleShowTopDebtors = () => {
@@ -380,7 +382,7 @@ export default function CustomersPage() {
                           size="sm"
                           onClick={(e) => {
                             e.preventDefault();
-                            handleDelete(customer._id, customer.fullName);
+                            setDeleteTarget(customer);
                           }}
                           disabled={deleteMutation.isPending}
                           className="w-full"
@@ -426,6 +428,14 @@ export default function CustomersPage() {
           </>
         )}
       </div>
+      <ConfirmDialog
+        open={!!deleteTarget}
+        onClose={() => setDeleteTarget(null)}
+        title="Delete customer?"
+        description={`Are you sure you want to delete ${deleteTarget?.fullName}?`}
+        onConfirm={confirmDelete}
+        loading={deleteMutation.isPending}
+      />
     </div>
   );
 }

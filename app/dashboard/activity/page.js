@@ -18,6 +18,8 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Modal } from "@/components/ui/modal";
+import { DateRangeFilter } from "@/app/dashboard/orders/components/DateRangeFilter";
+import { localDayStartISO, localDayEndISO } from "@/lib/dateUtils";
 
 const ENTITY_TYPES = ["Order", "Payment", "Product", "Purchase", "Disbursement", "Customer", "Company"];
 
@@ -25,15 +27,24 @@ export default function ActivityPage() {
   const [page, setPage] = useState(1);
   const [adminFilter, setAdminFilter] = useState("");
   const [entityTypeFilter, setEntityTypeFilter] = useState("");
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
   const [clearOpen, setClearOpen] = useState(false);
   const limit = 20;
   const queryClient = useQueryClient();
 
   const { data, isLoading, error } = useQuery({
-    queryKey: ["activity", page, adminFilter, entityTypeFilter],
+    queryKey: ["activity", page, adminFilter, entityTypeFilter, startDate, endDate],
     queryFn: async () => {
       const response = await axios.get("/api/activity", {
-        params: { page, limit, admin: adminFilter, entityType: entityTypeFilter },
+        params: {
+          page,
+          limit,
+          admin: adminFilter,
+          entityType: entityTypeFilter,
+          startDate: localDayStartISO(startDate),
+          endDate: localDayEndISO(endDate),
+        },
       });
       return response.data;
     },
@@ -142,6 +153,19 @@ export default function ActivityPage() {
               </option>
             ))}
           </select>
+
+          <DateRangeFilter
+            startDate={startDate}
+            endDate={endDate}
+            onStartDateChange={(value) => {
+              setStartDate(value);
+              setPage(1);
+            }}
+            onEndDateChange={(value) => {
+              setEndDate(value);
+              setPage(1);
+            }}
+          />
         </div>
 
         {isLoading && <TableSkeleton rows={8} cols={3} />}

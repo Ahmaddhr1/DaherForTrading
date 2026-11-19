@@ -33,12 +33,28 @@ export async function GET(req) {
       .skip(skip)
       .limit(limit);
 
+    const [totalsResult] = await Order.aggregate([
+      { $match: query },
+      {
+        $group: {
+          _id: null,
+          totalAmount: { $sum: "$total" },
+          totalProfit: { $sum: { $ifNull: ["$profit", 0] } },
+        },
+      },
+    ]);
+    const totals = {
+      totalAmount: totalsResult?.totalAmount || 0,
+      totalProfit: totalsResult?.totalProfit || 0,
+    };
+
     return NextResponse.json(
       {
         todayOrders,
         total,
         page,
         totalPages: Math.ceil(total / limit),
+        totals,
       },
       { status: 200 }
     );

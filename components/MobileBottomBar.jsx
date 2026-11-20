@@ -3,13 +3,14 @@
 import { useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
-import { Home, ClipboardList, ShoppingCart, Wallet, Boxes, MoreHorizontal, LogOut, X } from "lucide-react";
+import { Home, ClipboardList, ShoppingCart, Wallet, Boxes, MoreHorizontal, LogOut, X, Search } from "lucide-react";
 import { toast } from "sonner";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import tabs from "@/lib/SideBarTabs";
 import { useCart } from "@/lib/cartContext";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { GlobalSearchModal } from "@/components/GlobalSearchModal";
 
 const findTab = (label) => tabs.find((tab) => tab.label === label);
 
@@ -19,6 +20,7 @@ export function MobileBottomBar() {
   const pathname = usePathname();
   const router = useRouter();
   const [openSection, setOpenSection] = useState(null);
+  const [searchOpen, setSearchOpen] = useState(false);
   const { itemCount, openCart } = useCart();
 
   // Drives whether Admins/Activity Log show up in the "More" sheet - the
@@ -176,7 +178,17 @@ export function MobileBottomBar() {
               ))}
               {activeSheet.key === "more" && (
                 <>
-                  <ThemeToggle className="w-full text-gray-700 dark:text-gray-300 dark:text-gray-300" />
+                  <button
+                    onClick={() => {
+                      setOpenSection(null);
+                      setSearchOpen(true);
+                    }}
+                    className="w-full flex items-center gap-3 p-3 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
+                  >
+                    <Search size={20} />
+                    Search
+                  </button>
+                  <ThemeToggle className="w-full text-gray-700 dark:text-gray-300" />
                   <button
                     onClick={handleLogout}
                     className="w-full flex items-center gap-3 p-3 rounded-lg text-destructive hover:bg-destructive/10"
@@ -190,6 +202,7 @@ export function MobileBottomBar() {
           </div>
         </div>
       )}
+      <GlobalSearchModal open={searchOpen} onClose={() => setSearchOpen(false)} />
     </>
   );
 }

@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
-import { Home, ClipboardList, ShoppingCart, Wallet, Boxes, MoreHorizontal, LogOut, X, Search } from "lucide-react";
+import { Home, ClipboardList, ShoppingCart, Wallet, Boxes, MoreHorizontal, LogOut, X, Search, UserRound } from "lucide-react";
 import { toast } from "sonner";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
@@ -87,12 +87,24 @@ export function MobileBottomBar() {
       action: () => setSearchOpen(true),
       special: true,
     },
-    {
-      key: "sales",
-      label: "Sales",
-      icon: <Wallet size={20} />,
-      items: ["Customers", "Overdue Debt", "Payments", "Disbursements"].map(findTab).filter(Boolean),
-    },
+    // Owner gets the full Sales group (Customers plus the money-side
+    // pages); a plain employee's most frequent need here is just looking
+    // up a customer, so give them a direct "Customers" link in the same
+    // slot instead of burying it one level down - the rest of what Sales
+    // held for them moves into the More sheet instead of disappearing.
+    isOwner
+      ? {
+          key: "sales",
+          label: "Sales",
+          icon: <Wallet size={20} />,
+          items: ["Customers", "Overdue Debt", "Payments", "Disbursements"].map(findTab).filter(Boolean),
+        }
+      : {
+          key: "customers",
+          label: "Customers",
+          icon: <UserRound size={20} />,
+          path: findTab("Customers")?.path,
+        },
     {
       key: "inventory",
       label: "Stock",
@@ -103,7 +115,11 @@ export function MobileBottomBar() {
       key: "more",
       label: "More",
       icon: <MoreHorizontal size={20} />,
-      items: ["Settings", ...(isOwner ? ["Admins", "Activity Log"] : [])].map(findTab).filter(Boolean),
+      items: [
+        ...(isOwner ? [] : ["Overdue Debt", "Payments", "Disbursements"]),
+        "Settings",
+        ...(isOwner ? ["Admins", "Activity Log"] : []),
+      ].map(findTab).filter(Boolean),
     },
   ];
 

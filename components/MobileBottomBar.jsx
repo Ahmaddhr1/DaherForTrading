@@ -80,12 +80,19 @@ export function MobileBottomBar() {
       action: openCart,
       badge: itemCount,
     },
-    {
-      key: "payments",
-      label: "Payments",
-      icon: <CreditCard size={20} />,
-      path: findTab("Payments")?.path,
-    },
+    // Owner already has quick access to Payments inside the Sales sheet;
+    // an employee's most frequent money-side need is recording a payment,
+    // so give them a direct slot here instead of burying it in More.
+    ...(isOwner
+      ? []
+      : [
+          {
+            key: "payments",
+            label: "Payments",
+            icon: <CreditCard size={20} />,
+            path: findTab("Payments")?.path,
+          },
+        ]),
     {
       key: "search",
       label: "Search",
@@ -103,7 +110,7 @@ export function MobileBottomBar() {
           key: "sales",
           label: "Sales",
           icon: <Wallet size={20} />,
-          items: ["Customers", "Overdue Debt", "Disbursements"].map(findTab).filter(Boolean),
+          items: ["Customers", "Overdue Debt", "Payments", "Disbursements"].map(findTab).filter(Boolean),
         }
       : {
           key: "customers",
@@ -151,7 +158,7 @@ export function MobileBottomBar() {
   return (
     <>
       <nav className="lg:hidden fixed bottom-0 inset-x-0 z-40 bg-sidebar border-t border-sidebar-border pb-[env(safe-area-inset-bottom)]">
-        <div className={`grid ${isOwner || canViewStats ? "grid-cols-8" : "grid-cols-7"}`}>
+        <div className="grid" style={{ gridTemplateColumns: `repeat(${SECTIONS.length}, minmax(0, 1fr))` }}>
           {SECTIONS.map((section) => {
             const active = isSectionActive(section);
             const className = `flex flex-col items-center justify-center gap-1 py-2.5 text-[11px] font-medium ${

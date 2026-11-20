@@ -59,19 +59,19 @@ const CategoriesPage = () => {
   const totalCount = data?.total || 0;
 
   return (
-    <div className="min-h-screen bg-gray-50 py-6">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-950 py-6">
       <div className="container mx-auto px-4">
 
         {/* Page Header */}
         <div className="mb-8">
           <div className="flex items-center justify-between gap-3">
             <div className="flex items-center gap-3 min-w-0">
-              <div className="p-2 bg-blue-100 rounded-lg shrink-0">
+              <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg shrink-0">
                 <Grid3X3 className="h-6 w-6 text-blue-600" />
               </div>
               <div className="min-w-0">
-                <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 truncate">Categories</h1>
-                <p className="text-gray-600 text-sm sm:text-base truncate">Organize your products by categories</p>
+                <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-gray-100 truncate">Categories</h1>
+                <p className="text-gray-600 dark:text-gray-400 text-sm sm:text-base truncate">Organize your products by categories</p>
               </div>
             </div>
 
@@ -87,7 +87,7 @@ const CategoriesPage = () => {
         {/* Search Bar */}
         <div className="mb-6">
           <div className="relative max-w-md">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 h-4 w-4" />
             <Input
               type="text"
               placeholder="Search categories by name..."
@@ -101,7 +101,7 @@ const CategoriesPage = () => {
         {/* Results Count */}
         {!isLoading && !error && (
           <div className="mb-4">
-            <p className="text-gray-600">
+            <p className="text-gray-600 dark:text-gray-400">
               Showing {categories.length} of {totalCount} categories
             </p>
           </div>
@@ -115,7 +115,7 @@ const CategoriesPage = () => {
           <Card>
             <CardContent className="pt-6 text-center">
               <div className="text-red-500 text-lg mb-2">Error Loading Categories</div>
-              <p className="text-gray-600 mb-4">Unable to load categories. Please try again.</p>
+              <p className="text-gray-600 dark:text-gray-400 mb-4">Unable to load categories. Please try again.</p>
               <Button
                 onClick={() => window.location.reload()}
                 variant="outline"
@@ -130,11 +130,11 @@ const CategoriesPage = () => {
         {!isLoading && !error && categories.length === 0 && (
           <Card>
             <CardContent className="pt-6 text-center">
-              <Folder className="h-16 w-16 text-gray-300 mx-auto mb-4" />
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">
+              <Folder className="h-16 w-16 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">
                 {searchTerm ? "No Categories Found" : "No Categories Yet"}
               </h3>
-              <p className="text-gray-600 mb-4">
+              <p className="text-gray-600 dark:text-gray-400 mb-4">
                 {searchTerm
                   ? "Try adjusting your search."
                   : "Categories help you organize your products. Create your first category to get started."}
@@ -165,25 +165,25 @@ const CategoriesPage = () => {
                     <CardContent className="p-6">
                       {/* Category Icon */}
                       <div className="flex justify-center mb-4">
-                        <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center group-hover:bg-blue-200 transition-colors">
+                        <div className="w-16 h-16 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center group-hover:bg-blue-200 transition-colors">
                           <Folder className="h-8 w-8 text-blue-600" />
                         </div>
                       </div>
 
                       {/* Category Name */}
-                      <h3 className="text-lg font-semibold text-gray-900 text-center mb-2 group-hover:text-blue-600 transition-colors">
+                      <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 text-center mb-2 group-hover:text-blue-600 transition-colors">
                         {category.name}
                       </h3>
 
                       {/* Category Description */}
                       {category.description && (
-                        <p className="text-gray-600 text-sm text-center mb-4 line-clamp-2">
+                        <p className="text-gray-600 dark:text-gray-400 text-sm text-center mb-4 line-clamp-2">
                           {category.description}
                         </p>
                       )}
 
                       {/* Product Count (if available) */}
-                      <div className="flex items-center justify-center gap-2 text-sm text-gray-500 mb-4">
+                      <div className="flex items-center justify-center gap-2 text-sm text-gray-500 dark:text-gray-400 mb-4">
                         <FileText className="h-4 w-4" />
                         <span>{category.products?.length || 0} products</span>
                       </div>
@@ -212,7 +212,7 @@ const CategoriesPage = () => {
                   Previous
                 </Button>
 
-                <span className="text-gray-600">
+                <span className="text-gray-600 dark:text-gray-400">
                   Page {currentPage} of {totalPages}
                 </span>
 

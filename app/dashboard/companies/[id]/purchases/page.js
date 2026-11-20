@@ -54,13 +54,13 @@ export default function CompanyPurchasesPage() {
   const activeFilterCount = [startDate, endDate].filter(Boolean).length;
 
   return (
-    <div className="min-h-screen bg-gray-50 py-6">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-950 py-6">
       <div className="container mx-auto px-4 max-w-5xl">
         <div className="mb-6">
           <Button
             variant="ghost"
             onClick={() => router.back()}
-            className="mb-4 flex items-center gap-2 text-gray-600 hover:text-gray-900"
+            className="mb-4 flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100"
           >
             <ArrowLeft className="h-4 w-4" />
             Back to Company
@@ -68,14 +68,14 @@ export default function CompanyPurchasesPage() {
 
           <div className="flex items-center justify-between gap-3">
             <div className="flex items-center gap-3 min-w-0">
-              <div className="p-2 bg-blue-100 rounded-lg shrink-0">
+              <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg shrink-0">
                 <History className="h-6 w-6 text-blue-600" />
               </div>
               <div className="min-w-0">
-                <h1 className="text-xl sm:text-2xl font-bold text-gray-900 truncate">
+                <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-gray-100 truncate">
                   Purchase History {data?.companyName ? `— ${data.companyName}` : ""}
                 </h1>
-                <p className="text-gray-600 text-sm sm:text-base truncate">All restocking purchases from this company</p>
+                <p className="text-gray-600 dark:text-gray-400 text-sm sm:text-base truncate">All restocking purchases from this company</p>
               </div>
             </div>
 
@@ -92,23 +92,23 @@ export default function CompanyPurchasesPage() {
         <ProductPurchaseBreakdown companyId={id} />
 
         {/* Summary for the current filter scope */}
-        <Card className="shadow-sm border-gray-200 mb-6">
+        <Card className="shadow-sm border-gray-200 dark:border-gray-800 mb-6">
           <CardContent className="p-4 grid grid-cols-2 gap-4">
             <div className="flex flex-col items-center sm:items-start gap-1">
-              <span className="flex items-center gap-1.5 text-xs font-medium text-gray-500">
+              <span className="flex items-center gap-1.5 text-xs font-medium text-gray-500 dark:text-gray-400">
                 <DollarSign className="h-3.5 w-3.5" />
                 Total Purchased
               </span>
-              <span className="text-lg font-bold text-gray-900">
+              <span className="text-lg font-bold text-gray-900 dark:text-gray-100">
                 ${summary.totalAmount.toLocaleString()}
               </span>
             </div>
             <div className="flex flex-col items-center sm:items-start gap-1">
-              <span className="flex items-center gap-1.5 text-xs font-medium text-gray-500">
+              <span className="flex items-center gap-1.5 text-xs font-medium text-gray-500 dark:text-gray-400">
                 <Package className="h-3.5 w-3.5" />
                 Units Purchased
               </span>
-              <span className="text-lg font-bold text-gray-900">
+              <span className="text-lg font-bold text-gray-900 dark:text-gray-100">
                 {summary.totalQuantity.toLocaleString()}
               </span>
             </div>
@@ -117,11 +117,11 @@ export default function CompanyPurchasesPage() {
 
         {/* Filters */}
         <FiltersPanel activeCount={activeFilterCount}>
-          <Card className="shadow-sm border-gray-200 mb-6">
+          <Card className="shadow-sm border-gray-200 dark:border-gray-800 mb-6">
             <CardContent className="p-4">
               <div className="flex flex-col sm:flex-row sm:flex-wrap sm:items-center gap-3 sm:gap-4">
                 <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-2">
-                  <span className="text-sm font-medium text-gray-700">From</span>
+                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">From</span>
                   <input
                     type="date"
                     value={startDate}
@@ -133,7 +133,7 @@ export default function CompanyPurchasesPage() {
                   />
                 </div>
                 <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-2">
-                  <span className="text-sm font-medium text-gray-700">To</span>
+                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">To</span>
                   <input
                     type="date"
                     value={endDate}
@@ -153,7 +153,7 @@ export default function CompanyPurchasesPage() {
                       setEndDate("");
                       setPage(1);
                     }}
-                    className="w-full sm:w-auto justify-center text-gray-500"
+                    className="w-full sm:w-auto justify-center text-gray-500 dark:text-gray-400"
                   >
                     Clear Filters
                   </Button>
@@ -168,7 +168,7 @@ export default function CompanyPurchasesPage() {
         ) : isError ? (
           <div className="text-center py-10 text-red-600">Failed to load purchases.</div>
         ) : (
-          <div className="bg-white rounded-lg border">
+          <div className="bg-white dark:bg-gray-900 rounded-lg border">
             <Table>
               <TableCaption>{purchases.length === 0 ? "No purchases yet." : "Purchase history"}</TableCaption>
               <TableHeader>
@@ -199,11 +199,11 @@ export default function CompanyPurchasesPage() {
                       <TableCell className="text-center">{purchase.quantity}</TableCell>
                       <TableCell className="text-center font-medium">${purchase.total.toFixed(2)}</TableCell>
                       <TableCell className="text-center">
-                        <Badge variant={purchase.paid ? "default" : "destructive"} className={purchase.paid ? "bg-green-100 text-green-800" : ""}>
+                        <Badge variant={purchase.paid ? "default" : "destructive"} className={purchase.paid ? "bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-400" : ""}>
                           {purchase.paid ? "Paid" : "Unpaid"}
                         </Badge>
                       </TableCell>
-                      <TableCell className="text-gray-500 text-sm">
+                      <TableCell className="text-gray-500 dark:text-gray-400 text-sm">
                         {format(new Date(purchase.createdAt), "MMM d, yyyy HH:mm")}
                       </TableCell>
                       <TableCell className="text-right">
@@ -232,7 +232,7 @@ export default function CompanyPurchasesPage() {
                   <ChevronLeft className="h-4 w-4" />
                   Previous
                 </Button>
-                <span className="text-sm text-gray-600">
+                <span className="text-sm text-gray-600 dark:text-gray-400">
                   Page {page} of {totalPages}
                 </span>
                 <Button

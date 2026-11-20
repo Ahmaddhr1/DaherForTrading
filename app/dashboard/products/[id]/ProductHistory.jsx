@@ -33,7 +33,7 @@ export default function ProductHistory({ productId }) {
   const purchases = data?.purchases || { entries: [], totalQuantity: 0, totalCost: 0 };
 
   return (
-    <Card className="shadow-sm border-gray-200 mt-6">
+    <Card className="shadow-sm border-gray-200 dark:border-gray-800 mt-6">
       <CardHeader className="pb-4 flex-row items-center justify-between space-y-0">
         <CardTitle className="text-lg flex items-center gap-2">
           <History className="h-5 w-5 text-blue-600" />
@@ -49,7 +49,7 @@ export default function ProductHistory({ productId }) {
       <CardContent className="space-y-4">
         <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
           <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-2">
-            <span className="text-sm font-medium text-gray-700">From</span>
+            <span className="text-sm font-medium text-gray-700 dark:text-gray-300">From</span>
             <input
               type="date"
               value={startDate}
@@ -58,7 +58,7 @@ export default function ProductHistory({ productId }) {
             />
           </div>
           <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-2">
-            <span className="text-sm font-medium text-gray-700">To</span>
+            <span className="text-sm font-medium text-gray-700 dark:text-gray-300">To</span>
             <input
               type="date"
               value={endDate}
@@ -73,7 +73,7 @@ export default function ProductHistory({ productId }) {
                 setStartDate("");
                 setEndDate("");
               }}
-              className="text-sm text-gray-500 hover:text-gray-700 underline w-fit"
+              className="text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 underline w-fit"
             >
               Clear
             </button>
@@ -90,21 +90,21 @@ export default function ProductHistory({ productId }) {
         ) : (
           <div className="grid gap-4 sm:grid-cols-2">
             {/* Sales */}
-            <div className="rounded-lg border border-green-200 bg-green-50 p-4">
-              <div className="flex items-center gap-2 font-medium text-green-900 mb-3">
+            <div className="rounded-lg border border-green-200 dark:border-green-900/50 bg-green-50 dark:bg-green-900/20 p-4">
+              <div className="flex items-center gap-2 font-medium text-green-900 dark:text-green-300 mb-3">
                 <ShoppingCart className="h-4 w-4" />
                 Sales
               </div>
               <div className="space-y-1.5 text-sm mb-3">
                 <div className="flex justify-between">
                   <span className="text-green-700">Units Sold</span>
-                  <span className="font-medium text-green-900">{sales.totalQuantity}</span>
+                  <span className="font-medium text-green-900 dark:text-green-300">{sales.totalQuantity}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-green-700">Revenue</span>
-                  <span className="font-medium text-green-900">${sales.totalRevenue.toFixed(2)}</span>
+                  <span className="font-medium text-green-900 dark:text-green-300">${sales.totalRevenue.toFixed(2)}</span>
                 </div>
-                <div className="flex justify-between pt-1.5 border-t border-green-200">
+                <div className="flex justify-between pt-1.5 border-t border-green-200 dark:border-green-900/50">
                   <span className="text-green-700 flex items-center gap-1">
                     {sales.totalProfit >= 0 ? (
                       <TrendingUp className="h-3.5 w-3.5" />
@@ -113,7 +113,7 @@ export default function ProductHistory({ productId }) {
                     )}
                     Est. Profit
                   </span>
-                  <span className={`font-bold ${sales.totalProfit >= 0 ? "text-green-900" : "text-red-700"}`}>
+                  <span className={`font-bold ${sales.totalProfit >= 0 ? "text-green-900 dark:text-green-300" : "text-red-700"}`}>
                     ${sales.totalProfit.toFixed(2)}
                   </span>
                 </div>
@@ -123,7 +123,7 @@ export default function ProductHistory({ productId }) {
                   <p className="text-xs text-green-700/70">No sales in this range</p>
                 ) : (
                   sales.entries.map((e, i) => (
-                    <div key={i} className="flex justify-between text-xs text-green-800 bg-white/60 rounded px-2 py-1">
+                    <div key={i} className="flex justify-between text-xs text-green-800 dark:text-green-400 bg-white/60 dark:bg-gray-900/60 rounded px-2 py-1">
                       <span>{e.quantity} x ${e.price.toFixed(2)}</span>
                       <span>{format(new Date(e.createdAt), "MMM d, yyyy")}</span>
                     </div>
@@ -133,19 +133,19 @@ export default function ProductHistory({ productId }) {
             </div>
 
             {/* Purchases */}
-            <div className="rounded-lg border border-orange-200 bg-orange-50 p-4">
-              <div className="flex items-center gap-2 font-medium text-orange-900 mb-3">
+            <div className="rounded-lg border border-orange-200 dark:border-orange-900/50 bg-orange-50 dark:bg-orange-900/20 p-4">
+              <div className="flex items-center gap-2 font-medium text-orange-900 dark:text-orange-300 mb-3">
                 <Truck className="h-4 w-4" />
                 Purchases (Restocking)
               </div>
               <div className="space-y-1.5 text-sm mb-3">
                 <div className="flex justify-between">
                   <span className="text-orange-700">Units Purchased</span>
-                  <span className="font-medium text-orange-900">{purchases.totalQuantity}</span>
+                  <span className="font-medium text-orange-900 dark:text-orange-300">{purchases.totalQuantity}</span>
                 </div>
-                <div className="flex justify-between pt-1.5 border-t border-orange-200">
+                <div className="flex justify-between pt-1.5 border-t border-orange-200 dark:border-orange-900/50">
                   <span className="text-orange-700">Total Cost</span>
-                  <span className="font-bold text-orange-900">${purchases.totalCost.toFixed(2)}</span>
+                  <span className="font-bold text-orange-900 dark:text-orange-300">${purchases.totalCost.toFixed(2)}</span>
                 </div>
               </div>
               <div className="max-h-48 overflow-y-auto space-y-1">
@@ -153,7 +153,7 @@ export default function ProductHistory({ productId }) {
                   <p className="text-xs text-orange-700/70">No purchases in this range</p>
                 ) : (
                   purchases.entries.map((p) => (
-                    <div key={p._id} className="flex justify-between text-xs text-orange-800 bg-white/60 rounded px-2 py-1">
+                    <div key={p._id} className="flex justify-between text-xs text-orange-800 dark:text-orange-400 bg-white/60 dark:bg-gray-900/60 rounded px-2 py-1">
                       <span>{p.quantity} x ${p.unitPrice.toFixed(2)}</span>
                       <span>{format(new Date(p.createdAt), "MMM d, yyyy")}</span>
                     </div>

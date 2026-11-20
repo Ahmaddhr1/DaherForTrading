@@ -55,15 +55,15 @@ export default function GeneratePdfModal({ open, onClose }) {
         {CATALOG_FIELDS.map((field) => (
           <label
             key={field.key}
-            className="flex items-center gap-3 p-2 rounded-md hover:bg-gray-50 cursor-pointer"
+            className="flex items-center gap-3 p-2 rounded-md hover:bg-gray-50 dark:hover:bg-gray-800/60 cursor-pointer"
           >
             <input
               type="checkbox"
               checked={!!selectedFields[field.key]}
               onChange={() => toggleField(field.key)}
-              className="h-4 w-4 rounded border-gray-300"
+              className="h-4 w-4 rounded border-gray-300 dark:border-gray-700"
             />
-            <span className="text-sm text-gray-900">{field.label}</span>
+            <span className="text-sm text-gray-900 dark:text-gray-100">{field.label}</span>
           </label>
         ))}
 

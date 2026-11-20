@@ -7,8 +7,8 @@ import { Package, ShoppingCart } from "lucide-react";
 export default function ProductGridView({ products, onAddToCart }) {
   if (products.length === 0) {
     return (
-      <div className="text-center py-12 text-gray-500">
-        <Package className="h-12 w-12 mx-auto mb-2 text-gray-300" />
+      <div className="text-center py-12 text-gray-500 dark:text-gray-400">
+        <Package className="h-12 w-12 mx-auto mb-2 text-gray-300 dark:text-gray-600" />
         <p>No products found</p>
       </div>
     );
@@ -19,8 +19,8 @@ export default function ProductGridView({ products, onAddToCart }) {
       {products.map((product) => {
         const outOfStock = !product.quantity || product.quantity <= 0;
         return (
-          <Card key={product._id} className="shadow-sm border-gray-200 overflow-hidden py-0 gap-0">
-            <div className="aspect-square bg-gray-100 flex items-center justify-center">
+          <Card key={product._id} className="shadow-sm border-gray-200 dark:border-gray-800 overflow-hidden py-0 gap-0">
+            <div className="aspect-square bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
               {product.img?.[0] ? (
                 <img
                   src={product.img[0]}
@@ -28,13 +28,13 @@ export default function ProductGridView({ products, onAddToCart }) {
                   className="w-full h-full object-cover"
                 />
               ) : (
-                <Package className="h-10 w-10 text-gray-400" />
+                <Package className="h-10 w-10 text-gray-400 dark:text-gray-500" />
               )}
             </div>
             <CardContent className="p-3 space-y-2">
               <div>
-                <p className="font-medium text-gray-900 truncate">{product.name}</p>
-                <p className="text-sm text-gray-500">
+                <p className="font-medium text-gray-900 dark:text-gray-100 truncate">{product.name}</p>
+                <p className="text-sm text-gray-500 dark:text-gray-400">
                   {outOfStock ? (
                     <span className="text-red-600">Out of stock</span>
                   ) : (

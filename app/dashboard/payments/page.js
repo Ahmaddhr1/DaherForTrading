@@ -147,18 +147,18 @@ export default function PaymentsPage() {
   ).length;
 
   return (
-    <div className="min-h-screen bg-gray-50 py-6">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-950 py-6">
       <div className="container mx-auto px-4">
         {/* Header */}
         <div className="mb-8">
           <div className="flex items-center justify-between gap-3">
             <div className="flex items-center gap-3 min-w-0">
-              <div className="p-2 bg-blue-100 rounded-lg shrink-0">
+              <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg shrink-0">
                 <Wallet className="h-6 w-6 text-blue-600" />
               </div>
               <div className="min-w-0">
-                <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 truncate">Payments</h1>
-                <p className="text-gray-600 text-sm sm:text-base truncate">Payment history across all customers</p>
+                <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-gray-100 truncate">Payments</h1>
+                <p className="text-gray-600 dark:text-gray-400 text-sm sm:text-base truncate">Payment history across all customers</p>
               </div>
             </div>
 
@@ -170,15 +170,15 @@ export default function PaymentsPage() {
         </div>
 
         {/* Summary */}
-        <Card className="shadow-sm border-gray-200 mb-6">
+        <Card className="shadow-sm border-gray-200 dark:border-gray-800 mb-6">
           <CardContent className="p-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-            <div className="flex items-center gap-2 text-gray-700">
-              <History className="h-4 w-4 text-gray-500" />
+            <div className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
+              <History className="h-4 w-4 text-gray-500 dark:text-gray-400" />
               <span className="text-sm font-medium">
                 {totalCount} payment{totalCount === 1 ? "" : "s"} matching current filters
               </span>
             </div>
-            <div className="text-sm text-gray-600">
+            <div className="text-sm text-gray-600 dark:text-gray-400">
               Total Collected:{" "}
               <span className="font-bold text-green-600">${totalCollected.toLocaleString()}</span>
             </div>
@@ -186,17 +186,17 @@ export default function PaymentsPage() {
         </Card>
 
         {!hasInteracted && (
-          <p className="text-sm text-gray-500 mb-4">
+          <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
             Showing today&apos;s payments only. Pick a date range below to see more.
           </p>
         )}
 
         {/* Filters */}
         <FiltersPanel activeCount={activeFilterCount}>
-          <Card className="shadow-sm border-gray-200 mb-6">
+          <Card className="shadow-sm border-gray-200 dark:border-gray-800 mb-6">
             <CardContent className="p-4 space-y-4">
               <div className="relative max-w-md">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 h-4 w-4" />
                 <Input
                   type="text"
                   placeholder="Search by customer name..."
@@ -208,8 +208,8 @@ export default function PaymentsPage() {
 
               <div className="flex flex-col sm:flex-row sm:flex-wrap sm:items-center gap-3 sm:gap-4">
                 <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-2">
-                  <span className="flex items-center gap-1.5 text-sm font-medium text-gray-700">
-                    <Filter className="h-4 w-4 text-gray-500" />
+                  <span className="flex items-center gap-1.5 text-sm font-medium text-gray-700 dark:text-gray-300">
+                    <Filter className="h-4 w-4 text-gray-500 dark:text-gray-400" />
                     From
                   </span>
                   <input
@@ -220,7 +220,7 @@ export default function PaymentsPage() {
                   />
                 </div>
                 <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-2">
-                  <span className="text-sm font-medium text-gray-700">To</span>
+                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">To</span>
                   <input
                     type="date"
                     value={endDate}
@@ -230,8 +230,8 @@ export default function PaymentsPage() {
                 </div>
 
                 <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-2">
-                  <span className="flex items-center gap-1.5 text-sm font-medium text-gray-700">
-                    <ArrowUpDown className="h-4 w-4 text-gray-500" />
+                  <span className="flex items-center gap-1.5 text-sm font-medium text-gray-700 dark:text-gray-300">
+                    <ArrowUpDown className="h-4 w-4 text-gray-500 dark:text-gray-400" />
                     Sort by
                   </span>
                   <select
@@ -248,7 +248,7 @@ export default function PaymentsPage() {
                 </div>
 
                 <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-2">
-                  <span className="text-sm font-medium text-gray-700">Per page</span>
+                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Per page</span>
                   <select
                     value={pageSize}
                     onChange={(e) => setPageSize(parseInt(e.target.value))}
@@ -267,7 +267,7 @@ export default function PaymentsPage() {
                     variant="ghost"
                     size="sm"
                     onClick={handleClearFilters}
-                    className="flex items-center justify-center gap-1 text-gray-500 w-full sm:w-auto"
+                    className="flex items-center justify-center gap-1 text-gray-500 dark:text-gray-400 w-full sm:w-auto"
                   >
                     <X className="h-3 w-3" />
                     Clear Filters
@@ -285,14 +285,14 @@ export default function PaymentsPage() {
           <Card>
             <CardContent className="pt-6 text-center">
               <div className="text-red-500 text-lg mb-2">Error</div>
-              <p className="text-gray-600">Failed to load payment history.</p>
+              <p className="text-gray-600 dark:text-gray-400">Failed to load payment history.</p>
             </CardContent>
           </Card>
         ) : payments.length === 0 ? (
           <Card>
             <CardContent className="pt-6 text-center">
-              <CheckCircle className="h-12 w-12 text-gray-300 mx-auto mb-3" />
-              <p className="text-gray-500 text-lg mb-2">No payments found</p>
+              <CheckCircle className="h-12 w-12 text-gray-300 dark:text-gray-600 mx-auto mb-3" />
+              <p className="text-gray-500 dark:text-gray-400 text-lg mb-2">No payments found</p>
               {hasActiveFilters && (
                 <Button variant="outline" onClick={handleClearFilters}>
                   Clear Filters
@@ -301,7 +301,7 @@ export default function PaymentsPage() {
             </CardContent>
           </Card>
         ) : (
-          <Card className="shadow-sm border-gray-200">
+          <Card className="shadow-sm border-gray-200 dark:border-gray-800">
             <Table>
               <TableCaption>Payment history</TableCaption>
               <TableHeader>
@@ -316,16 +316,16 @@ export default function PaymentsPage() {
               </TableHeader>
               <TableBody>
                 {payments.map((payment, index) => (
-                  <TableRow key={payment._id} className="hover:bg-gray-50">
-                    <TableCell className="font-medium text-gray-500">
+                  <TableRow key={payment._id} className="hover:bg-gray-50 dark:hover:bg-gray-800/60">
+                    <TableCell className="font-medium text-gray-500 dark:text-gray-400">
                       {(currentPage - 1) * pageSize + index + 1}
                     </TableCell>
                     <TableCell>
-                      <div className="font-medium text-gray-900">
+                      <div className="font-medium text-gray-900 dark:text-gray-100">
                         {payment.customer?.fullName || "Deleted Customer"}
                       </div>
                       {payment.customer?.phoneNumber && (
-                        <div className="text-sm text-gray-500 flex items-center gap-1">
+                        <div className="text-sm text-gray-500 dark:text-gray-400 flex items-center gap-1">
                           <Phone className="h-3 w-3" />
                           {payment.customer.phoneNumber}
                         </div>
@@ -334,15 +334,15 @@ export default function PaymentsPage() {
                     <TableCell className="text-center font-semibold text-green-600">
                       +${payment.amount.toLocaleString()}
                     </TableCell>
-                    <TableCell className="text-center text-gray-600">
+                    <TableCell className="text-center text-gray-600 dark:text-gray-400">
                       ${payment.previousDebt.toLocaleString()}
                     </TableCell>
                     <TableCell className="text-center">
-                      <Badge variant={payment.newDebt > 0 ? "destructive" : "default"} className={payment.newDebt === 0 ? "bg-green-100 text-green-800" : ""}>
+                      <Badge variant={payment.newDebt > 0 ? "destructive" : "default"} className={payment.newDebt === 0 ? "bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-400" : ""}>
                         ${payment.newDebt.toLocaleString()}
                       </Badge>
                     </TableCell>
-                    <TableCell className="text-gray-500 text-sm">
+                    <TableCell className="text-gray-500 dark:text-gray-400 text-sm">
                       {format(new Date(payment.createdAt), "MMM d, yyyy HH:mm")}
                     </TableCell>
                   </TableRow>
@@ -362,7 +362,7 @@ export default function PaymentsPage() {
                   <ChevronLeft className="h-4 w-4" />
                   Previous
                 </Button>
-                <span className="text-sm text-gray-600">
+                <span className="text-sm text-gray-600 dark:text-gray-400">
                   Page {currentPage} of {totalPages}
                 </span>
                 <Button
@@ -489,14 +489,14 @@ function MakePaymentForm({ onSuccess }) {
   return (
     <div className="space-y-4">
       {selectedCustomer ? (
-        <div className="flex items-center justify-between bg-blue-50 border border-blue-200 rounded-lg p-4">
+        <div className="flex items-center justify-between bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-900/50 rounded-lg p-4">
           <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center">
+            <div className="w-12 h-12 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
               <User className="h-6 w-6 text-blue-600" />
             </div>
             <div>
-              <p className="font-semibold text-gray-900">{selectedCustomer.fullName}</p>
-              <p className="text-sm text-gray-600 flex items-center gap-1">
+              <p className="font-semibold text-gray-900 dark:text-gray-100">{selectedCustomer.fullName}</p>
+              <p className="text-sm text-gray-600 dark:text-gray-400 flex items-center gap-1">
                 <Phone className="h-3 w-3" />
                 {selectedCustomer.phoneNumber}
               </p>
@@ -509,7 +509,7 @@ function MakePaymentForm({ onSuccess }) {
         </div>
       ) : (
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 h-4 w-4" />
           <Input
             type="text"
             placeholder="Search customers by name..."
@@ -522,12 +522,12 @@ function MakePaymentForm({ onSuccess }) {
           {searchInput.trim().length > 0 && (
             <div className="mt-2 border rounded-lg divide-y max-h-64 overflow-y-auto">
               {(searching || isSearchPending) && (
-                <div className="p-4 text-center text-gray-500">
+                <div className="p-4 text-center text-gray-500 dark:text-gray-400">
                   <Loader2 className="h-5 w-5 animate-spin mx-auto" />
                 </div>
               )}
               {!searching && !isSearchPending && customers.length === 0 && (
-                <div className="p-4 text-center text-gray-500 text-sm">No customers found</div>
+                <div className="p-4 text-center text-gray-500 dark:text-gray-400 text-sm">No customers found</div>
               )}
               {!searching && !isSearchPending &&
                 customers.map((customer) => (
@@ -535,11 +535,11 @@ function MakePaymentForm({ onSuccess }) {
                     key={customer._id}
                     type="button"
                     onClick={() => handleSelectCustomer(customer)}
-                    className="w-full flex items-center justify-between p-3 hover:bg-gray-50 text-left"
+                    className="w-full flex items-center justify-between p-3 hover:bg-gray-50 dark:hover:bg-gray-800/60 text-left"
                   >
                     <div>
-                      <p className="font-medium text-gray-900">{customer.fullName}</p>
-                      <p className="text-sm text-gray-500">{customer.phoneNumber}</p>
+                      <p className="font-medium text-gray-900 dark:text-gray-100">{customer.fullName}</p>
+                      <p className="text-sm text-gray-500 dark:text-gray-400">{customer.phoneNumber}</p>
                     </div>
                     <Badge variant={customer.debt > 0 ? "destructive" : "outline"}>
                       ${customer.debt?.toLocaleString() || 0}
@@ -553,7 +553,7 @@ function MakePaymentForm({ onSuccess }) {
 
       {selectedCustomer && (
         <div className="space-y-4">
-          <p className="text-sm text-gray-600">
+          <p className="text-sm text-gray-600 dark:text-gray-400">
             Current debt: <span className="font-semibold text-red-600">${currentDebt.toLocaleString()}</span>
           </p>
 
@@ -565,7 +565,7 @@ function MakePaymentForm({ onSuccess }) {
           ) : (
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
-                <label className="text-sm font-medium text-gray-700">Payment Amount ($)</label>
+                <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Payment Amount ($)</label>
                 <Input
                   type="number"
                   min="0"
@@ -574,13 +574,13 @@ function MakePaymentForm({ onSuccess }) {
                   value={amount}
                   onChange={(e) => setAmount(e.target.value)}
                 />
-                <p className="text-xs text-gray-500">
+                <p className="text-xs text-gray-500 dark:text-gray-400">
                   Defaults to the full outstanding debt. Enter a smaller amount for a partial payment.
                 </p>
               </div>
 
-              <div className="bg-gray-50 rounded-lg p-4 flex items-center justify-between">
-                <span className="text-sm font-medium text-gray-700">Remaining After Payment</span>
+              <div className="bg-gray-50 dark:bg-gray-950 rounded-lg p-4 flex items-center justify-between">
+                <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Remaining After Payment</span>
                 <span className={`font-bold ${remaining > 0 ? "text-red-600" : "text-green-600"}`}>
                   ${remaining.toLocaleString()}
                 </span>

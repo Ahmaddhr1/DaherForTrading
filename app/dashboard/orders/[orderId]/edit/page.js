@@ -245,10 +245,10 @@ export default function EditOrderPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gray-50 py-6">
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-950 py-6">
         <div className="container mx-auto px-4 max-w-4xl">
           <PageHeaderSkeleton />
-          <Card className="shadow-sm border-gray-200">
+          <Card className="shadow-sm border-gray-200 dark:border-gray-800">
             <CardContent className="pt-6">
               <ListSkeleton rows={2} rowHeight="h-16" />
             </CardContent>
@@ -260,9 +260,9 @@ export default function EditOrderPage() {
 
   if (order && order.status !== "pending" && order.status !== "draft") {
     return (
-      <div className="min-h-screen bg-gray-50 py-6">
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-950 py-6">
         <div className="container mx-auto px-4 max-w-xl text-center">
-          <p className="text-gray-600 mb-4">Only pending orders or drafts can be updated. This order is {order.status}.</p>
+          <p className="text-gray-600 dark:text-gray-400 mb-4">Only pending orders or drafts can be updated. This order is {order.status}.</p>
           <Link href={`/dashboard/orders/${orderId}`}>
             <Button variant="outline">Back to Order</Button>
           </Link>
@@ -272,23 +272,23 @@ export default function EditOrderPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-6">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-950 py-6">
       <div className="container mx-auto px-4 max-w-4xl">
         <div className="mb-8">
           <Link href={`/dashboard/orders/${orderId}`}>
-            <Button variant="ghost" className="mb-4 flex items-center gap-2 text-gray-600 hover:text-gray-900">
+            <Button variant="ghost" className="mb-4 flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100">
               <ArrowLeft className="h-4 w-4" />
               Back to Order
             </Button>
           </Link>
 
           <div className="flex items-center gap-3 mb-2">
-            <div className="p-2 bg-blue-100 rounded-lg">
+            <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
               <PencilLine className="h-6 w-6 text-blue-600" />
             </div>
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">{isDraft ? "Edit Draft" : "Update Order"}</h1>
-              <p className="text-gray-600">
+              <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">{isDraft ? "Edit Draft" : "Update Order"}</h1>
+              <p className="text-gray-600 dark:text-gray-400">
                 {isDraft
                   ? "Edit products, quantities, and prices, then save or finalize this draft"
                   : "Edit products, quantities, and prices for this pending order"}
@@ -296,24 +296,24 @@ export default function EditOrderPage() {
             </div>
           </div>
           {order?.customer ? (
-            <p className="flex items-center gap-1.5 text-sm text-gray-500 mt-1">
+            <p className="flex items-center gap-1.5 text-sm text-gray-500 dark:text-gray-400 mt-1">
               <Layers className="h-3.5 w-3.5" />
-              Pricing for {order.customer.fullName}: <span className="font-medium text-gray-700">{getTierLabel(priceTier)}</span>
+              Pricing for {order.customer.fullName}: <span className="font-medium text-gray-700 dark:text-gray-300">{getTierLabel(priceTier)}</span>
             </p>
           ) : order?.customerNameText ? (
-            <p className="flex items-center gap-1.5 text-sm text-gray-500 mt-1">
+            <p className="flex items-center gap-1.5 text-sm text-gray-500 dark:text-gray-400 mt-1">
               <Layers className="h-3.5 w-3.5" />
               <OrderCustomerName order={order} />
             </p>
           ) : null}
           {!isOwner && (
-            <p className="text-xs text-gray-500 mt-1">
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
               Prices are set automatically for your account. Ask an owner to override a price or price a custom item.
             </p>
           )}
         </div>
 
-        <Card className="shadow-sm border-gray-200">
+        <Card className="shadow-sm border-gray-200 dark:border-gray-800">
           <CardHeader>
             <CardTitle className="text-xl">Order Details</CardTitle>
             <CardDescription>Update products and quantities for this order</CardDescription>
@@ -322,7 +322,7 @@ export default function EditOrderPage() {
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="space-y-4">
                 {orderRows.map((row, index) => (
-                  <div key={row.id} className="p-4 border rounded-lg bg-gray-50 space-y-4">
+                  <div key={row.id} className="p-4 border rounded-lg bg-gray-50 dark:bg-gray-950 space-y-4">
                     <div className="flex items-center justify-between">
                       <Label htmlFor={`product-${row.id}`} className="text-sm font-medium">
                         {row.isCustom ? "Custom Item" : "Product"} {index + 1}
@@ -357,7 +357,7 @@ export default function EditOrderPage() {
                         renderOption={(product) => (
                           <span>
                             {product.name}{" "}
-                            <span className="text-gray-400">
+                            <span className="text-gray-400 dark:text-gray-500">
                               (${getTierPrice(product, priceTier).toFixed(2)} · stock: {product.quantity})
                             </span>
                           </span>
@@ -377,7 +377,7 @@ export default function EditOrderPage() {
                           onChange={(e) => handleRowChange(row.id, "price", e.target.value)}
                           placeholder={row.isCustom ? "0.00" : "Select a product"}
                           disabled={row.free || !isOwner}
-                          className={row.free || !isOwner ? "bg-gray-100 text-gray-500" : ""}
+                          className={row.free || !isOwner ? "bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400" : ""}
                           required
                         />
                       </div>
@@ -411,13 +411,13 @@ export default function EditOrderPage() {
                       </div>
                     </div>
 
-                    <label className="flex items-center gap-2 text-sm text-gray-700 cursor-pointer w-fit">
+                    <label className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300 cursor-pointer w-fit">
                       <input
                         type="checkbox"
                         checked={row.free}
                         disabled={row.isCustom && !isOwner}
                         onChange={(e) => handleRowChange(row.id, "free", e.target.checked)}
-                        className="h-4 w-4 rounded border-gray-300 text-green-600 focus:ring-green-500"
+                        className="h-4 w-4 rounded border-gray-300 dark:border-gray-700 text-green-600 focus:ring-green-500"
                       />
                       <Gift className="h-3.5 w-3.5 text-green-600" />
                       Free (offer)
@@ -450,7 +450,7 @@ export default function EditOrderPage() {
                 />
               </div>
 
-              <div className="bg-blue-50 rounded-lg p-4 border border-blue-200 space-y-2">
+              <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4 border border-blue-200 dark:border-blue-900/50 space-y-2">
                 <div className="flex justify-between items-center text-sm text-blue-900/80">
                   <span>Subtotal</span>
                   <span>${calculateSubtotal().toFixed(2)}</span>
@@ -467,9 +467,9 @@ export default function EditOrderPage() {
                     <span>+${calculateTaxAmount().toFixed(2)}</span>
                   </div>
                 )}
-                <div className="flex justify-between items-center pt-2 border-t border-blue-200">
-                  <span className="text-lg font-semibold text-blue-900">Total Amount:</span>
-                  <span className="text-2xl font-bold text-blue-900">${calculateTotal().toFixed(2)}</span>
+                <div className="flex justify-between items-center pt-2 border-t border-blue-200 dark:border-blue-900/50">
+                  <span className="text-lg font-semibold text-blue-900 dark:text-blue-300">Total Amount:</span>
+                  <span className="text-2xl font-bold text-blue-900 dark:text-blue-300">${calculateTotal().toFixed(2)}</span>
                 </div>
                 {settings?.dollarRate > 0 && (
                   <div className="flex justify-between items-center text-sm text-blue-900/70">

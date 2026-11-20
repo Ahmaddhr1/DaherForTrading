@@ -44,7 +44,7 @@ const ProfitChart = ({ range = "all", startDate, endDate }) => {
   ];
 
   return (
-    <Card className="shadow-sm border-gray-200">
+    <Card className="shadow-sm border-gray-200 dark:border-gray-800">
       <CardHeader>
         <CardTitle className="text-lg font-medium">Profit Trends</CardTitle>
       </CardHeader>

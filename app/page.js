@@ -123,18 +123,18 @@ export default function LoginPage() {
   const isFormValid = formData.username.trim() && formData.password.trim();
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-950 flex items-center justify-center px-4">
       <div className="w-full max-w-md">
         <div className="flex flex-col items-center mb-6">
-          <div className="p-3 bg-blue-100 rounded-xl mb-3">
+          <div className="p-3 bg-blue-100 dark:bg-blue-900/30 rounded-xl mb-3">
             <ShieldCheck className="h-8 w-8 text-blue-600" />
           </div>
-          <h1 className="text-2xl font-bold text-gray-900">MDT Admin Panel</h1>
-          <p className="text-gray-600 text-sm mt-1">Sign in to manage your business</p>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">MDT Admin Panel</h1>
+          <p className="text-gray-600 dark:text-gray-400 text-sm mt-1">Sign in to manage your business</p>
         </div>
 
         {!otpStage ? (
-          <Card className="shadow-sm border-gray-200">
+          <Card className="shadow-sm border-gray-200 dark:border-gray-800">
             <CardHeader>
               <CardTitle className="text-lg">Welcome back</CardTitle>
               <CardDescription>Enter your credentials to continue</CardDescription>
@@ -192,14 +192,14 @@ export default function LoginPage() {
             </CardContent>
           </Card>
         ) : (
-          <Card className="shadow-sm border-gray-200">
+          <Card className="shadow-sm border-gray-200 dark:border-gray-800">
             <CardHeader>
               <CardTitle className="text-lg flex items-center gap-2">
                 <Mail className="h-5 w-5 text-blue-600" />
                 Check your email
               </CardTitle>
               <CardDescription>
-                We sent a 6-digit code to <span className="font-medium text-gray-700">{otpStage.maskedEmail}</span>
+                We sent a 6-digit code to <span className="font-medium text-gray-700 dark:text-gray-300">{otpStage.maskedEmail}</span>
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -243,7 +243,7 @@ export default function LoginPage() {
                   <button
                     type="button"
                     onClick={handleBack}
-                    className="flex items-center gap-1 text-gray-500 hover:text-gray-700"
+                    className="flex items-center gap-1 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"
                   >
                     <ArrowLeft className="h-3.5 w-3.5" />
                     Back
@@ -252,7 +252,7 @@ export default function LoginPage() {
                     type="button"
                     onClick={() => resendMutation.mutate()}
                     disabled={resendCooldown > 0 || resendMutation.isPending}
-                    className="text-blue-600 hover:text-blue-700 disabled:text-gray-400 disabled:cursor-not-allowed"
+                    className="text-blue-600 hover:text-blue-700 disabled:text-gray-400 dark:disabled:text-gray-600 disabled:cursor-not-allowed"
                   >
                     {resendCooldown > 0 ? `Resend code (${resendCooldown}s)` : "Resend code"}
                   </button>
@@ -262,7 +262,7 @@ export default function LoginPage() {
           </Card>
         )}
 
-        <p className="text-center text-xs text-gray-400 mt-6">
+        <p className="text-center text-xs text-gray-400 dark:text-gray-500 mt-6">
           Access is restricted to authorized administrators only.
         </p>
       </div>

@@ -166,28 +166,28 @@ export default function CustomerOrdersTable() {
   const counts = data?.counts || { draft: 0, pending: 0, partiallyPaid: 0, paid: 0 };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-6">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-950 py-6">
       <div className="container mx-auto px-4 max-w-5xl">
         {/* Header */}
         <div className="mb-6">
           <Button
             variant="ghost"
             onClick={() => router.push(`/dashboard/customers/${id}`)}
-            className="mb-4 flex items-center gap-2 text-gray-600 hover:text-gray-900"
+            className="mb-4 flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100"
           >
             <ArrowLeft className="h-4 w-4" />
             Back to Customer
           </Button>
 
           <div className="flex items-center gap-3">
-            <div className="p-2 bg-blue-100 rounded-lg">
+            <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
               <ShoppingCart className="h-6 w-6 text-blue-600" />
             </div>
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">
+              <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
                 Orders for {data?.fullName || "Customer"}
               </h1>
-              <p className="text-gray-600">Full order history for this customer</p>
+              <p className="text-gray-600 dark:text-gray-400">Full order history for this customer</p>
             </div>
           </div>
         </div>
@@ -197,12 +197,12 @@ export default function CustomerOrdersTable() {
 
         {/* Filters */}
         <FiltersPanel activeCount={activeFilterCount}>
-          <Card className="shadow-sm border-gray-200 mb-6">
+          <Card className="shadow-sm border-gray-200 dark:border-gray-800 mb-6">
             <CardContent className="p-4 space-y-4">
               <div className="flex flex-col sm:flex-row sm:flex-wrap gap-2">
                 <div className="flex items-center gap-2">
-                  <Filter className="h-4 w-4 text-gray-500" />
-                  <span className="text-sm font-medium text-gray-700">Status:</span>
+                  <Filter className="h-4 w-4 text-gray-500 dark:text-gray-400" />
+                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Status:</span>
                 </div>
 
                 <Button
@@ -254,7 +254,7 @@ export default function CustomerOrdersTable() {
 
               <div className="flex flex-col sm:flex-row sm:flex-wrap sm:items-center gap-3 sm:gap-4">
                 <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-2">
-                  <span className="text-sm font-medium text-gray-700">Category</span>
+                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Category</span>
                   <select
                     value={category}
                     onChange={(e) => setCategory(e.target.value)}
@@ -268,7 +268,7 @@ export default function CustomerOrdersTable() {
                 </div>
 
                 <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-2">
-                  <span className="text-sm font-medium text-gray-700">From</span>
+                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">From</span>
                   <input
                     type="date"
                     value={startDate}
@@ -277,7 +277,7 @@ export default function CustomerOrdersTable() {
                   />
                 </div>
                 <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-2">
-                  <span className="text-sm font-medium text-gray-700">To</span>
+                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">To</span>
                   <input
                     type="date"
                     value={endDate}
@@ -287,8 +287,8 @@ export default function CustomerOrdersTable() {
                 </div>
 
                 <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-2">
-                  <span className="flex items-center gap-1.5 text-sm font-medium text-gray-700">
-                    <ArrowUpDown className="h-4 w-4 text-gray-500" />
+                  <span className="flex items-center gap-1.5 text-sm font-medium text-gray-700 dark:text-gray-300">
+                    <ArrowUpDown className="h-4 w-4 text-gray-500 dark:text-gray-400" />
                     Sort by
                   </span>
                   <select
@@ -305,7 +305,7 @@ export default function CustomerOrdersTable() {
                 </div>
 
                 <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-2">
-                  <span className="text-sm font-medium text-gray-700">Per page</span>
+                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Per page</span>
                   <select
                     value={pageSize}
                     onChange={(e) => setPageSize(parseInt(e.target.value))}
@@ -324,7 +324,7 @@ export default function CustomerOrdersTable() {
                     variant="ghost"
                     size="sm"
                     onClick={handleClearFilters}
-                    className="w-full sm:w-auto justify-center text-gray-500"
+                    className="w-full sm:w-auto justify-center text-gray-500 dark:text-gray-400"
                   >
                     Clear Filters
                   </Button>
@@ -345,8 +345,8 @@ export default function CustomerOrdersTable() {
         ) : orders.length === 0 ? (
           <Card>
             <CardContent className="pt-6 text-center">
-              <Package className="h-12 w-12 text-gray-300 mx-auto mb-3" />
-              <p className="text-gray-500 text-lg">No orders found</p>
+              <Package className="h-12 w-12 text-gray-300 dark:text-gray-600 mx-auto mb-3" />
+              <p className="text-gray-500 dark:text-gray-400 text-lg">No orders found</p>
               {statusFilter !== "all" && (
                 <Button variant="outline" className="mt-3" onClick={() => setStatusFilter("all")}>
                   Clear Filter
@@ -355,7 +355,7 @@ export default function CustomerOrdersTable() {
             </CardContent>
           </Card>
         ) : (
-          <Card className="shadow-sm border-gray-200">
+          <Card className="shadow-sm border-gray-200 dark:border-gray-800">
             <Table>
               <TableCaption>Orders placed by this customer</TableCaption>
               <TableHeader>
@@ -369,12 +369,12 @@ export default function CustomerOrdersTable() {
               </TableHeader>
               <TableBody>
                 {orders.map((order, index) => (
-                  <TableRow key={order._id} className="hover:bg-gray-50">
-                    <TableCell className="font-medium text-gray-500">
+                  <TableRow key={order._id} className="hover:bg-gray-50 dark:hover:bg-gray-800/60">
+                    <TableCell className="font-medium text-gray-500 dark:text-gray-400">
                       {(page - 1) * pageSize + index + 1}
                     </TableCell>
                     <TableCell className="font-medium">${Number(order.total).toFixed(2)}</TableCell>
-                    <TableCell className="text-gray-500 text-sm">
+                    <TableCell className="text-gray-500 dark:text-gray-400 text-sm">
                       {format(new Date(order.createdAt), "yyyy-MM-dd HH:mm")}
                     </TableCell>
                     <TableCell>
@@ -382,11 +382,11 @@ export default function CustomerOrdersTable() {
                         variant={order.status === "paid" ? "default" : "destructive"}
                         className={
                           order.status === "paid"
-                            ? "bg-green-100 text-green-800"
+                            ? "bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-400"
                             : order.status === "partiallyPaid"
-                            ? "bg-yellow-100 text-yellow-800"
+                            ? "bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-400"
                             : order.status === "draft"
-                            ? "bg-slate-200 text-slate-800"
+                            ? "bg-slate-200 dark:bg-slate-700 text-slate-800 dark:text-slate-200"
                             : ""
                         }
                       >
@@ -476,7 +476,7 @@ export default function CustomerOrdersTable() {
                   <ChevronLeft className="h-4 w-4" />
                   Previous
                 </Button>
-                <span className="text-sm text-gray-600">
+                <span className="text-sm text-gray-600 dark:text-gray-400">
                   Page {page} of {totalPages}
                 </span>
                 <Button

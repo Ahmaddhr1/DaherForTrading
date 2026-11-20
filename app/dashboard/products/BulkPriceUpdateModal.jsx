@@ -128,7 +128,7 @@ export default function BulkPriceUpdateModal({ open, onClose, productIds, onDone
           />
         </div>
 
-        <p className="text-xs text-gray-500">
+        <p className="text-xs text-gray-500 dark:text-gray-400">
           Products where this would make the cost price exceed the selling price are skipped
           automatically and reported after applying.
         </p>

@@ -39,23 +39,23 @@ export default function OverdueDebtPage() {
   const total = data?.total || 0;
 
   return (
-    <div className="min-h-screen bg-gray-50 py-6">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-950 py-6">
       <div className="container mx-auto px-4 max-w-5xl">
         <div className="mb-8 flex items-center gap-3">
-          <div className="p-2 bg-red-100 rounded-lg">
+          <div className="p-2 bg-red-100 dark:bg-red-900/30 rounded-lg">
             <AlertTriangle className="h-6 w-6 text-red-600" />
           </div>
           <div>
-            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Overdue Debt</h1>
-            <p className="text-gray-600 text-sm sm:text-base">
+            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-gray-100">Overdue Debt</h1>
+            <p className="text-gray-600 dark:text-gray-400 text-sm sm:text-base">
               Customers with outstanding debt who haven&apos;t paid in a while, sorted by amount owed
             </p>
           </div>
         </div>
 
-        <Card className="mb-6 shadow-sm border-gray-200">
+        <Card className="mb-6 shadow-sm border-gray-200 dark:border-gray-800">
           <CardContent className="p-4 flex flex-wrap items-center gap-3">
-            <span className="text-sm font-medium text-gray-700">Hasn&apos;t paid in at least</span>
+            <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Hasn&apos;t paid in at least</span>
             <div className="flex flex-wrap gap-2">
               {DAY_OPTIONS.map((d) => (
                 <Button
@@ -85,16 +85,16 @@ export default function OverdueDebtPage() {
             </Button>
           </div>
         ) : customers.length === 0 ? (
-          <div className="text-center py-16 text-gray-500">
+          <div className="text-center py-16 text-gray-500 dark:text-gray-400">
             <CheckCircle2 className="h-12 w-12 mx-auto mb-3 text-green-500" />
             <p className="text-lg">No customers overdue by {minDays}+ days</p>
           </div>
         ) : (
           <>
-            <p className="text-sm text-gray-600 mb-3">
+            <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
               {total} customer{total === 1 ? "" : "s"} overdue by {minDays}+ days
             </p>
-            <Card className="shadow-sm border-gray-200 overflow-hidden">
+            <Card className="shadow-sm border-gray-200 dark:border-gray-800 overflow-hidden">
               <Table>
                 <TableHeader>
                   <TableRow>
@@ -116,11 +116,11 @@ export default function OverdueDebtPage() {
                           {customer.fullName}
                         </Link>
                       </TableCell>
-                      <TableCell className="text-gray-600">{customer.phoneNumber}</TableCell>
+                      <TableCell className="text-gray-600 dark:text-gray-400">{customer.phoneNumber}</TableCell>
                       <TableCell className="font-semibold text-red-600">
                         ${customer.debt.toLocaleString()}
                       </TableCell>
-                      <TableCell className="text-gray-600">
+                      <TableCell className="text-gray-600 dark:text-gray-400">
                         {customer.lastPaymentDate
                           ? format(new Date(customer.lastPaymentDate), "MMM d, yyyy")
                           : "Never paid"}
@@ -146,7 +146,7 @@ export default function OverdueDebtPage() {
                   <ChevronLeft className="h-4 w-4" />
                   Previous
                 </Button>
-                <span className="text-sm text-gray-600">
+                <span className="text-sm text-gray-600 dark:text-gray-400">
                   Page {page} of {totalPages}
                 </span>
                 <Button

@@ -31,11 +31,11 @@ const TYPE_LABELS = {
 };
 
 const TYPE_BADGE_CLASSES = {
-  damaged: "bg-red-100 text-red-800",
-  lost: "bg-orange-100 text-orange-800",
-  expired: "bg-amber-100 text-amber-800",
-  correction: "bg-blue-100 text-blue-800",
-  other: "bg-gray-100 text-gray-800",
+  damaged: "bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-400",
+  lost: "bg-orange-100 dark:bg-orange-900/30 text-orange-800 dark:text-orange-400",
+  expired: "bg-amber-100 dark:bg-amber-900/30 text-amber-800 dark:text-amber-400",
+  correction: "bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-400",
+  other: "bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200",
 };
 
 const EMPTY_FORM = { type: "damaged", quantityChange: "", reason: "" };
@@ -82,7 +82,7 @@ export default function StockAdjustments({ productId, currentQuantity, unit }) {
   };
 
   return (
-    <Card className="shadow-sm border-gray-200 mt-6">
+    <Card className="shadow-sm border-gray-200 dark:border-gray-800 mt-6">
       <CardHeader className="pb-4 flex flex-row items-center justify-between space-y-0">
         <CardTitle className="text-lg flex items-center gap-2">
           <ClipboardList className="h-5 w-5 text-purple-600" />
@@ -104,7 +104,7 @@ export default function StockAdjustments({ productId, currentQuantity, unit }) {
         ) : error ? (
           <div className="text-red-500 text-center py-6">Failed to load stock adjustments</div>
         ) : adjustments.length === 0 ? (
-          <p className="text-sm text-gray-500 text-center py-6">
+          <p className="text-sm text-gray-500 dark:text-gray-400 text-center py-6">
             No stock adjustments recorded for this product yet.
           </p>
         ) : (
@@ -124,7 +124,7 @@ export default function StockAdjustments({ productId, currentQuantity, unit }) {
                 {adjustments.map((adj) => (
                   <TableRow key={adj._id}>
                     <TableCell>
-                      <Badge className={TYPE_BADGE_CLASSES[adj.type] || "bg-gray-100 text-gray-800"}>
+                      <Badge className={TYPE_BADGE_CLASSES[adj.type] || "bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200"}>
                         {TYPE_LABELS[adj.type] || adj.type}
                       </Badge>
                     </TableCell>
@@ -136,14 +136,14 @@ export default function StockAdjustments({ productId, currentQuantity, unit }) {
                       {adj.quantityChange > 0 ? "+" : ""}
                       {adj.quantityChange}
                     </TableCell>
-                    <TableCell className="text-center text-gray-600">
+                    <TableCell className="text-center text-gray-600 dark:text-gray-400">
                       {adj.quantityBefore} → {adj.quantityAfter}
                     </TableCell>
-                    <TableCell className="text-gray-600 text-sm max-w-[220px] truncate">
+                    <TableCell className="text-gray-600 dark:text-gray-400 text-sm max-w-[220px] truncate">
                       {adj.reason || "—"}
                     </TableCell>
-                    <TableCell className="text-gray-600 text-sm">{adj.adminName || "—"}</TableCell>
-                    <TableCell className="text-gray-500 text-sm">
+                    <TableCell className="text-gray-600 dark:text-gray-400 text-sm">{adj.adminName || "—"}</TableCell>
+                    <TableCell className="text-gray-500 dark:text-gray-400 text-sm">
                       {format(new Date(adj.createdAt), "MMM d, yyyy")}
                     </TableCell>
                   </TableRow>
@@ -171,7 +171,7 @@ export default function StockAdjustments({ productId, currentQuantity, unit }) {
               id="adj-type"
               value={form.type}
               onChange={(e) => setForm((prev) => ({ ...prev, type: e.target.value }))}
-              className="w-full p-2 border border-gray-300 rounded-md focus:border-purple-500 focus:ring-1 focus:ring-purple-500"
+              className="w-full p-2 border border-gray-300 dark:border-gray-700 rounded-md focus:border-purple-500 focus:ring-1 focus:ring-purple-500"
             >
               {Object.entries(TYPE_LABELS).map(([value, label]) => (
                 <option key={value} value={value}>
@@ -195,7 +195,7 @@ export default function StockAdjustments({ productId, currentQuantity, unit }) {
               }
               required
             />
-            <p className="text-xs text-gray-500">
+            <p className="text-xs text-gray-500 dark:text-gray-400">
               Use a negative number to remove stock (damaged/lost/expired), positive to add it back
               (e.g. a recount correction).
             </p>

@@ -1,7 +1,7 @@
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Providers from "@/lib/providers";
-import { Toaster } from "sonner";
+import { Toaster } from "@/components/ui/sonner";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -21,7 +21,7 @@ export const metadata = {
 export default async function RootLayout({ children }) {
 
   return (
-    <html lang="en" className={`${geistSans.className} ${geistMono.variable}`}>
+    <html lang="en" className={`${geistSans.className} ${geistMono.variable}`} suppressHydrationWarning>
       <body
         className="antialiased"
       >

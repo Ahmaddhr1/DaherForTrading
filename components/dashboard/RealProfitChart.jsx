@@ -61,7 +61,7 @@ export default function RealProfitChart() {
   const totalProfit = trends.reduce((sum, t) => sum + t.realProfit, 0);
 
   return (
-    <Card className="shadow-sm border-gray-200">
+    <Card className="shadow-sm border-gray-200 dark:border-gray-800">
       <CardHeader className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <CardTitle className="flex items-center gap-2 text-lg font-medium">
           <TrendingUp className="h-5 w-5 text-green-600" />
@@ -95,7 +95,7 @@ export default function RealProfitChart() {
               className={`text-sm px-2 py-1.5 rounded-md border transition-colors ${
                 useCustomRange
                   ? "bg-primary text-primary-foreground border-primary"
-                  : "border-gray-300 text-gray-700 hover:bg-gray-50"
+                  : "border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800/60"
               }`}
             >
               Custom Range
@@ -109,7 +109,7 @@ export default function RealProfitChart() {
                 onChange={(e) => setStartDate(e.target.value)}
                 className="border rounded-md text-sm px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
-              <span className="text-gray-400 text-sm">to</span>
+              <span className="text-gray-400 dark:text-gray-500 text-sm">to</span>
               <input
                 type="date"
                 value={endDate}
@@ -126,10 +126,10 @@ export default function RealProfitChart() {
         ) : error ? (
           <div className="text-red-500 text-center py-10">Failed to load real profit</div>
         ) : trends.length === 0 ? (
-          <div className="text-gray-500 text-center py-10">No data yet for this range</div>
+          <div className="text-gray-500 dark:text-gray-400 text-center py-10">No data yet for this range</div>
         ) : (
           <>
-            <div className="mb-3 text-sm text-gray-600">
+            <div className="mb-3 text-sm text-gray-600 dark:text-gray-400">
               Total for this range:{" "}
               <span className={`font-bold ${totalProfit >= 0 ? "text-green-600" : "text-red-600"}`}>
                 ${totalProfit.toLocaleString()}

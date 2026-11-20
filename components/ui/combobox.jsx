@@ -120,7 +120,7 @@ export function Combobox({
             if (!open) setOpen(true);
           }}
           onKeyDown={handleKeyDown}
-          className="w-full p-2 pr-16 border rounded-md focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 disabled:bg-gray-100 disabled:text-gray-500"
+          className="w-full p-2 pr-16 border rounded-md focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 disabled:bg-gray-100 dark:disabled:bg-gray-800 disabled:text-gray-500 dark:disabled:text-gray-500"
           autoComplete="off"
         />
         <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1">
@@ -134,20 +134,20 @@ export function Combobox({
                 setQuery("");
                 inputRef.current?.focus();
               }}
-              className="text-gray-400 hover:text-gray-600"
+              className="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-400"
               aria-label="Clear selection"
             >
               <X className="h-3.5 w-3.5" />
             </button>
           )}
-          <ChevronsUpDown className="h-4 w-4 text-gray-400" />
+          <ChevronsUpDown className="h-4 w-4 text-gray-400 dark:text-gray-500" />
         </div>
       </div>
 
       {open && !disabled && (
-        <div className="absolute z-50 mt-1 w-full max-h-60 overflow-auto rounded-md border bg-white shadow-lg">
+        <div className="absolute z-50 mt-1 w-full max-h-60 overflow-auto rounded-md border bg-white dark:bg-gray-900 shadow-lg">
           {filteredOptions.length === 0 ? (
-            <div className="px-3 py-2 text-sm text-gray-500">{emptyMessage}</div>
+            <div className="px-3 py-2 text-sm text-gray-500 dark:text-gray-400">{emptyMessage}</div>
           ) : (
             filteredOptions.map((opt, index) => {
               const optValue = getOptionValue(opt);
@@ -164,8 +164,8 @@ export function Combobox({
                   }}
                   onMouseEnter={() => setHighlightedIndex(index)}
                   className={`px-3 py-2 text-sm cursor-pointer ${
-                    isHighlighted ? "bg-blue-50" : ""
-                  } ${isSelected ? "font-medium text-blue-700" : "text-gray-900"}`}
+                    isHighlighted ? "bg-blue-50 dark:bg-blue-900/20" : ""
+                  } ${isSelected ? "font-medium text-blue-700" : "text-gray-900 dark:text-gray-100"}`}
                 >
                   {renderOption ? renderOption(opt) : getOptionLabel(opt)}
                 </div>

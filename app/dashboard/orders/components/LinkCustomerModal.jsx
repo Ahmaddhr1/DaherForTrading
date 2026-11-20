@@ -99,7 +99,7 @@ export default function LinkCustomerModal({ open, onClose, order }) {
       {mode === "search" ? (
         <div className="space-y-3">
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 h-4 w-4" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500 h-4 w-4" />
             <Input
               type="text"
               placeholder="Search customers by name..."
@@ -113,12 +113,12 @@ export default function LinkCustomerModal({ open, onClose, order }) {
           {searchInput.trim().length > 0 && (
             <div className="border rounded-lg divide-y max-h-64 overflow-y-auto">
               {(searching || isSearchPending) && (
-                <div className="p-4 text-center text-gray-500">
+                <div className="p-4 text-center text-gray-500 dark:text-gray-400">
                   <Loader2 className="h-5 w-5 animate-spin mx-auto" />
                 </div>
               )}
               {!searching && !isSearchPending && customers.length === 0 && (
-                <div className="p-4 text-center text-gray-500 text-sm">No customers found</div>
+                <div className="p-4 text-center text-gray-500 dark:text-gray-400 text-sm">No customers found</div>
               )}
               {!searching && !isSearchPending &&
                 customers.map((customer) => (
@@ -127,11 +127,11 @@ export default function LinkCustomerModal({ open, onClose, order }) {
                     type="button"
                     disabled={linking}
                     onClick={() => linkCustomer(customer._id)}
-                    className="w-full flex items-center justify-between p-3 hover:bg-gray-50 text-left disabled:opacity-50"
+                    className="w-full flex items-center justify-between p-3 hover:bg-gray-50 dark:hover:bg-gray-800/60 text-left disabled:opacity-50"
                   >
                     <div>
-                      <p className="font-medium text-gray-900">{customer.fullName}</p>
-                      <p className="text-sm text-gray-500">{customer.phoneNumber}</p>
+                      <p className="font-medium text-gray-900 dark:text-gray-100">{customer.fullName}</p>
+                      <p className="text-sm text-gray-500 dark:text-gray-400">{customer.phoneNumber}</p>
                     </div>
                     <Badge variant={customer.debt > 0 ? "destructive" : "outline"}>
                       ${customer.debt?.toLocaleString() || 0}
@@ -153,7 +153,7 @@ export default function LinkCustomerModal({ open, onClose, order }) {
             Back to search
           </Button>
           <div className="space-y-2">
-            <label className="text-sm font-medium text-gray-700">Full Name</label>
+            <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Full Name</label>
             <Input
               value={newCustomer.fullName}
               onChange={(e) => setNewCustomer((prev) => ({ ...prev, fullName: e.target.value }))}
@@ -161,7 +161,7 @@ export default function LinkCustomerModal({ open, onClose, order }) {
             />
           </div>
           <div className="space-y-2">
-            <label className="text-sm font-medium text-gray-700">Phone Number</label>
+            <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Phone Number</label>
             <Input
               value={newCustomer.phoneNumber}
               onChange={(e) => setNewCustomer((prev) => ({ ...prev, phoneNumber: e.target.value.replace(/\D/g, "") }))}
@@ -169,7 +169,7 @@ export default function LinkCustomerModal({ open, onClose, order }) {
             />
           </div>
           <div className="space-y-2">
-            <label className="text-sm font-medium text-gray-700">Starting Debt ($, optional)</label>
+            <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Starting Debt ($, optional)</label>
             <Input
               type="number"
               min="0"

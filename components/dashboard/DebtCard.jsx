@@ -32,7 +32,7 @@ const DebtCard = () => {
   const totalDebt = data?.totalDebt || 0;
 
   return (
-    <Card className="shadow-sm border-gray-200 h-full">
+    <Card className="shadow-sm border-gray-200 dark:border-gray-800 h-full">
       <CardHeader className="pb-2">
         <CardTitle className="flex items-center gap-2 text-lg font-medium">
           <CreditCard className="h-5 w-5 text-blue-600" />
@@ -47,7 +47,7 @@ const DebtCard = () => {
             <div className="text-2xl font-bold text-red-600">
               ${totalDebt.toLocaleString()}
             </div>
-            <p className="text-sm text-gray-500 mt-1">Amount owed by customers</p>
+            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Amount owed by customers</p>
           </>
         )}
       </CardContent>

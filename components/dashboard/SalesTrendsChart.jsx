@@ -57,7 +57,7 @@ export default function SalesTrendsChart() {
   return (
     <div className="grid grid-cols-1 xl:grid-cols-2 gap-8 mb-8">
       {/* Sales vs Purchases */}
-      <Card className="shadow-sm border-gray-200">
+      <Card className="shadow-sm border-gray-200 dark:border-gray-800">
         <CardHeader className="flex flex-row items-center justify-between flex-wrap gap-3">
           <CardTitle className="flex items-center gap-2 text-lg font-medium">
             <BarChart3 className="h-5 w-5 text-blue-600" />
@@ -90,7 +90,7 @@ export default function SalesTrendsChart() {
           ) : error ? (
             <div className="text-red-500 text-center py-10">Failed to load trends</div>
           ) : trends.length === 0 ? (
-            <div className="text-gray-500 text-center py-10">No data yet for this range</div>
+            <div className="text-gray-500 dark:text-gray-400 text-center py-10">No data yet for this range</div>
           ) : (
             <BarChart
               data={trends}
@@ -105,7 +105,7 @@ export default function SalesTrendsChart() {
       </Card>
 
       {/* Orders Volume */}
-      <Card className="shadow-sm border-gray-200">
+      <Card className="shadow-sm border-gray-200 dark:border-gray-800">
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-lg font-medium">
             <ShoppingCart className="h-5 w-5 text-blue-600" />
@@ -118,7 +118,7 @@ export default function SalesTrendsChart() {
           ) : error ? (
             <div className="text-red-500 text-center py-10">Failed to load trends</div>
           ) : trends.length === 0 ? (
-            <div className="text-gray-500 text-center py-10">No data yet for this range</div>
+            <div className="text-gray-500 dark:text-gray-400 text-center py-10">No data yet for this range</div>
           ) : (
             <BarChart
               data={trends}

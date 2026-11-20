@@ -155,30 +155,30 @@ const NewPurchasePage = () => {
   const total = rows.reduce((sum, row) => sum + rowTotal(row), 0);
 
   return (
-    <div className="min-h-screen bg-gray-50 py-6">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-950 py-6">
       <div className="container mx-auto px-4 max-w-3xl">
         <div className="mb-8">
           <Link href={`/dashboard/companies/${companyId}`}>
-            <Button variant="ghost" className="mb-4 flex items-center gap-2 text-gray-600 hover:text-gray-900">
+            <Button variant="ghost" className="mb-4 flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100">
               <ArrowLeft className="h-4 w-4" />
               Back to Company
             </Button>
           </Link>
 
           <div className="flex items-center gap-3 mb-2">
-            <div className="p-2 bg-blue-100 rounded-lg">
+            <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
               <ShoppingBag className="h-6 w-6 text-blue-600" />
             </div>
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">New Purchase</h1>
-              <p className="text-gray-600">
+              <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">New Purchase</h1>
+              <p className="text-gray-600 dark:text-gray-400">
                 Record a restock purchase{company?.name ? ` from ${company.name}` : ""}
               </p>
             </div>
           </div>
         </div>
 
-        <Card className="shadow-sm border-gray-200">
+        <Card className="shadow-sm border-gray-200 dark:border-gray-800">
           <CardHeader>
             <CardTitle className="text-xl">Purchase Details</CardTitle>
             <CardDescription>Select the products and enter purchase quantity and pricing</CardDescription>
@@ -189,7 +189,7 @@ const NewPurchasePage = () => {
                 {rows.map((row, index) => {
                   const rowProduct = products.find((p) => p._id === row.productId);
                   return (
-                    <div key={row.id} className="p-4 border rounded-lg bg-gray-50 space-y-4">
+                    <div key={row.id} className="p-4 border rounded-lg bg-gray-50 dark:bg-gray-950 space-y-4">
                       <div className="flex items-center justify-between">
                         <Label className="text-sm font-medium">Product {index + 1} *</Label>
                         <Button
@@ -213,7 +213,7 @@ const NewPurchasePage = () => {
                         renderOption={(product) => (
                           <span>
                             {product.name}{" "}
-                            <span className="text-gray-400">(current stock: {product.quantity})</span>
+                            <span className="text-gray-400 dark:text-gray-500">(current stock: {product.quantity})</span>
                           </span>
                         )}
                       />
@@ -230,7 +230,7 @@ const NewPurchasePage = () => {
                             required
                           />
                           {rowProduct && (
-                            <p className="text-xs text-gray-500">
+                            <p className="text-xs text-gray-500 dark:text-gray-400">
                               Current cost on file: ${rowProduct.initialPrice?.toFixed(2)}
                             </p>
                           )}
@@ -304,12 +304,12 @@ const NewPurchasePage = () => {
                 </Label>
               </div>
               {!paid && (
-                <p className="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-md p-2">
+                <p className="text-xs text-amber-700 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-900/50 rounded-md p-2">
                   This purchase is unpaid — the full total will be added to what we owe this company.
                 </p>
               )}
 
-              <div className="bg-blue-50 rounded-lg p-4 border border-blue-200 space-y-2">
+              <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4 border border-blue-200 dark:border-blue-900/50 space-y-2">
                 <div className="flex justify-between items-center text-sm text-blue-900/80">
                   <span>Subtotal</span>
                   <span>${subtotal.toFixed(2)}</span>
@@ -326,9 +326,9 @@ const NewPurchasePage = () => {
                     <span>+${taxAmountTotal.toFixed(2)}</span>
                   </div>
                 )}
-                <div className="flex justify-between items-center pt-2 border-t border-blue-200">
-                  <span className="text-lg font-semibold text-blue-900">Total Amount:</span>
-                  <span className="text-2xl font-bold text-blue-900">${total.toFixed(2)}</span>
+                <div className="flex justify-between items-center pt-2 border-t border-blue-200 dark:border-blue-900/50">
+                  <span className="text-lg font-semibold text-blue-900 dark:text-blue-300">Total Amount:</span>
+                  <span className="text-2xl font-bold text-blue-900 dark:text-blue-300">${total.toFixed(2)}</span>
                 </div>
                 {settings?.dollarRate > 0 && (
                   <div className="flex justify-between items-center text-sm text-blue-900/70">

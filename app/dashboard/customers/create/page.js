@@ -79,26 +79,26 @@ const AddCustomerPage = () => {
   const hasAnyDebt = parseInt(form.debt) > 0;
 
   return (
-    <div className="min-h-screen bg-gray-50/30 py-8">
+    <div className="min-h-screen bg-gray-50/30 dark:bg-gray-900/30 py-8">
       <div className="container mx-auto px-4 max-w-4xl">
         {/* Header */}
         <div className="mb-8">
           <Button 
             variant="ghost" 
             onClick={() => router.back()}
-            className="mb-4 flex items-center gap-2 text-gray-600 hover:text-gray-900"
+            className="mb-4 flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100"
           >
             <ArrowLeft className="h-4 w-4" />
             Back to Customers
           </Button>
           
           <div className="flex items-center gap-3 mb-2">
-            <div className="p-2 bg-blue-100 rounded-lg">
+            <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
               <UserPlus className="h-6 w-6 text-blue-600" />
             </div>
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">Add New Customer</h1>
-              <p className="text-gray-600">Create a new customer profile in the system</p>
+              <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">Add New Customer</h1>
+              <p className="text-gray-600 dark:text-gray-400">Create a new customer profile in the system</p>
             </div>
           </div>
         </div>
@@ -106,7 +106,7 @@ const AddCustomerPage = () => {
         <div className="grid gap-6 lg:grid-cols-3">
           {/* Main Form */}
           <div className="lg:col-span-2">
-            <Card className="shadow-sm border-gray-200">
+            <Card className="shadow-sm border-gray-200 dark:border-gray-800">
               <CardHeader className="pb-4">
                 <CardTitle className="text-xl flex items-center gap-2">
                   <User className="h-5 w-5" />
@@ -117,7 +117,7 @@ const AddCustomerPage = () => {
                 <form onSubmit={handleSubmit} className="space-y-6">
                   {/* Personal Information Section */}
                   <div className="space-y-4">
-                    <div className="flex items-center gap-2 text-sm font-medium text-gray-500 uppercase tracking-wide">
+                    <div className="flex items-center gap-2 text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">
                       <div className="w-1 h-4 bg-blue-600 rounded"></div>
                       Personal Details
                     </div>
@@ -164,7 +164,7 @@ const AddCustomerPage = () => {
 
                   {/* Pricing Section */}
                   <div className="space-y-4">
-                    <div className="flex items-center gap-2 text-sm font-medium text-gray-500 uppercase tracking-wide">
+                    <div className="flex items-center gap-2 text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">
                       <div className="w-1 h-4 bg-teal-600 rounded"></div>
                       Pricing
                     </div>
@@ -179,7 +179,7 @@ const AddCustomerPage = () => {
                         name="priceTier"
                         value={form.priceTier}
                         onChange={handleChange}
-                        className="w-full p-2 border border-gray-300 rounded-md focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-colors"
+                        className="w-full p-2 border border-gray-300 dark:border-gray-700 rounded-md focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-colors"
                       >
                         {PRICE_TIERS.map((tier) => (
                           <option key={tier.value} value={tier.value}>
@@ -187,7 +187,7 @@ const AddCustomerPage = () => {
                           </option>
                         ))}
                       </select>
-                      <p className="text-xs text-gray-500">
+                      <p className="text-xs text-gray-500 dark:text-gray-400">
                         Which product price this customer is charged when creating an order
                       </p>
                     </div>
@@ -197,7 +197,7 @@ const AddCustomerPage = () => {
 
                   {/* Debt Information Section */}
                   <div className="space-y-6">
-                    <div className="flex items-center gap-2 text-sm font-medium text-gray-500 uppercase tracking-wide">
+                    <div className="flex items-center gap-2 text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">
                       <div className="w-1 h-4 bg-amber-600 rounded"></div>
                       Debt Information
                     </div>
@@ -206,7 +206,7 @@ const AddCustomerPage = () => {
                       {/* Monetary Debt */}
                       <div className="space-y-4">
                         <div className="space-y-2">
-                          <Label htmlFor="debt" className="text-sm font-medium text-gray-700">
+                          <Label htmlFor="debt" className="text-sm font-medium text-gray-700 dark:text-gray-300">
                             Amount Owed ($)
                           </Label>
                           <Input
@@ -261,7 +261,7 @@ const AddCustomerPage = () => {
 
           {/* Summary Sidebar */}
           <div className="lg:col-span-1">
-            <Card className="shadow-sm border-gray-200 sticky top-6">
+            <Card className="shadow-sm border-gray-200 dark:border-gray-800 sticky top-6">
               <CardHeader className="pb-4">
                 <CardTitle className="text-lg">Debt Summary</CardTitle>
                 <CardDescription>Customer obligation overview</CardDescription>
@@ -269,21 +269,21 @@ const AddCustomerPage = () => {
               <CardContent className="space-y-6">
                 {/* Customer Info */}
                 <div className="space-y-3">
-                  <h4 className="font-medium text-gray-900 flex items-center gap-2">
+                  <h4 className="font-medium text-gray-900 dark:text-gray-100 flex items-center gap-2">
                     <User className="h-4 w-4" />
                     Customer
                   </h4>
                   <div className="space-y-2">
                     <div className="flex justify-between items-center">
-                      <span className="text-sm text-gray-600">Name</span>
-                      <span className="font-medium text-gray-900 truncate max-w-[120px] text-right">
+                      <span className="text-sm text-gray-600 dark:text-gray-400">Name</span>
+                      <span className="font-medium text-gray-900 dark:text-gray-100 truncate max-w-[120px] text-right">
                         {form.fullName || "Not provided"}
                       </span>
                     </div>
                     
                     <div className="flex justify-between items-center">
-                      <span className="text-sm text-gray-600">Phone</span>
-                      <span className="font-medium text-gray-900">
+                      <span className="text-sm text-gray-600 dark:text-gray-400">Phone</span>
+                      <span className="font-medium text-gray-900 dark:text-gray-100">
                         {form.phoneNumber || "Not provided"}
                       </span>
                     </div>
@@ -294,19 +294,19 @@ const AddCustomerPage = () => {
 
                 {/* Monetary Debt Summary */}
                 <div className="space-y-3">
-                  <h4 className="font-medium text-gray-900 flex items-center gap-2">
+                  <h4 className="font-medium text-gray-900 dark:text-gray-100 flex items-center gap-2">
                     <DollarSign className="h-4 w-4" />
                     Money Debt
                   </h4>
-                  <div className="flex justify-between items-center p-3 rounded-lg bg-amber-50 border border-amber-200">
-                    <span className="text-sm font-medium text-amber-800">Amount Owed</span>
+                  <div className="flex justify-between items-center p-3 rounded-lg bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-900/50">
+                    <span className="text-sm font-medium text-amber-800 dark:text-amber-400">Amount Owed</span>
                     <div className="text-right">
-                      <span className="text-lg font-bold text-amber-900">
+                      <span className="text-lg font-bold text-amber-900 dark:text-amber-300">
                         ${(parseInt(form.debt) || 0).toLocaleString()}
                       </span>
                       <Badge
                         variant={hasAnyDebt ? "default" : "outline"}
-                        className={`ml-2 ${hasAnyDebt ? 'bg-amber-100 text-amber-800' : ''}`}
+                        className={`ml-2 ${hasAnyDebt ? 'bg-amber-100 dark:bg-amber-900/30 text-amber-800 dark:text-amber-400' : ''}`}
                       >
                         {hasAnyDebt ? "Owes Money" : "No Money Debt"}
                       </Badge>
@@ -317,8 +317,8 @@ const AddCustomerPage = () => {
                 <Separator />
 
                 {/* Overall Status */}
-                <div className="bg-gray-50 rounded-lg p-4">
-                  <h4 className="font-medium text-gray-900 flex items-center gap-2 mb-2">
+                <div className="bg-gray-50 dark:bg-gray-950 rounded-lg p-4">
+                  <h4 className="font-medium text-gray-900 dark:text-gray-100 flex items-center gap-2 mb-2">
                     <Scale className="h-4 w-4" />
                     Overall Status
                   </h4>
@@ -329,7 +329,7 @@ const AddCustomerPage = () => {
                     >
                       {hasAnyDebt ? "Customer Has Debt" : "Debt-Free Customer"}
                     </Badge>
-                    <p className="text-xs text-gray-600 mt-2">
+                    <p className="text-xs text-gray-600 dark:text-gray-400 mt-2">
                       {hasAnyDebt
                         ? "This customer has an outstanding balance"
                         : "No current debt"

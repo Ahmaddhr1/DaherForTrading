@@ -22,7 +22,7 @@ export function ConfirmDialog({
 }) {
   return (
     <Modal open={open} onClose={onClose} title={title} maxWidth="max-w-md">
-      {description && <p className="text-sm text-gray-600 mb-4">{description}</p>}
+      {description && <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">{description}</p>}
       <div className="flex justify-end gap-3">
         <Button type="button" variant="outline" onClick={onClose} disabled={loading}>
           {cancelLabel}

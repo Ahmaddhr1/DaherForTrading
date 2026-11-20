@@ -44,11 +44,11 @@ export default function DashboardFilters({ filters, setFilters }) {
 
   return (
     <FiltersPanel activeCount={activeFilterCount}>
-      <Card className="shadow-sm border-gray-200 mb-8">
+      <Card className="shadow-sm border-gray-200 dark:border-gray-800 mb-8">
         <CardContent className="p-4 space-y-4">
           {/* Date Range */}
           <div className="flex flex-col sm:flex-row sm:flex-wrap sm:items-center gap-3">
-            <div className="flex items-center gap-2 text-sm font-medium text-gray-700">
+            <div className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300">
               <CalendarRange className="h-4 w-4 text-blue-600" />
               Date Range
             </div>
@@ -83,7 +83,7 @@ export default function DashboardFilters({ filters, setFilters }) {
                   onChange={(e) => update({ startDate: e.target.value })}
                   className="w-full sm:w-auto border rounded-md text-sm px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
-                <span className="hidden sm:inline text-gray-400">to</span>
+                <span className="hidden sm:inline text-gray-400 dark:text-gray-500">to</span>
                 <input
                   type="date"
                   value={filters.endDate}
@@ -97,7 +97,7 @@ export default function DashboardFilters({ filters, setFilters }) {
           <div className="flex flex-col sm:flex-row sm:flex-wrap sm:items-center gap-4 sm:gap-6 border-t pt-4">
             {/* Top Products filters */}
             <div className="flex flex-col sm:flex-row sm:flex-wrap sm:items-center gap-2 sm:gap-3">
-              <div className="flex items-center gap-2 text-sm font-medium text-gray-700">
+              <div className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300">
                 <Package className="h-4 w-4 text-purple-600" />
                 Top Products
               </div>
@@ -139,7 +139,7 @@ export default function DashboardFilters({ filters, setFilters }) {
 
             {/* Top Customers / Debtors filters */}
             <div className="flex flex-col sm:flex-row sm:flex-wrap sm:items-center gap-2 sm:gap-3">
-              <div className="flex items-center gap-2 text-sm font-medium text-gray-700">
+              <div className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300">
                 <Trophy className="h-4 w-4 text-amber-600" />
                 Top Debtors
               </div>
@@ -154,7 +154,7 @@ export default function DashboardFilters({ filters, setFilters }) {
                   </option>
                 ))}
               </select>
-              <div className="flex items-center gap-2 text-sm text-gray-500">
+              <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
                 <ListFilter className="h-3 w-3" />
                 Min debt ($)
                 <input

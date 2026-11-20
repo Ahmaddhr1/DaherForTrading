@@ -129,19 +129,19 @@ export default function CustomersPage() {
   ].filter(Boolean).length;
 
   return (
-    <div className="min-h-screen bg-gray-50 py-6">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-950 py-6">
       <div className="container mx-auto px-4">
 
         {/* Page Header */}
         <div className="mb-8">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="p-2 bg-blue-100 rounded-lg">
+              <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
                 <Users className="h-6 w-6 text-blue-600" />
               </div>
               <div>
-                <h1 className="text-3xl font-bold text-gray-900">Customers</h1>
-                <p className="text-gray-600">Manage your customers</p>
+                <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">Customers</h1>
+                <p className="text-gray-600 dark:text-gray-400">Manage your customers</p>
               </div>
             </div>
 
@@ -159,7 +159,7 @@ export default function CustomersPage() {
           <div className="mb-6 space-y-4">
             {/* Search Bar */}
             <div className="relative max-w-md">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 h-4 w-4" />
               <Input
                 type="text"
                 placeholder="Search customers by name..."
@@ -172,8 +172,8 @@ export default function CustomersPage() {
             {/* Debt Filter Buttons */}
             <div className="flex flex-col sm:flex-row sm:flex-wrap gap-2">
               <div className="flex items-center gap-2">
-                <Filter className="h-4 w-4 text-gray-500" />
-                <span className="text-sm font-medium text-gray-700">Filter by Debt:</span>
+                <Filter className="h-4 w-4 text-gray-500 dark:text-gray-400" />
+                <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Filter by Debt:</span>
               </div>
 
               <Button
@@ -220,8 +220,8 @@ export default function CustomersPage() {
             {/* Sort & Page Size */}
             <div className="flex flex-col sm:flex-row sm:flex-wrap sm:items-center gap-3 sm:gap-4">
               <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-2">
-                <span className="flex items-center gap-1.5 text-sm font-medium text-gray-700">
-                  <ArrowUpDown className="h-4 w-4 text-gray-500" />
+                <span className="flex items-center gap-1.5 text-sm font-medium text-gray-700 dark:text-gray-300">
+                  <ArrowUpDown className="h-4 w-4 text-gray-500 dark:text-gray-400" />
                   Sort by
                 </span>
                 <select
@@ -238,7 +238,7 @@ export default function CustomersPage() {
               </div>
 
               <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-2">
-                <span className="text-sm font-medium text-gray-700">Per page</span>
+                <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Per page</span>
                 <select
                   value={pageSize}
                   onChange={(e) => setPageSize(parseInt(e.target.value))}
@@ -257,7 +257,7 @@ export default function CustomersPage() {
 
         {/* Results Count */}
         <div className="mb-4">
-          <p className="text-gray-600">
+          <p className="text-gray-600 dark:text-gray-400">
             Showing {customers.length} of {totalCount} customers
             {debtFilter !== "all" && (
               <span className="ml-2 text-blue-600">
@@ -278,7 +278,7 @@ export default function CustomersPage() {
           <Card>
             <CardContent className="pt-6 text-center">
               <div className="text-red-500 text-lg mb-2">Error</div>
-              <p className="text-gray-600">Failed to load customers. Please try again.</p>
+              <p className="text-gray-600 dark:text-gray-400">Failed to load customers. Please try again.</p>
               <Button
                 onClick={() => queryClient.refetchQueries(["customers"])}
                 className="mt-4"
@@ -293,11 +293,11 @@ export default function CustomersPage() {
         {!isLoading && !error && customers.length === 0 && (
           <Card>
             <CardContent className="pt-6 text-center">
-              <User className="h-12 w-12 text-gray-400 mx-auto mb-3" />
-              <p className="text-gray-500 text-lg mb-2">No customers found</p>
+              <User className="h-12 w-12 text-gray-400 dark:text-gray-500 mx-auto mb-3" />
+              <p className="text-gray-500 dark:text-gray-400 text-lg mb-2">No customers found</p>
               {searchTerm || debtFilter !== "all" ? (
                 <div>
-                  <p className="text-gray-400 mb-2">Try adjusting your filters</p>
+                  <p className="text-gray-400 dark:text-gray-500 mb-2">Try adjusting your filters</p>
                   <Button
                     variant="outline"
                     onClick={() => {
@@ -342,7 +342,7 @@ export default function CustomersPage() {
 
                         {/* Customer Avatar */}
                         <div className="flex justify-center mb-3">
-                          <div className={`w-16 h-16 rounded-full flex items-center justify-center ${hasDebt ? "bg-red-100" : "bg-green-100"
+                          <div className={`w-16 h-16 rounded-full flex items-center justify-center ${hasDebt ? "bg-red-100 dark:bg-red-900/30" : "bg-green-100 dark:bg-green-900/30"
                             }`}>
                             <User className={`h-8 w-8 ${hasDebt ? "text-red-600" : "text-green-600"}`} />
                           </div>
@@ -350,12 +350,12 @@ export default function CustomersPage() {
 
                         {/* Customer Info */}
                         <div className="text-center mb-3">
-                          <h3 className="font-semibold text-gray-900 mb-1">
+                          <h3 className="font-semibold text-gray-900 dark:text-gray-100 mb-1">
                             #{customerNumber} - {customer.fullName}
                           </h3>
 
                           {customer.phoneNumber && (
-                            <p className="text-sm text-gray-600 flex items-center justify-center gap-1">
+                            <p className="text-sm text-gray-600 dark:text-gray-400 flex items-center justify-center gap-1">
                               <Phone className="h-3 w-3" />
                               {customer.phoneNumber}
                             </p>
@@ -410,7 +410,7 @@ export default function CustomersPage() {
                   Previous
                 </Button>
 
-                <span className="text-gray-600">
+                <span className="text-gray-600 dark:text-gray-400">
                   Page {currentPage} of {totalPages}
                 </span>
 

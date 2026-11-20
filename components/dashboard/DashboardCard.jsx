@@ -15,31 +15,31 @@ const DashboardCard = ({ title, value, description, color, icon: Icon }) => {
   };
 
   const iconBg = {
-    green: "bg-green-100 text-green-600",
-    blue: "bg-blue-100 text-blue-600",
-    purple: "bg-purple-100 text-purple-600",
-    orange: "bg-orange-100 text-orange-600",
-    red: "bg-red-100 text-red-600",
-    yellow: "bg-yellow-100 text-yellow-600",
+    green: "bg-green-100 dark:bg-green-900/30 text-green-600",
+    blue: "bg-blue-100 dark:bg-blue-900/30 text-blue-600",
+    purple: "bg-purple-100 dark:bg-purple-900/30 text-purple-600",
+    orange: "bg-orange-100 dark:bg-orange-900/30 text-orange-600",
+    red: "bg-red-100 dark:bg-red-900/30 text-red-600",
+    yellow: "bg-yellow-100 dark:bg-yellow-900/30 text-yellow-600",
   };
 
   return (
-    <Card className="shadow-sm border-gray-200 h-full">
+    <Card className="shadow-sm border-gray-200 dark:border-gray-800 h-full">
       <CardContent className="p-4">
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
-            <p className="text-xs font-medium text-gray-500 uppercase tracking-wide truncate">
+            <p className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide truncate">
               {title}
             </p>
-            <div className={`text-2xl font-bold mt-1 ${colorClasses[color] || "text-gray-900"}`}>
+            <div className={`text-2xl font-bold mt-1 ${colorClasses[color] || "text-gray-900 dark:text-gray-100"}`}>
               {value}
             </div>
             {description && (
-              <p className="text-xs text-gray-500 mt-1">{description}</p>
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">{description}</p>
             )}
           </div>
           {Icon && (
-            <div className={`p-2 rounded-lg shrink-0 ${iconBg[color] || "bg-gray-100 text-gray-600"}`}>
+            <div className={`p-2 rounded-lg shrink-0 ${iconBg[color] || "bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400"}`}>
               <Icon className="h-4 w-4" />
             </div>
           )}

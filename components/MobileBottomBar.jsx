@@ -13,7 +13,17 @@ import { ThemeToggle } from "@/components/ThemeToggle";
 import { GlobalSearchModal } from "@/components/GlobalSearchModal";
 import { hasPermission } from "@/lib/permissions";
 
-const findTab = (label) => tabs.find((tab) => tab.label === label);
+// Searches both top-level tabs and any nested `children` (see
+// SideBarTabs.js) - mobile doesn't nest them visually, it just needs to
+// find them by label for its own flat section groupings below.
+const findTab = (label) => {
+  for (const tab of tabs) {
+    if (tab.label === label) return tab;
+    const child = tab.children?.find((c) => c.label === label);
+    if (child) return child;
+  }
+  return undefined;
+};
 
 // Mobile-only bottom navigation bar - see MySideBar for the desktop (lg+)
 // sidebar it replaces below that breakpoint.
@@ -110,7 +120,7 @@ export function MobileBottomBar() {
           {SECTIONS.map((section) => {
             const active = isSectionActive(section);
             const className = `flex flex-col items-center justify-center gap-1 py-2.5 text-[11px] font-medium ${
-              active ? "text-primary" : "text-gray-500 dark:text-gray-400"
+              active ? "text-primary dark:text-white" : "text-gray-500 dark:text-gray-400"
             }`;
             const iconWithBadge = (
               <span className="relative">
@@ -160,12 +170,12 @@ export function MobileBottomBar() {
       {activeSheet && (
         <div className="lg:hidden fixed inset-0 z-50" role="dialog" aria-modal="true">
           <div className="absolute inset-0 bg-black/50" onClick={() => setOpenSection(null)} />
-          <div className="absolute bottom-0 inset-x-0 bg-white dark:bg-gray-900 dark:bg-gray-900 rounded-t-2xl shadow-xl pb-[env(safe-area-inset-bottom)]">
-            <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-800 dark:border-gray-800">
-              <h2 className="font-semibold text-gray-900 dark:text-gray-100 dark:text-gray-100">{activeSheet.label}</h2>
+          <div className="absolute bottom-0 inset-x-0 bg-white dark:bg-gray-900 rounded-t-2xl shadow-xl pb-[env(safe-area-inset-bottom)]">
+            <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-800">
+              <h2 className="font-semibold text-gray-900 dark:text-gray-100">{activeSheet.label}</h2>
               <button
                 onClick={() => setOpenSection(null)}
-                className="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-400 dark:hover:text-gray-300 rounded-md p-1"
+                className="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 rounded-md p-1"
                 aria-label="Close"
               >
                 <X className="h-5 w-5" />
@@ -178,7 +188,7 @@ export function MobileBottomBar() {
                   href={tab.path}
                   onClick={() => setOpenSection(null)}
                   className={`flex items-center gap-3 p-3 rounded-lg ${
-                    pathname === tab.path ? "bg-primary text-white" : "text-gray-700 dark:text-gray-300 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 dark:hover:bg-gray-800"
+                    pathname === tab.path ? "bg-primary text-white" : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
                   }`}
                 >
                   {tab.icon}

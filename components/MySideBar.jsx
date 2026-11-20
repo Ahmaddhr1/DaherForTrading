@@ -74,9 +74,24 @@ export function MySideBar() {
     );
   };
 
+  const renderChildLink = (child) => {
+    const isActive = pathname === child.path;
+    return (
+      <Link
+        key={child.path}
+        href={child.path}
+        className={`flex items-center py-2 pl-12 pr-4 text-sm transition-colors ${
+          isActive ? "bg-primary text-white" : "text-sidebar-foreground/70 hover:bg-primary hover:text-white"
+        }`}
+      >
+        {child.label}
+      </Link>
+    );
+  };
+
   return (
     <aside
-      className={`hidden lg:flex lg:sticky top-0 left-0 h-screen z-40 bg-sidebar text-primary
+      className={`hidden lg:flex lg:sticky top-0 left-0 h-screen z-40 bg-sidebar text-sidebar-foreground
                   transition-all duration-300 ease-in-out
                   ${isCollapsed ? "w-20" : "w-64"}`}
     >
@@ -115,7 +130,12 @@ export function MySideBar() {
         {/* Navigation */}
         <nav className="flex-1 overflow-y-auto py-4">
           <div className="space-y-2">
-            {visibleTabs.map((tab, index) => renderLink(tab, index))}
+            {visibleTabs.map((tab, index) => (
+              <div key={index}>
+                {renderLink(tab, index)}
+                {!isCollapsed && tab.children?.map(renderChildLink)}
+              </div>
+            ))}
           </div>
         </nav>
 

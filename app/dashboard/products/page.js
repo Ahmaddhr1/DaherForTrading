@@ -20,10 +20,12 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Search, Package, Plus, Edit, Trash2, ChevronLeft, ChevronRight, Loader2, DollarSign, Box, TrendingUp, Wallet, AlertTriangle, LayoutList, LayoutGrid, FileDown, Filter } from "lucide-react";
+import { Search, Package, Plus, Edit, Trash2, ChevronLeft, ChevronRight, Loader2, DollarSign, Box, TrendingUp, Wallet, AlertTriangle, LayoutList, LayoutGrid, FileDown, Filter, Tag, X } from "lucide-react";
 import ProductGridView from "./ProductGridView";
 import GeneratePdfModal from "./GeneratePdfModal";
 import CategoryFilterModal from "./CategoryFilterModal";
+import BulkPriceUpdateModal from "./BulkPriceUpdateModal";
+import BulkCategoryModal from "./BulkCategoryModal";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { useCart } from "@/lib/cartContext";
 import { useIsOwner } from "@/lib/useIsOwner";
@@ -40,6 +42,11 @@ export default function ProductsPage() {
   const [deletingId, setDeletingId] = useState(null);
   const [viewMode, setViewMode] = useState("list"); // "list" | "grid"
   const [pdfModalOpen, setPdfModalOpen] = useState(false);
+  const [selectedIds, setSelectedIds] = useState([]);
+  const [bulkPriceModalOpen, setBulkPriceModalOpen] = useState(false);
+  const [bulkCategoryModalOpen, setBulkCategoryModalOpen] = useState(false);
+  const [bulkDeleteConfirmOpen, setBulkDeleteConfirmOpen] = useState(false);
+  const [bulkDeleting, setBulkDeleting] = useState(false);
   const { addToCart } = useCart();
   const { isOwner } = useIsOwner();
   const queryClient = useQueryClient();
@@ -117,6 +124,11 @@ export default function ProductsPage() {
     setCurrentPage(1);
   }, [categoryFilters]);
 
+  // A selection only makes sense for the page/filter it was made on.
+  useEffect(() => {
+    setSelectedIds([]);
+  }, [currentPage, searchTerm, categoryFilters]);
+
   useEffect(() => {
     const el = tableColumnRef.current;
     if (!el) return;
@@ -138,6 +150,41 @@ export default function ProductsPage() {
     } finally {
       setDeletingId(null);
       setDeleteTarget(null);
+    }
+  };
+
+  const toggleSelectOne = (id) => {
+    setSelectedIds((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));
+  };
+
+  const toggleSelectAllOnPage = (products) => {
+    const pageIds = products.map((p) => p._id);
+    const allSelected = pageIds.length > 0 && pageIds.every((id) => selectedIds.includes(id));
+    setSelectedIds(allSelected ? [] : pageIds);
+  };
+
+  const confirmBulkDelete = async () => {
+    setBulkDeleting(true);
+    try {
+      const response = await axios.post("/api/products/bulk", {
+        action: "delete",
+        productIds: selectedIds,
+      });
+      const { deleted, skipped } = response.data;
+      if (skipped?.length > 0) {
+        toast.warning(
+          `Deleted ${deleted} product${deleted === 1 ? "" : "s"}, skipped ${skipped.length} already ordered by a customer`
+        );
+      } else {
+        toast.success(`Deleted ${deleted} product${deleted === 1 ? "" : "s"}`);
+      }
+      queryClient.invalidateQueries(["products"]);
+      setSelectedIds([]);
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Bulk delete failed");
+    } finally {
+      setBulkDeleting(false);
+      setBulkDeleteConfirmOpen(false);
     }
   };
 
@@ -306,6 +353,35 @@ export default function ProductsPage() {
           </p>
         </div>
 
+        {/* Bulk Actions Toolbar - list view only, shown once something is selected */}
+        {viewMode === "list" && selectedIds.length > 0 && (
+          <Card className="mb-4 shadow-sm border-blue-200 bg-blue-50">
+            <CardContent className="p-3 flex flex-wrap items-center gap-2">
+              <span className="text-sm font-medium text-blue-900">
+                {selectedIds.length} selected
+              </span>
+              <div className="flex flex-wrap gap-2 ml-auto">
+                <Button size="sm" variant="outline" onClick={() => setBulkPriceModalOpen(true)}>
+                  <DollarSign className="h-3.5 w-3.5 mr-1" />
+                  Update Price
+                </Button>
+                <Button size="sm" variant="outline" onClick={() => setBulkCategoryModalOpen(true)}>
+                  <Tag className="h-3.5 w-3.5 mr-1" />
+                  Reassign Category
+                </Button>
+                <Button size="sm" variant="destructive" onClick={() => setBulkDeleteConfirmOpen(true)}>
+                  <Trash2 className="h-3.5 w-3.5 mr-1" />
+                  Delete
+                </Button>
+                <Button size="sm" variant="ghost" onClick={() => setSelectedIds([])}>
+                  <X className="h-3.5 w-3.5 mr-1" />
+                  Clear
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
         {/* Category sidebar + table/grid row - the sidebar's max-height is
             measured off the table/grid column (see sidebarMaxHeight above)
             so a long category list scrolls inside the sidebar instead of
@@ -388,6 +464,15 @@ export default function ProductsPage() {
               
               <TableHeader>
                 <TableRow>
+                  <TableHead className="w-10">
+                    <input
+                      type="checkbox"
+                      className="h-4 w-4 rounded border-gray-300 accent-primary"
+                      checked={products.length > 0 && products.every((p) => selectedIds.includes(p._id))}
+                      onChange={() => toggleSelectAllOnPage(products)}
+                      aria-label="Select all products on this page"
+                    />
+                  </TableHead>
                   <TableHead className="w-12">#</TableHead>
                   <TableHead>Product Info</TableHead>
                   <TableHead className="text-center">Stock</TableHead>
@@ -402,7 +487,7 @@ export default function ProductsPage() {
               <TableBody>
                 {products.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={8} className="text-center py-8 text-gray-500">
+                    <TableCell colSpan={9} className="text-center py-8 text-gray-500">
                       <Package className="h-12 w-12 text-gray-300 mx-auto mb-2" />
                       <p>No products found</p>
                       {searchTerm && <p className="text-sm">Try adjusting your search</p>}
@@ -416,6 +501,16 @@ export default function ProductsPage() {
                     
                     return (
                       <TableRow key={product._id} className="hover:bg-gray-50">
+                        {/* Select */}
+                        <TableCell>
+                          <input
+                            type="checkbox"
+                            className="h-4 w-4 rounded border-gray-300 accent-primary"
+                            checked={selectedIds.includes(product._id)}
+                            onChange={() => toggleSelectOne(product._id)}
+                            aria-label={`Select ${product.name}`}
+                          />
+                        </TableCell>
                         {/* Number */}
                         <TableCell className="font-medium text-gray-500">
                           #{productNumber}
@@ -570,6 +665,33 @@ export default function ProductsPage() {
         categories={categories}
         value={categoryFilters.length === 1 ? categoryFilters[0] : ""}
         onChange={(id) => setCategoryFilters(id ? [id] : [])}
+      />
+      <BulkPriceUpdateModal
+        open={bulkPriceModalOpen}
+        onClose={() => setBulkPriceModalOpen(false)}
+        productIds={selectedIds}
+        onDone={() => {
+          setBulkPriceModalOpen(false);
+          setSelectedIds([]);
+        }}
+      />
+      <BulkCategoryModal
+        open={bulkCategoryModalOpen}
+        onClose={() => setBulkCategoryModalOpen(false)}
+        productIds={selectedIds}
+        categories={categories}
+        onDone={() => {
+          setBulkCategoryModalOpen(false);
+          setSelectedIds([]);
+        }}
+      />
+      <ConfirmDialog
+        open={bulkDeleteConfirmOpen}
+        onClose={() => setBulkDeleteConfirmOpen(false)}
+        title={`Delete ${selectedIds.length} product${selectedIds.length === 1 ? "" : "s"}?`}
+        description="Products already ordered by a customer will be skipped automatically."
+        onConfirm={confirmBulkDelete}
+        loading={bulkDeleting}
       />
     </div>
   );

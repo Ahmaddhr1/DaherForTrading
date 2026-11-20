@@ -23,8 +23,8 @@ const spaceGrotesk = Space_Grotesk({
 });
 
 export const metadata = {
-  title: "MDT",
-  description: "Admin Panel",
+  title: "Invento",
+  description: "Trade and inventory management",
 };
 
 export default async function RootLayout({ children }) {

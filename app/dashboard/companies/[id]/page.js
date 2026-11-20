@@ -13,7 +13,6 @@ import {
   Building2,
   Phone,
   MapPin,
-  ArrowLeft,
   ShoppingBag,
   Plus,
   History,
@@ -129,15 +128,6 @@ const EditCompanyPage = () => {
     <div className="min-h-screen bg-gray-50/30 dark:bg-gray-900/30 py-8">
       <div className="container mx-auto px-4 max-w-4xl">
         <div className="mb-8">
-          <Button
-            variant="ghost"
-            onClick={() => router.back()}
-            className="mb-4 flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100"
-          >
-            <ArrowLeft className="h-4 w-4" />
-            Back to Companies
-          </Button>
-
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
             <div className="flex items-center gap-3 min-w-0">
               <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg shrink-0">

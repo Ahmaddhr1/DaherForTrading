@@ -14,10 +14,10 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { FiltersPanel } from "@/components/ui/filters-panel";
-import { ArrowLeft, ChevronLeft, ChevronRight, Plus, History, DollarSign, Package, Eye } from "lucide-react";
+import { ChevronLeft, ChevronRight, Plus, History, DollarSign, Package, Eye } from "lucide-react";
 import { TableSkeleton } from "@/components/ui/skeleton-patterns";
 import { format } from "date-fns";
-import { useRouter, useParams } from "next/navigation";
+import { useParams } from "next/navigation";
 import axios from "axios";
 import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
@@ -25,7 +25,6 @@ import { localDayStartISO, localDayEndISO } from "@/lib/dateUtils";
 import ProductPurchaseBreakdown from "./ProductPurchaseBreakdown";
 
 export default function CompanyPurchasesPage() {
-  const router = useRouter();
   const { id } = useParams();
   const [page, setPage] = useState(1);
   const [startDate, setStartDate] = useState("");
@@ -57,15 +56,6 @@ export default function CompanyPurchasesPage() {
     <div className="min-h-screen bg-gray-50 dark:bg-gray-950 py-6">
       <div className="container mx-auto px-4 max-w-5xl">
         <div className="mb-6">
-          <Button
-            variant="ghost"
-            onClick={() => router.back()}
-            className="mb-4 flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100"
-          >
-            <ArrowLeft className="h-4 w-4" />
-            Back to Company
-          </Button>
-
           <div className="flex items-center justify-between gap-3">
             <div className="flex items-center gap-3 min-w-0">
               <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg shrink-0">

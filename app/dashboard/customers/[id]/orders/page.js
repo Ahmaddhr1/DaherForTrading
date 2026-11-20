@@ -23,7 +23,6 @@ import { TableSkeleton } from "@/components/ui/skeleton-patterns";
 import { FiltersPanel } from "@/components/ui/filters-panel";
 import {
   Loader2,
-  ArrowLeft,
   ChevronLeft,
   ChevronRight,
   Package,
@@ -170,15 +169,6 @@ export default function CustomerOrdersTable() {
       <div className="container mx-auto px-4 max-w-5xl">
         {/* Header */}
         <div className="mb-6">
-          <Button
-            variant="ghost"
-            onClick={() => router.push(`/dashboard/customers/${id}`)}
-            className="mb-4 flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100"
-          >
-            <ArrowLeft className="h-4 w-4" />
-            Back to Customer
-          </Button>
-
           <div className="flex items-center gap-3">
             <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
               <ShoppingCart className="h-6 w-6 text-blue-600" />

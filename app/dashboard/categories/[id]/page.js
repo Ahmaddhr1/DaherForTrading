@@ -22,7 +22,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { ArrowLeft, Folder, Eye, Loader2, Trash2, Package, Edit } from "lucide-react";
+import { Folder, Eye, Loader2, Trash2, Package, Edit } from "lucide-react";
 
 const EditCategoryPage = () => {
   const { id } = useParams();
@@ -181,13 +181,6 @@ const EditCategoryPage = () => {
 
         {/* Header */}
         <div className="mb-8">
-          <Link href="/dashboard/categories">
-            <Button variant="ghost" className="mb-4 flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100">
-              <ArrowLeft className="h-4 w-4" />
-              Back to Categories
-            </Button>
-          </Link>
-
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg">

@@ -2,6 +2,7 @@ import { connectToDB } from "@/lib/connectDb";
 import Customer from "@/models/Customers";
 import Order from "@/models/Orders";
 import Payment from "@/models/Payment";
+import { getCustomerOverdueInfo, DEFAULT_OVERDUE_DAYS } from "@/lib/overdueCustomers";
 import { NextResponse } from "next/server";
 
 // GET one customer
@@ -23,7 +24,18 @@ export async function GET(req, { params }) {
         { status: 404 }
       );
     }
-    return NextResponse.json(customer, { status: 200 });
+
+    const result = customer.toObject();
+    if (customer.debt > 0) {
+      const { lastPaymentDate, firstOrderDate } = await getCustomerOverdueInfo(id);
+      const referenceDate = lastPaymentDate || firstOrderDate || customer.createdAt;
+      const daysSincePayment = Math.floor((Date.now() - new Date(referenceDate).getTime()) / (1000 * 60 * 60 * 24));
+      result.lastPaymentDate = lastPaymentDate;
+      result.daysSincePayment = daysSincePayment;
+      result.isOverdue = daysSincePayment >= DEFAULT_OVERDUE_DAYS;
+    }
+
+    return NextResponse.json(result, { status: 200 });
   } catch (error) {
     return NextResponse.json(
       { message: "Error fetching customer", error: error.message },

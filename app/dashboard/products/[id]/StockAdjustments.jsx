@@ -28,6 +28,9 @@ const TYPE_LABELS = {
   expired: "Expired",
   correction: "Correction",
   other: "Other",
+  // Only ever created programmatically (see models/Return.js) - never a
+  // manual option below, but still needs a label/badge to display.
+  returned: "Customer Return",
 };
 
 const TYPE_BADGE_CLASSES = {
@@ -36,7 +39,10 @@ const TYPE_BADGE_CLASSES = {
   expired: "bg-amber-100 dark:bg-amber-900/30 text-amber-800 dark:text-amber-400",
   correction: "bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-400",
   other: "bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200",
+  returned: "bg-emerald-100 dark:bg-emerald-900/30 text-emerald-800 dark:text-emerald-400",
 };
+
+const MANUAL_TYPE_OPTIONS = Object.entries(TYPE_LABELS).filter(([value]) => value !== "returned");
 
 const EMPTY_FORM = { type: "damaged", quantityChange: "", reason: "" };
 
@@ -173,7 +179,7 @@ export default function StockAdjustments({ productId, currentQuantity, unit }) {
               onChange={(e) => setForm((prev) => ({ ...prev, type: e.target.value }))}
               className="w-full p-2 border border-gray-300 dark:border-gray-700 rounded-md focus:border-purple-500 focus:ring-1 focus:ring-purple-500"
             >
-              {Object.entries(TYPE_LABELS).map(([value, label]) => (
+              {MANUAL_TYPE_OPTIONS.map(([value, label]) => (
                 <option key={value} value={value}>
                   {label}
                 </option>

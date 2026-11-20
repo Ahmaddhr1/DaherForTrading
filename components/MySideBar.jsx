@@ -8,6 +8,7 @@ import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import tabs from "@/lib/SideBarTabs";
 import { toast } from "sonner";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 // Desktop-only navigation (lg and up). On mobile, navigation is handled by
 // MobileBottomBar instead - see components/MobileBottomBar.jsx.
@@ -64,7 +65,7 @@ export function MySideBar() {
     >
       <div className="flex flex-col h-full w-full">
         {/* Header */}
-        <div className="p-4 flex justify-between items-center border-b border-gray-700">
+        <div className="p-4 flex justify-between items-center border-b border-sidebar-border">
           {!isCollapsed && <h1 className="text-xl font-bold">M.D.T</h1>}
           <button
             onClick={toggleCollapse}
@@ -83,15 +84,18 @@ export function MySideBar() {
         </nav>
 
         {/* Footer */}
-        <button
-          onClick={handleLogout}
-          className={`p-4 border-t border-gray-700 flex items-center hover:bg-destructive hover:text-white cursor-pointer duration-150 ${
-            isCollapsed ? "justify-center" : ""
-          }`}
-        >
-          <LogOut />
-          {!isCollapsed && <span className="ml-3">Logout</span>}
-        </button>
+        <div className="border-t border-sidebar-border">
+          <ThemeToggle collapsed={isCollapsed} className={`mx-2 mt-2 ${isCollapsed ? "" : "w-[calc(100%-1rem)]"}`} />
+          <button
+            onClick={handleLogout}
+            className={`p-4 flex items-center hover:bg-destructive hover:text-white cursor-pointer duration-150 ${
+              isCollapsed ? "justify-center" : ""
+            }`}
+          >
+            <LogOut />
+            {!isCollapsed && <span className="ml-3">Logout</span>}
+          </button>
+        </div>
       </div>
     </aside>
   );

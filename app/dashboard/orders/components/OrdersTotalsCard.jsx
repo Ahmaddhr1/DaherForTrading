@@ -15,19 +15,19 @@ import { Receipt, TrendingUp, Wallet } from "lucide-react";
 export function OrdersTotalsCard({ totalAmount = 0, totalProfit = 0, collectedAmount, label = "Total Sales" }) {
   const showCollected = collectedAmount !== undefined;
   return (
-    <Card className="shadow-sm border-gray-200">
+    <Card className="shadow-sm border-gray-200 dark:border-gray-800">
       <CardContent className={`p-4 grid gap-4 ${showCollected ? "grid-cols-3" : "grid-cols-2"}`}>
         <div className="flex flex-col items-center sm:items-start gap-1">
-          <span className="flex items-center gap-1.5 text-xs font-medium text-gray-500">
+          <span className="flex items-center gap-1.5 text-xs font-medium text-gray-500 dark:text-gray-400">
             <Receipt className="h-3.5 w-3.5" />
             {label}
           </span>
-          <span className="text-lg font-bold text-gray-900">
+          <span className="text-lg font-bold text-gray-900 dark:text-gray-100">
             ${totalAmount.toLocaleString()}
           </span>
         </div>
         <div className="flex flex-col items-center sm:items-start gap-1">
-          <span className="flex items-center gap-1.5 text-xs font-medium text-gray-500">
+          <span className="flex items-center gap-1.5 text-xs font-medium text-gray-500 dark:text-gray-400">
             <TrendingUp className="h-3.5 w-3.5" />
             Profit Made
           </span>
@@ -37,7 +37,7 @@ export function OrdersTotalsCard({ totalAmount = 0, totalProfit = 0, collectedAm
         </div>
         {showCollected && (
           <div className="flex flex-col items-center sm:items-start gap-1">
-            <span className="flex items-center gap-1.5 text-xs font-medium text-gray-500">
+            <span className="flex items-center gap-1.5 text-xs font-medium text-gray-500 dark:text-gray-400">
               <Wallet className="h-3.5 w-3.5" />
               Paid + Partially Paid
             </span>

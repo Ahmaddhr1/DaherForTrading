@@ -57,7 +57,7 @@ export default function OrderDetailsPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gray-50/30 py-8">
+      <div className="min-h-screen bg-gray-50/30 dark:bg-gray-900/30 py-8">
         <div className="container mx-auto px-4 max-w-4xl">
           <PageHeaderSkeleton />
           <div className="grid gap-6 lg:grid-cols-3">
@@ -79,11 +79,11 @@ export default function OrderDetailsPage() {
       <div className="flex justify-center items-center min-h-96">
         <Card className="w-full max-w-md">
           <CardContent className="pt-6 text-center">
-            <div className="text-red-500 bg-red-50 rounded-full p-3 w-12 h-12 mx-auto mb-4 flex items-center justify-center">
+            <div className="text-red-500 bg-red-50 dark:bg-red-900/20 rounded-full p-3 w-12 h-12 mx-auto mb-4 flex items-center justify-center">
               <Tag className="h-6 w-6" />
             </div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">Error Loading Order</h3>
-            <p className="text-gray-600">Unable to load order details. Please try again.</p>
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">Error Loading Order</h3>
+            <p className="text-gray-600 dark:text-gray-400">Unable to load order details. Please try again.</p>
           </CardContent>
         </Card>
       </div>
@@ -91,9 +91,9 @@ export default function OrderDetailsPage() {
   }
 
   const statusConfig = {
-    paid: { label: "Paid", color: "bg-green-100 text-green-800" },
-    partiallyPaid: { label: "Partially Paid", color: "bg-yellow-100 text-yellow-800" },
-    unpaid: { label: "Unpaid", color: "bg-red-100 text-red-800" },
+    paid: { label: "Paid", color: "bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-400" },
+    partiallyPaid: { label: "Partially Paid", color: "bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-400" },
+    unpaid: { label: "Unpaid", color: "bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-400" },
   };
 
   const status = statusConfig[order.status] || statusConfig.unpaid;
@@ -112,13 +112,13 @@ export default function OrderDetailsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50/30 py-8">
+    <div className="min-h-screen bg-gray-50/30 dark:bg-gray-900/30 py-8">
       <div className="container mx-auto px-4 max-w-4xl">
         {/* Header */}
         <div className="mb-8">
           {order.customer?._id && (
             <Link href={`/dashboard/customers/${order.customer._id}/orders`}>
-              <Button variant="ghost" className="mb-4 flex items-center gap-2 text-gray-600 hover:text-gray-900">
+              <Button variant="ghost" className="mb-4 flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100">
                 <ArrowLeft className="h-4 w-4" />
                 Back to Order History
               </Button>
@@ -126,8 +126,8 @@ export default function OrderDetailsPage() {
           )}
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-2">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">Order Details</h1>
-              <p className="text-gray-600 mt-1">Order #{order._id}</p>
+              <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">Order Details</h1>
+              <p className="text-gray-600 dark:text-gray-400 mt-1">Order #{order._id}</p>
 
             </div>
             <Badge className={`px-3 py-1 text-sm font-medium ${status.color} self-start sm:self-auto`}>
@@ -135,7 +135,7 @@ export default function OrderDetailsPage() {
             </Badge>
 
           </div>
-          <div className="flex items-center text-gray-500 text-sm">
+          <div className="flex items-center text-gray-500 dark:text-gray-400 text-sm">
             <Calendar className="h-4 w-4 mr-1" />
             {format(new Date(order.createdAt), "EEEE, MMMM d, yyyy 'at' h:mm a")}
           </div>
@@ -164,7 +164,7 @@ export default function OrderDetailsPage() {
           {/* Left Column */}
           <div className="lg:col-span-2 space-y-6">
             {/* Products Table */}
-            <Card className="shadow-sm border-gray-200">
+            <Card className="shadow-sm border-gray-200 dark:border-gray-800">
               <CardHeader className="pb-4">
                 <CardTitle className="flex items-center text-lg">
                   <Package className="h-5 w-5 mr-2 text-blue-600" />
@@ -174,27 +174,27 @@ export default function OrderDetailsPage() {
               </CardHeader>
               <CardContent className="p-0">
                 <Table>
-                  <TableHeader className="bg-gray-50/50">
+                  <TableHeader className="bg-gray-50/50 dark:bg-gray-900/40">
                     <TableRow>
-                      <TableHead className="font-semibold text-gray-700">Product</TableHead>
-                      <TableHead className="text-center font-semibold text-gray-700">Quantity</TableHead>
-                      <TableHead className="text-center font-semibold text-gray-700">Unit Price</TableHead>
-                      <TableHead className="text-center font-semibold text-gray-700">Discount</TableHead>
-                      <TableHead className="text-right font-semibold text-gray-700">Total</TableHead>
+                      <TableHead className="font-semibold text-gray-700 dark:text-gray-300">Product</TableHead>
+                      <TableHead className="text-center font-semibold text-gray-700 dark:text-gray-300">Quantity</TableHead>
+                      <TableHead className="text-center font-semibold text-gray-700 dark:text-gray-300">Unit Price</TableHead>
+                      <TableHead className="text-center font-semibold text-gray-700 dark:text-gray-300">Discount</TableHead>
+                      <TableHead className="text-right font-semibold text-gray-700 dark:text-gray-300">Total</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {order.products.map((item, index) => (
-                      <TableRow key={item.productId} className={index % 2 === 0 ? "bg-gray-50/30" : ""}>
-                        <TableCell className="font-medium text-gray-900">{item.name}</TableCell>
-                        <TableCell className="text-center text-gray-600">{item.quantity}</TableCell>
-                        <TableCell className="text-center text-gray-600">
+                      <TableRow key={item.productId} className={index % 2 === 0 ? "bg-gray-50/30 dark:bg-gray-900/30" : ""}>
+                        <TableCell className="font-medium text-gray-900 dark:text-gray-100">{item.name}</TableCell>
+                        <TableCell className="text-center text-gray-600 dark:text-gray-400">{item.quantity}</TableCell>
+                        <TableCell className="text-center text-gray-600 dark:text-gray-400">
                           ${item.price.toFixed(2)}
                         </TableCell>
                         <TableCell className="text-center text-amber-700">
                           {item.discount ? `-$${item.discount.toFixed(2)}` : "—"}
                         </TableCell>
-                        <TableCell className="text-right font-medium text-gray-900">
+                        <TableCell className="text-right font-medium text-gray-900 dark:text-gray-100">
                           ${(item.price * item.quantity - (item.discount || 0)).toFixed(2)}
                         </TableCell>
                       </TableRow>
@@ -208,7 +208,7 @@ export default function OrderDetailsPage() {
           {/* Right Column */}
           <div className="space-y-6">
             {/* Customer Info */}
-            <Card className="shadow-sm border-gray-200">
+            <Card className="shadow-sm border-gray-200 dark:border-gray-800">
               <CardHeader className="pb-4">
                 <CardTitle className="flex items-center text-lg">
                   <User className="h-5 w-5 mr-2 text-blue-600" />
@@ -217,19 +217,19 @@ export default function OrderDetailsPage() {
               </CardHeader>
               <CardContent className="space-y-3">
                 <div>
-                  <p className="text-sm font-medium text-gray-500">Full Name</p>
-                  <p className="text-gray-900">{order.customer?.fullName || "Not provided"}</p>
+                  <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Full Name</p>
+                  <p className="text-gray-900 dark:text-gray-100">{order.customer?.fullName || "Not provided"}</p>
                 </div>
                 <Separator />
                 <div>
-                  <p className="text-sm font-medium text-gray-500">Phone Number</p>
-                  <p className="text-gray-900">{order.customer?.phoneNumber || "Not provided"}</p>
+                  <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Phone Number</p>
+                  <p className="text-gray-900 dark:text-gray-100">{order.customer?.phoneNumber || "Not provided"}</p>
                 </div>
               </CardContent>
             </Card>
 
             {/* Payment Summary */}
-            <Card className="shadow-sm border-gray-200">
+            <Card className="shadow-sm border-gray-200 dark:border-gray-800">
               <CardHeader className="pb-4">
                 <CardTitle className="flex items-center text-lg">
                   <CreditCard className="h-5 w-5 mr-2 text-blue-600" />
@@ -238,47 +238,47 @@ export default function OrderDetailsPage() {
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="flex justify-between items-center">
-                  <span className="text-gray-600">Subtotal</span>
-                  <span className="font-medium text-gray-900">
+                  <span className="text-gray-600 dark:text-gray-400">Subtotal</span>
+                  <span className="font-medium text-gray-900 dark:text-gray-100">
                     ${order.products.reduce((s, i) => s + i.price * i.quantity, 0).toFixed(2)}
                   </span>
                 </div>
 
                 {order.discountTotal > 0 && (
                   <div className="flex justify-between items-center">
-                    <span className="text-gray-600">Discount</span>
+                    <span className="text-gray-600 dark:text-gray-400">Discount</span>
                     <span className="text-amber-700 font-medium">-${order.discountTotal.toFixed(2)}</span>
                   </div>
                 )}
 
                 {order.taxAmount > 0 && (
                   <div className="flex justify-between items-center">
-                    <span className="text-gray-600">Tax ({order.taxRate}%)</span>
-                    <span className="text-gray-900 font-medium">+${order.taxAmount.toFixed(2)}</span>
+                    <span className="text-gray-600 dark:text-gray-400">Tax ({order.taxRate}%)</span>
+                    <span className="text-gray-900 dark:text-gray-100 font-medium">+${order.taxAmount.toFixed(2)}</span>
                   </div>
                 )}
 
                 <div className="flex justify-between items-center pt-2 border-t">
-                  <span className="text-gray-600 font-medium">Grand Total</span>
-                  <span className="font-semibold text-gray-900">${Number(order.total).toFixed(2)}</span>
+                  <span className="text-gray-600 dark:text-gray-400 font-medium">Grand Total</span>
+                  <span className="font-semibold text-gray-900 dark:text-gray-100">${Number(order.total).toFixed(2)}</span>
                 </div>
                 {settings?.dollarRate > 0 && (
                   <div className="flex justify-between items-center text-sm">
-                    <span className="text-gray-400">≈</span>
-                    <span className="text-gray-500">{formatLL(order.total, settings.dollarRate)}</span>
+                    <span className="text-gray-400 dark:text-gray-500">≈</span>
+                    <span className="text-gray-500 dark:text-gray-400">{formatLL(order.total, settings.dollarRate)}</span>
                   </div>
                 )}
 
                 <div className="flex justify-between items-center pt-2 border-t">
-                  <span className="text-gray-600">Amount Paid</span>
+                  <span className="text-gray-600 dark:text-gray-400">Amount Paid</span>
                   <span className="text-green-600 font-medium">
                     ${Number(order.amountpaid || 0).toFixed(2)}
                   </span>
                 </div>
 
                 <div className="flex justify-between items-center pt-2 border-t">
-                  <span className="text-gray-600">Remaining Balance</span>
-                  <span className={`font-medium ${Number(order.remainingBalance || 0) > 0 ? "text-red-600" : "text-gray-900"
+                  <span className="text-gray-600 dark:text-gray-400">Remaining Balance</span>
+                  <span className={`font-medium ${Number(order.remainingBalance || 0) > 0 ? "text-red-600" : "text-gray-900 dark:text-gray-100"
                     }`}>
                     ${Number(order.remainingBalance || 0).toFixed(2)}
                   </span>
@@ -287,7 +287,7 @@ export default function OrderDetailsPage() {
                 <Separator />
 
                 <div className="flex justify-between items-center pt-2">
-                  <span className="font-semibold text-gray-900">Status</span>
+                  <span className="font-semibold text-gray-900 dark:text-gray-100">Status</span>
                   <Badge variant="outline" className={status.color}>
                     {status.label}
                   </Badge>
@@ -295,8 +295,8 @@ export default function OrderDetailsPage() {
 
                 {typeof order.customer?.debt === "number" && (
                   <div className="flex justify-between items-center pt-2 border-t">
-                    <span className="text-gray-600">Customer&apos;s Total Debt</span>
-                    <span className={`font-semibold ${order.customer.debt > 0 ? "text-red-600" : "text-gray-900"}`}>
+                    <span className="text-gray-600 dark:text-gray-400">Customer&apos;s Total Debt</span>
+                    <span className={`font-semibold ${order.customer.debt > 0 ? "text-red-600" : "text-gray-900 dark:text-gray-100"}`}>
                       ${order.customer.debt.toFixed(2)}
                     </span>
                   </div>
@@ -307,8 +307,8 @@ export default function OrderDetailsPage() {
         </div>
 
         {/* Footer */}
-        <div className="mt-12 pt-6 border-t border-gray-200 text-center">
-          <p className="text-gray-500 text-sm">
+        <div className="mt-12 pt-6 border-t border-gray-200 dark:border-gray-800 text-center">
+          <p className="text-gray-500 dark:text-gray-400 text-sm">
             Order management system • Powered by Ahmad Daher
           </p>
         </div>

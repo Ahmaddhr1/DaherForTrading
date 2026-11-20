@@ -31,7 +31,7 @@ export default function CategoryFilterModal({ open, onClose, categories, value, 
     <Modal open={open} onClose={handleClose} title="Filter by Category">
       <div className="space-y-3">
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 h-4 w-4" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500 h-4 w-4" />
           <Input
             placeholder="Search categories..."
             value={query}
@@ -44,23 +44,23 @@ export default function CategoryFilterModal({ open, onClose, categories, value, 
           <button
             type="button"
             onClick={() => handleSelect("")}
-            className={`w-full flex items-center justify-between px-3 py-2 text-left hover:bg-gray-50 ${
-              !value ? "font-medium text-blue-700" : "text-gray-900"
+            className={`w-full flex items-center justify-between px-3 py-2 text-left hover:bg-gray-50 dark:hover:bg-gray-800/60 ${
+              !value ? "font-medium text-blue-700" : "text-gray-900 dark:text-gray-100"
             }`}
           >
             All Categories
             {!value && <Check className="h-4 w-4" />}
           </button>
           {filtered.length === 0 ? (
-            <div className="px-3 py-4 text-center text-sm text-gray-500">No matching categories</div>
+            <div className="px-3 py-4 text-center text-sm text-gray-500 dark:text-gray-400">No matching categories</div>
           ) : (
             filtered.map((cat) => (
               <button
                 key={cat._id}
                 type="button"
                 onClick={() => handleSelect(cat._id)}
-                className={`w-full flex items-center justify-between px-3 py-2 text-left hover:bg-gray-50 ${
-                  value === cat._id ? "font-medium text-blue-700" : "text-gray-900"
+                className={`w-full flex items-center justify-between px-3 py-2 text-left hover:bg-gray-50 dark:hover:bg-gray-800/60 ${
+                  value === cat._id ? "font-medium text-blue-700" : "text-gray-900 dark:text-gray-100"
                 }`}
               >
                 {cat.name}

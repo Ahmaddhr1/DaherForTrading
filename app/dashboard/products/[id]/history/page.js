@@ -76,20 +76,20 @@ export default function ProductStockHistoryPage() {
   const typeBadge = (type) => {
     if (type === "purchase") {
       return (
-        <Badge className="bg-orange-100 text-orange-800 flex items-center gap-1 w-fit">
+        <Badge className="bg-orange-100 dark:bg-orange-900/30 text-orange-800 dark:text-orange-400 flex items-center gap-1 w-fit">
           <Truck className="h-3 w-3" /> Purchase
         </Badge>
       );
     }
     if (type === "sale") {
       return (
-        <Badge className="bg-green-100 text-green-800 flex items-center gap-1 w-fit">
+        <Badge className="bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-400 flex items-center gap-1 w-fit">
           <ShoppingCart className="h-3 w-3" /> Sale
         </Badge>
       );
     }
     return (
-      <Badge className="bg-blue-100 text-blue-800 flex items-center gap-1 w-fit">
+      <Badge className="bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-400 flex items-center gap-1 w-fit">
         <Wrench className="h-3 w-3" /> Adjustment
       </Badge>
     );
@@ -103,7 +103,7 @@ export default function ProductStockHistoryPage() {
           <div>
             {e.quantity} {unit} @ ${e.unitPrice.toFixed(2)}
           </div>
-          <div className="text-xs text-gray-500">
+          <div className="text-xs text-gray-500 dark:text-gray-400">
             Total ${e.total.toFixed(2)}
             {e.company ? ` · from ${e.company}` : ""}
           </div>
@@ -121,7 +121,7 @@ export default function ProductStockHistoryPage() {
               </Badge>
             )}
           </div>
-          <div className="text-xs text-gray-500">to {e.customer}</div>
+          <div className="text-xs text-gray-500 dark:text-gray-400">to {e.customer}</div>
         </div>
       );
     }
@@ -131,7 +131,7 @@ export default function ProductStockHistoryPage() {
           {e.delta > 0 ? "+" : ""}
           {e.delta} {unit} ({ADJUSTMENT_LABELS[e.adjustmentType] || e.adjustmentType})
         </div>
-        <div className="text-xs text-gray-500">
+        <div className="text-xs text-gray-500 dark:text-gray-400">
           {e.reason ? `${e.reason} · ` : ""}
           {e.adminName || "unknown"}
         </div>
@@ -140,35 +140,35 @@ export default function ProductStockHistoryPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-6">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-950 py-6">
       <div className="container mx-auto px-4 max-w-4xl">
         <Button
           variant="ghost"
           onClick={() => router.push(`/dashboard/products/${id}`)}
-          className="mb-4 flex items-center gap-2 text-gray-600 hover:text-gray-900"
+          className="mb-4 flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100"
         >
           <ArrowLeft className="h-4 w-4" />
           Back to Product
         </Button>
 
         <div className="flex items-center gap-3 mb-6">
-          <div className="p-2 bg-blue-100 rounded-lg">
+          <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
             <History className="h-6 w-6 text-blue-600" />
           </div>
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
               Stock History{product ? ` — ${product.name}` : ""}
             </h1>
-            <p className="text-gray-600">
+            <p className="text-gray-600 dark:text-gray-400">
               Every purchase, sale, and stock adjustment, in order, with the stock level before and after each one
             </p>
           </div>
         </div>
 
-        <Card className="shadow-sm border-gray-200 mb-6">
+        <Card className="shadow-sm border-gray-200 dark:border-gray-800 mb-6">
           <CardContent className="p-4 flex flex-col sm:flex-row sm:flex-wrap sm:items-center gap-3">
             <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-2 w-full sm:w-auto">
-              <span className="text-sm font-medium text-gray-700">From</span>
+              <span className="text-sm font-medium text-gray-700 dark:text-gray-300">From</span>
               <input
                 type="date"
                 value={startDate}
@@ -180,7 +180,7 @@ export default function ProductStockHistoryPage() {
               />
             </div>
             <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-2 w-full sm:w-auto">
-              <span className="text-sm font-medium text-gray-700">To</span>
+              <span className="text-sm font-medium text-gray-700 dark:text-gray-300">To</span>
               <input
                 type="date"
                 value={endDate}
@@ -192,13 +192,13 @@ export default function ProductStockHistoryPage() {
               />
             </div>
             {hasDateFilter && (
-              <Button variant="ghost" size="sm" onClick={clearFilter} className="text-gray-500 self-start sm:self-auto">
+              <Button variant="ghost" size="sm" onClick={clearFilter} className="text-gray-500 dark:text-gray-400 self-start sm:self-auto">
                 Clear
               </Button>
             )}
             {product && (
-              <div className="sm:ml-auto text-sm text-gray-600">
-                Current stock: <span className="font-semibold text-gray-900">{product.quantity} {product.unit}</span>
+              <div className="sm:ml-auto text-sm text-gray-600 dark:text-gray-400">
+                Current stock: <span className="font-semibold text-gray-900 dark:text-gray-100">{product.quantity} {product.unit}</span>
               </div>
             )}
           </CardContent>
@@ -209,13 +209,13 @@ export default function ProductStockHistoryPage() {
         ) : isError ? (
           <div className="text-center py-12 text-red-600">Failed to load stock history.</div>
         ) : events.length === 0 ? (
-          <div className="text-center py-12 text-gray-500">
+          <div className="text-center py-12 text-gray-500 dark:text-gray-400">
             <History className="h-12 w-12 mx-auto mb-3" />
             <p>No stock movements found{hasDateFilter ? " in this date range" : ""}</p>
           </div>
         ) : (
           <>
-            <Card className="shadow-sm border-gray-200">
+            <Card className="shadow-sm border-gray-200 dark:border-gray-800">
               <Table>
                 <TableCaption>
                   Starting stock before the earliest recorded event: {data.startingStock} {product?.unit || ""}
@@ -231,14 +231,14 @@ export default function ProductStockHistoryPage() {
                 </TableHeader>
                 <TableBody>
                   {events.map((e) => (
-                    <TableRow key={`${e.type}-${e.sourceId}`} className="hover:bg-gray-50">
-                      <TableCell className="text-gray-500 text-sm whitespace-nowrap">
+                    <TableRow key={`${e.type}-${e.sourceId}`} className="hover:bg-gray-50 dark:hover:bg-gray-800/60">
+                      <TableCell className="text-gray-500 dark:text-gray-400 text-sm whitespace-nowrap">
                         {format(new Date(e.date), "MMM d, yyyy")}
                       </TableCell>
                       <TableCell>{typeBadge(e.type)}</TableCell>
                       <TableCell className="text-sm">{detail(e)}</TableCell>
-                      <TableCell className="text-center text-gray-600">{e.stockBefore}</TableCell>
-                      <TableCell className="text-center font-medium text-gray-900">{e.stockAfter}</TableCell>
+                      <TableCell className="text-center text-gray-600 dark:text-gray-400">{e.stockBefore}</TableCell>
+                      <TableCell className="text-center font-medium text-gray-900 dark:text-gray-100">{e.stockAfter}</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
@@ -257,7 +257,7 @@ export default function ProductStockHistoryPage() {
                   <ChevronLeft className="h-4 w-4" />
                   Previous
                 </Button>
-                <span className="text-sm text-gray-600">
+                <span className="text-sm text-gray-600 dark:text-gray-400">
                   Page {page} of {totalPages}
                 </span>
                 <Button

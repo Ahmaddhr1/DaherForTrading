@@ -160,26 +160,26 @@ const Page = () => {
     form.category.trim() !== "";
 
   return (
-    <div className="min-h-screen bg-gray-50/30 py-8">
+    <div className="min-h-screen bg-gray-50/30 dark:bg-gray-900/30 py-8">
       <div className="container mx-auto px-4 max-w-4xl">
         {/* Header */}
         <div className="mb-8">
           <Button 
             variant="ghost" 
             onClick={() => router.back()}
-            className="mb-4 flex items-center gap-2 text-gray-600 hover:text-gray-900"
+            className="mb-4 flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100"
           >
             <ArrowLeft className="h-4 w-4" />
             Back to Products
           </Button>
           
           <div className="flex items-center gap-3 mb-2">
-            <div className="p-2 bg-blue-100 rounded-lg">
+            <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
               <PackagePlus className="h-6 w-6 text-blue-600" />
             </div>
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">Add New Product</h1>
-              <p className="text-gray-600">Add a new product to your inventory</p>
+              <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">Add New Product</h1>
+              <p className="text-gray-600 dark:text-gray-400">Add a new product to your inventory</p>
             </div>
           </div>
         </div>
@@ -187,7 +187,7 @@ const Page = () => {
         <div className="grid gap-6 lg:grid-cols-3">
           {/* Main Form */}
           <div className="lg:col-span-2">
-            <Card className="shadow-sm border-gray-200">
+            <Card className="shadow-sm border-gray-200 dark:border-gray-800">
               <CardHeader className="pb-4">
                 <CardTitle className="text-xl flex items-center gap-2">
                   <Package className="h-5 w-5" />
@@ -201,7 +201,7 @@ const Page = () => {
                 <form onSubmit={handleSubmit} className="space-y-6">
                   {/* Basic Information Section */}
                   <div className="space-y-4">
-                    <div className="flex items-center gap-2 text-sm font-medium text-gray-500 uppercase tracking-wide">
+                    <div className="flex items-center gap-2 text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">
                       <div className="w-1 h-4 bg-blue-600 rounded"></div>
                       Basic Information
                     </div>
@@ -233,7 +233,7 @@ const Page = () => {
                           name="category"
                           value={form.category}
                           onChange={handleChange}
-                          className="w-full p-2 border border-gray-300 rounded-md focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors"
+                          className="w-full p-2 border border-gray-300 dark:border-gray-700 rounded-md focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors"
                           disabled={categoriesLoading || categoriesError}
                           required
                         >
@@ -262,7 +262,7 @@ const Page = () => {
                           inputMode="numeric"
                           className="focus:border-blue-500 transition-colors"
                         />
-                        <p className="text-xs text-gray-500">Leave blank to start at 0 and add stock later via a purchase</p>
+                        <p className="text-xs text-gray-500 dark:text-gray-400">Leave blank to start at 0 and add stock later via a purchase</p>
                       </div>
 
                       <div className="space-y-2">
@@ -275,7 +275,7 @@ const Page = () => {
                             <img
                               src={imagePreview}
                               alt="Preview"
-                              className="h-20 w-20 rounded-md border border-gray-200 object-cover"
+                              className="h-20 w-20 rounded-md border border-gray-200 dark:border-gray-800 object-cover"
                             />
                             <Button type="button" variant="outline" size="sm" onClick={handleRemoveImage} className="flex items-center gap-1">
                               <X className="h-3.5 w-3.5" />
@@ -299,7 +299,7 @@ const Page = () => {
 
                   {/* Inventory Details Section */}
                   <div className="space-y-4">
-                    <div className="flex items-center gap-2 text-sm font-medium text-gray-500 uppercase tracking-wide">
+                    <div className="flex items-center gap-2 text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">
                       <div className="w-1 h-4 bg-purple-600 rounded"></div>
                       Inventory Details
                     </div>
@@ -341,7 +341,7 @@ const Page = () => {
                           onChange={handleChange}
                           className="focus:border-purple-500 transition-colors"
                         />
-                        <p className="text-xs text-gray-500">Alerts you when stock falls to or below this number</p>
+                        <p className="text-xs text-gray-500 dark:text-gray-400">Alerts you when stock falls to or below this number</p>
                       </div>
                     </div>
 
@@ -355,7 +355,7 @@ const Page = () => {
                         name="defaultSupplier"
                         value={form.defaultSupplier}
                         onChange={handleChange}
-                        className="w-full p-2 border border-gray-300 rounded-md focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-colors"
+                        className="w-full p-2 border border-gray-300 dark:border-gray-700 rounded-md focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-colors"
                       >
                         <option value="">No default supplier</option>
                         {companies.map((c) => (
@@ -364,7 +364,7 @@ const Page = () => {
                           </option>
                         ))}
                       </select>
-                      <p className="text-xs text-gray-500">Lets you quickly reorder this product from a supplier later</p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400">Lets you quickly reorder this product from a supplier later</p>
                     </div>
                   </div>
 
@@ -372,7 +372,7 @@ const Page = () => {
 
                   {/* Pricing Information Section */}
                   <div className="space-y-4">
-                    <div className="flex items-center gap-2 text-sm font-medium text-gray-500 uppercase tracking-wide">
+                    <div className="flex items-center gap-2 text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">
                       <div className="w-1 h-4 bg-green-600 rounded"></div>
                       Pricing Information
                     </div>
@@ -393,7 +393,7 @@ const Page = () => {
                           className="focus:border-green-500 transition-colors"
                           required
                         />
-                        <p className="text-xs text-gray-500">The price you paid to acquire the product</p>
+                        <p className="text-xs text-gray-500 dark:text-gray-400">The price you paid to acquire the product</p>
                       </div>
 
                       <div className="space-y-2">
@@ -411,7 +411,7 @@ const Page = () => {
                           className="focus:border-green-500 transition-colors"
                           required
                         />
-                        <p className="text-xs text-gray-500">The price customers will pay</p>
+                        <p className="text-xs text-gray-500 dark:text-gray-400">The price customers will pay</p>
                       </div>
                     </div>
                   </div>
@@ -420,11 +420,11 @@ const Page = () => {
 
                   {/* Price Tiers Section */}
                   <div className="space-y-4">
-                    <div className="flex items-center gap-2 text-sm font-medium text-gray-500 uppercase tracking-wide">
+                    <div className="flex items-center gap-2 text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">
                       <div className="w-1 h-4 bg-teal-600 rounded"></div>
                       Price Tiers
                     </div>
-                    <p className="text-xs text-gray-500 -mt-2">
+                    <p className="text-xs text-gray-500 dark:text-gray-400 -mt-2">
                       Selling Price above is the Retail price. Set different prices for other customer
                       tiers here, or leave a field blank to use the Retail price for that tier.
                     </p>
@@ -517,7 +517,7 @@ const Page = () => {
 
           {/* Summary Sidebar */}
           <div className="lg:col-span-1">
-            <Card className="shadow-sm border-gray-200 sticky top-6">
+            <Card className="shadow-sm border-gray-200 dark:border-gray-800 sticky top-6">
               <CardHeader className="pb-4">
                 <CardTitle className="text-lg">Product Summary</CardTitle>
                 <CardDescription>Pricing and profit overview</CardDescription>
@@ -525,14 +525,14 @@ const Page = () => {
               <CardContent className="space-y-6">
                 {/* Basic Info */}
                 <div className="space-y-3">
-                  <h4 className="font-medium text-gray-900 flex items-center gap-2">
+                  <h4 className="font-medium text-gray-900 dark:text-gray-100 flex items-center gap-2">
                     <Package className="h-4 w-4" />
                     Product Details
                   </h4>
                   <div className="space-y-2">
                     <div className="flex justify-between items-center">
-                      <span className="text-sm text-gray-600">Name</span>
-                      <span className="font-medium text-gray-900 truncate max-w-[120px] text-right">
+                      <span className="text-sm text-gray-600 dark:text-gray-400">Name</span>
+                      <span className="font-medium text-gray-900 dark:text-gray-100 truncate max-w-[120px] text-right">
                         {form.name || "Not provided"}
                       </span>
                     </div>
@@ -543,19 +543,19 @@ const Page = () => {
 
                 {/* Pricing Summary */}
                 <div className="space-y-3">
-                  <h4 className="font-medium text-gray-900 flex items-center gap-2">
+                  <h4 className="font-medium text-gray-900 dark:text-gray-100 flex items-center gap-2">
                     <DollarSign className="h-4 w-4" />
                     Pricing
                   </h4>
                   <div className="space-y-2">
                     <div className="flex justify-between items-center">
-                      <span className="text-sm text-gray-600">Cost Price</span>
-                      <span className="font-medium text-gray-900">${costPrice.toFixed(2)}</span>
+                      <span className="text-sm text-gray-600 dark:text-gray-400">Cost Price</span>
+                      <span className="font-medium text-gray-900 dark:text-gray-100">${costPrice.toFixed(2)}</span>
                     </div>
                     
                     <div className="flex justify-between items-center">
-                      <span className="text-sm text-gray-600">Selling Price</span>
-                      <span className="font-medium text-gray-900">${sellingPrice.toFixed(2)}</span>
+                      <span className="text-sm text-gray-600 dark:text-gray-400">Selling Price</span>
+                      <span className="font-medium text-gray-900 dark:text-gray-100">${sellingPrice.toFixed(2)}</span>
                     </div>
                   </div>
                 </div>
@@ -564,22 +564,22 @@ const Page = () => {
 
                 {/* Profit Analysis */}
                 <div className="space-y-3">
-                  <h4 className="font-medium text-gray-900 flex items-center gap-2">
+                  <h4 className="font-medium text-gray-900 dark:text-gray-100 flex items-center gap-2">
                     <TrendingUp className="h-4 w-4" />
                     Profit Analysis
                   </h4>
                   
-                  <div className="bg-green-50 rounded-lg p-3 border border-green-200">
+                  <div className="bg-green-50 dark:bg-green-900/20 rounded-lg p-3 border border-green-200 dark:border-green-900/50">
                     <div className="flex justify-between items-center mb-1">
-                      <span className="text-sm font-medium text-green-800">Profit per Unit</span>
-                      <Badge variant={profit >= 0 ? "default" : "destructive"} className="bg-green-100 text-green-800">
+                      <span className="text-sm font-medium text-green-800 dark:text-green-400">Profit per Unit</span>
+                      <Badge variant={profit >= 0 ? "default" : "destructive"} className="bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-400">
                         ${Math.abs(profit).toFixed(2)}
                       </Badge>
                     </div>
                     
                     <div className="flex justify-between items-center mb-2">
                       <span className="text-sm text-green-700">Profit Margin</span>
-                      <span className={`text-sm font-medium ${profitMargin >= 0 ? 'text-green-800' : 'text-red-800'}`}>
+                      <span className={`text-sm font-medium ${profitMargin >= 0 ? 'text-green-800 dark:text-green-400' : 'text-red-800 dark:text-red-400'}`}>
                         {profitMargin.toFixed(1)}%
                       </span>
                     </div>
@@ -589,11 +589,11 @@ const Page = () => {
                 <Separator />
 
                 {/* Validation Status */}
-                <div className="bg-gray-50 rounded-lg p-3">
-                  <h4 className="font-medium text-gray-900 text-sm mb-2">Form Status</h4>
+                <div className="bg-gray-50 dark:bg-gray-950 rounded-lg p-3">
+                  <h4 className="font-medium text-gray-900 dark:text-gray-100 text-sm mb-2">Form Status</h4>
                   <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-600">All fields completed</span>
-                    <Badge variant={isFormValid ? "default" : "outline"} className={isFormValid ? 'bg-green-100 text-green-800' : ''}>
+                    <span className="text-sm text-gray-600 dark:text-gray-400">All fields completed</span>
+                    <Badge variant={isFormValid ? "default" : "outline"} className={isFormValid ? 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-400' : ''}>
                       {isFormValid ? "Ready" : "Incomplete"}
                     </Badge>
                   </div>

@@ -127,17 +127,17 @@ const EditCategoryPage = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gray-50 py-6">
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-950 py-6">
         <div className="container mx-auto px-4 max-w-4xl">
           <PageHeaderSkeleton />
           <div className="grid gap-6 lg:grid-cols-3">
             <div className="lg:col-span-2 space-y-6">
-              <Card className="shadow-sm border-gray-200">
+              <Card className="shadow-sm border-gray-200 dark:border-gray-800">
                 <CardContent className="pt-6">
                   <FormSkeleton fields={1} />
                 </CardContent>
               </Card>
-              <Card className="shadow-sm border-gray-200">
+              <Card className="shadow-sm border-gray-200 dark:border-gray-800">
                 <CardContent className="pt-6">
                   <ListSkeleton rows={3} rowHeight="h-12" />
                 </CardContent>
@@ -151,15 +151,15 @@ const EditCategoryPage = () => {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gray-50 py-6">
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-950 py-6">
         <div className="container mx-auto px-4 max-w-4xl">
           <Card className="max-w-md mx-auto">
             <CardContent className="pt-6 text-center">
-              <div className="text-red-500 bg-red-50 rounded-full p-3 w-12 h-12 mx-auto mb-4 flex items-center justify-center">
+              <div className="text-red-500 bg-red-50 dark:bg-red-900/20 rounded-full p-3 w-12 h-12 mx-auto mb-4 flex items-center justify-center">
                 <Folder className="h-6 w-6" />
               </div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">Category Not Found</h3>
-              <p className="text-gray-600 mb-4">Unable to load category details.</p>
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">Category Not Found</h3>
+              <p className="text-gray-600 dark:text-gray-400 mb-4">Unable to load category details.</p>
               <Link href="/dashboard/categories">
                 <Button>Back to Categories</Button>
               </Link>
@@ -174,13 +174,13 @@ const EditCategoryPage = () => {
   const productCount = products.length;
 
   return (
-    <div className="min-h-screen bg-gray-50 py-6">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-950 py-6">
       <div className="container mx-auto px-4 max-w-4xl">
 
         {/* Header */}
         <div className="mb-8">
           <Link href="/dashboard/categories">
-            <Button variant="ghost" className="mb-4 flex items-center gap-2 text-gray-600 hover:text-gray-900">
+            <Button variant="ghost" className="mb-4 flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100">
               <ArrowLeft className="h-4 w-4" />
               Back to Categories
             </Button>
@@ -188,12 +188,12 @@ const EditCategoryPage = () => {
 
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="p-2 bg-blue-100 rounded-lg">
+              <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
                 <Edit className="h-6 w-6 text-blue-600" />
               </div>
               <div>
-                <h1 className="text-3xl font-bold text-gray-900">Edit Category</h1>
-                <p className="text-gray-600">Update category information and products</p>
+                <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">Edit Category</h1>
+                <p className="text-gray-600 dark:text-gray-400">Update category information and products</p>
               </div>
             </div>
 
@@ -216,7 +216,7 @@ const EditCategoryPage = () => {
         <div className="grid gap-6 lg:grid-cols-3">
           {/* Main Form */}
           <div className="lg:col-span-2">
-            <Card className="shadow-sm border-gray-200">
+            <Card className="shadow-sm border-gray-200 dark:border-gray-800">
               <CardHeader className="pb-4">
                 <CardTitle className="text-xl flex items-center gap-2">
                   <Folder className="h-5 w-5" />
@@ -275,12 +275,12 @@ const EditCategoryPage = () => {
             </Card>
 
             {/* Products Section */}
-            <Card className="shadow-sm border-gray-200 mt-6">
+            <Card className="shadow-sm border-gray-200 dark:border-gray-800 mt-6">
               <CardHeader className="pb-4">
                 <CardTitle className="text-xl flex items-center gap-2">
                   <Package className="h-5 w-5" />
                   Products in this Category
-                  <span className="bg-blue-100 text-blue-800 text-sm px-2 py-1 rounded-full">
+                  <span className="bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-400 text-sm px-2 py-1 rounded-full">
                     {productCount}
                   </span>
                 </CardTitle>
@@ -293,8 +293,8 @@ const EditCategoryPage = () => {
               </CardHeader>
               <CardContent>
                 {productCount === 0 ? (
-                  <div className="text-center py-8 text-gray-500">
-                    <Package className="h-12 w-12 text-gray-300 mx-auto mb-3" />
+                  <div className="text-center py-8 text-gray-500 dark:text-gray-400">
+                    <Package className="h-12 w-12 text-gray-300 dark:text-gray-600 mx-auto mb-3" />
                     <p>No products in this category</p>
                     <Link href="/dashboard/products/add">
                       <Button variant="outline" className="mt-3">
@@ -327,7 +327,7 @@ const EditCategoryPage = () => {
                             <TableRow key={product._id}>
                               <TableCell className="font-medium">
                                 <div className="flex items-center gap-3">
-                                  <Package className="h-5 w-5 text-gray-400" />
+                                  <Package className="h-5 w-5 text-gray-400 dark:text-gray-500" />
                                   {product.name}
                                 </div>
                               </TableCell>
@@ -336,10 +336,10 @@ const EditCategoryPage = () => {
                               </TableCell>
                               <TableCell className="text-center">
                                 <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs ${product.quantity > 10
-                                  ? "bg-green-100 text-green-800"
+                                  ? "bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-400"
                                   : product.quantity > 0
-                                    ? "bg-yellow-100 text-yellow-800"
-                                    : "bg-red-100 text-red-800"
+                                    ? "bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-400"
+                                    : "bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-400"
                                   }`}>
                                   {product?.quantity} in stock
                                 </span>

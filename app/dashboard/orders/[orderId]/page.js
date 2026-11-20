@@ -173,12 +173,12 @@ export default function OrderDetailsPage() {
               <span
                 className={`ml-1 px-2 py-1 rounded-full text-sm ${
                   order.status === "paid"
-                    ? "bg-green-100 text-green-700"
+                    ? "bg-green-100 dark:bg-green-900/30 text-green-700"
                     : order.status === "partiallyPaid"
-                    ? "bg-yellow-100 text-yellow-700"
+                    ? "bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700"
                     : order.status === "draft"
-                    ? "bg-slate-200 text-slate-700"
-                    : "bg-gray-100 text-gray-700"
+                    ? "bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300"
+                    : "bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300"
                 }`}
               >
                 {order.status}
@@ -197,7 +197,7 @@ export default function OrderDetailsPage() {
 
           {order.status === "draft" && (
             <div className="space-y-3">
-              <p className="text-sm text-gray-600 text-center">
+              <p className="text-sm text-gray-600 dark:text-gray-400 text-center">
                 This is a draft - it hasn&apos;t been finalized yet, so stock and the customer&apos;s debt haven&apos;t been affected.
               </p>
               <Link href={`/dashboard/orders/${orderId}/edit`}>
@@ -237,7 +237,7 @@ export default function OrderDetailsPage() {
           {order.status !== "paid" && order.status !== "draft" && (
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
-                <label className="text-sm font-medium text-gray-700">Payment Amount ($)</label>
+                <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Payment Amount ($)</label>
                 <Input
                   type="number"
                   placeholder="Enter amount to pay"
@@ -252,13 +252,13 @@ export default function OrderDetailsPage() {
                   max={remainingBalance}
                   step="0.001"
                 />
-                <p className="text-xs text-gray-500">
+                <p className="text-xs text-gray-500 dark:text-gray-400">
                   Defaults to the full remaining balance. Enter a smaller amount for a partial payment.
                 </p>
               </div>
 
-              <div className="bg-gray-50 rounded-lg p-4 flex items-center justify-between">
-                <span className="text-sm font-medium text-gray-700">Remaining After Payment</span>
+              <div className="bg-gray-50 dark:bg-gray-950 rounded-lg p-4 flex items-center justify-between">
+                <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Remaining After Payment</span>
                 <span className={`font-bold ${remainingAfterPayment > 0 ? "text-red-600" : "text-green-600"}`}>
                   ${remainingAfterPayment.toLocaleString()}
                 </span>

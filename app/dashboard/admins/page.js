@@ -175,16 +175,16 @@ export default function AdminsPage() {
   const admins = data?.admins || [];
 
   return (
-    <div className="min-h-screen bg-gray-50 py-6">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-950 py-6">
       <div className="container mx-auto px-4 max-w-4xl">
         <div className="mb-8 flex items-center justify-between gap-3">
           <div className="flex items-center gap-3 min-w-0">
-            <div className="p-2 bg-blue-100 rounded-lg shrink-0">
+            <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg shrink-0">
               <Users className="h-6 w-6 text-blue-600" />
             </div>
             <div className="min-w-0">
-              <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 truncate">Admins</h1>
-              <p className="text-gray-600 text-sm sm:text-base truncate">
+              <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-gray-100 truncate">Admins</h1>
+              <p className="text-gray-600 dark:text-gray-400 text-sm sm:text-base truncate">
                 Manage who can log in and what they can do
               </p>
             </div>
@@ -228,13 +228,13 @@ export default function AdminsPage() {
                       <TableRow key={admin._id}>
                         <TableCell className="font-medium">
                           {admin.adminname}
-                          {isSelf && <span className="text-gray-400 text-xs ml-2">(you)</span>}
+                          {isSelf && <span className="text-gray-400 dark:text-gray-500 text-xs ml-2">(you)</span>}
                         </TableCell>
                         <TableCell>
                           {admin.email ? (
-                            <span className="text-sm text-gray-700">{admin.email}</span>
+                            <span className="text-sm text-gray-700 dark:text-gray-300">{admin.email}</span>
                           ) : (
-                            <span className="text-sm text-gray-400 italic">No code (direct login)</span>
+                            <span className="text-sm text-gray-400 dark:text-gray-500 italic">No code (direct login)</span>
                           )}
                         </TableCell>
                         <TableCell>
@@ -242,7 +242,7 @@ export default function AdminsPage() {
                             {admin.role === "owner" ? (
                               <Crown className="h-3 w-3 text-amber-600" />
                             ) : (
-                              <UserRound className="h-3 w-3 text-gray-500" />
+                              <UserRound className="h-3 w-3 text-gray-500 dark:text-gray-400" />
                             )}
                             {admin.role === "owner" ? "Owner" : "Employee"}
                           </Badge>
@@ -252,8 +252,8 @@ export default function AdminsPage() {
                             variant="outline"
                             className={
                               admin.active
-                                ? "text-green-700 border-green-200 bg-green-50"
-                                : "text-gray-500 border-gray-200 bg-gray-50"
+                                ? "text-green-700 border-green-200 dark:border-green-900/50 bg-green-50 dark:bg-green-900/20"
+                                : "text-gray-500 dark:text-gray-400 border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-950"
                             }
                           >
                             {admin.active ? "Active" : "Deactivated"}
@@ -354,7 +354,7 @@ export default function AdminsPage() {
               autoComplete="off"
               required
             />
-            <p className="text-xs text-gray-500">A login code is sent here every time they sign in</p>
+            <p className="text-xs text-gray-500 dark:text-gray-400">A login code is sent here every time they sign in</p>
           </div>
           <div className="space-y-2">
             <Label htmlFor="new-password">Password</Label>
@@ -366,7 +366,7 @@ export default function AdminsPage() {
               autoComplete="new-password"
               required
             />
-            <p className="text-xs text-gray-500">At least 8 characters</p>
+            <p className="text-xs text-gray-500 dark:text-gray-400">At least 8 characters</p>
           </div>
           <div className="space-y-2">
             <Label htmlFor="new-role">Role</Label>
@@ -414,7 +414,7 @@ export default function AdminsPage() {
               autoComplete="new-password"
               required
             />
-            <p className="text-xs text-gray-500">At least 8 characters</p>
+            <p className="text-xs text-gray-500 dark:text-gray-400">At least 8 characters</p>
           </div>
           <Button
             type="submit"
@@ -450,7 +450,7 @@ export default function AdminsPage() {
               autoComplete="off"
               placeholder="Leave blank to disable the login code"
             />
-            <p className="text-xs text-gray-500">
+            <p className="text-xs text-gray-500 dark:text-gray-400">
               Leaving this blank lets {emailTarget?.adminname} log in with just a password again.
             </p>
           </div>

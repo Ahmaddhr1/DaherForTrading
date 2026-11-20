@@ -76,16 +76,16 @@ export default function ActivityPage() {
   });
 
   return (
-    <div className="min-h-screen bg-gray-50 py-6">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-950 py-6">
       <div className="container mx-auto px-4 max-w-5xl">
         <div className="mb-8 flex items-start justify-between gap-3 flex-wrap">
           <div className="flex items-center gap-3">
-            <div className="p-2 bg-blue-100 rounded-lg">
+            <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
               <History className="h-6 w-6 text-blue-600" />
             </div>
             <div>
-              <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Activity Log</h1>
-              <p className="text-gray-600 text-sm sm:text-base">
+              <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-gray-100">Activity Log</h1>
+              <p className="text-gray-600 dark:text-gray-400 text-sm sm:text-base">
                 Who did what, across orders, payments, products, and more
               </p>
             </div>
@@ -129,7 +129,7 @@ export default function ActivityPage() {
         </Modal>
 
         {!hasInteracted && (
-          <p className="text-sm text-gray-500 mb-3">
+          <p className="text-sm text-gray-500 dark:text-gray-400 mb-3">
             Showing today&apos;s activity only. Pick a date range below to see more.
           </p>
         )}
@@ -200,7 +200,7 @@ export default function ActivityPage() {
           <Card>
             <CardContent className="p-0">
               {entries.length === 0 ? (
-                <div className="text-center py-12 text-gray-500">No activity recorded yet.</div>
+                <div className="text-center py-12 text-gray-500 dark:text-gray-400">No activity recorded yet.</div>
               ) : (
                 <Table>
                   <TableHeader>
@@ -214,7 +214,7 @@ export default function ActivityPage() {
                   <TableBody>
                     {entries.map((entry) => (
                       <TableRow key={entry._id}>
-                        <TableCell className="text-gray-500 whitespace-nowrap">
+                        <TableCell className="text-gray-500 dark:text-gray-400 whitespace-nowrap">
                           {new Date(entry.createdAt).toLocaleString()}
                         </TableCell>
                         <TableCell className="font-medium">{entry.adminName}</TableCell>
@@ -245,7 +245,7 @@ export default function ActivityPage() {
               <ChevronLeft className="h-4 w-4" />
               Previous
             </Button>
-            <span className="text-sm text-gray-600">
+            <span className="text-sm text-gray-600 dark:text-gray-400">
               Page {page} of {totalPages}
             </span>
             <Button

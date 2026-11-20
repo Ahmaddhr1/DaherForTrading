@@ -37,12 +37,12 @@ export default function DashboardPage() {
   const rangeEnd = localDayEndISO(filters.endDate);
 
   return (
-    <div className="min-h-screen bg-gray-50 py-6">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-950 py-6">
       <div className="container mx-auto px-4">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">Business Dashboard</h1>
-          <p className="text-gray-600">Overview of your business performance</p>
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">Business Dashboard</h1>
+          <p className="text-gray-600 dark:text-gray-400">Overview of your business performance</p>
         </div>
 
         {/* Filters */}

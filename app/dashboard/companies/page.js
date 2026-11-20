@@ -127,19 +127,19 @@ export default function CompaniesPage() {
   const summary = data?.summary || { totalDebt: 0, totalSpent: 0, expectedProfit: 0 };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-6">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-950 py-6">
       <div className="container mx-auto px-4">
 
         {/* Page Header */}
         <div className="mb-8">
           <div className="flex items-center justify-between gap-3">
             <div className="flex items-center gap-3 min-w-0">
-              <div className="p-2 bg-blue-100 rounded-lg shrink-0">
+              <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg shrink-0">
                 <Building2 className="h-6 w-6 text-blue-600" />
               </div>
               <div className="min-w-0">
-                <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 truncate">Companies</h1>
-                <p className="text-gray-600 text-sm sm:text-base truncate">Manage your suppliers and purchase history</p>
+                <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-gray-100 truncate">Companies</h1>
+                <p className="text-gray-600 dark:text-gray-400 text-sm sm:text-base truncate">Manage your suppliers and purchase history</p>
               </div>
             </div>
 
@@ -154,9 +154,9 @@ export default function CompaniesPage() {
 
         {/* Debt / spending / expected profit summary */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
-          <Card className="shadow-sm border-gray-200">
+          <Card className="shadow-sm border-gray-200 dark:border-gray-800">
             <CardContent className="p-4 flex flex-col gap-1">
-              <span className="flex items-center gap-1.5 text-xs font-medium text-gray-500">
+              <span className="flex items-center gap-1.5 text-xs font-medium text-gray-500 dark:text-gray-400">
                 <DollarSign className="h-3.5 w-3.5" />
                 Total We Owe (All Companies)
               </span>
@@ -165,20 +165,20 @@ export default function CompaniesPage() {
               </span>
             </CardContent>
           </Card>
-          <Card className="shadow-sm border-gray-200">
+          <Card className="shadow-sm border-gray-200 dark:border-gray-800">
             <CardContent className="p-4 flex flex-col gap-1">
-              <span className="flex items-center gap-1.5 text-xs font-medium text-gray-500">
+              <span className="flex items-center gap-1.5 text-xs font-medium text-gray-500 dark:text-gray-400">
                 <Wallet className="h-3.5 w-3.5" />
                 Total Spent (Purchases)
               </span>
-              <span className="text-lg font-bold text-gray-900">
+              <span className="text-lg font-bold text-gray-900 dark:text-gray-100">
                 ${summary.totalSpent.toLocaleString()}
               </span>
             </CardContent>
           </Card>
-          <Card className="shadow-sm border-gray-200">
+          <Card className="shadow-sm border-gray-200 dark:border-gray-800">
             <CardContent className="p-4 flex flex-col gap-1">
-              <span className="flex items-center gap-1.5 text-xs font-medium text-gray-500">
+              <span className="flex items-center gap-1.5 text-xs font-medium text-gray-500 dark:text-gray-400">
                 <TrendingUp className="h-3.5 w-3.5" />
                 Expected Profit From Stock
               </span>
@@ -193,7 +193,7 @@ export default function CompaniesPage() {
         <FiltersPanel activeCount={activeFilterCount}>
           <div className="mb-6 space-y-4">
             <div className="relative max-w-md">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 h-4 w-4" />
               <Input
                 type="text"
                 placeholder="Search companies by name..."
@@ -205,8 +205,8 @@ export default function CompaniesPage() {
 
             <div className="flex flex-col sm:flex-row sm:flex-wrap gap-2">
               <div className="flex items-center gap-2">
-                <Filter className="h-4 w-4 text-gray-500" />
-                <span className="text-sm font-medium text-gray-700">Filter by Debt We Owe:</span>
+                <Filter className="h-4 w-4 text-gray-500 dark:text-gray-400" />
+                <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Filter by Debt We Owe:</span>
               </div>
 
               <Button
@@ -252,7 +252,7 @@ export default function CompaniesPage() {
 
             <div className="flex flex-col sm:flex-row sm:flex-wrap sm:items-center gap-3 sm:gap-4">
               <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-2">
-                <span className="text-sm font-medium text-gray-700">From</span>
+                <span className="text-sm font-medium text-gray-700 dark:text-gray-300">From</span>
                 <input
                   type="date"
                   value={startDate}
@@ -261,7 +261,7 @@ export default function CompaniesPage() {
                 />
               </div>
               <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-2">
-                <span className="text-sm font-medium text-gray-700">To</span>
+                <span className="text-sm font-medium text-gray-700 dark:text-gray-300">To</span>
                 <input
                   type="date"
                   value={endDate}
@@ -271,8 +271,8 @@ export default function CompaniesPage() {
               </div>
 
               <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-2">
-                <span className="flex items-center gap-1.5 text-sm font-medium text-gray-700">
-                  <ArrowUpDown className="h-4 w-4 text-gray-500" />
+                <span className="flex items-center gap-1.5 text-sm font-medium text-gray-700 dark:text-gray-300">
+                  <ArrowUpDown className="h-4 w-4 text-gray-500 dark:text-gray-400" />
                   Sort by
                 </span>
                 <select
@@ -289,7 +289,7 @@ export default function CompaniesPage() {
               </div>
 
               <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-2">
-                <span className="text-sm font-medium text-gray-700">Per page</span>
+                <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Per page</span>
                 <select
                   value={pageSize}
                   onChange={(e) => setPageSize(parseInt(e.target.value))}
@@ -310,7 +310,7 @@ export default function CompaniesPage() {
                       setStartDate("");
                       setEndDate("");
                     }}
-                    className="w-full sm:w-auto justify-center text-gray-500"
+                    className="w-full sm:w-auto justify-center text-gray-500 dark:text-gray-400"
                   >
                     Clear Dates
                   </Button>
@@ -322,7 +322,7 @@ export default function CompaniesPage() {
 
         {/* Results Count */}
         <div className="mb-4">
-          <p className="text-gray-600">
+          <p className="text-gray-600 dark:text-gray-400">
             Showing {companies.length} of {totalCount} companies
             {debtFilter !== "all" && (
               <span className="ml-2 text-blue-600">
@@ -343,7 +343,7 @@ export default function CompaniesPage() {
           <Card>
             <CardContent className="pt-6 text-center">
               <div className="text-red-500 text-lg mb-2">Error</div>
-              <p className="text-gray-600">Failed to load companies. Please try again.</p>
+              <p className="text-gray-600 dark:text-gray-400">Failed to load companies. Please try again.</p>
               <Button
                 onClick={() => queryClient.refetchQueries(["companies"])}
                 className="mt-4"
@@ -358,11 +358,11 @@ export default function CompaniesPage() {
         {!isLoading && !error && companies.length === 0 && (
           <Card>
             <CardContent className="pt-6 text-center">
-              <Building2 className="h-12 w-12 text-gray-400 mx-auto mb-3" />
-              <p className="text-gray-500 text-lg mb-2">No companies found</p>
+              <Building2 className="h-12 w-12 text-gray-400 dark:text-gray-500 mx-auto mb-3" />
+              <p className="text-gray-500 dark:text-gray-400 text-lg mb-2">No companies found</p>
               {searchTerm || debtFilter !== "all" ? (
                 <div>
-                  <p className="text-gray-400 mb-2">Try adjusting your filters</p>
+                  <p className="text-gray-400 dark:text-gray-500 mb-2">Try adjusting your filters</p>
                   <Button
                     variant="outline"
                     onClick={() => {
@@ -406,19 +406,19 @@ export default function CompaniesPage() {
                         )}
 
                         <div className="flex justify-center mb-3">
-                          <div className={`w-16 h-16 rounded-full flex items-center justify-center ${hasDebt ? "bg-red-100" : "bg-green-100"
+                          <div className={`w-16 h-16 rounded-full flex items-center justify-center ${hasDebt ? "bg-red-100 dark:bg-red-900/30" : "bg-green-100 dark:bg-green-900/30"
                             }`}>
                             <Building2 className={`h-8 w-8 ${hasDebt ? "text-red-600" : "text-green-600"}`} />
                           </div>
                         </div>
 
                         <div className="text-center mb-3">
-                          <h3 className="font-semibold text-gray-900 mb-1">
+                          <h3 className="font-semibold text-gray-900 dark:text-gray-100 mb-1">
                             #{companyNumber} - {company.name}
                           </h3>
 
                           {company.phoneNumber && (
-                            <p className="text-sm text-gray-600 flex items-center justify-center gap-1">
+                            <p className="text-sm text-gray-600 dark:text-gray-400 flex items-center justify-center gap-1">
                               <Phone className="h-3 w-3" />
                               {company.phoneNumber}
                             </p>
@@ -470,7 +470,7 @@ export default function CompaniesPage() {
                   Previous
                 </Button>
 
-                <span className="text-gray-600">
+                <span className="text-gray-600 dark:text-gray-400">
                   Page {currentPage} of {totalPages}
                 </span>
 

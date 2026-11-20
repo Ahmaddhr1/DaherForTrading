@@ -99,19 +99,19 @@ const EditCompanyPage = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gray-50/30 py-8">
+      <div className="min-h-screen bg-gray-50/30 dark:bg-gray-900/30 py-8">
         <div className="container mx-auto px-4 max-w-4xl">
           <PageHeaderSkeleton />
           <div className="grid gap-6 lg:grid-cols-3">
             <div className="lg:col-span-2">
-              <Card className="shadow-sm border-gray-200">
+              <Card className="shadow-sm border-gray-200 dark:border-gray-800">
                 <CardContent className="pt-6">
                   <FormSkeleton fields={4} />
                 </CardContent>
               </Card>
             </div>
             <div className="lg:col-span-1">
-              <Card className="shadow-sm border-gray-200">
+              <Card className="shadow-sm border-gray-200 dark:border-gray-800">
                 <CardContent className="pt-6 space-y-4">
                   <Skeleton className="h-5 w-32" />
                   <Skeleton className="h-20 w-full rounded-lg" />
@@ -126,13 +126,13 @@ const EditCompanyPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50/30 py-8">
+    <div className="min-h-screen bg-gray-50/30 dark:bg-gray-900/30 py-8">
       <div className="container mx-auto px-4 max-w-4xl">
         <div className="mb-8">
           <Button
             variant="ghost"
             onClick={() => router.back()}
-            className="mb-4 flex items-center gap-2 text-gray-600 hover:text-gray-900"
+            className="mb-4 flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100"
           >
             <ArrowLeft className="h-4 w-4" />
             Back to Companies
@@ -140,12 +140,12 @@ const EditCompanyPage = () => {
 
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
             <div className="flex items-center gap-3 min-w-0">
-              <div className="p-2 bg-blue-100 rounded-lg shrink-0">
+              <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg shrink-0">
                 <Building2 className="h-6 w-6 text-blue-600" />
               </div>
               <div className="min-w-0">
-                <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 truncate">{data?.name || "Company"}</h1>
-                <p className="text-gray-600 text-sm sm:text-base truncate">Supplier details and purchase history</p>
+                <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-gray-100 truncate">{data?.name || "Company"}</h1>
+                <p className="text-gray-600 dark:text-gray-400 text-sm sm:text-base truncate">Supplier details and purchase history</p>
               </div>
             </div>
 
@@ -175,7 +175,7 @@ const EditCompanyPage = () => {
 
         <div className="grid gap-6 lg:grid-cols-3">
           <div className="lg:col-span-2">
-            <Card className="shadow-sm border-gray-200">
+            <Card className="shadow-sm border-gray-200 dark:border-gray-800">
               <CardHeader className="pb-4">
                 <CardTitle className="text-xl flex items-center gap-2">
                   <Building2 className="h-5 w-5" />
@@ -211,9 +211,9 @@ const EditCompanyPage = () => {
                   <Separator />
 
                   <div className="space-y-2">
-                    <Label htmlFor="debt" className="text-sm font-medium text-gray-700 flex items-center gap-2">
+                    <Label htmlFor="debt" className="text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center gap-2">
                       Amount We Owe ($)
-                      <Lock className="h-3 w-3 text-gray-400" />
+                      <Lock className="h-3 w-3 text-gray-400 dark:text-gray-500" />
                     </Label>
                     <Input
                       id="debt"
@@ -221,9 +221,9 @@ const EditCompanyPage = () => {
                       value={form.debt}
                       disabled
                       readOnly
-                      className="max-w-xs bg-gray-100 text-gray-500 cursor-not-allowed"
+                      className="max-w-xs bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400 cursor-not-allowed"
                     />
-                    <p className="text-xs text-gray-500">
+                    <p className="text-xs text-gray-500 dark:text-gray-400">
                       This is tracked automatically from unpaid purchases and can&apos;t be edited directly.
                     </p>
                   </div>
@@ -251,23 +251,23 @@ const EditCompanyPage = () => {
           </div>
 
           <div className="lg:col-span-1">
-            <Card className="shadow-sm border-gray-200 sticky top-6">
+            <Card className="shadow-sm border-gray-200 dark:border-gray-800 sticky top-6">
               <CardHeader className="pb-4">
                 <CardTitle className="text-lg">Summary</CardTitle>
                 <CardDescription>Current standing with this supplier</CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
                 <div className="flex justify-between items-center pt-2 border-t">
-                  <span className="text-sm text-gray-600">Total Purchases</span>
+                  <span className="text-sm text-gray-600 dark:text-gray-400">Total Purchases</span>
                   <Badge variant="outline" className="flex items-center gap-1">
                     <ShoppingBag className="h-3 w-3" />
                     {purchasesCount}
                   </Badge>
                 </div>
 
-                <div className="flex justify-between items-center p-3 rounded-lg bg-amber-50 border border-amber-200">
-                  <span className="text-sm font-medium text-amber-800">We Owe</span>
-                  <span className="text-lg font-bold text-amber-900">
+                <div className="flex justify-between items-center p-3 rounded-lg bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-900/50">
+                  <span className="text-sm font-medium text-amber-800 dark:text-amber-400">We Owe</span>
+                  <span className="text-lg font-bold text-amber-900 dark:text-amber-300">
                     ${(parseFloat(form.debt) || 0).toLocaleString()}
                   </span>
                 </div>

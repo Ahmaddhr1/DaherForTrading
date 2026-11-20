@@ -155,9 +155,9 @@ export default function AllOrders() {
       variant={status === "paid" ? "default" : "destructive"}
       className={
         status === "paid"
-          ? "bg-green-100 text-green-800"
+          ? "bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-400"
           : status === "partiallyPaid"
-          ? "bg-yellow-100 text-yellow-800"
+          ? "bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-400"
           : ""
       }
     >
@@ -216,10 +216,10 @@ export default function AllOrders() {
 
       {/* Filters */}
       <FiltersPanel activeCount={activeFilterCount}>
-        <Card className="shadow-sm border-gray-200">
+        <Card className="shadow-sm border-gray-200 dark:border-gray-800">
           <CardContent className="p-4 space-y-4">
             <div className="relative max-w-md">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 h-4 w-4" />
               <Input
                 type="text"
                 placeholder="Search by customer name..."
@@ -231,8 +231,8 @@ export default function AllOrders() {
 
             <div className="flex flex-col sm:flex-row sm:flex-wrap gap-2">
               <div className="flex items-center gap-2">
-                <Filter className="h-4 w-4 text-gray-500" />
-                <span className="text-sm font-medium text-gray-700">Status:</span>
+                <Filter className="h-4 w-4 text-gray-500 dark:text-gray-400" />
+                <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Status:</span>
               </div>
               <Button
                 variant={statusFilter === "all" ? "default" : "outline"}
@@ -280,8 +280,8 @@ export default function AllOrders() {
                 onEndDateChange={setEndDate}
               />
               <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-2">
-                <span className="flex items-center gap-1.5 text-sm font-medium text-gray-700">
-                  <ArrowUpDown className="h-4 w-4 text-gray-500" />
+                <span className="flex items-center gap-1.5 text-sm font-medium text-gray-700 dark:text-gray-300">
+                  <ArrowUpDown className="h-4 w-4 text-gray-500 dark:text-gray-400" />
                   Sort by
                 </span>
                 <select
@@ -295,7 +295,7 @@ export default function AllOrders() {
                 </select>
               </div>
               <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-2">
-                <span className="text-sm font-medium text-gray-700">Per page</span>
+                <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Per page</span>
                 <select
                   value={pageSize}
                   onChange={(e) => setPageSize(parseInt(e.target.value))}
@@ -316,7 +316,7 @@ export default function AllOrders() {
       ) : isError ? (
         <div className="text-center py-12 text-red-600">Failed to load orders.</div>
       ) : orders.length === 0 ? (
-        <div className="text-center py-12 text-gray-500">
+        <div className="text-center py-12 text-gray-500 dark:text-gray-400">
           <Package className="h-12 w-12 mx-auto mb-3" />
           <p>No orders found</p>
         </div>
@@ -325,17 +325,17 @@ export default function AllOrders() {
           {/* Mobile: card list */}
           <div className="space-y-3 sm:hidden">
             {orders.map((order, index) => (
-              <Card key={order._id} className="shadow-sm border-gray-200">
+              <Card key={order._id} className="shadow-sm border-gray-200 dark:border-gray-800">
                 <CardContent className="p-4">
                   <div className="flex items-start justify-between gap-2">
                     <div className="min-w-0">
-                      <p className="text-xs text-gray-400">
+                      <p className="text-xs text-gray-400 dark:text-gray-500">
                         #{(page - 1) * pageSize + index + 1}
                       </p>
-                      <p className="font-medium text-gray-900 truncate">
+                      <p className="font-medium text-gray-900 dark:text-gray-100 truncate">
                         <OrderCustomerName order={order} />
                       </p>
-                      <p className="text-xs text-gray-500 mt-0.5">
+                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
                         {format(new Date(order.createdAt), "MMM d, yyyy HH:mm")}
                       </p>
                     </div>
@@ -343,7 +343,7 @@ export default function AllOrders() {
                   </div>
                   <div className="flex items-center justify-between mt-3">
                     {statusBadge(order.status)}
-                    <span className="font-semibold text-gray-900">
+                    <span className="font-semibold text-gray-900 dark:text-gray-100">
                       ${Number(order.total).toFixed(2)}
                     </span>
                   </div>
@@ -353,7 +353,7 @@ export default function AllOrders() {
           </div>
 
           {/* Desktop: table */}
-          <Card className="shadow-sm border-gray-200 hidden sm:block">
+          <Card className="shadow-sm border-gray-200 dark:border-gray-800 hidden sm:block">
             <Table>
               <TableCaption>All orders across all customers</TableCaption>
               <TableHeader>
@@ -368,16 +368,16 @@ export default function AllOrders() {
               </TableHeader>
               <TableBody>
                 {orders.map((order, index) => (
-                  <TableRow key={order._id} className="hover:bg-gray-50">
-                    <TableCell className="font-medium text-gray-500">
+                  <TableRow key={order._id} className="hover:bg-gray-50 dark:hover:bg-gray-800/60">
+                    <TableCell className="font-medium text-gray-500 dark:text-gray-400">
                       {(page - 1) * pageSize + index + 1}
                     </TableCell>
-                    <TableCell className="font-medium text-gray-900">
+                    <TableCell className="font-medium text-gray-900 dark:text-gray-100">
                       <OrderCustomerName order={order} />
                     </TableCell>
                     <TableCell className="text-center font-medium">${Number(order.total).toFixed(2)}</TableCell>
                     <TableCell className="text-center">{statusBadge(order.status)}</TableCell>
-                    <TableCell className="text-gray-500 text-sm">
+                    <TableCell className="text-gray-500 dark:text-gray-400 text-sm">
                       {format(new Date(order.createdAt), "MMM d, yyyy HH:mm")}
                     </TableCell>
                     <TableCell className="text-right">{actionsMenu(order)}</TableCell>
@@ -388,13 +388,13 @@ export default function AllOrders() {
           </Card>
 
           {totalPages > 1 && (
-            <Card className="shadow-sm border-gray-200">
+            <Card className="shadow-sm border-gray-200 dark:border-gray-800">
               <div className="flex items-center justify-center gap-4 p-4">
                 <Button onClick={() => setPage((p) => p - 1)} disabled={page === 1} variant="outline" size="sm" className="flex items-center gap-2">
                   <ChevronLeft className="h-4 w-4" />
                   Previous
                 </Button>
-                <span className="text-sm text-gray-600">Page {page} of {totalPages}</span>
+                <span className="text-sm text-gray-600 dark:text-gray-400">Page {page} of {totalPages}</span>
                 <Button onClick={() => setPage((p) => p + 1)} disabled={page === totalPages} variant="outline" size="sm" className="flex items-center gap-2">
                   Next
                   <ChevronRight className="h-4 w-4" />

@@ -48,22 +48,22 @@ export default function StockHistoryIndexPage() {
   const totalPages = data?.totalPages || 1;
 
   return (
-    <div className="min-h-screen bg-gray-50 py-6">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-950 py-6">
       <div className="container mx-auto px-4 max-w-3xl">
         <div className="mb-8 flex items-center gap-3">
-          <div className="p-2 bg-blue-100 rounded-lg">
+          <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
             <PackageSearch className="h-6 w-6 text-blue-600" />
           </div>
           <div>
-            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Stock History</h1>
-            <p className="text-gray-600 text-sm sm:text-base">
+            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-gray-100">Stock History</h1>
+            <p className="text-gray-600 dark:text-gray-400 text-sm sm:text-base">
               Search for a product to see every purchase, sale, and stock adjustment made to it
             </p>
           </div>
         </div>
 
         <div className="relative mb-6">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 h-4 w-4" />
           <Input
             type="text"
             placeholder="Search products by name..."
@@ -79,7 +79,7 @@ export default function StockHistoryIndexPage() {
         ) : error ? (
           <div className="text-center py-12 text-red-600">Failed to load products.</div>
         ) : products.length === 0 ? (
-          <div className="text-center py-12 text-gray-500">
+          <div className="text-center py-12 text-gray-500 dark:text-gray-400">
             <Package className="h-12 w-12 mx-auto mb-3" />
             <p>No products found{searchTerm ? " matching your search" : ""}</p>
           </div>
@@ -88,7 +88,7 @@ export default function StockHistoryIndexPage() {
             {products.map((product) => (
               <Card
                 key={product._id}
-                className="shadow-sm border-gray-200 hover:border-blue-300 hover:shadow-md transition-all cursor-pointer"
+                className="shadow-sm border-gray-200 dark:border-gray-800 hover:border-blue-300 hover:shadow-md transition-all cursor-pointer"
                 onClick={() => router.push(`/dashboard/products/${product._id}/history`)}
               >
                 <CardContent className="p-3 flex items-center gap-3">
@@ -99,13 +99,13 @@ export default function StockHistoryIndexPage() {
                       className="h-10 w-10 rounded-md object-cover shrink-0"
                     />
                   ) : (
-                    <div className="h-10 w-10 rounded-md bg-gray-100 flex items-center justify-center shrink-0">
-                      <Package className="h-5 w-5 text-gray-400" />
+                    <div className="h-10 w-10 rounded-md bg-gray-100 dark:bg-gray-800 flex items-center justify-center shrink-0">
+                      <Package className="h-5 w-5 text-gray-400 dark:text-gray-500" />
                     </div>
                   )}
                   <div className="min-w-0 flex-1">
-                    <p className="font-medium text-gray-900 truncate">{product.name}</p>
-                    <p className="text-sm text-gray-500">
+                    <p className="font-medium text-gray-900 dark:text-gray-100 truncate">{product.name}</p>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">
                       {product.quantity} {product.unit || "pcs"} in stock
                     </p>
                   </div>
@@ -127,7 +127,7 @@ export default function StockHistoryIndexPage() {
               <ChevronLeft className="h-4 w-4" />
               Previous
             </Button>
-            <span className="text-sm text-gray-600">
+            <span className="text-sm text-gray-600 dark:text-gray-400">
               Page {page} of {totalPages}
             </span>
             <Button

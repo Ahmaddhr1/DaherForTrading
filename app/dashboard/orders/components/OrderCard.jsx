@@ -4,7 +4,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import OrderActions from "./OrderActions";
 import OrderCustomerName from "./OrderCustomerName";
 
-const OrderCard = ({ order, borderColor = "border-gray-200", onStatusUpdate }) => {
+const OrderCard = ({ order, borderColor = "border-gray-200 dark:border-gray-800", onStatusUpdate }) => {
   const getStatusColor = (status) => {
     switch (status) {
       case "paid":
@@ -14,7 +14,7 @@ const OrderCard = ({ order, borderColor = "border-gray-200", onStatusUpdate }) =
       case "partiallyPaid":
         return "text-orange-600";
       default:
-        return "text-gray-600";
+        return "text-gray-600 dark:text-gray-400";
     }
   };
 
@@ -37,11 +37,11 @@ const OrderCard = ({ order, borderColor = "border-gray-200", onStatusUpdate }) =
         <div className="flex justify-between items-start">
           <div className="flex-1">
             <div className="flex items-center gap-2 mb-2">
-              <h3 className="font-semibold text-gray-900">
+              <h3 className="font-semibold text-gray-900 dark:text-gray-100">
                 <OrderCustomerName order={order} />
               </h3>
               {order.orderNumber && (
-                <span className="text-sm text-gray-500">#{order.orderNumber}</span>
+                <span className="text-sm text-gray-500 dark:text-gray-400">#{order.orderNumber}</span>
               )}
             </div>
 
@@ -57,7 +57,7 @@ const OrderCard = ({ order, borderColor = "border-gray-200", onStatusUpdate }) =
                 </div>
               )}
 
-              <p className="text-xs text-gray-500">
+              <p className="text-xs text-gray-500 dark:text-gray-400">
                 {new Date(order.createdAt).toLocaleDateString()} at{" "}
                 {new Date(order.createdAt).toLocaleTimeString()}
               </p>
@@ -65,8 +65,8 @@ const OrderCard = ({ order, borderColor = "border-gray-200", onStatusUpdate }) =
           </div>
 
           <div className="text-right">
-            <p className="font-bold text-lg text-gray-900">${order.total}</p>
-            <p className="text-sm text-gray-600">
+            <p className="font-bold text-lg text-gray-900 dark:text-gray-100">${order.total}</p>
+            <p className="text-sm text-gray-600 dark:text-gray-400">
               {order.products?.length || 0} items
             </p>
           </div>

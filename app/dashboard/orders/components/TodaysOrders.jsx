@@ -61,7 +61,7 @@ const TodaysOrders = () => {
       )}
 
       {orders.length === 0 ? (
-        <div className="text-center py-12 text-gray-500">
+        <div className="text-center py-12 text-gray-500 dark:text-gray-400">
           <Package className="h-12 w-12 mx-auto mb-3" />
           <p>No orders for today</p>
         </div>
@@ -87,7 +87,7 @@ const TodaysOrders = () => {
                 <ChevronLeft className="h-4 w-4" />
                 Previous
               </Button>
-              <span className="text-sm text-gray-600">
+              <span className="text-sm text-gray-600 dark:text-gray-400">
                 Page {page} of {totalPages}
               </span>
               <Button

@@ -124,15 +124,15 @@ export default function CartDrawer() {
 
       <Modal open={open} onClose={handleClose} title="Cart" maxWidth="max-w-md">
         {cart.length === 0 ? (
-          <p className="text-center text-gray-500 py-8">Your cart is empty.</p>
+          <p className="text-center text-gray-500 dark:text-gray-400 py-8">Your cart is empty.</p>
         ) : !checkingOut ? (
           <div className="space-y-4">
             <div className="space-y-3 max-h-80 overflow-y-auto">
               {cart.map((item) => (
                 <div key={item.productId} className="flex items-center justify-between gap-2">
                   <div className="min-w-0">
-                    <p className="font-medium text-gray-900 truncate">{item.name}</p>
-                    <p className="text-sm text-gray-500">${item.price.toFixed(2)} each</p>
+                    <p className="font-medium text-gray-900 dark:text-gray-100 truncate">{item.name}</p>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">${item.price.toFixed(2)} each</p>
                   </div>
                   <div className="flex items-center gap-2 shrink-0">
                     <Button variant="outline" size="icon" className="h-7 w-7" onClick={() => onUpdateQty(item.productId, -1)}>
@@ -150,8 +150,8 @@ export default function CartDrawer() {
               ))}
             </div>
             <div className="flex items-center justify-between pt-3 border-t">
-              <span className="font-medium text-gray-700">Total</span>
-              <span className="font-bold text-lg text-gray-900">${total.toFixed(2)}</span>
+              <span className="font-medium text-gray-700 dark:text-gray-300">Total</span>
+              <span className="font-bold text-lg text-gray-900 dark:text-gray-100">${total.toFixed(2)}</span>
             </div>
             <Button className="w-full" onClick={() => setCheckingOut(true)}>
               Create Draft Order
@@ -159,7 +159,7 @@ export default function CartDrawer() {
           </div>
         ) : !checkoutMode ? (
           <div className="space-y-3">
-            <p className="text-sm text-gray-600">Who is this order for?</p>
+            <p className="text-sm text-gray-600 dark:text-gray-400">Who is this order for?</p>
             <Button variant="outline" className="w-full flex items-center gap-2" onClick={() => setCheckoutMode("search")}>
               <Search className="h-4 w-4" />
               Search Existing Customer
@@ -175,10 +175,10 @@ export default function CartDrawer() {
         ) : checkoutMode === "search" ? (
           <div className="space-y-3">
             {selectedCustomer ? (
-              <div className="flex items-center justify-between bg-blue-50 border border-blue-200 rounded-lg p-3">
+              <div className="flex items-center justify-between bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-900/50 rounded-lg p-3">
                 <div>
-                  <p className="font-medium text-gray-900">{selectedCustomer.fullName}</p>
-                  <p className="text-sm text-gray-600">{selectedCustomer.phoneNumber}</p>
+                  <p className="font-medium text-gray-900 dark:text-gray-100">{selectedCustomer.fullName}</p>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">{selectedCustomer.phoneNumber}</p>
                 </div>
                 <Button variant="ghost" size="sm" onClick={() => setSelectedCustomer(null)}>
                   <X className="h-4 w-4" />
@@ -187,7 +187,7 @@ export default function CartDrawer() {
             ) : (
               <>
                 <div className="relative">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 h-4 w-4" />
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500 h-4 w-4" />
                   <Input
                     placeholder="Search customers by name..."
                     value={searchInput}
@@ -199,12 +199,12 @@ export default function CartDrawer() {
                 {searchInput.trim().length > 0 && (
                   <div className="border rounded-lg divide-y max-h-56 overflow-y-auto">
                     {(searching || isSearchPending) && (
-                      <div className="p-4 text-center text-gray-500">
+                      <div className="p-4 text-center text-gray-500 dark:text-gray-400">
                         <Loader2 className="h-5 w-5 animate-spin mx-auto" />
                       </div>
                     )}
                     {!searching && !isSearchPending && customers.length === 0 && (
-                      <div className="p-4 text-center text-gray-500 text-sm">No customers found</div>
+                      <div className="p-4 text-center text-gray-500 dark:text-gray-400 text-sm">No customers found</div>
                     )}
                     {!searching && !isSearchPending &&
                       customers.map((customer) => (
@@ -212,11 +212,11 @@ export default function CartDrawer() {
                           key={customer._id}
                           type="button"
                           onClick={() => setSelectedCustomer(customer)}
-                          className="w-full flex items-center justify-between p-3 hover:bg-gray-50 text-left"
+                          className="w-full flex items-center justify-between p-3 hover:bg-gray-50 dark:hover:bg-gray-800/60 text-left"
                         >
                           <div>
-                            <p className="font-medium text-gray-900">{customer.fullName}</p>
-                            <p className="text-sm text-gray-500">{customer.phoneNumber}</p>
+                            <p className="font-medium text-gray-900 dark:text-gray-100">{customer.fullName}</p>
+                            <p className="text-sm text-gray-500 dark:text-gray-400">{customer.phoneNumber}</p>
                           </div>
                           <Badge variant={customer.debt > 0 ? "destructive" : "outline"}>
                             ${customer.debt?.toLocaleString() || 0}
@@ -241,14 +241,14 @@ export default function CartDrawer() {
         ) : (
           <div className="space-y-3">
             <div className="space-y-2">
-              <label className="text-sm font-medium text-gray-700">Customer Name</label>
+              <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Customer Name</label>
               <Input
                 value={typedName}
                 onChange={(e) => setTypedName(e.target.value)}
                 placeholder="Enter customer name"
                 autoFocus
               />
-              <p className="text-xs text-gray-500">
+              <p className="text-xs text-gray-500 dark:text-gray-400">
                 No customer selected yet - you can link a real customer later from the Drafts tab.
               </p>
             </div>

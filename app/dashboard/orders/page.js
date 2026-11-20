@@ -28,21 +28,21 @@ const OrdersPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-6">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-950 py-6">
       <div className="container mx-auto px-4 max-w-6xl">
         <div className="mb-8">
           <div className="flex items-center gap-3 mb-2">
-            <div className="p-2 bg-blue-100 rounded-lg">
+            <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
               <Package className="h-6 w-6 text-blue-600" />
             </div>
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">Orders Management</h1>
-              <p className="text-gray-600">View and manage all customer orders</p>
+              <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">Orders Management</h1>
+              <p className="text-gray-600 dark:text-gray-400">View and manage all customer orders</p>
             </div>
           </div>
         </div>
 
-        <Card className="shadow-sm border-gray-200">
+        <Card className="shadow-sm border-gray-200 dark:border-gray-800">
           <CardHeader>
             <CardTitle className="text-xl">Order Overview</CardTitle>
             <CardDescription>

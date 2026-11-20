@@ -25,8 +25,10 @@ import {
   CheckCircle2,
   XCircle,
   Send,
+  Moon,
 } from "lucide-react";
 import { useSettings } from "@/lib/currency";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 const RESTORE_WARNING =
   "This will permanently replace all current customers, orders, products, categories, companies, purchases, payments, and disbursements with the contents of this file. This cannot be undone. Continue?";
@@ -225,22 +227,36 @@ export default function SettingsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-6">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-950 py-6">
       <div className="container mx-auto px-4 max-w-2xl">
         <div className="mb-8">
           <div className="flex items-center gap-3">
-            <div className="p-2 bg-blue-100 rounded-lg">
+            <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
               <SettingsIcon className="h-6 w-6 text-blue-600" />
             </div>
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">Settings</h1>
-              <p className="text-gray-600">Manage your account and data</p>
+              <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">Settings</h1>
+              <p className="text-gray-600 dark:text-gray-400">Manage your account and data</p>
             </div>
           </div>
         </div>
 
+        {/* Appearance */}
+        <Card className="shadow-sm border-gray-200 dark:border-gray-800 mb-6">
+          <CardHeader>
+            <CardTitle className="text-lg flex items-center gap-2">
+              <Moon className="h-5 w-5 text-indigo-600" />
+              Appearance
+            </CardTitle>
+            <CardDescription>Switch between light and dark mode</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <ThemeToggle className="border border-gray-200 dark:border-gray-800" />
+          </CardContent>
+        </Card>
+
         {/* Business Settings: Dollar Rate + default Tax Rate */}
-        <Card className="shadow-sm border-gray-200 mb-6">
+        <Card className="shadow-sm border-gray-200 dark:border-gray-800 mb-6">
           <CardHeader>
             <CardTitle className="text-lg flex items-center gap-2">
               <DollarSign className="h-5 w-5 text-green-600" />
@@ -253,7 +269,7 @@ export default function SettingsPage() {
           </CardHeader>
           <CardContent>
             {settingsLoading ? (
-              <p className="text-sm text-gray-500">Loading...</p>
+              <p className="text-sm text-gray-500 dark:text-gray-400">Loading...</p>
             ) : (
               <form onSubmit={handleSettingsSubmit} className="space-y-4">
                 <div className="space-y-2">
@@ -270,7 +286,7 @@ export default function SettingsPage() {
                     onChange={(e) => setDollarRate(e.target.value)}
                     placeholder="90000"
                   />
-                  <p className="text-xs text-gray-500">
+                  <p className="text-xs text-gray-500 dark:text-gray-400">
                     e.g. 90000 means $1 = 90,000 LL. Update this whenever the rate moves.
                   </p>
                 </div>
@@ -292,7 +308,7 @@ export default function SettingsPage() {
                     onChange={(e) => setTaxRate(e.target.value)}
                     placeholder="0"
                   />
-                  <p className="text-xs text-gray-500">
+                  <p className="text-xs text-gray-500 dark:text-gray-400">
                     Pre-fills the tax field when creating an order or purchase - it can
                     still be changed per transaction.
                   </p>
@@ -318,7 +334,7 @@ export default function SettingsPage() {
         </Card>
 
         {/* Change Password */}
-        <Card className="shadow-sm border-gray-200 mb-6">
+        <Card className="shadow-sm border-gray-200 dark:border-gray-800 mb-6">
           <CardHeader>
             <CardTitle className="text-lg flex items-center gap-2">
               <Lock className="h-5 w-5 text-blue-600" />
@@ -354,7 +370,7 @@ export default function SettingsPage() {
                   autoComplete="new-password"
                   required
                 />
-                <p className="text-xs text-gray-500">At least 8 characters</p>
+                <p className="text-xs text-gray-500 dark:text-gray-400">At least 8 characters</p>
               </div>
 
               <div className="space-y-2">
@@ -389,7 +405,7 @@ export default function SettingsPage() {
 
         {/* Database Backup - owner only (see middleware.js) */}
         {isOwner && (
-          <Card className="shadow-sm border-gray-200 mb-6">
+          <Card className="shadow-sm border-gray-200 dark:border-gray-800 mb-6">
             <CardHeader>
               <CardTitle className="text-lg flex items-center gap-2">
                 <DatabaseBackup className="h-5 w-5 text-green-600" />
@@ -419,8 +435,8 @@ export default function SettingsPage() {
                   </>
                 )}
               </Button>
-              <p className="text-xs text-gray-500 mt-3 flex items-start gap-1">
-                <ShieldCheck className="h-3.5 w-3.5 shrink-0 mt-0.5 text-gray-400" />
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-3 flex items-start gap-1">
+                <ShieldCheck className="h-3.5 w-3.5 shrink-0 mt-0.5 text-gray-400 dark:text-gray-500" />
                 Login credentials are never included in this backup file.
               </p>
             </CardContent>
@@ -429,7 +445,7 @@ export default function SettingsPage() {
 
         {/* Automated Backups - owner only (see middleware.js) */}
         {isOwner && (
-          <Card className="shadow-sm border-gray-200 mb-6">
+          <Card className="shadow-sm border-gray-200 dark:border-gray-800 mb-6">
             <CardHeader>
               <CardTitle className="text-lg flex items-center gap-2">
                 <Mail className="h-5 w-5 text-blue-600" />
@@ -444,8 +460,8 @@ export default function SettingsPage() {
                 <div
                   className={`rounded-lg p-3 flex items-start gap-2 border ${
                     settings.lastScheduledBackupStatus === "failed"
-                      ? "bg-red-50 border-red-200"
-                      : "bg-green-50 border-green-200"
+                      ? "bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-900/50"
+                      : "bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-900/50"
                   }`}
                 >
                   {settings.lastScheduledBackupStatus === "failed" ? (
@@ -457,8 +473,8 @@ export default function SettingsPage() {
                     <p
                       className={
                         settings.lastScheduledBackupStatus === "failed"
-                          ? "text-red-800 font-medium"
-                          : "text-green-800 font-medium"
+                          ? "text-red-800 dark:text-red-400 font-medium"
+                          : "text-green-800 dark:text-green-400 font-medium"
                       }
                     >
                       Last backup email {settings.lastScheduledBackupStatus === "failed" ? "failed" : "sent"}
@@ -471,9 +487,9 @@ export default function SettingsPage() {
                   </div>
                 </div>
               ) : (
-                <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 flex items-start gap-2">
+                <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-900/50 rounded-lg p-3 flex items-start gap-2">
                   <AlertTriangle className="h-4 w-4 text-amber-600 shrink-0 mt-0.5" />
-                  <p className="text-xs text-amber-800">
+                  <p className="text-xs text-amber-800 dark:text-amber-400">
                     No automated backup has run yet. Once the schedule is configured on the
                     server (see below), or you send a test email, it will show up here.
                   </p>
@@ -499,7 +515,7 @@ export default function SettingsPage() {
                 )}
               </Button>
 
-              <p className="text-xs text-gray-500">
+              <p className="text-xs text-gray-500 dark:text-gray-400">
                 Runs automatically once a day. This needs a few things set up on the server
                 once (SMTP credentials for sending mail, a recipient address, and a schedule
                 secret) - ask your developer if the status above says a backup email failed.
@@ -510,7 +526,7 @@ export default function SettingsPage() {
 
         {/* Import / Restore Backup - owner only (see middleware.js) */}
         {isOwner && (
-          <Card className="shadow-sm border-amber-200">
+          <Card className="shadow-sm border-amber-200 dark:border-amber-900/50">
             <CardHeader>
               <CardTitle className="text-lg flex items-center gap-2">
                 <Upload className="h-5 w-5 text-amber-600" />
@@ -522,9 +538,9 @@ export default function SettingsPage() {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 flex items-start gap-2">
+              <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-900/50 rounded-lg p-3 flex items-start gap-2">
                 <AlertTriangle className="h-4 w-4 text-amber-600 shrink-0 mt-0.5" />
-                <p className="text-xs text-amber-800">{RESTORE_WARNING}</p>
+                <p className="text-xs text-amber-800 dark:text-amber-400">{RESTORE_WARNING}</p>
               </div>
 
               <div className="space-y-2">
@@ -575,11 +591,11 @@ export default function SettingsPage() {
               </Button>
 
               {restoreSummary && (
-                <div className="bg-green-50 border border-green-200 rounded-lg p-3">
-                  <p className="text-sm font-medium text-green-800 mb-2">Restored:</p>
+                <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-900/50 rounded-lg p-3">
+                  <p className="text-sm font-medium text-green-800 dark:text-green-400 mb-2">Restored:</p>
                   <div className="flex flex-wrap gap-2">
                     {Object.entries(restoreSummary).map(([key, count]) => (
-                      <Badge key={key} variant="outline" className="bg-white">
+                      <Badge key={key} variant="outline" className="bg-white dark:bg-gray-900">
                         {key}: {count}
                       </Badge>
                     ))}

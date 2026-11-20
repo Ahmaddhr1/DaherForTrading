@@ -33,7 +33,7 @@ export default function LowStockAlerts() {
   if (error) return null;
 
   return (
-    <Card className="shadow-sm border-gray-200 mb-8">
+    <Card className="shadow-sm border-gray-200 dark:border-gray-800 mb-8">
       <CardHeader className="pb-3">
         <CardTitle className="text-lg flex items-center gap-2">
           <AlertTriangle className="h-5 w-5 text-amber-600" />
@@ -53,7 +53,7 @@ export default function LowStockAlerts() {
           </div>
         ) : (
           <>
-            <div className="divide-y divide-gray-100">
+            <div className="divide-y divide-gray-100 dark:divide-gray-800">
               {pageItems.map((product) => {
                 const threshold = product.lowStockThreshold ?? 5;
                 const outOfStock = product.quantity === 0;
@@ -61,22 +61,22 @@ export default function LowStockAlerts() {
                   <Link
                     key={product._id}
                     href={`/dashboard/products/${product._id}`}
-                    className="flex items-center justify-between py-2.5 hover:bg-gray-50 -mx-2 px-2 rounded-md transition-colors"
+                    className="flex items-center justify-between py-2.5 hover:bg-gray-50 dark:hover:bg-gray-800/60 -mx-2 px-2 rounded-md transition-colors"
                   >
                     <div className="flex items-center gap-2 min-w-0">
-                      <Box className="h-4 w-4 text-gray-400 shrink-0" />
+                      <Box className="h-4 w-4 text-gray-400 dark:text-gray-500 shrink-0" />
                       <div className="min-w-0">
-                        <div className="font-medium text-gray-900 truncate">{product.name}</div>
+                        <div className="font-medium text-gray-900 dark:text-gray-100 truncate">{product.name}</div>
                         {product.category?.name && (
-                          <div className="text-xs text-gray-500 truncate">{product.category.name}</div>
+                          <div className="text-xs text-gray-500 dark:text-gray-400 truncate">{product.category.name}</div>
                         )}
                       </div>
                     </div>
                     <Badge
                       className={
                         outOfStock
-                          ? "bg-red-100 text-red-800 shrink-0"
-                          : "bg-yellow-100 text-yellow-800 shrink-0"
+                          ? "bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-400 shrink-0"
+                          : "bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-400 shrink-0"
                       }
                     >
                       {product.quantity} {product.unit || "pcs"} left
@@ -99,7 +99,7 @@ export default function LowStockAlerts() {
                   <ChevronLeft className="h-4 w-4" />
                   Previous
                 </Button>
-                <span className="text-sm text-gray-600">
+                <span className="text-sm text-gray-600 dark:text-gray-400">
                   Page {page} of {totalPages}
                 </span>
                 <Button

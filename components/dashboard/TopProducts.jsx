@@ -49,7 +49,7 @@ const TopProducts = ({ limit = 10, sort = "orders", category = "" }) => {
   const pageItems = topProducts.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 
   return (
-    <Card className="shadow-sm border-gray-200">
+    <Card className="shadow-sm border-gray-200 dark:border-gray-800">
       <CardHeader>
         <CardTitle className="flex items-center gap-2 text-lg font-medium">
           <Package className="h-5 w-5 text-blue-600" />
@@ -64,14 +64,14 @@ const TopProducts = ({ limit = 10, sort = "orders", category = "" }) => {
             ))}
           </div>
         ) : topProducts.length === 0 ? (
-          <div className="text-center py-8 text-gray-500">No products found</div>
+          <div className="text-center py-8 text-gray-500 dark:text-gray-400">No products found</div>
         ) : (
           <>
             <div className="space-y-4">
               {pageItems.map((product, index) => (
                 <div
                   key={product._id || index}
-                  className="flex items-center justify-between bg-gray-50 rounded-lg p-4"
+                  className="flex items-center justify-between bg-gray-50 dark:bg-gray-950 rounded-lg p-4"
                 >
                   <div className="flex items-center gap-3">
                     <Badge className="bg-primary hover:bg-primary w-7 h-7 rounded-full flex items-center justify-center p-0">
@@ -84,13 +84,13 @@ const TopProducts = ({ limit = 10, sort = "orders", category = "" }) => {
                         className="w-10 h-10 rounded object-cover"
                       />
                     ) : (
-                      <div className="w-10 h-10 bg-gray-200 rounded flex items-center justify-center">
-                        <Package className="h-5 w-5 text-gray-400" />
+                      <div className="w-10 h-10 bg-gray-200 dark:bg-gray-700 rounded flex items-center justify-center">
+                        <Package className="h-5 w-5 text-gray-400 dark:text-gray-500" />
                       </div>
                     )}
                     <div>
                       <p className="font-medium">{product.name}</p>
-                      <p className="text-sm text-gray-500">
+                      <p className="text-sm text-gray-500 dark:text-gray-400">
                         {product.nbOfOrders} orders
                       </p>
                     </div>
@@ -103,7 +103,7 @@ const TopProducts = ({ limit = 10, sort = "orders", category = "" }) => {
                     ) : (
                       <p className="font-semibold">${product.price}</p>
                     )}
-                    <p className="text-sm text-gray-500">
+                    <p className="text-sm text-gray-500 dark:text-gray-400">
                       {sort === "profit" ? "total profit" : "each"}
                     </p>
                   </div>
@@ -123,7 +123,7 @@ const TopProducts = ({ limit = 10, sort = "orders", category = "" }) => {
                   <ChevronLeft className="h-4 w-4" />
                   Previous
                 </Button>
-                <span className="text-sm text-gray-600">
+                <span className="text-sm text-gray-600 dark:text-gray-400">
                   Page {page} of {totalPages}
                 </span>
                 <Button

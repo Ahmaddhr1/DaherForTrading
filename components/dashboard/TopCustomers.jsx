@@ -48,7 +48,7 @@ const TopCustomers = ({ limit = 10, minDebt = 0 }) => {
   const pageItems = topCustomers.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 
   return (
-    <Card className="shadow-sm border-gray-200">
+    <Card className="shadow-sm border-gray-200 dark:border-gray-800">
       <CardHeader>
         <CardTitle className="flex items-center gap-2 text-lg font-medium">
           <Trophy className="h-5 w-5 text-amber-600" />
@@ -63,7 +63,7 @@ const TopCustomers = ({ limit = 10, minDebt = 0 }) => {
             ))}
           </div>
         ) : topCustomers.length === 0 ? (
-          <div className="text-center py-8 text-gray-500">
+          <div className="text-center py-8 text-gray-500 dark:text-gray-400">
             No customers with outstanding debt
           </div>
         ) : (
@@ -71,17 +71,17 @@ const TopCustomers = ({ limit = 10, minDebt = 0 }) => {
             <div className="space-y-3">
               {pageItems.map((customer, index) => (
                 <Link key={customer._id} href={`/dashboard/customers/${customer._id}`}>
-                  <div className="flex items-center justify-between bg-gray-50 hover:bg-gray-100 transition-colors rounded-lg p-3">
+                  <div className="flex items-center justify-between bg-gray-50 dark:bg-gray-950 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors rounded-lg p-3">
                     <div className="flex items-center gap-3">
                       <Badge className="bg-amber-500 hover:bg-amber-500 w-7 h-7 rounded-full flex items-center justify-center p-0">
                         {(page - 1) * PAGE_SIZE + index + 1}
                       </Badge>
-                      <div className="w-9 h-9 rounded-full bg-red-100 flex items-center justify-center">
+                      <div className="w-9 h-9 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center">
                         <User className="h-4 w-4 text-red-600" />
                       </div>
                       <div>
-                        <p className="font-medium text-gray-900">{customer.fullName}</p>
-                        <p className="text-sm text-gray-500">{customer.phoneNumber}</p>
+                        <p className="font-medium text-gray-900 dark:text-gray-100">{customer.fullName}</p>
+                        <p className="text-sm text-gray-500 dark:text-gray-400">{customer.phoneNumber}</p>
                       </div>
                     </div>
                     <div className="text-right font-semibold text-red-600">
@@ -104,7 +104,7 @@ const TopCustomers = ({ limit = 10, minDebt = 0 }) => {
                   <ChevronLeft className="h-4 w-4" />
                   Previous
                 </Button>
-                <span className="text-sm text-gray-600">
+                <span className="text-sm text-gray-600 dark:text-gray-400">
                   Page {page} of {totalPages}
                 </span>
                 <Button

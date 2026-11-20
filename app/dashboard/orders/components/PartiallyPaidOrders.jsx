@@ -81,7 +81,7 @@ const PartiallyPaidOrders = () => {
         <OrdersTotalsCard totalAmount={totals.totalAmount} totalProfit={totals.totalProfit} label="Total Partially Paid" />
       )}
 
-      <Card className="shadow-sm border-gray-200">
+      <Card className="shadow-sm border-gray-200 dark:border-gray-800">
         <CardContent className="p-4 flex flex-col sm:flex-row sm:flex-wrap sm:items-center gap-3">
           <DateRangeFilter
             startDate={startDate}
@@ -90,7 +90,7 @@ const PartiallyPaidOrders = () => {
             onEndDateChange={setEndDate}
           />
           {hasDateFilter && (
-            <Button variant="ghost" size="sm" onClick={clearDateFilter} className="flex items-center gap-1 text-gray-500 self-start sm:self-auto">
+            <Button variant="ghost" size="sm" onClick={clearDateFilter} className="flex items-center gap-1 text-gray-500 dark:text-gray-400 self-start sm:self-auto">
               <X className="h-3.5 w-3.5" />
               Clear
             </Button>
@@ -99,7 +99,7 @@ const PartiallyPaidOrders = () => {
       </Card>
 
       {orders.length === 0 ? (
-        <div className="text-center py-12 text-gray-500">
+        <div className="text-center py-12 text-gray-500 dark:text-gray-400">
           <DollarSign className="h-12 w-12 mx-auto mb-3" />
           <p>No partially paid orders</p>
         </div>
@@ -109,7 +109,7 @@ const PartiallyPaidOrders = () => {
             <OrderCard
               key={order._id}
               order={order}
-              borderColor="border-orange-200"
+              borderColor="border-orange-200 dark:border-orange-900/50"
               onStatusUpdate={handleStatusUpdate}
             />
           ))}
@@ -126,7 +126,7 @@ const PartiallyPaidOrders = () => {
                 <ChevronLeft className="h-4 w-4" />
                 Previous
               </Button>
-              <span className="text-sm text-gray-600">
+              <span className="text-sm text-gray-600 dark:text-gray-400">
                 Page {page} of {totalPages}
               </span>
               <Button

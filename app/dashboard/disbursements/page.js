@@ -178,18 +178,18 @@ export default function DisbursementsPage() {
   ].filter(Boolean).length;
 
   return (
-    <div className="min-h-screen bg-gray-50 py-6">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-950 py-6">
       <div className="container mx-auto px-4">
         {/* Header */}
         <div className="mb-8">
           <div className="flex items-center justify-between gap-3">
             <div className="flex items-center gap-3 min-w-0">
-              <div className="p-2 bg-red-100 rounded-lg shrink-0">
+              <div className="p-2 bg-red-100 dark:bg-red-900/30 rounded-lg shrink-0">
                 <TrendingDown className="h-6 w-6 text-red-600" />
               </div>
               <div className="min-w-0">
-                <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 truncate">Disbursements</h1>
-                <p className="text-gray-600 text-sm sm:text-base truncate">Cash paid out — deducted from revenue in hand</p>
+                <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-gray-100 truncate">Disbursements</h1>
+                <p className="text-gray-600 dark:text-gray-400 text-sm sm:text-base truncate">Cash paid out — deducted from revenue in hand</p>
               </div>
             </div>
 
@@ -201,15 +201,15 @@ export default function DisbursementsPage() {
         </div>
 
         {/* Summary */}
-        <Card className="shadow-sm border-gray-200 mb-6">
+        <Card className="shadow-sm border-gray-200 dark:border-gray-800 mb-6">
           <CardContent className="p-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-            <div className="flex items-center gap-2 text-gray-700">
-              <Receipt className="h-4 w-4 text-gray-500" />
+            <div className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
+              <Receipt className="h-4 w-4 text-gray-500 dark:text-gray-400" />
               <span className="text-sm font-medium">
                 {totalCount} disbursement{totalCount === 1 ? "" : "s"} matching current filters
               </span>
             </div>
-            <div className="text-sm text-gray-600">
+            <div className="text-sm text-gray-600 dark:text-gray-400">
               Total Disbursed:{" "}
               <span className="font-bold text-red-600">${totalAmount.toLocaleString()}</span>
             </div>
@@ -217,17 +217,17 @@ export default function DisbursementsPage() {
         </Card>
 
         {!hasInteracted && (
-          <p className="text-sm text-gray-500 mb-4">
+          <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
             Showing today&apos;s disbursements only. Pick a date range below to see more.
           </p>
         )}
 
         {/* Filters */}
         <FiltersPanel activeCount={activeFilterCount}>
-          <Card className="shadow-sm border-gray-200 mb-6">
+          <Card className="shadow-sm border-gray-200 dark:border-gray-800 mb-6">
             <CardContent className="p-4 space-y-4">
               <div className="relative max-w-md">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 h-4 w-4" />
                 <Input
                   type="text"
                   placeholder="Search by description..."
@@ -239,8 +239,8 @@ export default function DisbursementsPage() {
 
               <div className="flex flex-col sm:flex-row sm:flex-wrap sm:items-center gap-3 sm:gap-4">
                 <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-2">
-                  <span className="flex items-center gap-1.5 text-sm font-medium text-gray-700">
-                    <Filter className="h-4 w-4 text-gray-500" />
+                  <span className="flex items-center gap-1.5 text-sm font-medium text-gray-700 dark:text-gray-300">
+                    <Filter className="h-4 w-4 text-gray-500 dark:text-gray-400" />
                     Category
                   </span>
                   <select
@@ -256,7 +256,7 @@ export default function DisbursementsPage() {
                 </div>
 
                 <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-2">
-                  <span className="text-sm font-medium text-gray-700">From</span>
+                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">From</span>
                   <input
                     type="date"
                     value={startDate}
@@ -265,7 +265,7 @@ export default function DisbursementsPage() {
                   />
                 </div>
                 <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-2">
-                  <span className="text-sm font-medium text-gray-700">To</span>
+                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">To</span>
                   <input
                     type="date"
                     value={endDate}
@@ -275,8 +275,8 @@ export default function DisbursementsPage() {
                 </div>
 
                 <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-2">
-                  <span className="flex items-center gap-1.5 text-sm font-medium text-gray-700">
-                    <ArrowUpDown className="h-4 w-4 text-gray-500" />
+                  <span className="flex items-center gap-1.5 text-sm font-medium text-gray-700 dark:text-gray-300">
+                    <ArrowUpDown className="h-4 w-4 text-gray-500 dark:text-gray-400" />
                     Sort by
                   </span>
                   <select
@@ -291,7 +291,7 @@ export default function DisbursementsPage() {
                 </div>
 
                 <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-2">
-                  <span className="text-sm font-medium text-gray-700">Per page</span>
+                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Per page</span>
                   <select
                     value={pageSize}
                     onChange={(e) => setPageSize(parseInt(e.target.value))}
@@ -308,7 +308,7 @@ export default function DisbursementsPage() {
                     variant="ghost"
                     size="sm"
                     onClick={handleClearFilters}
-                    className="flex items-center justify-center gap-1 text-gray-500 w-full sm:w-auto"
+                    className="flex items-center justify-center gap-1 text-gray-500 dark:text-gray-400 w-full sm:w-auto"
                   >
                     <X className="h-3 w-3" />
                     Clear Filters
@@ -329,15 +329,15 @@ export default function DisbursementsPage() {
         ) : disbursements.length === 0 ? (
           <Card>
             <CardContent className="pt-6 text-center">
-              <Receipt className="h-12 w-12 text-gray-300 mx-auto mb-3" />
-              <p className="text-gray-500 text-lg mb-2">No disbursements found</p>
+              <Receipt className="h-12 w-12 text-gray-300 dark:text-gray-600 mx-auto mb-3" />
+              <p className="text-gray-500 dark:text-gray-400 text-lg mb-2">No disbursements found</p>
               {hasActiveFilters && (
                 <Button variant="outline" onClick={handleClearFilters}>Clear Filters</Button>
               )}
             </CardContent>
           </Card>
         ) : (
-          <Card className="shadow-sm border-gray-200">
+          <Card className="shadow-sm border-gray-200 dark:border-gray-800">
             <Table>
               <TableCaption>Disbursement history</TableCaption>
               <TableHeader>
@@ -352,18 +352,18 @@ export default function DisbursementsPage() {
               </TableHeader>
               <TableBody>
                 {disbursements.map((item, index) => (
-                  <TableRow key={item._id} className="hover:bg-gray-50">
-                    <TableCell className="font-medium text-gray-500">
+                  <TableRow key={item._id} className="hover:bg-gray-50 dark:hover:bg-gray-800/60">
+                    <TableCell className="font-medium text-gray-500 dark:text-gray-400">
                       {(currentPage - 1) * pageSize + index + 1}
                     </TableCell>
-                    <TableCell className="font-medium text-gray-900">{item.description}</TableCell>
+                    <TableCell className="font-medium text-gray-900 dark:text-gray-100">{item.description}</TableCell>
                     <TableCell>
                       <Badge variant="outline">{item.category}</Badge>
                     </TableCell>
                     <TableCell className="text-center font-semibold text-red-600">
                       -${item.amount.toLocaleString()}
                     </TableCell>
-                    <TableCell className="text-gray-500 text-sm">
+                    <TableCell className="text-gray-500 dark:text-gray-400 text-sm">
                       {format(new Date(item.createdAt), "MMM d, yyyy HH:mm")}
                     </TableCell>
                     <TableCell className="text-right">
@@ -401,7 +401,7 @@ export default function DisbursementsPage() {
                   <ChevronLeft className="h-4 w-4" />
                   Previous
                 </Button>
-                <span className="text-sm text-gray-600">Page {currentPage} of {totalPages}</span>
+                <span className="text-sm text-gray-600 dark:text-gray-400">Page {currentPage} of {totalPages}</span>
                 <Button
                   onClick={() => setCurrentPage((p) => p + 1)}
                   disabled={currentPage === totalPages}

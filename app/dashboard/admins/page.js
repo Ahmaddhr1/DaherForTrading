@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { toast } from "sonner";
+import Link from "next/link";
 import {
   Users,
   Plus,
@@ -16,6 +17,7 @@ import {
   Crown,
   UserRound,
   Mail,
+  BarChart3,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -189,13 +191,21 @@ export default function AdminsPage() {
               </p>
             </div>
           </div>
-          <Button
-            onClick={() => setCreateOpen(true)}
-            className="flex items-center gap-2 shrink-0"
-          >
-            <Plus className="h-4 w-4" />
-            <span className="hidden sm:inline">Add Admin</span>
-          </Button>
+          <div className="flex items-center gap-2 shrink-0">
+            <Link href="/dashboard/admins/performance">
+              <Button variant="outline" className="flex items-center gap-2">
+                <BarChart3 className="h-4 w-4" />
+                <span className="hidden sm:inline">Performance</span>
+              </Button>
+            </Link>
+            <Button
+              onClick={() => setCreateOpen(true)}
+              className="flex items-center gap-2"
+            >
+              <Plus className="h-4 w-4" />
+              <span className="hidden sm:inline">Add Admin</span>
+            </Button>
+          </div>
         </div>
 
         {isLoading && <TableSkeleton rows={4} />}

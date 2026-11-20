@@ -125,7 +125,18 @@ export function MySideBar() {
       <div className="flex flex-col h-full w-full">
         {/* Header */}
         <div className="p-4 flex justify-between items-center border-b border-sidebar-border">
-          {!isCollapsed && <h1 className="text-xl font-bold">M.D.T</h1>}
+          {!isCollapsed && (
+            <div className="flex items-center gap-2 overflow-hidden">
+              <svg width="28" height="28" viewBox="20 30 102 102" className="shrink-0 text-sidebar-foreground">
+                <rect x="20" y="86" width="26" height="46" rx="7" fill="currentColor" />
+                <rect x="58" y="58" width="26" height="74" rx="7" fill="currentColor" />
+                <rect x="96" y="30" width="26" height="102" rx="7" fill="#E8A33D" />
+              </svg>
+              <h1 className="text-xl font-bold whitespace-nowrap" style={{ fontFamily: "var(--font-space-grotesk, sans-serif)" }}>
+                Invento
+              </h1>
+            </div>
+          )}
           <button
             onClick={toggleCollapse}
             className="p-2 rounded-lg hover:bg-primary hover:text-white duration-150"

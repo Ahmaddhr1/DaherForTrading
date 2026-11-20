@@ -24,8 +24,7 @@ export default function DisbursementThermalReceipt({ disbursement }) {
     <div id="thermal-receipt-root">
       <div className="mx-auto w-[80mm] p-2 font-mono text-[11px] leading-tight text-black bg-white">
         <div className="text-center mb-2">
-          <p className="text-sm font-bold">M.D.T</p>
-          <p>Daher For Trading</p>
+          <p className="text-sm font-bold">Invento</p>
           <p>Disbursement Receipt</p>
         </div>
 

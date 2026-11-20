@@ -46,7 +46,7 @@ export function MobileBottomBar() {
       key: "orders",
       label: "Orders",
       icon: <ClipboardList size={20} />,
-      items: ["Orders", "Drafts"].map(findTab).filter(Boolean),
+      items: ["Orders", "Drafts", "Returns"].map(findTab).filter(Boolean),
     },
     {
       key: "cart",

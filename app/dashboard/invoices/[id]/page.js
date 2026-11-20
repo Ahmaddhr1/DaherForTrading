@@ -1,13 +1,14 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useParams } from "next/navigation";
 import { format } from "date-fns";
-import { User, Package, CreditCard, Calendar, Tag, Printer, MessageCircle, Receipt, ArrowLeft } from "lucide-react";
+import { User, Package, CreditCard, Calendar, Tag, Printer, MessageCircle, Receipt, ArrowLeft, RotateCcw } from "lucide-react";
 import { toast } from "sonner";
 import Link from "next/link";
 import ThermalReceipt from "./ThermalReceipt";
+import ProcessReturnModal from "./ProcessReturnModal";
 
 import {
   Table,
@@ -41,6 +42,14 @@ export default function OrderDetailsPage() {
   });
 
   const { data: settings } = useSettings();
+  const [returnModalOpen, setReturnModalOpen] = useState(false);
+
+  const { data: returnsData } = useQuery({
+    queryKey: ["order-returns", id],
+    queryFn: async () => (await fetch(`/api/orders/${id}/returns`)).json(),
+    enabled: !!id,
+  });
+  const returns = returnsData?.returns || [];
 
   // Cleans up the thermal-print body class if the user cancels the print
   // dialog instead of completing it.
@@ -155,6 +164,16 @@ export default function OrderDetailsPage() {
               <MessageCircle className="h-4 w-4" />
               Share via WhatsApp
             </Button>
+            {order.status !== "draft" && (
+              <Button
+                variant="outline"
+                onClick={() => setReturnModalOpen(true)}
+                className="flex items-center gap-2"
+              >
+                <RotateCcw className="h-4 w-4" />
+                Process Return
+              </Button>
+            )}
           </div>
         </div>
 
@@ -203,6 +222,40 @@ export default function OrderDetailsPage() {
                 </Table>
               </CardContent>
             </Card>
+
+            {returns.length > 0 && (
+              <Card className="shadow-sm border-gray-200 dark:border-gray-800">
+                <CardHeader className="pb-4">
+                  <CardTitle className="flex items-center text-lg">
+                    <RotateCcw className="h-5 w-5 mr-2 text-amber-600" />
+                    Returns
+                  </CardTitle>
+                  <CardDescription>Stock this customer has sent back from this order</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  {returns.map((ret) => (
+                    <div
+                      key={ret._id}
+                      className="flex items-start justify-between gap-3 p-3 rounded-lg bg-gray-50 dark:bg-gray-950 border border-gray-200 dark:border-gray-800"
+                    >
+                      <div className="min-w-0">
+                        <p className="text-sm text-gray-900 dark:text-gray-100">
+                          {ret.items.map((i) => `${i.quantity}x ${i.name}`).join(", ")}
+                        </p>
+                        <p className="text-xs text-gray-500 dark:text-gray-400">
+                          {format(new Date(ret.createdAt), "MMM d, yyyy h:mm a")}
+                          {ret.reason ? ` · ${ret.reason}` : ""}
+                          {!ret.restocked ? " · not restocked" : ""}
+                        </p>
+                      </div>
+                      <span className="text-sm font-semibold text-green-600 whitespace-nowrap">
+                        -${ret.totalRefundAmount.toFixed(2)}
+                      </span>
+                    </div>
+                  ))}
+                </CardContent>
+              </Card>
+            )}
           </div>
 
           {/* Right Column */}
@@ -313,6 +366,11 @@ export default function OrderDetailsPage() {
           </p>
         </div>
       </div>
+      <ProcessReturnModal
+        open={returnModalOpen}
+        onClose={() => setReturnModalOpen(false)}
+        order={order}
+      />
     </div>
   );
 }

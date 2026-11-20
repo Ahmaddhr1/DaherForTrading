@@ -5,7 +5,7 @@ const stockAdjustmentSchema = new mongoose.Schema(
     product: { type: mongoose.Types.ObjectId, ref: "Product", required: true },
     type: {
       type: String,
-      enum: ["damaged", "lost", "expired", "correction", "other"],
+      enum: ["damaged", "lost", "expired", "correction", "other", "returned"],
       required: true,
     },
     // Signed change applied to the product's quantity, e.g. -5 for damaged

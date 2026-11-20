@@ -204,14 +204,15 @@ const EditCategoryPage = () => {
               variant="destructive"
               onClick={handleDelete}
               disabled={deleteMutation.isPending}
-              className="flex items-center gap-2"
+              className="flex items-center gap-2 shrink-0"
+              aria-label="Delete Category"
             >
               {deleteMutation.isPending ? (
                 <Loader2 className="animate-spin h-4 w-4" />
               ) : (
                 <Trash2 className="h-4 w-4" />
               )}
-              Delete Category
+              <span className="hidden sm:inline">Delete Category</span>
             </Button>
             )}
           </div>

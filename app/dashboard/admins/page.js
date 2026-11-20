@@ -257,6 +257,7 @@ export default function AdminsPage() {
         {!isLoading && !error && (
           <Card>
             <CardContent className="p-0">
+              <div className="overflow-x-auto">
               <Table>
                 <TableHeader>
                   <TableRow>
@@ -392,6 +393,7 @@ export default function AdminsPage() {
                   })}
                 </TableBody>
               </Table>
+              </div>
             </CardContent>
           </Card>
         )}

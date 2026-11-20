@@ -170,7 +170,7 @@ const EditCustomerPage = () => {
               <Link href={`/dashboard/customers/${id}/addorder`} className="flex-1 sm:flex-none">
                 <Button className="flex items-center gap-2 w-full sm:w-auto justify-center">
                   <Package className="h-4 w-4" />
-                  <span className="hidden sm:inline">Create Order</span>
+                  Create Order
                 </Button>
               </Link>
             </div>

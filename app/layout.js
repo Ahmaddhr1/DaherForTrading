@@ -25,6 +25,15 @@ const spaceGrotesk = Space_Grotesk({
 export const metadata = {
   title: "Invento",
   description: "Trade and inventory management",
+  // Explicit, versioned icon URLs - browsers cache a bare /favicon.ico
+  // very aggressively, so after a rebrand the only reliable way to get a
+  // new icon to actually show up is to change its URL. Bump the `v`
+  // value again if the icon ever changes and still appears stale.
+  icons: {
+    icon: "/icon.png?v=invento-1",
+    shortcut: "/favicon.ico?v=invento-1",
+    apple: "/apple-icon.png?v=invento-1",
+  },
 };
 
 export default async function RootLayout({ children }) {

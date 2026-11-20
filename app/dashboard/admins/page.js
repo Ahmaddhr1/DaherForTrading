@@ -18,6 +18,7 @@ import {
   UserRound,
   Mail,
   BarChart3,
+  Lock,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -41,8 +42,33 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { PERMISSION_KEYS, PERMISSION_LABELS, emptyPermissions } from "@/lib/permissions";
 
-const EMPTY_CREATE_FORM = { adminname: "", email: "", password: "", role: "employee" };
+const EMPTY_CREATE_FORM = {
+  adminname: "",
+  email: "",
+  password: "",
+  role: "employee",
+  permissions: emptyPermissions(),
+};
+
+function PermissionCheckboxes({ permissions, onChange }) {
+  return (
+    <div className="space-y-2 rounded-md border border-gray-200 dark:border-gray-800 p-3">
+      {PERMISSION_KEYS.map((key) => (
+        <label key={key} className="flex items-start gap-2 text-sm text-gray-700 dark:text-gray-300">
+          <input
+            type="checkbox"
+            checked={!!permissions[key]}
+            onChange={(e) => onChange({ ...permissions, [key]: e.target.checked })}
+            className="h-4 w-4 mt-0.5 rounded border-gray-300 accent-primary shrink-0"
+          />
+          {PERMISSION_LABELS[key]}
+        </label>
+      ))}
+    </div>
+  );
+}
 
 export default function AdminsPage() {
   const queryClient = useQueryClient();
@@ -52,6 +78,8 @@ export default function AdminsPage() {
   const [resetPassword, setResetPassword] = useState("");
   const [emailTarget, setEmailTarget] = useState(null); // { _id, adminname, email } | null
   const [emailValue, setEmailValue] = useState("");
+  const [permissionsTarget, setPermissionsTarget] = useState(null); // admin | null
+  const [permissionsValue, setPermissionsValue] = useState(emptyPermissions());
 
   const { data: me } = useQuery({
     queryKey: ["admin", "me"],
@@ -120,6 +148,14 @@ export default function AdminsPage() {
     patchMutation.mutate(
       { id: emailTarget._id, email: emailValue.trim() },
       { onSuccess: () => setEmailTarget(null) }
+    );
+  };
+
+  const handleEditPermissions = (e) => {
+    e.preventDefault();
+    patchMutation.mutate(
+      { id: permissionsTarget._id, permissions: permissionsValue },
+      { onSuccess: () => setPermissionsTarget(null) }
     );
   };
 
@@ -227,6 +263,7 @@ export default function AdminsPage() {
                     <TableHead>Username</TableHead>
                     <TableHead>Email / Login Code</TableHead>
                     <TableHead>Role</TableHead>
+                    <TableHead>Permissions</TableHead>
                     <TableHead>Status</TableHead>
                     <TableHead className="w-10" />
                   </TableRow>
@@ -256,6 +293,20 @@ export default function AdminsPage() {
                             )}
                             {admin.role === "owner" ? "Owner" : "Employee"}
                           </Badge>
+                        </TableCell>
+                        <TableCell className="text-sm text-gray-600 dark:text-gray-400">
+                          {admin.role === "owner" ? (
+                            "Full access"
+                          ) : (
+                            (() => {
+                              const count = PERMISSION_KEYS.filter((key) => admin.permissions?.[key]).length;
+                              return count === 0 ? (
+                                <span className="text-gray-400 dark:text-gray-500 italic">None</span>
+                              ) : (
+                                `${count} of ${PERMISSION_KEYS.length}`
+                              );
+                            })()
+                          )}
                         </TableCell>
                         <TableCell>
                           <Badge
@@ -305,6 +356,16 @@ export default function AdminsPage() {
                                 >
                                   <Mail className="h-4 w-4" /> Edit Email
                                 </DropdownMenuItem>
+                                {admin.role !== "owner" && (
+                                  <DropdownMenuItem
+                                    onClick={() => {
+                                      setPermissionsTarget(admin);
+                                      setPermissionsValue({ ...emptyPermissions(), ...admin.permissions });
+                                    }}
+                                  >
+                                    <Lock className="h-4 w-4" /> Edit Permissions
+                                  </DropdownMenuItem>
+                                )}
                                 <DropdownMenuItem onClick={() => handleToggleActive(admin)}>
                                   {admin.active ? (
                                     <>
@@ -390,6 +451,15 @@ export default function AdminsPage() {
               <option value="owner">Owner - full access</option>
             </select>
           </div>
+          {createForm.role === "employee" && (
+            <div className="space-y-2">
+              <Label>Extra Permissions</Label>
+              <PermissionCheckboxes
+                permissions={createForm.permissions}
+                onChange={(permissions) => setCreateForm((f) => ({ ...f, permissions }))}
+              />
+            </div>
+          )}
           <Button
             type="submit"
             disabled={createMutation.isPending}
@@ -471,6 +541,27 @@ export default function AdminsPage() {
               </span>
             ) : (
               "Save Email"
+            )}
+          </Button>
+        </form>
+      </Modal>
+
+      {/* Edit Permissions */}
+      <Modal
+        open={!!permissionsTarget}
+        onClose={() => setPermissionsTarget(null)}
+        title="Edit Permissions"
+        description={permissionsTarget ? `What ${permissionsTarget.adminname} can do beyond day-to-day access` : ""}
+      >
+        <form onSubmit={handleEditPermissions} className="space-y-4">
+          <PermissionCheckboxes permissions={permissionsValue} onChange={setPermissionsValue} />
+          <Button type="submit" disabled={patchMutation.isPending} className="w-full">
+            {patchMutation.isPending ? (
+              <span className="flex items-center gap-2">
+                <Loader2 className="h-4 w-4 animate-spin" /> Saving...
+              </span>
+            ) : (
+              "Save Permissions"
             )}
           </Button>
         </form>

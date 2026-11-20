@@ -22,6 +22,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { TableSkeleton } from "@/components/ui/skeleton-patterns";
 import { FiltersPanel } from "@/components/ui/filters-panel";
+import { useHasPermission } from "@/lib/useHasPermission";
 import {
   ChevronLeft,
   ChevronRight,
@@ -55,6 +56,7 @@ export default function AllOrders() {
   const router = useRouter();
   const queryClient = useQueryClient();
   const { isOwner } = useIsOwner();
+  const { hasPermission: canDelete } = useHasPermission("canDelete");
 
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
@@ -192,9 +194,11 @@ export default function AllOrders() {
             <DropdownMenuItem onClick={() => handleAction("markPaid", order._id)}>
               Mark as Paid
             </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => handleAction("delete", order._id)}>
-              Undo Order
-            </DropdownMenuItem>
+            {canDelete && (
+              <DropdownMenuItem onClick={() => handleAction("delete", order._id)}>
+                Undo Order
+              </DropdownMenuItem>
+            )}
           </>
         )}
       </DropdownMenuContent>

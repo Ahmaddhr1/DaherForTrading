@@ -5,6 +5,7 @@ import Order from "@/models/Orders";
 import { NextResponse } from "next/server";
 import { getUserFromCookie } from "@/lib/auth";
 import { logActivity } from "@/lib/activityLog";
+import { requirePermission } from "@/lib/permissions";
 
 const PRICE_FIELDS = ["price", "priceWholesale", "priceDistributor", "priceVip", "initialPrice"];
 const PRICE_MODES = ["set", "increasePercent", "decreasePercent", "increaseAmount", "decreaseAmount"];
@@ -178,6 +179,8 @@ export async function POST(req) {
       return await handleCategoryReassign(productIds, body);
     }
     if (action === "delete") {
+      const forbidden = await requirePermission(await getUserFromCookie(), "canDelete");
+      if (forbidden) return forbidden;
       return await handleBulkDelete(productIds);
     }
 

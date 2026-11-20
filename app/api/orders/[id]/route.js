@@ -6,6 +6,7 @@ import { NextResponse } from "next/server";
 import { getUserFromCookie } from "@/lib/auth";
 import { logActivity } from "@/lib/activityLog";
 import { priceOrderItems, PricingError } from "@/lib/orderPricing";
+import { requirePermission } from "@/lib/permissions";
 
 // GET one
 export async function GET(_, { params }) {
@@ -49,8 +50,13 @@ export async function DELETE(request, { params }) {
     }
 
     // A draft never touched stock or debt, so there's nothing to roll back -
-    // just detach it from the customer and remove it.
+    // just detach it from the customer and remove it, and (unlike a real
+    // pending order below) no special permission is needed: discarding
+    // your own in-progress draft is low-risk, not "deleting a record".
     if (order.status === "pending") {
+      const forbidden = await requirePermission(await getUserFromCookie(), "canDelete");
+      if (forbidden) return forbidden;
+
       for (const item of order.products) {
         // A custom line never touched inventory, so there's no stock to
         // restore for it.

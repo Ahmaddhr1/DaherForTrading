@@ -29,6 +29,7 @@ import BulkCategoryModal from "./BulkCategoryModal";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { useCart } from "@/lib/cartContext";
 import { useIsOwner } from "@/lib/useIsOwner";
+import { useHasPermission } from "@/lib/useHasPermission";
 
 export default function ProductsPage() {
   // State for search and pagination
@@ -49,6 +50,7 @@ export default function ProductsPage() {
   const [bulkDeleting, setBulkDeleting] = useState(false);
   const { addToCart } = useCart();
   const { isOwner } = useIsOwner();
+  const { hasPermission: canDelete } = useHasPermission("canDelete");
   const queryClient = useQueryClient();
 
   // The category sidebar's height is capped to match whatever height the
@@ -369,10 +371,12 @@ export default function ProductsPage() {
                   <Tag className="h-3.5 w-3.5 mr-1" />
                   Reassign Category
                 </Button>
-                <Button size="sm" variant="destructive" onClick={() => setBulkDeleteConfirmOpen(true)}>
-                  <Trash2 className="h-3.5 w-3.5 mr-1" />
-                  Delete
-                </Button>
+                {canDelete && (
+                  <Button size="sm" variant="destructive" onClick={() => setBulkDeleteConfirmOpen(true)}>
+                    <Trash2 className="h-3.5 w-3.5 mr-1" />
+                    Delete
+                  </Button>
+                )}
                 <Button size="sm" variant="ghost" onClick={() => setSelectedIds([])}>
                   <X className="h-3.5 w-3.5 mr-1" />
                   Clear
@@ -593,20 +597,22 @@ export default function ProductsPage() {
                               </Button>
                             </Link>
                             
-                            <Button
-                              variant="destructive"
-                              size="sm"
-                              onClick={() => setDeleteTarget(product)}
-                              disabled={deletingId === product._id}
-                              className="flex items-center gap-1"
-                            >
-                              {deletingId === product._id ? (
-                                <Loader2 className="h-3 w-3 animate-spin" />
-                              ) : (
-                                <Trash2 className="h-3 w-3" />
-                              )}
-                              Delete
-                            </Button>
+                            {canDelete && (
+                              <Button
+                                variant="destructive"
+                                size="sm"
+                                onClick={() => setDeleteTarget(product)}
+                                disabled={deletingId === product._id}
+                                className="flex items-center gap-1"
+                              >
+                                {deletingId === product._id ? (
+                                  <Loader2 className="h-3 w-3 animate-spin" />
+                                ) : (
+                                  <Trash2 className="h-3 w-3" />
+                                )}
+                                Delete
+                              </Button>
+                            )}
                           </div>
                         </TableCell>
                       </TableRow>

@@ -3,6 +3,7 @@ import RecurringDisbursement from "@/models/RecurringDisbursement";
 import { NextResponse } from "next/server";
 import { getUserFromCookie } from "@/lib/auth";
 import { logActivity } from "@/lib/activityLog";
+import { requirePermission } from "@/lib/permissions";
 
 export async function GET() {
   await connectToDB();
@@ -19,6 +20,10 @@ export async function GET() {
 
 export async function POST(req) {
   await connectToDB();
+  const admin = await getUserFromCookie();
+  const forbidden = await requirePermission(admin, "canManageDisbursements");
+  if (forbidden) return forbidden;
+
   try {
     const { description, amount, category, dayOfMonth } = await req.json();
 
@@ -44,7 +49,7 @@ export async function POST(req) {
     });
 
     await logActivity({
-      admin: await getUserFromCookie(),
+      admin,
       action: "recurringDisbursement.create",
       entityType: "Disbursement",
       entityId: template._id,

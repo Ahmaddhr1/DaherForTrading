@@ -13,6 +13,7 @@ import { Badge } from "@/components/ui/badge";
 import { CardGridSkeleton } from "@/components/ui/skeleton-patterns";
 import { FiltersPanel } from "@/components/ui/filters-panel";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
+import { useHasPermission } from "@/lib/useHasPermission";
 import {
   Search,
   User,
@@ -49,6 +50,7 @@ export default function CustomersPage() {
   const [debtFilter, setDebtFilter] = useState("all"); // "all", "hasDebt", "noDebt"
   const [sortBy, setSortBy] = useState("newest");
   const queryClient = useQueryClient();
+  const { hasPermission: canDelete } = useHasPermission("canDelete");
 
   // Fetch customers data with filters
   const { data, isLoading, error } = useQuery({
@@ -377,19 +379,21 @@ export default function CustomersPage() {
                         </div>
 
                         {/* Delete Button */}
-                        <Button
-                          variant="destructive"
-                          size="sm"
-                          onClick={(e) => {
-                            e.preventDefault();
-                            setDeleteTarget(customer);
-                          }}
-                          disabled={deleteMutation.isPending}
-                          className="w-full"
-                        >
-                          <Trash2 className="h-4 w-4 mr-1" />
-                          {deleteMutation.isPending ? "Deleting..." : "Delete"}
-                        </Button>
+                        {canDelete && (
+                          <Button
+                            variant="destructive"
+                            size="sm"
+                            onClick={(e) => {
+                              e.preventDefault();
+                              setDeleteTarget(customer);
+                            }}
+                            disabled={deleteMutation.isPending}
+                            className="w-full"
+                          >
+                            <Trash2 className="h-4 w-4 mr-1" />
+                            {deleteMutation.isPending ? "Deleting..." : "Delete"}
+                          </Button>
+                        )}
                       </CardContent>
                     </Card>
                   </Link>

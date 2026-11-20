@@ -4,6 +4,8 @@ import Order from "@/models/Orders";
 import Payment from "@/models/Payment";
 import { getCustomerOverdueInfo, DEFAULT_OVERDUE_DAYS } from "@/lib/overdueCustomers";
 import { NextResponse } from "next/server";
+import { getUserFromCookie } from "@/lib/auth";
+import { requirePermission } from "@/lib/permissions";
 
 // GET one customer
 export async function GET(req, { params }) {
@@ -88,6 +90,9 @@ export async function PUT(req, { params }) {
 // DELETE customer
 export async function DELETE(req, { params }) {
   await connectToDB();
+  const forbidden = await requirePermission(await getUserFromCookie(), "canDelete");
+  if (forbidden) return forbidden;
+
   try {
     const id = params.id;
     const deletedCustomer = await Customer.findByIdAndDelete(id);

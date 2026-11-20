@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { jwtVerify } from 'jose'
+import { hasPermission } from '@/lib/permissions'
 
 // API paths that must remain reachable without a logged-in session.
 // Keep this list short and explicit - everything else under /api is
@@ -16,15 +17,16 @@ function isPublicApiPath(pathname) {
   )
 }
 
-// Routes restricted to role "owner". Everything else that requires a
-// session is open to any logged-in admin ("owner" or "employee").
+// Routes restricted to role "owner" - never delegable to an employee via a
+// permission grant (managing other admins/permissions, the raw activity
+// log, backups). Everything else that requires a session is open to any
+// logged-in admin ("owner" or "employee"), subject to the permission-gated
+// list below.
 //
 // Exact paths: the path itself, not anything nested under it.
 const OWNER_ONLY_EXACT_PATHS = [
   '/api/admin', // GET: list admins
-  '/dashboard', // the stats/charts overview page
   '/dashboard/admins',
-  '/dashboard/admins/performance',
   '/dashboard/activity',
 ]
 // Prefixes: the path itself or anything nested under it.
@@ -32,10 +34,7 @@ const OWNER_ONLY_PATH_PREFIXES = [
   '/api/admin/create',
   '/api/settings/backup',
   '/api/settings/restore',
-  '/api/activity',
-  '/api/dashboard', // backs the stats/charts overview page - see '/dashboard' above
-  '/api/reports', // profit margin, supplier price trends, and other owner-only financial reports
-  '/dashboard/reports', // the above reports' own pages
+  '/api/activity', // the raw activity log (performance is carved out below - see PERMISSION_GATED_PATHS)
 ]
 const MONGO_ID = /^[0-9a-fA-F]{24}$/
 
@@ -47,6 +46,9 @@ function isOwnerOnlyPath(pathname) {
       (prefix) => pathname === prefix || pathname.startsWith(prefix + '/')
     )
   ) {
+    // Carved out: the employee-performance report lives under /api/activity
+    // but is gated by canViewStats instead (see PERMISSION_GATED_PATHS).
+    if (pathname === '/api/activity/performance') return false
     return true
   }
 
@@ -59,6 +61,23 @@ function isOwnerOnlyPath(pathname) {
   if (adminIdMatch && MONGO_ID.test(adminIdMatch[1])) return true
 
   return false
+}
+
+// Routes an employee can reach only with the matching permission granted
+// (see lib/permissions.js) - an owner always passes these too. Checked
+// after the strict owner-only list above, so e.g. '/api/activity/performance'
+// being carved out there is what lets it reach this list at all.
+const PERMISSION_GATED_PATHS = [
+  { test: (p) => p === '/dashboard', permission: 'canViewStats' },
+  { test: (p) => p === '/dashboard/admins/performance', permission: 'canViewStats' },
+  { test: (p) => p === '/api/activity/performance', permission: 'canViewStats' },
+  { test: (p) => p === '/api/dashboard' || p.startsWith('/api/dashboard/'), permission: 'canViewStats' },
+  { test: (p) => p === '/api/reports' || p.startsWith('/api/reports/'), permission: 'canViewStats' },
+  { test: (p) => p === '/dashboard/reports' || p.startsWith('/dashboard/reports/'), permission: 'canViewStats' },
+]
+
+function permissionGateFor(pathname) {
+  return PERMISSION_GATED_PATHS.find((entry) => entry.test(pathname))?.permission || null
 }
 
 // Middleware runs on the Edge runtime, where `next/headers`'s cookies() and
@@ -82,11 +101,13 @@ async function verifySession(request) {
 
 // Where a logged-in admin lands when redirected away from a page they
 // can't use - the root '/' redirect for any already-logged-in admin, and
-// the fallback when an employee is bounced off an owner-only page (now
-// including '/dashboard' itself, so that fallback can no longer be
-// '/dashboard' without looping).
+// the fallback when an employee is bounced off an owner-only or
+// permission-gated page. Must never itself be a page the admin can't
+// reach, or the redirect would loop.
 function landingPathFor(user) {
-  return user.role === 'owner' ? '/dashboard' : '/dashboard/orders'
+  return user.role === 'owner' || hasPermission(user, 'canViewStats')
+    ? '/dashboard'
+    : '/dashboard/orders'
 }
 
 export async function middleware(request) {
@@ -109,6 +130,14 @@ export async function middleware(request) {
   // `user` or is a public API path (which is never owner-only), so it's
   // safe to check role without re-checking for a session.
   if (user && isOwnerOnlyPath(pathname) && user.role !== 'owner') {
+    if (pathname.startsWith('/api')) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+    }
+    return NextResponse.redirect(new URL(landingPathFor(user), request.url))
+  }
+
+  const requiredPermission = permissionGateFor(pathname)
+  if (user && requiredPermission && !hasPermission(user, requiredPermission)) {
     if (pathname.startsWith('/api')) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
     }

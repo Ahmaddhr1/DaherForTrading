@@ -7,6 +7,7 @@ import Return from "@/models/Return";
 import { NextResponse } from "next/server";
 import { getUserFromCookie } from "@/lib/auth";
 import { logActivity } from "@/lib/activityLog";
+import { requirePermission } from "@/lib/permissions";
 
 export async function GET(_, { params }) {
   await connectToDB();
@@ -24,6 +25,10 @@ export async function GET(_, { params }) {
 
 export async function POST(req, { params }) {
   await connectToDB();
+  const admin = await getUserFromCookie();
+  const forbidden = await requirePermission(admin, "canProcessReturns");
+  if (forbidden) return forbidden;
+
   try {
     const { id } = await params;
     const { items, reason, restocked } = await req.json();
@@ -104,8 +109,6 @@ export async function POST(req, { params }) {
     if (returnItems.length === 0) {
       return NextResponse.json({ error: "Enter a quantity to return for at least one item" }, { status: 400 });
     }
-
-    const admin = await getUserFromCookie();
 
     if (shouldRestock) {
       for (const update of stockUpdates) {

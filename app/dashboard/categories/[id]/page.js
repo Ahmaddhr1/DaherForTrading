@@ -13,6 +13,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Label } from "@/components/ui/label";
 import { FormSkeleton, ListSkeleton, PageHeaderSkeleton } from "@/components/ui/skeleton-patterns";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
+import { useHasPermission } from "@/lib/useHasPermission";
 import {
   Table,
   TableBody,
@@ -27,6 +28,7 @@ const EditCategoryPage = () => {
   const { id } = useParams();
   const router = useRouter();
   const queryClient = useQueryClient();
+  const { hasPermission: canDelete } = useHasPermission("canDelete");
 
   const [formData, setFormData] = useState({
     name: "",
@@ -197,6 +199,7 @@ const EditCategoryPage = () => {
               </div>
             </div>
 
+            {canDelete && (
             <Button
               variant="destructive"
               onClick={handleDelete}
@@ -210,6 +213,7 @@ const EditCategoryPage = () => {
               )}
               Delete Category
             </Button>
+            )}
           </div>
         </div>
 

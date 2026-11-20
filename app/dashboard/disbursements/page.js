@@ -14,6 +14,7 @@ import { Modal } from "@/components/ui/modal";
 import { TableSkeleton } from "@/components/ui/skeleton-patterns";
 import { FiltersPanel } from "@/components/ui/filters-panel";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
+import { useHasPermission } from "@/lib/useHasPermission";
 import { getTodayDateString, localDayStartISO, localDayEndISO } from "@/lib/dateUtils";
 import {
   Table,
@@ -70,6 +71,7 @@ export default function DisbursementsPage() {
   const [hasInteracted, setHasInteracted] = useState(false);
 
   const queryClient = useQueryClient();
+  const { hasPermission: canManageDisbursements } = useHasPermission("canManageDisbursements");
 
   const effectiveStartDate = hasInteracted ? startDate : getTodayDateString();
   const effectiveEndDate = hasInteracted ? endDate : getTodayDateString();
@@ -194,18 +196,20 @@ export default function DisbursementsPage() {
               </div>
             </div>
 
-            <div className="flex items-center gap-2 shrink-0">
-              <Link href="/dashboard/disbursements/recurring">
-                <Button variant="outline" className="flex items-center gap-2">
-                  <Repeat className="h-4 w-4" />
-                  <span className="hidden sm:inline">Recurring</span>
+            {canManageDisbursements && (
+              <div className="flex items-center gap-2 shrink-0">
+                <Link href="/dashboard/disbursements/recurring">
+                  <Button variant="outline" className="flex items-center gap-2">
+                    <Repeat className="h-4 w-4" />
+                    <span className="hidden sm:inline">Recurring</span>
+                  </Button>
+                </Link>
+                <Button onClick={() => setIsModalOpen(true)} className="bg-red-600 hover:bg-red-700 flex items-center gap-2">
+                  <Plus className="h-4 w-4" />
+                  <span className="hidden sm:inline">Add Disbursement</span>
                 </Button>
-              </Link>
-              <Button onClick={() => setIsModalOpen(true)} className="bg-red-600 hover:bg-red-700 flex items-center gap-2">
-                <Plus className="h-4 w-4" />
-                <span className="hidden sm:inline">Add Disbursement</span>
-              </Button>
-            </div>
+              </div>
+            )}
           </div>
         </div>
 
@@ -393,14 +397,16 @@ export default function DisbursementsPage() {
                             View
                           </Button>
                         </Link>
-                        <Button
-                          variant="destructive"
-                          size="sm"
-                          onClick={() => setDeleteTarget(item)}
-                          disabled={deleteMutation.isPending}
-                        >
-                          <Trash2 className="h-3 w-3" />
-                        </Button>
+                        {canManageDisbursements && (
+                          <Button
+                            variant="destructive"
+                            size="sm"
+                            onClick={() => setDeleteTarget(item)}
+                            disabled={deleteMutation.isPending}
+                          >
+                            <Trash2 className="h-3 w-3" />
+                          </Button>
+                        )}
                       </div>
                     </TableCell>
                   </TableRow>

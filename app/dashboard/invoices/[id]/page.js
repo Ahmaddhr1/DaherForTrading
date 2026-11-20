@@ -9,6 +9,7 @@ import { toast } from "sonner";
 import Link from "next/link";
 import ThermalReceipt from "./ThermalReceipt";
 import ProcessReturnModal from "./ProcessReturnModal";
+import { useHasPermission } from "@/lib/useHasPermission";
 
 import {
   Table,
@@ -43,6 +44,7 @@ export default function OrderDetailsPage() {
 
   const { data: settings } = useSettings();
   const [returnModalOpen, setReturnModalOpen] = useState(false);
+  const { hasPermission: canProcessReturns } = useHasPermission("canProcessReturns");
 
   const { data: returnsData } = useQuery({
     queryKey: ["order-returns", id],
@@ -164,7 +166,7 @@ export default function OrderDetailsPage() {
               <MessageCircle className="h-4 w-4" />
               Share via WhatsApp
             </Button>
-            {order.status !== "draft" && (
+            {order.status !== "draft" && canProcessReturns && (
               <Button
                 variant="outline"
                 onClick={() => setReturnModalOpen(true)}

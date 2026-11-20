@@ -43,7 +43,7 @@ export function SplashScreen() {
       }`}
       aria-hidden="true"
     >
-      <div className="flex items-center gap-4">
+      <div className="flex items-end gap-4">
         <svg width="64" height="64" viewBox="20 30 102 102" className="shrink-0">
           <rect className="invento-splash-bar" x="20" y="86" width="26" height="46" rx="7" fill="#FFFFFF" style={{ animationDelay: "0s" }} />
           <rect className="invento-splash-bar" x="58" y="58" width="26" height="74" rx="7" fill="#FFFFFF" style={{ animationDelay: "0.15s" }} />
@@ -65,8 +65,8 @@ export function SplashScreen() {
         }
         .invento-splash-wordmark {
           display: inline-block;
-          opacity: 0;
-          animation: invento-splash-slide-in 0.6s ease-out 0.3s forwards;
+          clip-path: inset(0 100% 0 0);
+          animation: invento-splash-reveal 0.6s ease-out 0.3s forwards;
         }
         @keyframes invento-splash-grow {
           0%,
@@ -77,14 +77,12 @@ export function SplashScreen() {
             transform: scaleY(1);
           }
         }
-        @keyframes invento-splash-slide-in {
+        @keyframes invento-splash-reveal {
           from {
-            opacity: 0;
-            transform: translateX(-16px);
+            clip-path: inset(0 100% 0 0);
           }
           to {
-            opacity: 1;
-            transform: translateX(0);
+            clip-path: inset(0 0% 0 0);
           }
         }
       `}</style>

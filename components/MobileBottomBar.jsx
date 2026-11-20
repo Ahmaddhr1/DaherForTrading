@@ -46,16 +46,25 @@ export function MobileBottomBar() {
   const canViewStats = hasPermission(me, "canViewStats");
 
   // Groups the sidebar's tabs into a handful of bottom-bar slots - a flat
-  // row of icons doesn't fit on a phone screen. Dashboard and Cart (the
-  // most frequently used) each get their own direct slot; everything else
-  // is grouped into a section that opens a small sheet listing its tabs -
-  // Orders groups "Orders" and its sub-tab "Drafts" (see SideBarTabs.js),
-  // the same pattern Sales/Stock already use for their own tabs.
+  // row of icons doesn't fit on a phone screen. Cart (the most frequently
+  // used) gets its own direct slot; everything else is grouped into a
+  // section that opens a small sheet listing its tabs - Orders groups
+  // "Orders" and its sub-tab "Drafts" (see SideBarTabs.js), Home groups
+  // Dashboard with its nested stats sub-pages (Profit Margins, Supplier
+  // Trends - see Dashboard's `children` in SideBarTabs.js), the same
+  // pattern Sales/Stock already use for their own tabs.
   const SECTIONS = [
     // The stats/charts overview page needs canViewStats (see middleware.js) -
     // an admin without it gets no "Home" slot at all rather than a dead link.
     ...(isOwner || canViewStats
-      ? [{ key: "dashboard", label: "Home", icon: <Home size={20} />, path: "/dashboard" }]
+      ? [
+          {
+            key: "dashboard",
+            label: "Home",
+            icon: <Home size={20} />,
+            items: ["Dashboard", "Profit Margins", "Supplier Trends"].map(findTab).filter(Boolean),
+          },
+        ]
       : []),
     {
       key: "orders",
@@ -86,11 +95,7 @@ export function MobileBottomBar() {
       key: "more",
       label: "More",
       icon: <MoreHorizontal size={20} />,
-      items: [
-        "Settings",
-        ...(isOwner ? ["Admins", "Activity Log"] : []),
-        ...(isOwner || canViewStats ? ["Profit Margins", "Supplier Trends"] : []),
-      ].map(findTab).filter(Boolean),
+      items: ["Settings", ...(isOwner ? ["Admins", "Activity Log"] : [])].map(findTab).filter(Boolean),
     },
   ];
 

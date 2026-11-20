@@ -8,7 +8,8 @@ import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { FormSkeleton, PageHeaderSkeleton } from "@/components/ui/skeleton-patterns";
-import { Eye, Loader2, User, Phone, DollarSign, ArrowLeft, UserCog, Package, PhoneCall, Lock, FileText, Layers } from "lucide-react";
+import { Eye, Loader2, User, Phone, DollarSign, ArrowLeft, UserCog, Package, PhoneCall, Lock, FileText, Layers, AlertTriangle } from "lucide-react";
+import { format } from "date-fns";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -110,6 +111,7 @@ const EditCustomerPage = () => {
 
   const hasAnyDebt = parseInt(form.debt) > 0;
   const ordersCount = form.orders?.length || 0;
+  const isOverdue = hasAnyDebt && data?.isOverdue;
 
   if (isLoading) {
     return (
@@ -432,6 +434,17 @@ const EditCustomerPage = () => {
                       </Badge>
                     </div>
                   </div>
+                  {isOverdue && (
+                    <div className="flex items-center gap-2 p-3 rounded-lg bg-red-50 border border-red-200 text-red-800 text-sm">
+                      <AlertTriangle className="h-4 w-4 flex-shrink-0" />
+                      <span>
+                        Overdue - hasn&apos;t paid in {data.daysSincePayment} days
+                        {data.lastPaymentDate
+                          ? ` (last payment ${format(new Date(data.lastPaymentDate), "MMM d, yyyy")})`
+                          : " (never made a payment)"}
+                      </span>
+                    </div>
+                  )}
                 </div>
 
                 <Separator />

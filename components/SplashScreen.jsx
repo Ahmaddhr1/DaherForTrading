@@ -1,24 +1,38 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useIsFetching } from "@tanstack/react-query";
 
 // Brand splash shown on a hard page load (mounted once in the root layout,
 // which persists across client-side navigation in the App Router, so this
 // never reappears when switching dashboard pages). Fixed navy/white/amber
 // regardless of light/dark mode - matches the "dark" lockup of the Invento
 // mark and avoids a flash while next-themes resolves the system theme.
+//
+// Stays up for at least 3s, and longer if the page's own data (every page
+// in this app fetches via react-query) is still loading past that - hides
+// only once both the minimum time has elapsed AND nothing is fetching.
 export function SplashScreen() {
-  const [visible, setVisible] = useState(true);
+  const [minTimeElapsed, setMinTimeElapsed] = useState(false);
   const [fading, setFading] = useState(false);
+  const [visible, setVisible] = useState(true);
+  const isFetching = useIsFetching();
 
   useEffect(() => {
-    const fadeTimer = setTimeout(() => setFading(true), 2700);
-    const hideTimer = setTimeout(() => setVisible(false), 3000);
-    return () => {
-      clearTimeout(fadeTimer);
-      clearTimeout(hideTimer);
-    };
+    const timer = setTimeout(() => setMinTimeElapsed(true), 3000);
+    return () => clearTimeout(timer);
   }, []);
+
+  useEffect(() => {
+    if (fading || !minTimeElapsed || isFetching > 0) return;
+    setFading(true);
+  }, [fading, minTimeElapsed, isFetching]);
+
+  useEffect(() => {
+    if (!fading) return;
+    const hideTimer = setTimeout(() => setVisible(false), 300);
+    return () => clearTimeout(hideTimer);
+  }, [fading]);
 
   if (!visible) return null;
 

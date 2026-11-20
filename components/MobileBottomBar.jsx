@@ -71,7 +71,7 @@ export function MobileBottomBar() {
       key: "more",
       label: "More",
       icon: <MoreHorizontal size={20} />,
-      items: ["Settings", ...(isOwner ? ["Admins", "Activity Log", "Profit Margins"] : [])].map(findTab).filter(Boolean),
+      items: ["Settings", ...(isOwner ? ["Admins", "Activity Log", "Profit Margins", "Supplier Trends"] : [])].map(findTab).filter(Boolean),
     },
   ];
 

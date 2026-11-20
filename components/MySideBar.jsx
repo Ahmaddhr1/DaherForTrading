@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
-import { LogOut, ListCollapse, Search } from "lucide-react";
+import { LogOut, ListCollapse, Search, ChevronDown } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import tabs from "@/lib/SideBarTabs";
@@ -17,6 +17,7 @@ import { hasPermission } from "@/lib/permissions";
 export function MySideBar() {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
+  const [expandedTabs, setExpandedTabs] = useState({});
   const pathname = usePathname();
   const router = useRouter();
 
@@ -46,6 +47,14 @@ export function MySideBar() {
 
   const toggleCollapse = () => setIsCollapsed(!isCollapsed);
 
+  // A tab with children starts expanded only if one of its children is the
+  // active page, so landing on e.g. Profit Margins directly doesn't hide
+  // its own link; otherwise it's collapsed behind the arrow until clicked.
+  const isTabExpanded = (tab) =>
+    tab.label in expandedTabs ? expandedTabs[tab.label] : !!tab.children?.some((c) => pathname === c.path);
+
+  const toggleExpanded = (tab) => setExpandedTabs((prev) => ({ ...prev, [tab.label]: !isTabExpanded(tab) }));
+
   const handleLogout = async() => {
     try {
       await fetch("/api/admin/logout", { method: "POST" });
@@ -60,17 +69,35 @@ export function MySideBar() {
 
   const renderLink = (tab, index) => {
     const isActive = pathname === tab.path;
+    const hasChildren = !!tab.children?.length;
+    const expanded = hasChildren && isTabExpanded(tab);
+
     return (
-      <Link
+      <div
         key={index}
-        href={tab.path}
-        className={`flex items-center p-4 transition-colors ${
+        className={`flex items-center transition-colors ${
           isActive ? "bg-primary text-white" : "hover:bg-primary hover:text-white"
-        } ${isCollapsed ? "justify-center" : ""}`}
+        }`}
       >
-        <span>{tab.icon}</span>
-        {!isCollapsed && <span className="ml-3">{tab.label}</span>}
-      </Link>
+        <Link
+          href={tab.path}
+          className={`flex items-center flex-1 p-4 ${isCollapsed ? "justify-center" : ""}`}
+        >
+          <span>{tab.icon}</span>
+          {!isCollapsed && <span className="ml-3">{tab.label}</span>}
+        </Link>
+        {hasChildren && !isCollapsed && (
+          <button
+            type="button"
+            onClick={() => toggleExpanded(tab)}
+            className="p-4 pl-0"
+            aria-label={expanded ? `Collapse ${tab.label}` : `Expand ${tab.label}`}
+            aria-expanded={expanded}
+          >
+            <ChevronDown className={`h-4 w-4 transition-transform ${expanded ? "rotate-180" : ""}`} />
+          </button>
+        )}
+      </div>
     );
   };
 
@@ -133,7 +160,7 @@ export function MySideBar() {
             {visibleTabs.map((tab, index) => (
               <div key={index}>
                 {renderLink(tab, index)}
-                {!isCollapsed && tab.children?.map(renderChildLink)}
+                {!isCollapsed && isTabExpanded(tab) && tab.children?.map(renderChildLink)}
               </div>
             ))}
           </div>

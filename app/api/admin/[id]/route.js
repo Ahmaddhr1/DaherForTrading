@@ -33,8 +33,17 @@ export async function PATCH(req, { params }) {
       return NextResponse.json({ message: "Admin not found" }, { status: 404 });
     }
 
-    const { role, active, newPassword } = await req.json();
+    const { role, active, newPassword, email } = await req.json();
     const update = {};
+
+    if (email !== undefined) {
+      const trimmedEmail = (email || "").trim().toLowerCase();
+      if (trimmedEmail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmedEmail)) {
+        return NextResponse.json({ message: "Invalid email address" }, { status: 400 });
+      }
+      // Empty string clears it, turning off the OTP step for this admin.
+      update.email = trimmedEmail || null;
+    }
 
     if (role !== undefined) {
       if (!["owner", "employee"].includes(role)) {
@@ -81,7 +90,7 @@ export async function PATCH(req, { params }) {
     }
 
     const updated = await Admin.findByIdAndUpdate(id, update, { new: true }).select(
-      "adminname role active createdAt"
+      "adminname email role active createdAt"
     );
 
     return NextResponse.json({ message: "Admin updated successfully", admin: updated });

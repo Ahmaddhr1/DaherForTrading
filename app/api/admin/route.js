@@ -7,7 +7,7 @@ export async function GET() {
   await connectToDB();
 
   try {
-    const admins = await Admin.find({}, "adminname role active createdAt")
+    const admins = await Admin.find({}, "adminname email role active createdAt")
       .sort({ createdAt: 1 })
       .lean();
 

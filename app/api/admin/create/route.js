@@ -8,10 +8,17 @@ import { NextResponse } from 'next/server'
 // role never accidentally grants full access.
 export async function POST(req) {
   try {
-    const { adminname, password, role } = await req.json()
+    const { adminname, email, password, role } = await req.json()
 
     if (!adminname || !password) {
       return NextResponse.json({ error: 'Admin name and password are required' }, { status: 400 })
+    }
+
+    // Required going forward so every new admin gets the email-OTP login
+    // step - see app/api/admin/login/route.js.
+    const trimmedEmail = (email || '').trim().toLowerCase()
+    if (!trimmedEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmedEmail)) {
+      return NextResponse.json({ error: 'A valid email is required' }, { status: 400 })
     }
 
     if (password.length < 8) {
@@ -34,6 +41,7 @@ export async function POST(req) {
     // Create new admin
     const newAdmin = new Admin({
       adminname,
+      email: trimmedEmail,
       password: hashedPassword,
       role: resolvedRole,
       active: true,
@@ -47,6 +55,7 @@ export async function POST(req) {
         admin: {
           id: newAdmin._id,
           adminname: newAdmin.adminname,
+          email: newAdmin.email,
           role: newAdmin.role,
           active: newAdmin.active,
         },

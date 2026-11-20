@@ -1,41 +1,65 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useMutation } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Loader2, Lock, User, ShieldCheck } from "lucide-react";
+import { Loader2, Lock, User, ShieldCheck, Mail, ArrowLeft } from "lucide-react";
 import { toast } from "sonner";
 
+const OTP_RESEND_COOLDOWN_SECONDS = 30;
+
 export default function LoginPage() {
-  const [formData, setFormData] = useState({
-    username: "",
-    password: ""
-  });
+  const [formData, setFormData] = useState({ username: "", password: "" });
+  const [otpStage, setOtpStage] = useState(null); // { adminname, maskedEmail } | null
+  const [otpCode, setOtpCode] = useState("");
+  const [resendCooldown, setResendCooldown] = useState(0);
   const router = useRouter();
+
+  useEffect(() => {
+    if (resendCooldown <= 0) return;
+    const timer = setInterval(() => setResendCooldown((s) => Math.max(0, s - 1)), 1000);
+    return () => clearInterval(timer);
+  }, [resendCooldown]);
 
   const loginMutation = useMutation({
     mutationFn: async () => {
       const response = await fetch("/api/admin/login", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          adminname: formData.username,
-          password: formData.password
-        }),
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ adminname: formData.username, password: formData.password }),
       });
-
       const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || "Login failed");
+      if (!response.ok) throw new Error(data.error || "Login failed");
+      return data;
+    },
+    onSuccess: (data) => {
+      if (data.otpRequired) {
+        setOtpStage({ adminname: data.adminname, maskedEmail: data.maskedEmail });
+        setResendCooldown(OTP_RESEND_COOLDOWN_SECONDS);
+        toast.success(`Code sent to ${data.maskedEmail}`);
+        return;
       }
+      toast.success("Logged in successfully!");
+      router.push("/dashboard");
+    },
+    onError: (error) => {
+      toast.error(error.message || "An error occurred during login");
+    },
+  });
 
+  const verifyMutation = useMutation({
+    mutationFn: async () => {
+      const response = await fetch("/api/admin/login/verify-otp", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ adminname: otpStage.adminname, code: otpCode }),
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || "Verification failed");
       return data;
     },
     onSuccess: () => {
@@ -43,16 +67,33 @@ export default function LoginPage() {
       router.push("/dashboard");
     },
     onError: (error) => {
-      toast.error(error.message || "An error occurred during login");
-    }
+      toast.error(error.message || "Invalid code");
+    },
+  });
+
+  const resendMutation = useMutation({
+    mutationFn: async () => {
+      const response = await fetch("/api/admin/login/resend-otp", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ adminname: otpStage.adminname }),
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || "Couldn't resend code");
+      return data;
+    },
+    onSuccess: () => {
+      toast.success("A new code has been sent");
+      setResendCooldown(OTP_RESEND_COOLDOWN_SECONDS);
+    },
+    onError: (error) => {
+      toast.error(error.message || "Couldn't resend code");
+    },
   });
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = (e) => {
@@ -62,6 +103,20 @@ export default function LoginPage() {
       return;
     }
     loginMutation.mutate();
+  };
+
+  const handleVerify = (e) => {
+    e.preventDefault();
+    if (otpCode.trim().length !== 6) {
+      toast.error("Enter the 6-digit code from your email");
+      return;
+    }
+    verifyMutation.mutate();
+  };
+
+  const handleBack = () => {
+    setOtpStage(null);
+    setOtpCode("");
   };
 
   const isLoading = loginMutation.isPending;
@@ -78,68 +133,134 @@ export default function LoginPage() {
           <p className="text-gray-600 text-sm mt-1">Sign in to manage your business</p>
         </div>
 
-        <Card className="shadow-sm border-gray-200">
-          <CardHeader>
-            <CardTitle className="text-lg">Welcome back</CardTitle>
-            <CardDescription>Enter your credentials to continue</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="username" className="text-sm font-medium flex items-center gap-2">
-                  <User className="h-4 w-4" />
-                  Username
-                </Label>
-                <Input
-                  id="username"
-                  type="text"
-                  name="username"
-                  placeholder="Enter your username"
-                  value={formData.username}
-                  onChange={handleChange}
-                  disabled={isLoading}
-                  autoComplete="username"
-                  autoFocus
-                  required
-                />
-              </div>
+        {!otpStage ? (
+          <Card className="shadow-sm border-gray-200">
+            <CardHeader>
+              <CardTitle className="text-lg">Welcome back</CardTitle>
+              <CardDescription>Enter your credentials to continue</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <form onSubmit={handleSubmit} className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="username" className="text-sm font-medium flex items-center gap-2">
+                    <User className="h-4 w-4" />
+                    Username
+                  </Label>
+                  <Input
+                    id="username"
+                    type="text"
+                    name="username"
+                    placeholder="Enter your username"
+                    value={formData.username}
+                    onChange={handleChange}
+                    disabled={isLoading}
+                    autoComplete="username"
+                    autoFocus
+                    required
+                  />
+                </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="password" className="text-sm font-medium flex items-center gap-2">
-                  <Lock className="h-4 w-4" />
-                  Password
-                </Label>
-                <Input
-                  id="password"
-                  type="password"
-                  name="password"
-                  placeholder="Enter your password"
-                  value={formData.password}
-                  onChange={handleChange}
-                  disabled={isLoading}
-                  autoComplete="current-password"
-                  required
-                />
-              </div>
+                <div className="space-y-2">
+                  <Label htmlFor="password" className="text-sm font-medium flex items-center gap-2">
+                    <Lock className="h-4 w-4" />
+                    Password
+                  </Label>
+                  <Input
+                    id="password"
+                    type="password"
+                    name="password"
+                    placeholder="Enter your password"
+                    value={formData.password}
+                    onChange={handleChange}
+                    disabled={isLoading}
+                    autoComplete="current-password"
+                    required
+                  />
+                </div>
 
-              <Button
-                type="submit"
-                size="lg"
-                disabled={isLoading || !isFormValid}
-                className="w-full"
-              >
-                {isLoading ? (
-                  <span className="flex items-center gap-2">
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                    Logging In...
-                  </span>
-                ) : (
-                  "Login"
-                )}
-              </Button>
-            </form>
-          </CardContent>
-        </Card>
+                <Button type="submit" size="lg" disabled={isLoading || !isFormValid} className="w-full">
+                  {isLoading ? (
+                    <span className="flex items-center gap-2">
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                      Logging In...
+                    </span>
+                  ) : (
+                    "Login"
+                  )}
+                </Button>
+              </form>
+            </CardContent>
+          </Card>
+        ) : (
+          <Card className="shadow-sm border-gray-200">
+            <CardHeader>
+              <CardTitle className="text-lg flex items-center gap-2">
+                <Mail className="h-5 w-5 text-blue-600" />
+                Check your email
+              </CardTitle>
+              <CardDescription>
+                We sent a 6-digit code to <span className="font-medium text-gray-700">{otpStage.maskedEmail}</span>
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <form onSubmit={handleVerify} className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="otp" className="text-sm font-medium">
+                    Verification code
+                  </Label>
+                  <Input
+                    id="otp"
+                    type="text"
+                    inputMode="numeric"
+                    maxLength={6}
+                    placeholder="000000"
+                    value={otpCode}
+                    onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, "").slice(0, 6))}
+                    disabled={verifyMutation.isPending}
+                    className="text-center text-2xl tracking-[0.5em] font-semibold"
+                    autoFocus
+                    required
+                  />
+                </div>
+
+                <Button
+                  type="submit"
+                  size="lg"
+                  disabled={verifyMutation.isPending || otpCode.length !== 6}
+                  className="w-full"
+                >
+                  {verifyMutation.isPending ? (
+                    <span className="flex items-center gap-2">
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                      Verifying...
+                    </span>
+                  ) : (
+                    "Verify & Log In"
+                  )}
+                </Button>
+
+                <div className="flex items-center justify-between text-sm">
+                  <button
+                    type="button"
+                    onClick={handleBack}
+                    className="flex items-center gap-1 text-gray-500 hover:text-gray-700"
+                  >
+                    <ArrowLeft className="h-3.5 w-3.5" />
+                    Back
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => resendMutation.mutate()}
+                    disabled={resendCooldown > 0 || resendMutation.isPending}
+                    className="text-blue-600 hover:text-blue-700 disabled:text-gray-400 disabled:cursor-not-allowed"
+                  >
+                    {resendCooldown > 0 ? `Resend code (${resendCooldown}s)` : "Resend code"}
+                  </button>
+                </div>
+              </form>
+            </CardContent>
+          </Card>
+        )}
 
         <p className="text-center text-xs text-gray-400 mt-6">
           Access is restricted to authorized administrators only.

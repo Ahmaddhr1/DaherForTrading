@@ -15,6 +15,7 @@ import {
   Trash2,
   Crown,
   UserRound,
+  Mail,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -39,7 +40,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-const EMPTY_CREATE_FORM = { adminname: "", password: "", role: "employee" };
+const EMPTY_CREATE_FORM = { adminname: "", email: "", password: "", role: "employee" };
 
 export default function AdminsPage() {
   const queryClient = useQueryClient();
@@ -47,6 +48,8 @@ export default function AdminsPage() {
   const [createForm, setCreateForm] = useState(EMPTY_CREATE_FORM);
   const [resetTarget, setResetTarget] = useState(null); // { _id, adminname } | null
   const [resetPassword, setResetPassword] = useState("");
+  const [emailTarget, setEmailTarget] = useState(null); // { _id, adminname, email } | null
+  const [emailValue, setEmailValue] = useState("");
 
   const { data: me } = useQuery({
     queryKey: ["admin", "me"],
@@ -95,11 +98,27 @@ export default function AdminsPage() {
       toast.error("Username and password are required");
       return;
     }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(createForm.email.trim())) {
+      toast.error("A valid email is required - it's where their login code gets sent");
+      return;
+    }
     if (createForm.password.length < 8) {
       toast.error("Password must be at least 8 characters");
       return;
     }
     createMutation.mutate(createForm);
+  };
+
+  const handleEditEmail = (e) => {
+    e.preventDefault();
+    if (emailValue.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailValue.trim())) {
+      toast.error("Enter a valid email, or leave it blank to turn off the login code");
+      return;
+    }
+    patchMutation.mutate(
+      { id: emailTarget._id, email: emailValue.trim() },
+      { onSuccess: () => setEmailTarget(null) }
+    );
   };
 
   const handleToggleRole = (admin) => {
@@ -196,6 +215,7 @@ export default function AdminsPage() {
                 <TableHeader>
                   <TableRow>
                     <TableHead>Username</TableHead>
+                    <TableHead>Email / Login Code</TableHead>
                     <TableHead>Role</TableHead>
                     <TableHead>Status</TableHead>
                     <TableHead className="w-10" />
@@ -209,6 +229,13 @@ export default function AdminsPage() {
                         <TableCell className="font-medium">
                           {admin.adminname}
                           {isSelf && <span className="text-gray-400 text-xs ml-2">(you)</span>}
+                        </TableCell>
+                        <TableCell>
+                          {admin.email ? (
+                            <span className="text-sm text-gray-700">{admin.email}</span>
+                          ) : (
+                            <span className="text-sm text-gray-400 italic">No code (direct login)</span>
+                          )}
                         </TableCell>
                         <TableCell>
                           <Badge variant="outline" className="flex items-center gap-1 w-fit">
@@ -260,6 +287,14 @@ export default function AdminsPage() {
                                 >
                                   <KeyRound className="h-4 w-4" /> Reset Password
                                 </DropdownMenuItem>
+                                <DropdownMenuItem
+                                  onClick={() => {
+                                    setEmailTarget(admin);
+                                    setEmailValue(admin.email || "");
+                                  }}
+                                >
+                                  <Mail className="h-4 w-4" /> Edit Email
+                                </DropdownMenuItem>
                                 <DropdownMenuItem onClick={() => handleToggleActive(admin)}>
                                   {admin.active ? (
                                     <>
@@ -308,6 +343,18 @@ export default function AdminsPage() {
               autoComplete="off"
               required
             />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="new-email">Email</Label>
+            <Input
+              id="new-email"
+              type="email"
+              value={createForm.email}
+              onChange={(e) => setCreateForm((f) => ({ ...f, email: e.target.value }))}
+              autoComplete="off"
+              required
+            />
+            <p className="text-xs text-gray-500">A login code is sent here every time they sign in</p>
           </div>
           <div className="space-y-2">
             <Label htmlFor="new-password">Password</Label>
@@ -380,6 +427,40 @@ export default function AdminsPage() {
               </span>
             ) : (
               "Set New Password"
+            )}
+          </Button>
+        </form>
+      </Modal>
+
+      {/* Edit Email */}
+      <Modal
+        open={!!emailTarget}
+        onClose={() => setEmailTarget(null)}
+        title="Edit Email"
+        description={emailTarget ? `Login code address for ${emailTarget.adminname}` : ""}
+      >
+        <form onSubmit={handleEditEmail} className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="edit-email">Email</Label>
+            <Input
+              id="edit-email"
+              type="email"
+              value={emailValue}
+              onChange={(e) => setEmailValue(e.target.value)}
+              autoComplete="off"
+              placeholder="Leave blank to disable the login code"
+            />
+            <p className="text-xs text-gray-500">
+              Leaving this blank lets {emailTarget?.adminname} log in with just a password again.
+            </p>
+          </div>
+          <Button type="submit" disabled={patchMutation.isPending} className="w-full">
+            {patchMutation.isPending ? (
+              <span className="flex items-center gap-2">
+                <Loader2 className="h-4 w-4 animate-spin" /> Saving...
+              </span>
+            ) : (
+              "Save Email"
             )}
           </Button>
         </form>

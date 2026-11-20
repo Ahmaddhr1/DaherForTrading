@@ -16,8 +16,12 @@ export async function POST(req) {
     return NextResponse.json({ error: "Admin name and password are required" }, { status: 400 });
   }
 
+  // The login field accepts either the admin's username or their email -
+  // whichever one was typed, look it up by both so either works.
+  const identifier = adminname.trim();
+
   const ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
-  const rateLimitKey = `${ip}:${adminname}`;
+  const rateLimitKey = `${ip}:${identifier}`;
 
   const { blocked, retryAfterSeconds } = await checkLoginRateLimit(rateLimitKey);
   if (blocked) {
@@ -27,7 +31,9 @@ export async function POST(req) {
     );
   }
 
-  const admin = await Admin.findOne({ adminname });
+  const admin = await Admin.findOne({
+    $or: [{ adminname: identifier }, { email: identifier.toLowerCase() }],
+  });
   const isValid = admin && (await bcrypt.compare(password, admin.password));
 
   if (!isValid) {

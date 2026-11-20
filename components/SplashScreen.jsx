@@ -44,13 +44,13 @@ export function SplashScreen() {
       aria-hidden="true"
     >
       <div className="flex items-center gap-4">
-        <svg width="64" height="64" viewBox="0 0 160 160">
+        <svg width="64" height="64" viewBox="20 30 102 102" className="shrink-0">
           <rect className="invento-splash-bar" x="20" y="86" width="26" height="46" rx="7" fill="#FFFFFF" style={{ animationDelay: "0s" }} />
           <rect className="invento-splash-bar" x="58" y="58" width="26" height="74" rx="7" fill="#FFFFFF" style={{ animationDelay: "0.15s" }} />
           <rect className="invento-splash-bar" x="96" y="30" width="26" height="102" rx="7" fill="#E8A33D" style={{ animationDelay: "0.3s" }} />
         </svg>
         <span
-          className="invento-splash-wordmark text-4xl font-bold text-white"
+          className="invento-splash-wordmark text-4xl font-bold leading-none text-white"
           style={{ fontFamily: "var(--font-space-grotesk, sans-serif)" }}
         >
           Invento
@@ -66,8 +66,7 @@ export function SplashScreen() {
         .invento-splash-wordmark {
           display: inline-block;
           opacity: 0;
-          animation: invento-splash-slide 1.5s ease-in-out infinite;
-          animation-delay: 0.3s;
+          animation: invento-splash-slide-in 0.6s ease-out 0.3s forwards;
         }
         @keyframes invento-splash-grow {
           0%,
@@ -78,14 +77,12 @@ export function SplashScreen() {
             transform: scaleY(1);
           }
         }
-        @keyframes invento-splash-slide {
-          0%,
-          100% {
+        @keyframes invento-splash-slide-in {
+          from {
             opacity: 0;
             transform: translateX(-16px);
           }
-          40%,
-          70% {
+          to {
             opacity: 1;
             transform: translateX(0);
           }

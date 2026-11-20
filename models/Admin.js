@@ -26,6 +26,18 @@ const adminSchema = new mongoose.Schema(
     otpHash: { type: String, select: false, default: null },
     otpExpiresAt: { type: Date, select: false, default: null },
     otpLastSentAt: { type: Date, select: false, default: null },
+    // Fine-grained extras for an "employee" beyond the base role - see
+    // lib/permissions.js for the fixed set of keys and what each gates.
+    // Meaningless for an "owner" (hasPermission() always returns true for
+    // one regardless of this). Defaults to none granted, including for
+    // employees created before this field existed - an owner must
+    // explicitly grant each one.
+    permissions: {
+      canDelete: { type: Boolean, default: false },
+      canViewStats: { type: Boolean, default: false },
+      canManageDisbursements: { type: Boolean, default: false },
+      canProcessReturns: { type: Boolean, default: false },
+    },
   },
   { timestamps: true }
 );

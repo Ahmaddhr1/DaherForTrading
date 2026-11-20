@@ -11,6 +11,7 @@ import tabs from "@/lib/SideBarTabs";
 import { useCart } from "@/lib/cartContext";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { GlobalSearchModal } from "@/components/GlobalSearchModal";
+import { hasPermission } from "@/lib/permissions";
 
 const findTab = (label) => tabs.find((tab) => tab.label === label);
 
@@ -23,14 +24,16 @@ export function MobileBottomBar() {
   const [searchOpen, setSearchOpen] = useState(false);
   const { itemCount, openCart } = useCart();
 
-  // Drives whether Admins/Activity Log show up in the "More" sheet - the
-  // real enforcement is server-side in middleware.js, this just keeps an
-  // employee from seeing a link that would 403 (same as MySideBar).
+  // Drives whether ownerOnly/permission-gated tabs show up in the "More"
+  // sheet - the real enforcement is server-side in middleware.js, this
+  // just keeps an employee from seeing a link that would 403 (same as
+  // MySideBar).
   const { data: me } = useQuery({
     queryKey: ["admin", "me"],
     queryFn: async () => (await axios.get("/api/admin/me")).data,
   });
   const isOwner = me?.role === "owner";
+  const canViewStats = hasPermission(me, "canViewStats");
 
   // Groups the sidebar's tabs into a handful of bottom-bar slots - a flat
   // row of icons doesn't fit on a phone screen. Dashboard and Cart (the
@@ -39,9 +42,11 @@ export function MobileBottomBar() {
   // Orders groups "Orders" and its sub-tab "Drafts" (see SideBarTabs.js),
   // the same pattern Sales/Stock already use for their own tabs.
   const SECTIONS = [
-    // The stats/charts overview page is owner-only (see middleware.js) -
-    // an employee gets no "Home" slot at all rather than a dead link.
-    ...(isOwner ? [{ key: "dashboard", label: "Home", icon: <Home size={20} />, path: "/dashboard" }] : []),
+    // The stats/charts overview page needs canViewStats (see middleware.js) -
+    // an admin without it gets no "Home" slot at all rather than a dead link.
+    ...(isOwner || canViewStats
+      ? [{ key: "dashboard", label: "Home", icon: <Home size={20} />, path: "/dashboard" }]
+      : []),
     {
       key: "orders",
       label: "Orders",
@@ -71,7 +76,11 @@ export function MobileBottomBar() {
       key: "more",
       label: "More",
       icon: <MoreHorizontal size={20} />,
-      items: ["Settings", ...(isOwner ? ["Admins", "Activity Log", "Profit Margins", "Supplier Trends"] : [])].map(findTab).filter(Boolean),
+      items: [
+        "Settings",
+        ...(isOwner ? ["Admins", "Activity Log"] : []),
+        ...(isOwner || canViewStats ? ["Profit Margins", "Supplier Trends"] : []),
+      ].map(findTab).filter(Boolean),
     },
   ];
 
@@ -97,7 +106,7 @@ export function MobileBottomBar() {
   return (
     <>
       <nav className="lg:hidden fixed bottom-0 inset-x-0 z-40 bg-sidebar border-t border-sidebar-border pb-[env(safe-area-inset-bottom)]">
-        <div className={`grid ${isOwner ? "grid-cols-6" : "grid-cols-5"}`}>
+        <div className={`grid ${isOwner || canViewStats ? "grid-cols-6" : "grid-cols-5"}`}>
           {SECTIONS.map((section) => {
             const active = isSectionActive(section);
             const className = `flex flex-col items-center justify-center gap-1 py-2.5 text-[11px] font-medium ${

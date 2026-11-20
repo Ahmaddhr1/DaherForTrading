@@ -5,6 +5,7 @@ import Order from "@/models/Orders";
 import { NextResponse } from "next/server";
 import { getUserFromCookie } from "@/lib/auth";
 import { logActivity } from "@/lib/activityLog";
+import { requirePermission } from "@/lib/permissions";
 
 // GET a product by ID
 export async function GET(_, { params }) {
@@ -118,6 +119,10 @@ export async function PUT(req, { params }) {
 // DELETE a product by ID
 export async function DELETE(req, { params }) {
   await connectToDB();
+  const admin = await getUserFromCookie();
+  const forbidden = await requirePermission(admin, "canDelete");
+  if (forbidden) return forbidden;
+
   try {
     const id = params.id;
 
@@ -152,7 +157,7 @@ export async function DELETE(req, { params }) {
     }
 
     await logActivity({
-      admin: await getUserFromCookie(),
+      admin,
       action: "product.delete",
       entityType: "Product",
       entityId: id,

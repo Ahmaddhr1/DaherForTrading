@@ -15,6 +15,7 @@ import { Modal } from "@/components/ui/modal";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { ListSkeleton } from "@/components/ui/skeleton-patterns";
 import { ArrowLeft, Plus, Repeat, Trash2, Edit, Loader2, Pause, Play } from "lucide-react";
+import { useHasPermission } from "@/lib/useHasPermission";
 
 const CATEGORY_OPTIONS = ["Salaries", "Rent", "Utilities", "Maintenance", "Transport", "Other"];
 const EMPTY_FORM = { description: "", amount: "", category: "Other", dayOfMonth: "1" };
@@ -31,6 +32,7 @@ export default function RecurringDisbursementsPage() {
   const [deleteTarget, setDeleteTarget] = useState(null);
   const [form, setForm] = useState(EMPTY_FORM);
   const queryClient = useQueryClient();
+  const { hasPermission: canManageDisbursements } = useHasPermission("canManageDisbursements");
 
   const { data, isLoading } = useQuery({
     queryKey: ["recurring-disbursements"],
@@ -120,16 +122,18 @@ export default function RecurringDisbursementsPage() {
               </p>
             </div>
           </div>
-          <Button
-            onClick={() => {
-              setForm(EMPTY_FORM);
-              setModalOpen(true);
-            }}
-            className="flex items-center gap-2"
-          >
-            <Plus className="h-4 w-4" />
-            <span className="hidden sm:inline">Add Recurring</span>
-          </Button>
+          {canManageDisbursements && (
+            <Button
+              onClick={() => {
+                setForm(EMPTY_FORM);
+                setModalOpen(true);
+              }}
+              className="flex items-center gap-2"
+            >
+              <Plus className="h-4 w-4" />
+              <span className="hidden sm:inline">Add Recurring</span>
+            </Button>
+          )}
         </div>
 
         {isLoading ? (
@@ -171,22 +175,26 @@ export default function RecurringDisbursementsPage() {
                       </Badge>
                     </TableCell>
                     <TableCell className="text-right">
-                      <div className="flex justify-end gap-2">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => updateMutation.mutate({ id: t._id, active: !t.active })}
-                          title={t.active ? "Pause" : "Resume"}
-                        >
-                          {t.active ? <Pause className="h-3 w-3" /> : <Play className="h-3 w-3" />}
-                        </Button>
-                        <Button variant="outline" size="sm" onClick={() => openEdit(t)}>
-                          <Edit className="h-3 w-3" />
-                        </Button>
-                        <Button variant="destructive" size="sm" onClick={() => setDeleteTarget(t)}>
-                          <Trash2 className="h-3 w-3" />
-                        </Button>
-                      </div>
+                      {canManageDisbursements ? (
+                        <div className="flex justify-end gap-2">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => updateMutation.mutate({ id: t._id, active: !t.active })}
+                            title={t.active ? "Pause" : "Resume"}
+                          >
+                            {t.active ? <Pause className="h-3 w-3" /> : <Play className="h-3 w-3" />}
+                          </Button>
+                          <Button variant="outline" size="sm" onClick={() => openEdit(t)}>
+                            <Edit className="h-3 w-3" />
+                          </Button>
+                          <Button variant="destructive" size="sm" onClick={() => setDeleteTarget(t)}>
+                            <Trash2 className="h-3 w-3" />
+                          </Button>
+                        </div>
+                      ) : (
+                        <span className="text-xs text-gray-400 dark:text-gray-500">View only</span>
+                      )}
                     </TableCell>
                   </TableRow>
                 ))}

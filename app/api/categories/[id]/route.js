@@ -2,6 +2,8 @@ import { connectToDB } from '@/lib/connectDb';
 import Category from '@/models/Category';
 import Product from '@/models/Products';
 import { NextResponse } from 'next/server';
+import { getUserFromCookie } from '@/lib/auth';
+import { requirePermission } from '@/lib/permissions';
 
 export async function GET(_, { params }) {
   await connectToDB();
@@ -38,6 +40,9 @@ export async function PUT(req, { params }) {
 
 export async function DELETE(_, { params }) {
   await connectToDB();
+  const forbidden = await requirePermission(await getUserFromCookie(), 'canDelete');
+  if (forbidden) return forbidden;
+
   const category = await Category.findById(params.id);
   if (!category) {
     return NextResponse.json({ error: 'Category not found' }, { status: 404 });

@@ -13,6 +13,7 @@ import { Badge } from "@/components/ui/badge";
 import { CardGridSkeleton } from "@/components/ui/skeleton-patterns";
 import { FiltersPanel } from "@/components/ui/filters-panel";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
+import { useHasPermission } from "@/lib/useHasPermission";
 import { localDayStartISO, localDayEndISO } from "@/lib/dateUtils";
 import {
   Search,
@@ -52,6 +53,7 @@ export default function CompaniesPage() {
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const queryClient = useQueryClient();
+  const { hasPermission: canDelete } = useHasPermission("canDelete");
 
   const { data, isLoading, error } = useQuery({
     queryKey: ["companies", currentPage, pageSize, searchTerm, debtFilter, sortBy, startDate, endDate],
@@ -438,19 +440,21 @@ export default function CompaniesPage() {
                           )}
                         </div>
 
-                        <Button
-                          variant="destructive"
-                          size="sm"
-                          onClick={(e) => {
-                            e.preventDefault();
-                            setDeleteTarget(company);
-                          }}
-                          disabled={deleteMutation.isPending}
-                          className="w-full"
-                        >
-                          <Trash2 className="h-4 w-4 mr-1" />
-                          {deleteMutation.isPending ? "Deleting..." : "Delete"}
-                        </Button>
+                        {canDelete && (
+                          <Button
+                            variant="destructive"
+                            size="sm"
+                            onClick={(e) => {
+                              e.preventDefault();
+                              setDeleteTarget(company);
+                            }}
+                            disabled={deleteMutation.isPending}
+                            className="w-full"
+                          >
+                            <Trash2 className="h-4 w-4 mr-1" />
+                            {deleteMutation.isPending ? "Deleting..." : "Delete"}
+                          </Button>
+                        )}
                       </CardContent>
                     </Card>
                   </Link>

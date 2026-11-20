@@ -3,9 +3,14 @@ import Disbursement from "@/models/Disbursement";
 import { NextResponse } from "next/server";
 import { getUserFromCookie } from "@/lib/auth";
 import { logActivity } from "@/lib/activityLog";
+import { requirePermission } from "@/lib/permissions";
 
 export async function POST(req) {
   await connectToDB();
+  const admin = await getUserFromCookie();
+  const forbidden = await requirePermission(admin, "canManageDisbursements");
+  if (forbidden) return forbidden;
+
   try {
     const { description, amount, category } = await req.json();
 
@@ -28,7 +33,7 @@ export async function POST(req) {
     });
 
     await logActivity({
-      admin: await getUserFromCookie(),
+      admin,
       action: "disbursement.create",
       entityType: "Disbursement",
       entityId: disbursement._id,

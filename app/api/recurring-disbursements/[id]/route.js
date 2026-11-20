@@ -3,9 +3,14 @@ import RecurringDisbursement from "@/models/RecurringDisbursement";
 import { NextResponse } from "next/server";
 import { getUserFromCookie } from "@/lib/auth";
 import { logActivity } from "@/lib/activityLog";
+import { requirePermission } from "@/lib/permissions";
 
 export async function PATCH(req, { params }) {
   await connectToDB();
+  const admin = await getUserFromCookie();
+  const forbidden = await requirePermission(admin, "canManageDisbursements");
+  if (forbidden) return forbidden;
+
   try {
     const { id } = await params;
     const body = await req.json();
@@ -44,7 +49,7 @@ export async function PATCH(req, { params }) {
     }
 
     await logActivity({
-      admin: await getUserFromCookie(),
+      admin,
       action: "recurringDisbursement.edit",
       entityType: "Disbursement",
       entityId: template._id,
@@ -62,6 +67,10 @@ export async function PATCH(req, { params }) {
 
 export async function DELETE(_, { params }) {
   await connectToDB();
+  const admin = await getUserFromCookie();
+  const forbidden = await requirePermission(admin, "canManageDisbursements");
+  if (forbidden) return forbidden;
+
   try {
     const { id } = await params;
     const template = await RecurringDisbursement.findByIdAndDelete(id);
@@ -70,7 +79,7 @@ export async function DELETE(_, { params }) {
     }
 
     await logActivity({
-      admin: await getUserFromCookie(),
+      admin,
       action: "recurringDisbursement.delete",
       entityType: "Disbursement",
       entityId: id,

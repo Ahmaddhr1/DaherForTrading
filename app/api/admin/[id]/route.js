@@ -3,6 +3,7 @@ import Admin from "@/models/Admin";
 import bcrypt from "bcryptjs";
 import { NextResponse } from "next/server";
 import { getUserFromCookie } from "@/lib/auth";
+import { PERMISSION_KEYS } from "@/lib/permissions";
 
 // Owner-only (enforced in middleware.js). Both handlers guard against an
 // owner locking the business out of its own dashboard: you can never act
@@ -33,7 +34,7 @@ export async function PATCH(req, { params }) {
       return NextResponse.json({ message: "Admin not found" }, { status: 404 });
     }
 
-    const { role, active, newPassword, email } = await req.json();
+    const { role, active, newPassword, email, permissions } = await req.json();
     const update = {};
 
     if (email !== undefined) {
@@ -85,12 +86,23 @@ export async function PATCH(req, { params }) {
       update.password = await bcrypt.hash(newPassword, 10);
     }
 
+    if (permissions !== undefined) {
+      // Only meaningful for an employee - harmless to store on an owner
+      // too (hasPermission() ignores it for one), but the UI only ever
+      // sends this for an employee.
+      const resolvedPermissions = {};
+      for (const key of PERMISSION_KEYS) {
+        resolvedPermissions[key] = !!permissions?.[key];
+      }
+      update.permissions = resolvedPermissions;
+    }
+
     if (Object.keys(update).length === 0) {
       return NextResponse.json({ message: "Nothing to update" }, { status: 400 });
     }
 
     const updated = await Admin.findByIdAndUpdate(id, update, { new: true }).select(
-      "adminname email role active createdAt"
+      "adminname email role active permissions createdAt"
     );
 
     return NextResponse.json({ message: "Admin updated successfully", admin: updated });

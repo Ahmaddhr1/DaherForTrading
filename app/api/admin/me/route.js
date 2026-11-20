@@ -16,5 +16,6 @@ export async function GET() {
     id: user.id,
     adminname: user.adminname,
     role: user.role || "employee",
+    permissions: user.permissions || {},
   });
 }

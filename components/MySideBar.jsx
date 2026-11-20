@@ -10,6 +10,7 @@ import tabs from "@/lib/SideBarTabs";
 import { toast } from "sonner";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { GlobalSearchModal } from "@/components/GlobalSearchModal";
+import { hasPermission } from "@/lib/permissions";
 
 // Desktop-only navigation (lg and up). On mobile, navigation is handled by
 // MobileBottomBar instead - see components/MobileBottomBar.jsx.
@@ -31,15 +32,17 @@ export function MySideBar() {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, []);
 
-  // Drives which ownerOnly tabs (Admins, Activity Log) are shown - the
-  // real enforcement is server-side in middleware.js, this is just so an
+  // Drives which ownerOnly/permission-gated tabs are shown - the real
+  // enforcement is server-side in middleware.js, this is just so an
   // employee doesn't see a link that would 403.
   const { data: me } = useQuery({
     queryKey: ["admin", "me"],
     queryFn: async () => (await axios.get("/api/admin/me")).data,
   });
   const isOwner = me?.role === "owner";
-  const visibleTabs = tabs.filter((tab) => !tab.ownerOnly || isOwner);
+  const visibleTabs = tabs.filter(
+    (tab) => (!tab.ownerOnly || isOwner) && (!tab.permission || hasPermission(me, tab.permission))
+  );
 
   const toggleCollapse = () => setIsCollapsed(!isCollapsed);
 

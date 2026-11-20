@@ -2,13 +2,14 @@ import { connectToDB } from '@/lib/connectDb.js'
 import Admin from '@/models/Admin'
 import bcrypt from 'bcryptjs'
 import { NextResponse } from 'next/server'
+import { PERMISSION_KEYS } from '@/lib/permissions'
 
 // Owner-only (enforced in middleware.js). Creates a new admin account -
 // "owner" or "employee", defaulting to "employee" so a mistyped/omitted
 // role never accidentally grants full access.
 export async function POST(req) {
   try {
-    const { adminname, email, password, role } = await req.json()
+    const { adminname, email, password, role, permissions } = await req.json()
 
     if (!adminname || !password) {
       return NextResponse.json({ error: 'Admin name and password are required' }, { status: 400 })
@@ -26,6 +27,12 @@ export async function POST(req) {
     }
 
     const resolvedRole = role === 'owner' ? 'owner' : 'employee'
+    // Only meaningful for an employee - an owner has every permission
+    // implicitly (see lib/permissions.js) regardless of what's stored here.
+    const resolvedPermissions = {}
+    for (const key of PERMISSION_KEYS) {
+      resolvedPermissions[key] = !!permissions?.[key]
+    }
 
     await connectToDB()
 
@@ -45,6 +52,7 @@ export async function POST(req) {
       password: hashedPassword,
       role: resolvedRole,
       active: true,
+      permissions: resolvedPermissions,
     })
 
     await newAdmin.save()
@@ -58,6 +66,7 @@ export async function POST(req) {
           email: newAdmin.email,
           role: newAdmin.role,
           active: newAdmin.active,
+          permissions: newAdmin.permissions,
         },
       },
       { status: 201 }

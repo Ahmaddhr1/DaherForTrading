@@ -24,6 +24,7 @@ const OWNER_ONLY_EXACT_PATHS = [
   '/api/admin', // GET: list admins
   '/dashboard', // the stats/charts overview page
   '/dashboard/admins',
+  '/dashboard/admins/performance',
   '/dashboard/activity',
 ]
 // Prefixes: the path itself or anything nested under it.

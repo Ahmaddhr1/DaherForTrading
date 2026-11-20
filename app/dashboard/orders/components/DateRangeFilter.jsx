@@ -11,21 +11,21 @@ export function DateRangeFilter({ startDate, endDate, onStartDateChange, onEndDa
   return (
     <>
       <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-2 w-full sm:w-auto">
-        <span className="text-sm font-medium text-gray-700">From</span>
+        <span className="text-sm font-medium text-gray-700 dark:text-gray-300">From</span>
         <input
           type="date"
           value={startDate}
           onChange={(e) => onStartDateChange(e.target.value)}
-          className="w-full sm:w-auto border rounded-md text-sm px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="w-full sm:w-auto border rounded-md text-sm px-2 py-1.5 bg-transparent focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
       </div>
       <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-2 w-full sm:w-auto">
-        <span className="text-sm font-medium text-gray-700">To</span>
+        <span className="text-sm font-medium text-gray-700 dark:text-gray-300">To</span>
         <input
           type="date"
           value={endDate}
           onChange={(e) => onEndDateChange(e.target.value)}
-          className="w-full sm:w-auto border rounded-md text-sm px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="w-full sm:w-auto border rounded-md text-sm px-2 py-1.5 bg-transparent focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
       </div>
     </>

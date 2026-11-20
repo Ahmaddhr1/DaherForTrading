@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
-import { Home, ClipboardList, ShoppingCart, Wallet, Boxes, MoreHorizontal, LogOut, X, Search, UserRound } from "lucide-react";
+import { Home, ClipboardList, ShoppingCart, Wallet, Boxes, MoreHorizontal, LogOut, X, Search, UserRound, CreditCard } from "lucide-react";
 import { toast } from "sonner";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
@@ -81,6 +81,12 @@ export function MobileBottomBar() {
       badge: itemCount,
     },
     {
+      key: "payments",
+      label: "Payments",
+      icon: <CreditCard size={20} />,
+      path: findTab("Payments")?.path,
+    },
+    {
       key: "search",
       label: "Search",
       icon: <Search size={22} />,
@@ -97,7 +103,7 @@ export function MobileBottomBar() {
           key: "sales",
           label: "Sales",
           icon: <Wallet size={20} />,
-          items: ["Customers", "Overdue Debt", "Payments", "Disbursements"].map(findTab).filter(Boolean),
+          items: ["Customers", "Overdue Debt", "Disbursements"].map(findTab).filter(Boolean),
         }
       : {
           key: "customers",
@@ -116,7 +122,7 @@ export function MobileBottomBar() {
       label: "More",
       icon: <MoreHorizontal size={20} />,
       items: [
-        ...(isOwner ? [] : ["Overdue Debt", "Payments", "Disbursements"]),
+        ...(isOwner ? [] : ["Overdue Debt", "Disbursements"]),
         "Settings",
         ...(isOwner ? ["Admins", "Activity Log"] : []),
       ].map(findTab).filter(Boolean),
@@ -145,7 +151,7 @@ export function MobileBottomBar() {
   return (
     <>
       <nav className="lg:hidden fixed bottom-0 inset-x-0 z-40 bg-sidebar border-t border-sidebar-border pb-[env(safe-area-inset-bottom)]">
-        <div className={`grid ${isOwner || canViewStats ? "grid-cols-7" : "grid-cols-6"}`}>
+        <div className={`grid ${isOwner || canViewStats ? "grid-cols-8" : "grid-cols-7"}`}>
           {SECTIONS.map((section) => {
             const active = isSectionActive(section);
             const className = `flex flex-col items-center justify-center gap-1 py-2.5 text-[11px] font-medium ${

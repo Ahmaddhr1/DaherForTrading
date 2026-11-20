@@ -56,6 +56,15 @@ const orderSchema = new mongoose.Schema(
           type: Boolean,
           default: false,
         },
+        // Snapshot of the product's cost (Product.initialPrice) at the
+        // moment this order was placed, so a profit-margin report stays
+        // accurate even after the product's cost later changes. Absent on
+        // a custom line (no cost basis) and on orders placed before this
+        // field existed - those fall back to the product's current cost.
+        costAtSale: {
+          type: Number,
+          required: false,
+        },
       },
     ],
     total: {

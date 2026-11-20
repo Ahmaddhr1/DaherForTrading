@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Loader2, Lock, User, ShieldCheck, Mail, ArrowLeft } from "lucide-react";
+import { Loader2, Lock, User, Mail, ArrowLeft } from "lucide-react";
 import { toast } from "sonner";
 
 const OTP_RESEND_COOLDOWN_SECONDS = 30;
@@ -99,7 +99,7 @@ export default function LoginPage() {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!formData.username.trim() || !formData.password.trim()) {
-      toast.error("Please enter both username and password");
+      toast.error("Please enter both username/email and password");
       return;
     }
     loginMutation.mutate();
@@ -126,10 +126,13 @@ export default function LoginPage() {
     <div className="min-h-screen bg-gray-50 dark:bg-gray-950 flex items-center justify-center px-4">
       <div className="w-full max-w-md">
         <div className="flex flex-col items-center mb-6">
-          <div className="p-3 bg-blue-100 dark:bg-blue-900/30 rounded-xl mb-3">
-            <ShieldCheck className="h-8 w-8 text-blue-600" />
-          </div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">MDT Admin Panel</h1>
+          <svg width="56" height="56" viewBox="0 0 160 160" className="mb-3">
+            <rect width="160" height="160" rx="36" fill="#0B0B35" />
+            <rect x="38" y="86" width="22" height="46" rx="6" fill="#F5F5F7" />
+            <rect x="69" y="64" width="22" height="68" rx="6" fill="#F5F5F7" />
+            <rect x="100" y="38" width="22" height="94" rx="6" fill="#E8A33D" />
+          </svg>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Invento</h1>
           <p className="text-gray-600 dark:text-gray-400 text-sm mt-1">Sign in to manage your business</p>
         </div>
 
@@ -144,13 +147,13 @@ export default function LoginPage() {
                 <div className="space-y-2">
                   <Label htmlFor="username" className="text-sm font-medium flex items-center gap-2">
                     <User className="h-4 w-4" />
-                    Username
+                    Username or Email
                   </Label>
                   <Input
                     id="username"
                     type="text"
                     name="username"
-                    placeholder="Enter your username"
+                    placeholder="Enter your username or email"
                     value={formData.username}
                     onChange={handleChange}
                     disabled={isLoading}

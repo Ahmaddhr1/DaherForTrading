@@ -4,8 +4,7 @@ import { useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useParams } from "next/navigation";
 import { format } from "date-fns";
-import { Receipt, Calendar, Printer, MessageCircle, ArrowLeft, TrendingDown } from "lucide-react";
-import Link from "next/link";
+import { Receipt, Calendar, Printer, MessageCircle, TrendingDown } from "lucide-react";
 import DisbursementThermalReceipt from "./DisbursementThermalReceipt";
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -80,13 +79,6 @@ export default function DisbursementDetailsPage() {
     <div className="min-h-screen bg-gray-50/30 dark:bg-gray-900/30 py-8">
       <div className="container mx-auto px-4 max-w-2xl">
         <div className="mb-8">
-          <Link href="/dashboard/disbursements">
-            <Button variant="ghost" className="mb-4 flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100">
-              <ArrowLeft className="h-4 w-4" />
-              Back to Disbursements
-            </Button>
-          </Link>
-
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-2">
             <div>
               <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">Disbursement Receipt</h1>

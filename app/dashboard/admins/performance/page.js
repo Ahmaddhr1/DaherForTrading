@@ -3,12 +3,11 @@
 import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
-import Link from "next/link";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { ListSkeleton } from "@/components/ui/skeleton-patterns";
-import { BarChart3, ArrowLeft, X, Users } from "lucide-react";
+import { BarChart3, X, Users } from "lucide-react";
 import { localDayStartISO, localDayEndISO } from "@/lib/dateUtils";
 import { DateRangeFilter } from "@/app/dashboard/orders/components/DateRangeFilter";
 
@@ -37,13 +36,6 @@ export default function EmployeePerformancePage() {
     <div className="min-h-screen bg-gray-50 dark:bg-gray-950 py-6">
       <div className="container mx-auto px-4 max-w-6xl">
         <div className="mb-6">
-          <Link
-            href="/dashboard/admins"
-            className="text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 flex items-center gap-1 mb-3"
-          >
-            <ArrowLeft className="h-3.5 w-3.5" />
-            Back to Admins
-          </Link>
           <div className="flex items-center gap-3">
             <div className="p-2 bg-indigo-100 dark:bg-indigo-900/30 rounded-lg">
               <BarChart3 className="h-6 w-6 text-indigo-600" />

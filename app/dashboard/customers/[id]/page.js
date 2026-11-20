@@ -8,7 +8,7 @@ import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { FormSkeleton, PageHeaderSkeleton } from "@/components/ui/skeleton-patterns";
-import { Eye, Loader2, User, Phone, DollarSign, ArrowLeft, UserCog, Package, PhoneCall, Lock, FileText, Layers, AlertTriangle } from "lucide-react";
+import { Eye, Loader2, User, Phone, DollarSign, UserCog, Package, PhoneCall, Lock, FileText, Layers, AlertTriangle } from "lucide-react";
 import { format } from "date-fns";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -146,15 +146,6 @@ const EditCustomerPage = () => {
       <div className="container mx-auto px-4 max-w-4xl">
         {/* Header */}
         <div className="mb-8">
-          <Button 
-            variant="ghost" 
-            onClick={() => router.back()}
-            className="mb-4 flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100"
-          >
-            <ArrowLeft className="h-4 w-4" />
-            Back to Customers
-          </Button>
-          
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
             <div className="flex items-center gap-3 min-w-0">
               <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg shrink-0">

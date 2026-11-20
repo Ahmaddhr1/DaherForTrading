@@ -10,7 +10,7 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { toast } from "sonner";
-import { Loader2, ShoppingBag, ArrowLeft, Plus, Trash2 } from "lucide-react";
+import { Loader2, ShoppingBag, Plus, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useSettings, formatLL } from "@/lib/currency";
@@ -158,13 +158,6 @@ const NewPurchasePage = () => {
     <div className="min-h-screen bg-gray-50 dark:bg-gray-950 py-6">
       <div className="container mx-auto px-4 max-w-3xl">
         <div className="mb-8">
-          <Link href={`/dashboard/companies/${companyId}`}>
-            <Button variant="ghost" className="mb-4 flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100">
-              <ArrowLeft className="h-4 w-4" />
-              Back to Company
-            </Button>
-          </Link>
-
           <div className="flex items-center gap-3 mb-2">
             <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
               <ShoppingBag className="h-6 w-6 text-blue-600" />

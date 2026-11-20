@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
-import Link from "next/link";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -14,7 +13,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Modal } from "@/components/ui/modal";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { ListSkeleton } from "@/components/ui/skeleton-patterns";
-import { ArrowLeft, Plus, Repeat, Trash2, Edit, Loader2, Pause, Play } from "lucide-react";
+import { Plus, Repeat, Trash2, Edit, Loader2, Pause, Play } from "lucide-react";
 import { useHasPermission } from "@/lib/useHasPermission";
 
 const CATEGORY_OPTIONS = ["Salaries", "Rent", "Utilities", "Maintenance", "Transport", "Other"];
@@ -100,14 +99,6 @@ export default function RecurringDisbursementsPage() {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-950 py-6">
       <div className="container mx-auto px-4 max-w-4xl">
-        <Link
-          href="/dashboard/disbursements"
-          className="text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 flex items-center gap-1 mb-3"
-        >
-          <ArrowLeft className="h-3.5 w-3.5" />
-          Back to Disbursements
-        </Link>
-
         <div className="mb-8 flex items-center justify-between gap-3">
           <div className="flex items-center gap-3">
             <div className="p-2 bg-red-100 dark:bg-red-900/30 rounded-lg">

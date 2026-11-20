@@ -11,7 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
-import { ArrowLeft, FolderPlus, Loader2, Tag } from "lucide-react";
+import { FolderPlus, Loader2, Tag } from "lucide-react";
 
 export default function AddCategoryPage() {
   const router = useRouter();
@@ -66,13 +66,6 @@ export default function AddCategoryPage() {
         
         {/* Header */}
         <div className="mb-8">
-          <Link href="/dashboard/categories">
-            <Button variant="ghost" className="mb-4 flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100">
-              <ArrowLeft className="h-4 w-4" />
-              Back to Categories
-            </Button>
-          </Link>
-          
           <div className="flex items-center gap-3 mb-2">
             <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
               <FolderPlus className="h-6 w-6 text-blue-600" />

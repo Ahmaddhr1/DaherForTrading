@@ -26,6 +26,7 @@ const OWNER_ONLY_EXACT_PATHS = [
   '/dashboard/admins',
   '/dashboard/admins/performance',
   '/dashboard/activity',
+  '/dashboard/reports/profit-margin',
 ]
 // Prefixes: the path itself or anything nested under it.
 const OWNER_ONLY_PATH_PREFIXES = [
@@ -34,6 +35,7 @@ const OWNER_ONLY_PATH_PREFIXES = [
   '/api/settings/restore',
   '/api/activity',
   '/api/dashboard', // backs the stats/charts overview page - see '/dashboard' above
+  '/api/reports', // profit margin and other owner-only financial reports
 ]
 const MONGO_ID = /^[0-9a-fA-F]{24}$/
 

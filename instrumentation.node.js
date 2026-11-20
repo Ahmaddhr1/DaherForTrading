@@ -15,6 +15,11 @@ if (!process.env.VERCEL) {
   import("./lib/scheduledBackup.js").then(({ startScheduledBackup }) => {
     startScheduledBackup();
   });
+  import("./lib/scheduledRecurringDisbursements.js").then(
+    ({ startScheduledRecurringDisbursements }) => {
+      startScheduledRecurringDisbursements();
+    }
+  );
 }
 
 module.exports = {};

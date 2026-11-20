@@ -9,6 +9,13 @@ const disbursementSchema = new mongoose.Schema(
       enum: ["Salaries", "Rent", "Utilities", "Maintenance", "Transport", "Other"],
       default: "Other",
     },
+    // Set when this disbursement was auto-created by a recurring template
+    // (see models/RecurringDisbursement.js) rather than entered by hand.
+    recurringSourceId: {
+      type: mongoose.Types.ObjectId,
+      ref: "RecurringDisbursement",
+      default: null,
+    },
   },
   { timestamps: true }
 );

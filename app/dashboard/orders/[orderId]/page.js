@@ -144,7 +144,7 @@ export default function OrderDetailsPage() {
   return (
     <div className="max-w-xl mx-auto p-6 space-y-6">
       <h1 className="text-2xl font-semibold text-center">
-        Payment for Order #{orderId}
+        Payment for Order #{orderId?.slice(-6).toUpperCase()}
       </h1>
 
       <Card>

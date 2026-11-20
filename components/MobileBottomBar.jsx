@@ -46,13 +46,14 @@ export function MobileBottomBar() {
   const canViewStats = hasPermission(me, "canViewStats");
 
   // Groups the sidebar's tabs into a handful of bottom-bar slots - a flat
-  // row of icons doesn't fit on a phone screen. Cart (the most frequently
-  // used) gets its own direct slot; everything else is grouped into a
+  // row of icons doesn't fit on a phone screen. Search gets a raised,
+  // visually distinct slot in the middle since it's used from anywhere;
+  // everything else (Cart included, as a list item) is grouped into a
   // section that opens a small sheet listing its tabs - Orders groups
-  // "Orders" and its sub-tab "Drafts" (see SideBarTabs.js), Home groups
-  // Dashboard with its nested stats sub-pages (Profit Margins, Supplier
-  // Trends - see Dashboard's `children` in SideBarTabs.js), the same
-  // pattern Sales/Stock already use for their own tabs.
+  // "Orders", its sub-tab "Drafts" (see SideBarTabs.js) and Cart, Home
+  // groups Dashboard with its nested stats sub-pages (Profit Margins,
+  // Supplier Trends - see Dashboard's `children` in SideBarTabs.js), the
+  // same pattern Sales/Stock already use for their own tabs.
   const SECTIONS = [
     // The stats/charts overview page needs canViewStats (see middleware.js) -
     // an admin without it gets no "Home" slot at all rather than a dead link.
@@ -70,14 +71,18 @@ export function MobileBottomBar() {
       key: "orders",
       label: "Orders",
       icon: <ClipboardList size={20} />,
-      items: ["Orders", "Drafts", "Returns"].map(findTab).filter(Boolean),
+      items: [
+        ...["Orders", "Drafts", "Returns"].map(findTab).filter(Boolean),
+        { key: "cart", label: "Cart", icon: <ShoppingCart size={20} />, action: openCart, badge: itemCount },
+      ],
+      badge: itemCount,
     },
     {
-      key: "cart",
-      label: "Cart",
-      icon: <ShoppingCart size={20} />,
-      action: openCart,
-      badge: itemCount,
+      key: "search",
+      label: "Search",
+      icon: <Search size={22} />,
+      action: () => setSearchOpen(true),
+      special: true,
     },
     {
       key: "sales",
@@ -138,6 +143,23 @@ export function MobileBottomBar() {
               </span>
             );
 
+            if (section.special) {
+              return (
+                <button
+                  key={section.key}
+                  type="button"
+                  onClick={section.action}
+                  className="relative flex flex-col items-center justify-center"
+                  aria-label={section.label}
+                >
+                  <span className="absolute -top-6 flex h-14 w-14 items-center justify-center rounded-full bg-primary text-white shadow-lg shadow-primary/40 ring-4 ring-sidebar transition-transform active:scale-95">
+                    {section.icon}
+                  </span>
+                  <span className="mt-9 text-[11px] font-medium text-gray-500 dark:text-gray-400">{section.label}</span>
+                </button>
+              );
+            }
+
             if (section.action) {
               return (
                 <button key={section.key} type="button" onClick={section.action} className={className}>
@@ -187,31 +209,43 @@ export function MobileBottomBar() {
               </button>
             </div>
             <div className="p-2 pb-4">
-              {activeSheet.items.map((tab) => (
-                <Link
-                  key={tab.path}
-                  href={tab.path}
-                  onClick={() => setOpenSection(null)}
-                  className={`flex items-center gap-3 p-3 rounded-lg ${
-                    pathname === tab.path ? "bg-primary text-white" : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
-                  }`}
-                >
-                  {tab.icon}
-                  {tab.label}
-                </Link>
-              ))}
-              {activeSheet.key === "more" && (
-                <>
+              {activeSheet.items.map((item) =>
+                item.action ? (
                   <button
+                    key={item.key}
+                    type="button"
                     onClick={() => {
                       setOpenSection(null);
-                      setSearchOpen(true);
+                      item.action();
                     }}
                     className="w-full flex items-center gap-3 p-3 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
                   >
-                    <Search size={20} />
-                    Search
+                    <span className="relative">
+                      {item.icon}
+                      {item.badge > 0 && (
+                        <span className="absolute -top-1.5 -right-2 bg-red-600 text-white text-[10px] font-bold rounded-full h-4 min-w-4 px-1 flex items-center justify-center">
+                          {item.badge}
+                        </span>
+                      )}
+                    </span>
+                    {item.label}
                   </button>
+                ) : (
+                  <Link
+                    key={item.path}
+                    href={item.path}
+                    onClick={() => setOpenSection(null)}
+                    className={`flex items-center gap-3 p-3 rounded-lg ${
+                      pathname === item.path ? "bg-primary text-white" : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
+                    }`}
+                  >
+                    {item.icon}
+                    {item.label}
+                  </Link>
+                )
+              )}
+              {activeSheet.key === "more" && (
+                <>
                   <ThemeToggle className="w-full text-gray-700 dark:text-gray-300" />
                   <button
                     onClick={handleLogout}

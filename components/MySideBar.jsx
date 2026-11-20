@@ -1,21 +1,35 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
-import { LogOut, ListCollapse } from "lucide-react";
+import { LogOut, ListCollapse, Search } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import tabs from "@/lib/SideBarTabs";
 import { toast } from "sonner";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { GlobalSearchModal } from "@/components/GlobalSearchModal";
 
 // Desktop-only navigation (lg and up). On mobile, navigation is handled by
 // MobileBottomBar instead - see components/MobileBottomBar.jsx.
 export function MySideBar() {
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
   const pathname = usePathname();
   const router = useRouter();
+
+  // Ctrl/Cmd+K opens the global search from anywhere on desktop.
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
+        e.preventDefault();
+        setSearchOpen(true);
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
 
   // Drives which ownerOnly tabs (Admins, Activity Log) are shown - the
   // real enforcement is server-side in middleware.js, this is just so an
@@ -76,6 +90,25 @@ export function MySideBar() {
           </button>
         </div>
 
+        {/* Global search trigger */}
+        <div className="p-3">
+          <button
+            onClick={() => setSearchOpen(true)}
+            className={`w-full flex items-center gap-2 rounded-lg border border-sidebar-border px-3 py-2 text-sm text-sidebar-foreground/60 hover:bg-primary hover:text-white transition-colors duration-150 ${
+              isCollapsed ? "justify-center" : ""
+            }`}
+            aria-label="Search"
+          >
+            <Search className="h-4 w-4 shrink-0" />
+            {!isCollapsed && (
+              <>
+                <span className="flex-1 text-left">Search</span>
+                <kbd className="text-xs opacity-60">⌘K</kbd>
+              </>
+            )}
+          </button>
+        </div>
+
         {/* Navigation */}
         <nav className="flex-1 overflow-y-auto py-4">
           <div className="space-y-2">
@@ -97,6 +130,7 @@ export function MySideBar() {
           </button>
         </div>
       </div>
+      <GlobalSearchModal open={searchOpen} onClose={() => setSearchOpen(false)} />
     </aside>
   );
 }

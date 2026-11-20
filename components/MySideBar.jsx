@@ -8,7 +8,6 @@ import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import tabs from "@/lib/SideBarTabs";
 import { toast } from "sonner";
-import { ThemeToggle } from "@/components/ThemeToggle";
 import { GlobalSearchModal } from "@/components/GlobalSearchModal";
 import { hasPermission } from "@/lib/permissions";
 
@@ -179,7 +178,6 @@ export function MySideBar() {
 
         {/* Footer */}
         <div className="border-t border-sidebar-border">
-          <ThemeToggle collapsed={isCollapsed} className={`mx-2 mt-2 ${isCollapsed ? "" : "w-[calc(100%-1rem)]"}`} />
           <button
             onClick={handleLogout}
             className={`p-4 flex items-center hover:bg-destructive hover:text-white cursor-pointer duration-150 ${

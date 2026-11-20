@@ -37,6 +37,7 @@ import {
   Trash2,
   TrendingDown,
   Eye,
+  Repeat,
 } from "lucide-react";
 import { format } from "date-fns";
 import Link from "next/link";
@@ -193,10 +194,18 @@ export default function DisbursementsPage() {
               </div>
             </div>
 
-            <Button onClick={() => setIsModalOpen(true)} className="bg-red-600 hover:bg-red-700 flex items-center gap-2 shrink-0">
-              <Plus className="h-4 w-4" />
-              <span className="hidden sm:inline">Add Disbursement</span>
-            </Button>
+            <div className="flex items-center gap-2 shrink-0">
+              <Link href="/dashboard/disbursements/recurring">
+                <Button variant="outline" className="flex items-center gap-2">
+                  <Repeat className="h-4 w-4" />
+                  <span className="hidden sm:inline">Recurring</span>
+                </Button>
+              </Link>
+              <Button onClick={() => setIsModalOpen(true)} className="bg-red-600 hover:bg-red-700 flex items-center gap-2">
+                <Plus className="h-4 w-4" />
+                <span className="hidden sm:inline">Add Disbursement</span>
+              </Button>
+            </div>
           </div>
         </div>
 
@@ -356,7 +365,17 @@ export default function DisbursementsPage() {
                     <TableCell className="font-medium text-gray-500 dark:text-gray-400">
                       {(currentPage - 1) * pageSize + index + 1}
                     </TableCell>
-                    <TableCell className="font-medium text-gray-900 dark:text-gray-100">{item.description}</TableCell>
+                    <TableCell className="font-medium text-gray-900 dark:text-gray-100">
+                      <div className="flex items-center gap-2">
+                        {item.description}
+                        {item.recurringSourceId && (
+                          <Badge variant="outline" className="flex items-center gap-1 text-xs font-normal">
+                            <Repeat className="h-3 w-3" />
+                            Auto
+                          </Badge>
+                        )}
+                      </div>
+                    </TableCell>
                     <TableCell>
                       <Badge variant="outline">{item.category}</Badge>
                     </TableCell>

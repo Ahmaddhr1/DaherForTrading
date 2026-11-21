@@ -4,7 +4,7 @@ import { NextResponse } from "next/server";
 import { getUserFromCookie } from "@/lib/auth";
 import { logActivity } from "@/lib/activityLog";
 import { priceOrderItems, PricingError } from "@/lib/orderPricing";
-import { requirePermission } from "@/lib/permissions";
+import { requirePermission, hasPermission } from "@/lib/permissions";
 
 // Creates a draft order with no real customer yet - just a hand-typed name,
 // for the product-grid cart's "type a name" checkout path. The customer
@@ -30,9 +30,12 @@ export async function POST(req) {
     let priced;
     try {
       // No linked customer yet, so there's no price tier to apply - prices
-      // out at tier 1 (Retail) for anyone but an owner, same default as a
-      // brand-new customer.
-      priced = await priceOrderItems(products, taxRate, { role: user?.role, priceTier: 1 });
+      // out at tier 1 (Retail) for anyone without canOverrideOrderPricing,
+      // same default as a brand-new customer.
+      priced = await priceOrderItems(products, taxRate, {
+        canOverridePricing: hasPermission(user, "canOverrideOrderPricing"),
+        priceTier: 1,
+      });
     } catch (err) {
       if (err instanceof PricingError) {
         return NextResponse.json({ message: err.message }, { status: err.status });

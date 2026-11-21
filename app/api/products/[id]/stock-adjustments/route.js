@@ -13,7 +13,7 @@ const VALID_TYPES = ["damaged", "lost", "expired", "correction", "other"];
 // the audit trail can never drift apart.
 export async function POST(req, { params }) {
   await connectToDB();
-  const forbidden = await requirePermission(await getUserFromCookie(), "canManageProducts");
+  const forbidden = await requirePermission(await getUserFromCookie(), "canEditProducts");
   if (forbidden) return forbidden;
 
   try {

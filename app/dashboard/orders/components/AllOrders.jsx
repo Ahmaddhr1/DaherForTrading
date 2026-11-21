@@ -57,7 +57,7 @@ export default function AllOrders() {
   const queryClient = useQueryClient();
   const { isOwner } = useIsOwner();
   const { hasPermission: canDelete } = useHasPermission("canDelete");
-  const { hasPermission: canCreateOrders } = useHasPermission("canCreateOrders");
+  const { hasPermission: canEditOrders } = useHasPermission("canEditOrders");
   const { hasPermission: canFinalizeOrders } = useHasPermission("canFinalizeOrders");
 
   const [page, setPage] = useState(1);
@@ -191,7 +191,7 @@ export default function AllOrders() {
         <DropdownMenuItem onClick={() => handleAction("view", order._id)}>
           View Invoice
         </DropdownMenuItem>
-        {order.status === "pending" && canCreateOrders && (
+        {order.status === "pending" && canEditOrders && (
           <DropdownMenuItem onClick={() => router.push(`/dashboard/orders/${order._id}/edit`)}>
             Update Order
           </DropdownMenuItem>

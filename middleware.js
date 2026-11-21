@@ -78,12 +78,13 @@ const PERMISSION_GATED_PATHS = [
   // record lists themselves stay open to every employee; only the pages
   // whose entire purpose is the gated action redirect away without it, so
   // an employee can't land on a form that would just 403 on submit.
-  { test: (p) => p === '/dashboard/customers/create', permission: 'canManageCustomers' },
+  { test: (p) => p === '/dashboard/customers/create', permission: 'canCreateCustomers' },
   { test: (p) => /^\/dashboard\/customers\/[^/]+\/addorder$/.test(p), permission: 'canCreateOrders' },
-  { test: (p) => p === '/dashboard/companies/create', permission: 'canManageCompanies' },
-  { test: (p) => /^\/dashboard\/companies\/[^/]+\/addpurchase$/.test(p), permission: 'canManageCompanies' },
-  { test: (p) => p === '/dashboard/products/add', permission: 'canManageProducts' },
-  { test: (p) => p === '/dashboard/categories/add', permission: 'canManageCategories' },
+  { test: (p) => p === '/dashboard/companies/create', permission: 'canCreateCompanies' },
+  { test: (p) => /^\/dashboard\/companies\/[^/]+\/addpurchase$/.test(p), permission: 'canRecordPurchases' },
+  { test: (p) => p === '/dashboard/products/add', permission: 'canCreateProducts' },
+  { test: (p) => p === '/dashboard/categories/add', permission: 'canCreateCategories' },
+  { test: (p) => /^\/dashboard\/orders\/[^/]+\/edit$/.test(p), permission: 'canEditOrders' },
 ]
 
 function permissionGateFor(pathname) {

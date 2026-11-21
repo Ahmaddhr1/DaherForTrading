@@ -75,7 +75,7 @@ export async function GET(req, { params }) {
 // Create a purchase from this company (restocking a product)
 export async function POST(req, { params }) {
   await connectToDB();
-  const forbidden = await requirePermission(await getUserFromCookie(), "canManageCompanies");
+  const forbidden = await requirePermission(await getUserFromCookie(), "canRecordPurchases");
   if (forbidden) return forbidden;
 
   try {

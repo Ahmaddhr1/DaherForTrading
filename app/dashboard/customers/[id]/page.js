@@ -24,7 +24,7 @@ const EditCustomerPage = () => {
   const router = useRouter();
   const { id } = useParams();
   const queryClient = useQueryClient();
-  const { hasPermission: canManageCustomers } = useHasPermission("canManageCustomers");
+  const { hasPermission: canEditCustomers } = useHasPermission("canEditCustomers");
   const { hasPermission: canCreateOrders } = useHasPermission("canCreateOrders");
 
   const [form, setForm] = useState({
@@ -251,7 +251,7 @@ const EditCustomerPage = () => {
                           value={form.fullName}
                           onChange={handleChange}
                           className="focus:border-blue-500 transition-colors"
-                          disabled={!canManageCustomers}
+                          disabled={!canEditCustomers}
                           required
                         />
                       </div>
@@ -270,7 +270,7 @@ const EditCustomerPage = () => {
                           value={form.phoneNumber}
                           onChange={handleChange}
                           className="focus:border-blue-500 transition-colors"
-                          disabled={!canManageCustomers}
+                          disabled={!canEditCustomers}
                           required
                         />
                       </div>
@@ -296,7 +296,7 @@ const EditCustomerPage = () => {
                         name="priceTier"
                         value={form.priceTier}
                         onChange={handleChange}
-                        disabled={!canManageCustomers}
+                        disabled={!canEditCustomers}
                         className="w-full p-2 border border-gray-300 dark:border-gray-700 rounded-md focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
                       >
                         {PRICE_TIERS.map((tier) => (
@@ -354,7 +354,7 @@ const EditCustomerPage = () => {
                     </Button>
                     <Button
                       type="submit"
-                      disabled={mutation.isPending || !canManageCustomers}
+                      disabled={mutation.isPending || !canEditCustomers}
                       className="flex-1"
                     >
                       {mutation.isPending ? (

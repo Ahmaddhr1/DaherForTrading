@@ -51,7 +51,7 @@ export default function CustomersPage() {
   const [sortBy, setSortBy] = useState("newest");
   const queryClient = useQueryClient();
   const { hasPermission: canDelete } = useHasPermission("canDelete");
-  const { hasPermission: canManageCustomers } = useHasPermission("canManageCustomers");
+  const { hasPermission: canCreateCustomers } = useHasPermission("canCreateCustomers");
 
   // Fetch customers data with filters
   const { data, isLoading, error } = useQuery({
@@ -148,7 +148,7 @@ export default function CustomersPage() {
               </div>
             </div>
 
-            {canManageCustomers && (
+            {canCreateCustomers && (
               <Link href="/dashboard/customers/create">
                 <Button className="flex items-center gap-2">
                   <Plus className="h-4 w-4" />
@@ -315,7 +315,7 @@ export default function CustomersPage() {
                     Clear Filters
                   </Button>
                 </div>
-              ) : canManageCustomers ? (
+              ) : canCreateCustomers ? (
                 <Link href="/dashboard/customers/create">
                   <Button className="mt-2">Add Your First Customer</Button>
                 </Link>

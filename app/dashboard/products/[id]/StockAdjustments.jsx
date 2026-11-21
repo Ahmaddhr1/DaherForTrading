@@ -51,7 +51,7 @@ export default function StockAdjustments({ productId, currentQuantity, unit }) {
   const queryClient = useQueryClient();
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState(EMPTY_FORM);
-  const { hasPermission: canManageProducts } = useHasPermission("canManageProducts");
+  const { hasPermission: canEditProducts } = useHasPermission("canEditProducts");
 
   const { data, isLoading, error } = useQuery({
     queryKey: ["stock-adjustments", productId],
@@ -96,7 +96,7 @@ export default function StockAdjustments({ productId, currentQuantity, unit }) {
           <ClipboardList className="h-5 w-5 text-purple-600" />
           Stock Adjustments
         </CardTitle>
-        {canManageProducts && (
+        {canEditProducts && (
           <Button
             type="button"
             size="sm"

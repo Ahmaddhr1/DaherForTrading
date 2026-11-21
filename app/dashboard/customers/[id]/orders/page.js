@@ -55,7 +55,7 @@ export default function CustomerOrdersTable() {
   const queryClient = useQueryClient();
 
   const [actionLoading, setActionLoading] = useState(false);
-  const { hasPermission: canCreateOrders } = useHasPermission("canCreateOrders");
+  const { hasPermission: canEditOrders } = useHasPermission("canEditOrders");
   const { hasPermission: canFinalizeOrders } = useHasPermission("canFinalizeOrders");
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
@@ -408,7 +408,7 @@ export default function CustomerOrdersTable() {
                         <DropdownMenuContent align="end">
                           {order.status === "draft" ? (
                             <>
-                              {canCreateOrders && (
+                              {canEditOrders && (
                                 <DropdownMenuItem onClick={() => handleAction("continueEditing", order._id)}>
                                   Continue Editing
                                 </DropdownMenuItem>
@@ -433,7 +433,7 @@ export default function CustomerOrdersTable() {
                                 {actionLoading && <Loader2 className="animate-spin h-4 w-4 mr-2" />}
                                 Print
                               </DropdownMenuItem>
-                              {order.status === "pending" && canCreateOrders && (
+                              {order.status === "pending" && canEditOrders && (
                                 <DropdownMenuItem onClick={() => router.push(`/dashboard/orders/${order._id}/edit`)}>
                                   Update Order
                                 </DropdownMenuItem>

@@ -36,7 +36,7 @@ const PAGE_SIZE_OPTIONS = [10, 20, 50];
 export default function DraftOrders() {
   const router = useRouter();
   const queryClient = useQueryClient();
-  const { hasPermission: canCreateOrders } = useHasPermission("canCreateOrders");
+  const { hasPermission: canEditOrders } = useHasPermission("canEditOrders");
   const { hasPermission: canFinalizeOrders } = useHasPermission("canFinalizeOrders");
 
   const [page, setPage] = useState(1);
@@ -132,12 +132,12 @@ export default function DraftOrders() {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
-        {canCreateOrders && (
+        {canEditOrders && (
           <DropdownMenuItem onClick={() => handleAction("continueEditing", order._id)}>
             Continue Editing
           </DropdownMenuItem>
         )}
-        {canCreateOrders && (
+        {canEditOrders && (
           <DropdownMenuItem onClick={() => setLinkingOrder(order)}>
             {order.customer ? "Change Linked Customer" : "Link Customer"}
           </DropdownMenuItem>

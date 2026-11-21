@@ -29,7 +29,7 @@ const EditCategoryPage = () => {
   const router = useRouter();
   const queryClient = useQueryClient();
   const { hasPermission: canDelete } = useHasPermission("canDelete");
-  const { hasPermission: canManageCategories } = useHasPermission("canManageCategories");
+  const { hasPermission: canEditCategories } = useHasPermission("canEditCategories");
 
   const [formData, setFormData] = useState({
     name: "",
@@ -240,7 +240,7 @@ const EditCategoryPage = () => {
                       value={formData.name}
                       onChange={handleInputChange}
                       className="focus:border-blue-500 transition-colors"
-                      disabled={!canManageCategories}
+                      disabled={!canEditCategories}
                       required
                     />
                   </div>
@@ -254,7 +254,7 @@ const EditCategoryPage = () => {
                     </Link>
                     <Button
                       type="submit"
-                      disabled={updateMutation.isPending || !canManageCategories}
+                      disabled={updateMutation.isPending || !canEditCategories}
                       className="flex-1"
                     >
                       {updateMutation.isPending ? (

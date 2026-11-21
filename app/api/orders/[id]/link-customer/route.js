@@ -12,7 +12,7 @@ import { requirePermission } from "@/lib/permissions";
 // separate explicit action (PUT /api/orders/[id]/finalize).
 export async function PATCH(req, { params }) {
   await connectToDB();
-  const forbidden = await requirePermission(await getUserFromCookie(), "canCreateOrders");
+  const forbidden = await requirePermission(await getUserFromCookie(), "canEditOrders");
   if (forbidden) return forbidden;
 
   try {

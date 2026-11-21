@@ -31,7 +31,7 @@ export async function GET(_, { params }) {
 // UPDATE a product by ID
 export async function PUT(req, { params }) {
   await connectToDB();
-  const forbiddenPermission = await requirePermission(await getUserFromCookie(), "canManageProducts");
+  const forbiddenPermission = await requirePermission(await getUserFromCookie(), "canEditProducts");
   if (forbiddenPermission) return forbiddenPermission;
 
   try {

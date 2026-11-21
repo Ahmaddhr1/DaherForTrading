@@ -19,7 +19,7 @@ export async function GET(_, { params }) {
 
 export async function PUT(req, { params }) {
   await connectToDB();
-  const forbidden = await requirePermission(await getUserFromCookie(), 'canManageCategories');
+  const forbidden = await requirePermission(await getUserFromCookie(), 'canEditCategories');
   if (forbidden) return forbidden;
 
   const { name } = await req.json();

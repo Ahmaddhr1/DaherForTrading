@@ -51,7 +51,8 @@ export default function ProductsPage() {
   const { addToCart } = useCart();
   const { isOwner } = useIsOwner();
   const { hasPermission: canDelete } = useHasPermission("canDelete");
-  const { hasPermission: canManageProducts } = useHasPermission("canManageProducts");
+  const { hasPermission: canCreateProducts } = useHasPermission("canCreateProducts");
+  const { hasPermission: canEditProducts } = useHasPermission("canEditProducts");
   const queryClient = useQueryClient();
 
   // The category sidebar's height is capped to match whatever height the
@@ -230,7 +231,7 @@ export default function ProductsPage() {
                 <FileDown className="h-4 w-4" />
                 <span className="hidden sm:inline">Generate PDF</span>
               </Button>
-              {canManageProducts && (
+              {canCreateProducts && (
                 <Link href="/dashboard/products/add">
                   <Button className="flex items-center gap-2">
                     <Plus className="h-4 w-4" />
@@ -366,13 +367,13 @@ export default function ProductsPage() {
                 {selectedIds.length} selected
               </span>
               <div className="flex flex-wrap gap-2 ml-auto">
-                {canManageProducts && (
+                {canEditProducts && (
                   <Button size="sm" variant="outline" onClick={() => setBulkPriceModalOpen(true)}>
                     <DollarSign className="h-3.5 w-3.5 mr-1" />
                     Update Price
                   </Button>
                 )}
-                {canManageProducts && (
+                {canEditProducts && (
                   <Button size="sm" variant="outline" onClick={() => setBulkCategoryModalOpen(true)}>
                     <Tag className="h-3.5 w-3.5 mr-1" />
                     Reassign Category

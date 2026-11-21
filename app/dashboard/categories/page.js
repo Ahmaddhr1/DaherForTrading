@@ -26,7 +26,7 @@ const CategoriesPage = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const limit = 12;
-  const { hasPermission: canManageCategories } = useHasPermission("canManageCategories");
+  const { hasPermission: canCreateCategories } = useHasPermission("canCreateCategories");
 
   // Fetch categories data
   const { data, isLoading, error } = useQuery({
@@ -77,7 +77,7 @@ const CategoriesPage = () => {
               </div>
             </div>
 
-            {canManageCategories && (
+            {canCreateCategories && (
               <Link href="/dashboard/categories/add">
                 <Button className="flex items-center gap-2 shrink-0">
                   <Plus className="h-4 w-4" />
@@ -143,7 +143,7 @@ const CategoriesPage = () => {
                   ? "Try adjusting your search."
                   : "Categories help you organize your products. Create your first category to get started."}
               </p>
-              {!searchTerm && canManageCategories && (
+              {!searchTerm && canCreateCategories && (
                 <Link href="/dashboard/categories/add">
                   <Button>
                     <Plus className="h-4 w-4 mr-2" />

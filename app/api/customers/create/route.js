@@ -6,7 +6,7 @@ import { requirePermission } from "@/lib/permissions";
 
 export async function POST(req) {
   await connectToDB();
-  const forbidden = await requirePermission(await getUserFromCookie(), "canManageCustomers");
+  const forbidden = await requirePermission(await getUserFromCookie(), "canCreateCustomers");
   if (forbidden) return forbidden;
 
   try {

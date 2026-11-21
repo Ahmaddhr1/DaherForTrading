@@ -180,12 +180,12 @@ export async function POST(req) {
     }
 
     if (action === "priceUpdate") {
-      const forbidden = await requirePermission(await getUserFromCookie(), "canManageProducts");
+      const forbidden = await requirePermission(await getUserFromCookie(), "canEditProducts");
       if (forbidden) return forbidden;
       return await handlePriceUpdate(productIds, body);
     }
     if (action === "categoryReassign") {
-      const forbidden = await requirePermission(await getUserFromCookie(), "canManageProducts");
+      const forbidden = await requirePermission(await getUserFromCookie(), "canEditProducts");
       if (forbidden) return forbidden;
       return await handleCategoryReassign(productIds, body);
     }

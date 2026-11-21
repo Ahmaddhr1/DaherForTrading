@@ -6,7 +6,7 @@ import { NextResponse } from "next/server";
 import { getUserFromCookie } from "@/lib/auth";
 import { logActivity } from "@/lib/activityLog";
 import { priceOrderItems, PricingError } from "@/lib/orderPricing";
-import { requirePermission } from "@/lib/permissions";
+import { requirePermission, hasPermission } from "@/lib/permissions";
 
 // GET one
 export async function GET(_, { params }) {
@@ -115,7 +115,7 @@ export async function DELETE(request, { params }) {
 // delta before any write happens.
 export async function PUT(req, { params }) {
   await connectToDB();
-  const forbiddenPermission = await requirePermission(await getUserFromCookie(), "canCreateOrders");
+  const forbiddenPermission = await requirePermission(await getUserFromCookie(), "canEditOrders");
   if (forbiddenPermission) return forbiddenPermission;
 
   try {
@@ -143,11 +143,14 @@ export async function PUT(req, { params }) {
 
     const effectiveTaxRate = taxRate !== undefined ? taxRate : order.taxRate;
 
-    // Needed to re-derive the correct price for a non-owner's submitted
-    // line items - see priceOrderItems.
+    // Needed to re-derive the correct price for a submitted line item
+    // without override permission - see priceOrderItems.
     const user = await getUserFromCookie();
     const orderCustomer = order.customer ? await Customer.findById(order.customer) : null;
-    const pricingContext = { role: user?.role, priceTier: orderCustomer?.priceTier || 1 };
+    const pricingContext = {
+      canOverridePricing: hasPermission(user, "canOverrideOrderPricing"),
+      priceTier: orderCustomer?.priceTier || 1,
+    };
 
     if (order.status === "draft") {
       let priced;
@@ -305,8 +308,8 @@ export async function POST(req, { params }) {
       );
     }
 
-    // Needed to re-derive the correct price for a non-owner's submitted
-    // line items - see priceOrderItems.
+    // Needed to re-derive the correct price for a submitted line item
+    // without override permission - see priceOrderItems.
     const user = await getUserFromCookie();
     const customer = await Customer.findById(customerId);
     if (!customer) {
@@ -316,7 +319,7 @@ export async function POST(req, { params }) {
     let priced;
     try {
       priced = await priceOrderItems(products, taxRate, {
-        role: user?.role,
+        canOverridePricing: hasPermission(user, "canOverrideOrderPricing"),
         priceTier: customer.priceTier || 1,
       });
     } catch (err) {

@@ -66,12 +66,12 @@ export default function ActivityEntryPage() {
               <div className="min-w-0">
                 <div className="flex flex-wrap items-center gap-2 mb-1">
                   <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${KIND_BADGE[kind]}`}>
-                    {describeAction(entry.action)}
+                    {describeAction(entry.action, t)}
                   </span>
-                  <Badge variant="outline">{entry.entityType}</Badge>
+                  <Badge variant="outline">{t(entry.entityType)}</Badge>
                 </div>
                 <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-gray-100 break-words">
-                  {entry.entityLabel || describeAction(entry.action)}
+                  {entry.entityLabel || describeAction(entry.action, t)}
                 </h1>
                 <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-gray-600 dark:text-gray-400">
                   <span className="inline-flex items-center gap-1.5">

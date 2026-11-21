@@ -3,7 +3,7 @@ import { t } from "@/lib/i18n";
 import { useT } from "@/lib/i18n/LangProvider";
 
 import { ArrowRight } from "lucide-react";
-import { formatAuditValue } from "@/lib/auditFields";
+import { formatAuditValue, translateChangeLabel } from "@/lib/auditFields";
 
 // Field-by-field "previous vs current" view of an audit entry's changes.
 // `kind` ("create" | "delete" | "change") only adjusts the column headings
@@ -30,7 +30,7 @@ export function ChangesTable({ changes, kind = "change" }) {
         <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
           {changes.map((change) => (
             <tr key={change.field} className="align-top">
-              <td className="px-4 py-3 font-medium text-gray-900 dark:text-gray-100">{t(change.label)}</td>
+              <td className="px-4 py-3 font-medium text-gray-900 dark:text-gray-100">{translateChangeLabel(change.label, t)}</td>
               <td className="px-4 py-3">
                 <ValuePill value={change.before} format={change.format} tone="before" />
               </td>
@@ -49,7 +49,7 @@ export function ChangesTable({ changes, kind = "change" }) {
       <ul className="md:hidden divide-y divide-gray-100 dark:divide-gray-800">
         {changes.map((change) => (
           <li key={change.field} className="p-4 space-y-2">
-            <p className="text-sm font-semibold text-gray-900 dark:text-gray-100">{t(change.label)}</p>
+            <p className="text-sm font-semibold text-gray-900 dark:text-gray-100">{translateChangeLabel(change.label, t)}</p>
             <div className="grid grid-cols-2 gap-2 text-sm">
               <div>
                 <p className="text-[11px] uppercase tracking-wide text-gray-500 dark:text-gray-400 mb-1">{beforeHeading}</p>
@@ -69,7 +69,8 @@ export function ChangesTable({ changes, kind = "change" }) {
 
 function ValuePill({ value, format, tone }) {
   const empty = value === null || value === undefined || value === "";
-  const text = formatAuditValue(value, format);
+  const t = useT();
+  const text = formatAuditValue(value, format, t);
   if (empty) {
     return <span className="text-gray-400 dark:text-gray-500">—</span>;
   }
@@ -92,10 +93,10 @@ export function ChangePreview({ changes, total }) {
     <ul className="mt-1.5 space-y-0.5 text-xs text-gray-600 dark:text-gray-400">
       {changes.map((c) => (
         <li key={c.field} className="truncate">
-          <span className="font-medium text-gray-700 dark:text-gray-300">{c.label.replace(/^Permission: /, "")}:</span>{" "}
-          <span className="line-through decoration-red-400/70">{formatAuditValue(c.before, c.format)}</span>
+          <span className="font-medium text-gray-700 dark:text-gray-300">{translateChangeLabel(c.label, t).replace(/^(Permission:|الصلاحية:) /, "")}:</span>{" "}
+          <span className="line-through decoration-red-400/70">{formatAuditValue(c.before, c.format, t)}</span>
           {" → "}
-          <span className="text-green-700 dark:text-green-400">{formatAuditValue(c.after, c.format)}</span>
+          <span className="text-green-700 dark:text-green-400">{formatAuditValue(c.after, c.format, t)}</span>
         </li>
       ))}
       {total > changes.length && (

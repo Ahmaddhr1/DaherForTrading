@@ -210,7 +210,7 @@ export default function ActivityPage() {
             <option value="">{t("All types")}</option>
             {ENTITY_TYPES.map((type) => (
               <option key={type} value={type}>
-                {type}
+                {t(type)}
               </option>
             ))}
           </select>
@@ -272,10 +272,10 @@ export default function ActivityPage() {
                         <TableCell>
                           <div className="flex items-center gap-2">
                             <span className={`h-2 w-2 rounded-full ${KIND_DOT[actionKind(entry.action)]}`} />
-                            <Badge variant="outline">{entry.entityType}</Badge>
+                            <Badge variant="outline">{t(entry.entityType)}</Badge>
                           </div>
                           <p className="mt-1 text-xs text-gray-500 dark:text-gray-400 whitespace-nowrap">
-                            {describeAction(entry.action)}
+                            {describeAction(entry.action, t)}
                           </p>
                         </TableCell>
                         <TableCell className="whitespace-normal max-w-md">

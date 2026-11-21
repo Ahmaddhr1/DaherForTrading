@@ -9,19 +9,6 @@ const supplierPaymentSchema = new mongoose.Schema(
     company: { type: mongoose.Types.ObjectId, ref: "Company", required: true },
     // The purchase this payment settled, when it came from one.
     purchase: { type: mongoose.Types.ObjectId, ref: "Purchase", default: null },
-    // For a manual "Pay a supplier" payment: which unpaid purchases it was
-    // applied to (oldest first) - see lib/paymentAllocation.js.
-    allocations: {
-      type: [
-        {
-          purchase: { type: mongoose.Types.ObjectId, ref: "Purchase" },
-          productName: String,
-          amount: Number,
-          _id: false,
-        },
-      ],
-      default: [],
-    },
     amount: { type: Number, required: true },
     // What we owed this company before/after the payment.
     previousDebt: { type: Number, required: true },

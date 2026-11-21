@@ -5,8 +5,6 @@ import Payment from "@/models/Payment";
 import { NextResponse } from "next/server";
 import { getUserFromCookie } from "@/lib/auth";
 import { logActivity } from "@/lib/activityLog";
-import { allocateCustomerPayment } from "@/lib/paymentAllocation";
-import { orderLabel } from "@/lib/audit";
 import { auditView, diffViews, snapshotChanges, extraChange, describeChanges } from "@/lib/audit";
 import { requirePermission } from "@/lib/permissions";
 
@@ -50,18 +48,11 @@ export async function POST(req) {
     customer.debt = newDebt;
     await customer.save();
 
-    // Apply the money to the customer's open orders (oldest first) so each
-    // order reflects what's actually been paid on it - otherwise marking one
-    // of those orders paid later would collect the same money again.
-    const { allocations } = await allocateCustomerPayment(customerId, paymentAmount);
-
     const payment = await Payment.create({
       customer: customerId,
       amount: paymentAmount,
       previousDebt,
       newDebt,
-      source: "manual",
-      allocations,
     });
 
     await logActivity({
@@ -74,9 +65,6 @@ export async function POST(req) {
       changes: [
         extraChange("amount", "Payment amount", null, paymentAmount, "money"),
         extraChange("customer.debt", "Customer debt", previousDebt, newDebt, "money"),
-        ...allocations.map((a) =>
-          extraChange(`applied.${a.order}`, `Applied to ${orderLabel(a.order)}`, null, a.amount, "money")
-        ),
       ],
       metadata: { customerId, previousDebt, newDebt },
     });

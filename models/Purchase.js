@@ -26,11 +26,6 @@ const purchaseSchema = new mongoose.Schema(
     // what's added to Company.debt when the purchase is unpaid.
     total: { type: Number, required: true },
     paid: { type: Boolean, default: false },
-    // How much of `total` has been paid to the company so far - supplier
-    // payments can cover a purchase partially (see lib/paymentAllocation.js).
-    // Unset on purchases created before this existed: read it through
-    // purchasePaidAmount(), which falls back to `paid ? total : 0`.
-    amountPaid: { type: Number },
   },
   { timestamps: true }
 );

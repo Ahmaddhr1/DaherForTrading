@@ -389,23 +389,7 @@ export default function PaymentsPage() {
                           Order #{String(payment.order).slice(-6).toUpperCase()}
                         </Link>
                       ) : (
-                        <div className="space-y-1">
-                          <span className="text-xs text-gray-500 dark:text-gray-400">Manual payment</span>
-                          {payment.allocations?.length > 0 && (
-                            <div className="flex flex-wrap gap-1">
-                              {payment.allocations.map((a) => (
-                                <Link
-                                  key={String(a.order)}
-                                  href={`/dashboard/orders/${a.order}`}
-                                  title={`$${a.amount} applied to this order`}
-                                  className="inline-flex items-center rounded-md bg-gray-100 dark:bg-gray-800 px-1.5 py-0.5 text-[11px] font-medium text-gray-700 dark:text-gray-300 hover:underline"
-                                >
-                                  #{String(a.order).slice(-6).toUpperCase()} · ${a.amount.toLocaleString()}
-                                </Link>
-                              ))}
-                            </div>
-                          )}
-                        </div>
+                        <span className="text-xs text-gray-500 dark:text-gray-400">Manual payment</span>
                       )}
                     </TableCell>
                     <TableCell className="text-gray-500 dark:text-gray-400 text-sm">
@@ -645,8 +629,7 @@ function MakePaymentForm({ onSuccess }) {
                   onChange={(e) => setAmount(e.target.value)}
                 />
                 <p className="text-xs text-gray-500 dark:text-gray-400">
-                  Defaults to the full outstanding debt. Enter a smaller amount for a partial payment. It&apos;s
-                  applied to this customer&apos;s oldest unpaid orders first, so those orders show as paid.
+                  Defaults to the full outstanding debt. Enter a smaller amount for a partial payment.
                 </p>
               </div>
 

@@ -131,7 +131,6 @@ export async function POST(req, { params }) {
       taxAmount: numericTaxAmount,
       total,
       paid: isPaid,
-      amountPaid: isPaid ? total : 0,
     });
 
     // Restock the product and refresh its cost basis to the new unit price.

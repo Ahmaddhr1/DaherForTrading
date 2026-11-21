@@ -2,14 +2,10 @@
 
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { toast } from "sonner";
-import { Modal } from "@/components/ui/modal";
-import { ConfirmDialog } from "@/components/ui/confirm-dialog";
-import { useHasPermission } from "@/lib/useHasPermission";
+import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { format } from "date-fns";
-import { Search, Building2, History, ChevronLeft, ChevronRight, X, CheckCircle, Plus } from "lucide-react";
+import { Search, Building2, History, ChevronLeft, ChevronRight, X, CheckCircle } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -27,8 +23,6 @@ export default function SupplierPaymentsView() {
   const [endDate, setEndDate] = useState("");
   const [page, setPage] = useState(1);
   const [hasInteracted, setHasInteracted] = useState(false);
-  const [payOpen, setPayOpen] = useState(false);
-  const { hasPermission: canRecordPurchases } = useHasPermission("canRecordPurchases");
   const limit = 10;
 
   useEffect(() => {
@@ -68,25 +62,6 @@ export default function SupplierPaymentsView() {
 
   return (
     <>
-      {canRecordPurchases && (
-        <div className="flex justify-end -mt-2 mb-4">
-          <Button onClick={() => setPayOpen(true)} className="flex items-center gap-2">
-            <Plus className="h-4 w-4" />
-            Pay a Supplier
-          </Button>
-        </div>
-      )}
-
-      <Modal
-        open={payOpen}
-        onClose={() => setPayOpen(false)}
-        title="Pay a Supplier"
-        description="Record money paid to a company. It's applied to their oldest unpaid purchases first."
-        maxWidth="max-w-xl"
-      >
-        <PaySupplierForm onSuccess={() => setPayOpen(false)} />
-      </Modal>
-
       <Card className="shadow-sm border-gray-200 dark:border-gray-800 mb-6">
         <CardContent className="p-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
           <div className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
@@ -194,19 +169,7 @@ export default function SupplierPaymentsView() {
                     </div>
                   </TableCell>
                   <TableCell className="text-sm text-gray-600 dark:text-gray-400">
-                    {p.purchase ? (
-                      `${p.purchase.quantity} x ${p.purchase.productName}`
-                    ) : p.allocations?.length > 0 ? (
-                      <div className="space-y-0.5">
-                        {p.allocations.map((a) => (
-                          <div key={String(a.purchase)} className="text-xs">
-                            {a.productName} · ${a.amount.toLocaleString()}
-                          </div>
-                        ))}
-                      </div>
-                    ) : (
-                      "Balance payment"
-                    )}
+                    {p.purchase ? `${p.purchase.quantity} x ${p.purchase.productName}` : "—"}
                   </TableCell>
                   <TableCell className="text-center font-semibold text-violet-600">
                     -${p.amount.toLocaleString()}
@@ -247,97 +210,5 @@ export default function SupplierPaymentsView() {
         </Card>
       )}
     </>
-  );
-}
-
-function PaySupplierForm({ onSuccess }) {
-  const queryClient = useQueryClient();
-  const [companyId, setCompanyId] = useState("");
-  const [amount, setAmount] = useState("");
-  const [confirmOpen, setConfirmOpen] = useState(false);
-
-  // Companies we currently owe money to.
-  const { data: companies = [], isLoading } = useQuery({
-    queryKey: ["companies-owed"],
-    queryFn: async () => {
-      const res = await axios.get("/api/companies", { params: { all: true, debtFilter: "hasDebt" } });
-      return Array.isArray(res.data) ? res.data : [];
-    },
-  });
-
-  const company = companies.find((c) => c._id === companyId);
-  const owed = company?.debt || 0;
-
-  useEffect(() => {
-    if (company) setAmount(String(company.debt));
-  }, [companyId]); // eslint-disable-line react-hooks/exhaustive-deps
-
-  const value = parseFloat(amount) || 0;
-  const valid = !!company && value > 0 && value <= owed + 0.005;
-
-  const mutation = useMutation({
-    mutationFn: async () => (await axios.post("/api/supplier-payments", { companyId, amount: value })).data,
-    onSuccess: () => {
-      toast.success("Supplier payment recorded");
-      queryClient.invalidateQueries({ queryKey: ["supplier-payments"] });
-      queryClient.invalidateQueries({ queryKey: ["companies-owed"] });
-      queryClient.invalidateQueries({ queryKey: ["company-purchases"] });
-      setConfirmOpen(false);
-      onSuccess();
-    },
-    onError: (err) => toast.error(err.response?.data?.error || "Failed to record supplier payment"),
-  });
-
-  return (
-    <div className="space-y-4">
-      <div className="space-y-2">
-        <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Company</label>
-        <select
-          value={companyId}
-          onChange={(e) => setCompanyId(e.target.value)}
-          className="w-full border rounded-md text-sm px-3 py-2 bg-transparent"
-          disabled={isLoading}
-        >
-          <option value="">{isLoading ? "Loading..." : companies.length ? "Select a company you owe" : "You don't owe any company"}</option>
-          {companies.map((c) => (
-            <option key={c._id} value={c._id}>
-              {c.name} — owed ${c.debt.toLocaleString()}
-            </option>
-          ))}
-        </select>
-      </div>
-
-      {company && (
-        <>
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Amount ($)</label>
-            <Input type="number" min="0" max={owed} step="0.01" value={amount} onChange={(e) => setAmount(e.target.value)} />
-            <p className="text-xs text-gray-500 dark:text-gray-400">
-              Defaults to everything you owe them. Enter less for a partial payment.
-            </p>
-          </div>
-          <div className="bg-gray-50 dark:bg-gray-950 rounded-lg p-4 flex items-center justify-between">
-            <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Still owed after payment</span>
-            <span className={`font-bold ${owed - value > 0 ? "text-red-600" : "text-green-600"}`}>
-              ${Math.max(0, owed - value).toLocaleString()}
-            </span>
-          </div>
-          <Button className="w-full" disabled={!valid || mutation.isPending} onClick={() => setConfirmOpen(true)}>
-            Record Supplier Payment
-          </Button>
-        </>
-      )}
-
-      <ConfirmDialog
-        open={confirmOpen}
-        onClose={() => setConfirmOpen(false)}
-        title="Record supplier payment?"
-        description={`Pay ${company?.name} $${value.toFixed(2)}? It will be applied to their oldest unpaid purchases first.`}
-        confirmLabel="Record Payment"
-        variant="default"
-        loading={mutation.isPending}
-        onConfirm={() => mutation.mutate()}
-      />
-    </div>
   );
 }

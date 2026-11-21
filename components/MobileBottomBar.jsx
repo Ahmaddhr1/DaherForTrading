@@ -14,6 +14,7 @@ import { useCart } from "@/lib/cartContext";
 import { GlobalSearchModal } from "@/components/GlobalSearchModal";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { hasPermission } from "@/lib/permissions";
+import { LanguageSwitch } from "@/components/LanguageSwitch";
 
 // Searches both top-level tabs and any nested `children` (see
 // SideBarTabs.js) - mobile doesn't nest them visually, it just needs to
@@ -283,6 +284,7 @@ export function MobileBottomBar() {
               )}
               {activeSheet.key === "more" && (
                 <>
+                  <LanguageSwitch className="rounded-lg !p-3 text-gray-700 dark:text-gray-300 hover:!bg-gray-100 dark:hover:!bg-gray-800 hover:!text-inherit" />
                   <button
                     onClick={() => {
                       setOpenSection(null);

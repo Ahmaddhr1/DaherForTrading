@@ -31,6 +31,8 @@ import {
 } from "lucide-react";
 import { useSettings } from "@/lib/currency";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { LanguageSwitch } from "@/components/LanguageSwitch";
+import { Languages } from "lucide-react";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { useHasPermission } from "@/lib/useHasPermission";
 
@@ -253,6 +255,20 @@ export default function SettingsPage() {
             </div>
           </div>
         </div>
+
+        {/* Language */}
+        <Card className="shadow-sm border-gray-200 dark:border-gray-800 mb-6">
+          <CardHeader>
+            <CardTitle className="text-lg flex items-center gap-2">
+              <Languages className="h-5 w-5 text-blue-600" />
+              {t("Language")}
+            </CardTitle>
+            <CardDescription>{t("Choose the dashboard language. Arabic switches the layout to right-to-left.")}</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <LanguageSwitch variant="segmented" />
+          </CardContent>
+        </Card>
 
         {/* Appearance */}
         <Card className="shadow-sm border-gray-200 dark:border-gray-800 mb-6">

@@ -11,6 +11,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Loader2, Lock, User, Mail, ArrowLeft } from "lucide-react";
 import { toast } from "@/lib/i18n/toast";
+import { LanguageSwitch } from "@/components/LanguageSwitch";
 
 const OTP_RESEND_COOLDOWN_SECONDS = 30;
 
@@ -128,7 +129,10 @@ export default function LoginPage() {
   const isFormValid = formData.username.trim() && formData.password.trim();
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-950 flex items-center justify-center px-4">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-950 flex items-center justify-center px-4 relative">
+      <div className="absolute top-4 end-4">
+        <LanguageSwitch variant="pill" />
+      </div>
       <div className="w-full max-w-md">
         <div className="flex flex-col items-center mb-6">
           <svg width="56" height="56" viewBox="0 0 160 160" className="mb-3">

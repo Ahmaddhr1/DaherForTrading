@@ -4,6 +4,8 @@ import Product from '@/models/Products';
 import { NextResponse } from 'next/server';
 import { getUserFromCookie } from '@/lib/auth';
 import { requirePermission } from '@/lib/permissions';
+import { logActivity } from "@/lib/activityLog";
+import { auditView, diffViews, snapshotChanges, extraChange, describeChanges } from "@/lib/audit";
 
 export async function GET(_, { params }) {
   await connectToDB();
@@ -28,14 +30,28 @@ export async function PUT(req, { params }) {
     return NextResponse.json({ error: 'Name and image are required' }, { status: 400 });
   }
 
+  const before = await Category.findById(params.id);
+  if (!before) {
+    return NextResponse.json({ error: 'Category not found' }, { status: 404 });
+  }
+
   const updated = await Category.findByIdAndUpdate(
     params.id,
     { name },
     { new: true }
   );
 
-  if (!updated) {
-    return NextResponse.json({ error: 'Category not found' }, { status: 404 });
+  const changes = diffViews('Category', before.toObject(), updated.toObject());
+  if (changes.length > 0) {
+    await logActivity({
+      admin: await getUserFromCookie(),
+      action: 'category.edit',
+      entityType: 'Category',
+      entityId: updated._id,
+      entityLabel: updated.name,
+      summary: `Renamed category "${before.name}" to "${updated.name}"`,
+      changes,
+    });
   }
 
   return NextResponse.json(updated);
@@ -51,8 +67,22 @@ export async function DELETE(_, { params }) {
     return NextResponse.json({ error: 'Category not found' }, { status: 404 });
   }
 
+  const removedProducts = await Product.find({ category: params.id }).select('name').lean();
   await Product.deleteMany({ category: params.id });
   await Category.findByIdAndDelete(params.id);
+
+  await logActivity({
+    admin: await getUserFromCookie(),
+    action: 'category.delete',
+    entityType: 'Category',
+    entityId: params.id,
+    entityLabel: category.name,
+    summary: `Deleted category "${category.name}" and its ${removedProducts.length} product${removedProducts.length === 1 ? '' : 's'}`,
+    changes: [
+      ...snapshotChanges('Category', category.toObject(), 'delete'),
+      ...removedProducts.map((p) => extraChange(`product.${p._id}`, `Product removed: ${p.name}`, p.name, null)),
+    ],
+  });
 
   return NextResponse.json({ message: 'Deleted' });
 }

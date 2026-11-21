@@ -1,6 +1,9 @@
 import { NextResponse } from "next/server";
 import mongoose from "mongoose";
 import { connectToDB } from "@/lib/connectDb";
+import { getUserFromCookie } from "@/lib/auth";
+import { logActivity } from "@/lib/activityLog";
+import { extraChange } from "@/lib/audit";
 import Customer from "@/models/Customers";
 import Order from "@/models/Orders";
 import Product from "@/models/Products";
@@ -96,6 +99,21 @@ export async function POST(req) {
       if (!transactionsUnsupported) throw txError;
       summary = await runRestore(null);
     }
+
+    // Written after the restore so it survives a backup that replaces the
+    // activity log itself.
+    await logActivity({
+      admin: await getUserFromCookie(),
+      action: "settings.restore",
+      entityType: "Settings",
+      entityLabel: "Backup restore",
+      summary: `Restored a backup (${Object.entries(summary)
+        .map(([key, count]) => `${count} ${key}`)
+        .join(", ")})`,
+      changes: Object.entries(summary).map(([key, count]) =>
+        extraChange(`restore.${key}`, `Restored ${key}`, null, count, "number")
+      ),
+    });
 
     return NextResponse.json({ message: "Backup restored successfully", summary });
   } catch (error) {

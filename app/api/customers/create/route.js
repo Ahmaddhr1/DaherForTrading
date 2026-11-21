@@ -3,6 +3,8 @@ import Customer from "@/models/Customers";
 import { NextResponse } from "next/server";
 import { getUserFromCookie } from "@/lib/auth";
 import { requirePermission } from "@/lib/permissions";
+import { logActivity } from "@/lib/activityLog";
+import { auditView, diffViews, snapshotChanges, extraChange, describeChanges } from "@/lib/audit";
 
 export async function POST(req) {
   await connectToDB();
@@ -39,6 +41,16 @@ export async function POST(req) {
       priceTier: parsedPriceTier,
     });
     await newCustomer.save();
+
+    await logActivity({
+      admin: await getUserFromCookie(),
+      action: "customer.create",
+      entityType: "Customer",
+      entityId: newCustomer._id,
+      entityLabel: newCustomer.fullName,
+      summary: `Created customer "${newCustomer.fullName}"`,
+      changes: snapshotChanges("Customer", await auditView("Customer", newCustomer), "create"),
+    });
     return NextResponse.json(
       { message: "Customer created successfully", customer: newCustomer },
       { status: 201 }

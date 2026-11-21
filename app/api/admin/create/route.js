@@ -3,6 +3,9 @@ import Admin from '@/models/Admin'
 import bcrypt from 'bcryptjs'
 import { NextResponse } from 'next/server'
 import { PERMISSION_KEYS } from '@/lib/permissions'
+import { getUserFromCookie } from '@/lib/auth'
+import { logActivity } from '@/lib/activityLog'
+import { snapshotChanges } from '@/lib/audit'
 
 // Owner-only (enforced in middleware.js). Creates a new admin account -
 // "owner" or "employee", defaulting to "employee" so a mistyped/omitted
@@ -56,6 +59,16 @@ export async function POST(req) {
     })
 
     await newAdmin.save()
+
+    await logActivity({
+      admin: await getUserFromCookie(),
+      action: 'admin.create',
+      entityType: 'Admin',
+      entityId: newAdmin._id,
+      entityLabel: newAdmin.adminname,
+      summary: `Created ${newAdmin.role} account "${newAdmin.adminname}"`,
+      changes: snapshotChanges('Admin', newAdmin.toObject(), 'create'),
+    })
 
     return NextResponse.json(
       {

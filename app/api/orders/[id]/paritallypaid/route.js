@@ -5,6 +5,8 @@ import Payment from "@/models/Payment";
 import { connectToDB } from "@/lib/connectDb";
 import { getUserFromCookie } from "@/lib/auth";
 import { requirePermission } from "@/lib/permissions";
+import { logActivity } from "@/lib/activityLog";
+import { auditView, diffViews, snapshotChanges, diffOrderLines, extraChange, describeChanges, orderLabel } from "@/lib/audit";
 
 export async function PUT(req, { params }) {
   await connectToDB();
@@ -54,6 +56,8 @@ export async function PUT(req, { params }) {
     const newAmountPaid = previousAmountPaid + amountpaid;
     const newRemaining = order.total - newAmountPaid;
 
+    const beforeView = await auditView("Order", order);
+
     // Update order
     order.amountpaid = newAmountPaid;
     order.remainingBalance = newRemaining;
@@ -63,6 +67,19 @@ export async function PUT(req, { params }) {
     // Update customer debt - use either $inc or $set, not both
     await Customer.findByIdAndUpdate(order.customer, {
       $set: { debt: newDebtValue }
+    });
+
+    await logActivity({
+      admin: await getUserFromCookie(),
+      action: "order.payment",
+      entityType: "Order",
+      entityId: order._id,
+      entityLabel: orderLabel(order),
+      summary: `Recorded a $${amountpaid.toFixed(2)} payment on ${orderLabel(order)} from ${customer.fullName}`,
+      changes: [
+        ...diffViews("Order", beforeView, await auditView("Order", order)),
+        extraChange("customer.debt", "Customer debt", customer.debt, newDebtValue, "money"),
+      ],
     });
 
     // Record this as a normal payment so it shows up in the payment history

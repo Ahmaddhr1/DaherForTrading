@@ -7,6 +7,7 @@ import Return from "@/models/Return";
 import { NextResponse } from "next/server";
 import { getUserFromCookie } from "@/lib/auth";
 import { logActivity } from "@/lib/activityLog";
+import { auditView, diffViews, snapshotChanges, diffOrderLines, extraChange, describeChanges, orderLabel } from "@/lib/audit";
 import { requirePermission } from "@/lib/permissions";
 
 export async function GET(_, { params }) {
@@ -153,6 +154,22 @@ export async function POST(req, { params }) {
       action: "order.return",
       entityType: "Order",
       entityId: order._id,
+      entityLabel: orderLabel(order),
+      changes: [
+        ...returnItems.map((item) =>
+          extraChange(
+            `returned.${item.productId || item.name}`,
+            `Returned: ${item.name}`,
+            null,
+            { quantity: item.quantity, price: item.unitPrice },
+            "line"
+          )
+        ),
+        extraChange("return.refund", "Refund amount", null, totalRefundAmount, "money"),
+        extraChange("return.restocked", "Returned to stock", null, shouldRestock, "bool"),
+        extraChange("return.reason", "Reason", null, reason?.trim() || null),
+        extraChange("customer.debt", "Customer debt", previousDebt, customer.debt, "money"),
+      ],
       summary: `Processed a $${totalRefundAmount.toFixed(2)} return for ${customer.fullName} (order ${order._id})`,
       metadata: { returnId: returnDoc._id, items: returnItems, restocked: shouldRestock },
     });

@@ -27,13 +27,13 @@ function isPublicApiPath(pathname) {
 const OWNER_ONLY_EXACT_PATHS = [
   '/api/admin', // GET: list admins
   '/dashboard/admins',
-  '/dashboard/activity',
 ]
 // Prefixes: the path itself or anything nested under it.
 const OWNER_ONLY_PATH_PREFIXES = [
   '/api/admin/create',
   '/api/settings/backup',
   '/api/settings/restore',
+  '/dashboard/activity', // the activity log and each entry's detail page
   '/api/activity', // the raw activity log (performance is carved out below - see PERMISSION_GATED_PATHS)
 ]
 const MONGO_ID = /^[0-9a-fA-F]{24}$/

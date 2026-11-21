@@ -5,6 +5,7 @@ import Product from "@/models/Products";
 import { NextResponse } from "next/server";
 import { getUserFromCookie } from "@/lib/auth";
 import { logActivity } from "@/lib/activityLog";
+import { auditView, diffViews, snapshotChanges, diffOrderLines, extraChange, describeChanges, orderLabel } from "@/lib/audit";
 import { priceOrderItems, PricingError } from "@/lib/orderPricing";
 import { requirePermission, hasPermission } from "@/lib/permissions";
 
@@ -49,6 +50,12 @@ export async function DELETE(request, { params }) {
       );
     }
 
+    const deletedView = await auditView("Order", order);
+    const debtBeforeDelete =
+      order.status === "pending" && order.customer
+        ? (await Customer.findById(order.customer).select("debt").lean())?.debt
+        : null;
+
     // A draft never touched stock or debt, so there's nothing to roll back -
     // just detach it from the customer and remove it, and (unlike a real
     // pending order below) no special permission is needed: discarding
@@ -90,7 +97,17 @@ export async function DELETE(request, { params }) {
       action: "order.delete",
       entityType: "Order",
       entityId: id,
-      summary: `Deleted ${order.status === "draft" ? "a draft" : "an order"} worth $${order.total}`,
+      entityLabel: orderLabel(order),
+      summary: `Deleted ${order.status === "draft" ? "a draft" : "an order"} worth $${order.total}${
+        deletedView.customer ? ` for ${deletedView.customer}` : ""
+      }`,
+      changes: [
+        ...snapshotChanges("Order", deletedView, "delete"),
+        ...diffOrderLines(order.products, []),
+        debtBeforeDelete != null
+          ? extraChange("customer.debt", "Customer debt", debtBeforeDelete, debtBeforeDelete - order.total, "money")
+          : null,
+      ],
     });
 
     return NextResponse.json(
@@ -141,6 +158,9 @@ export async function PUT(req, { params }) {
       );
     }
 
+    const beforeView = await auditView("Order", order);
+    const beforeLines = order.products.map((p) => p.toObject());
+
     const effectiveTaxRate = taxRate !== undefined ? taxRate : order.taxRate;
 
     // Needed to re-derive the correct price for a submitted line item
@@ -171,12 +191,18 @@ export async function PUT(req, { params }) {
       order.profit = priced.profit;
       await order.save();
 
+      const draftChanges = [
+        ...diffOrderLines(beforeLines, order.products),
+        ...diffViews("Order", beforeView, await auditView("Order", order)),
+      ];
       await logActivity({
         admin: await getUserFromCookie(),
         action: "order.edit",
         entityType: "Order",
         entityId: order._id,
-        summary: `Edited a draft order (now $${priced.total.toFixed(2)})`,
+        entityLabel: orderLabel(order),
+        summary: `Edited draft ${orderLabel(order)}: ${describeChanges(draftChanges) || "no changes"}`,
+        changes: draftChanges,
       });
 
       return NextResponse.json(
@@ -271,13 +297,22 @@ export async function PUT(req, { params }) {
       $inc: { debt: debtDelta },
     });
 
+    const orderChanges = [
+      ...diffOrderLines(beforeLines, order.products),
+      ...diffViews("Order", beforeView, await auditView("Order", order)),
+      orderCustomer
+        ? extraChange("customer.debt", "Customer debt", orderCustomer.debt, orderCustomer.debt + debtDelta, "money")
+        : null,
+    ];
     await logActivity({
       admin: await getUserFromCookie(),
       action: "order.edit",
       entityType: "Order",
       entityId: order._id,
-      summary: `Edited order (total changed from $${previousTotal.toFixed(2)} to $${priced.total.toFixed(2)})`,
+      entityLabel: orderLabel(order),
+      summary: `Edited ${orderLabel(order)}: ${describeChanges(orderChanges) || "no changes"}`,
       metadata: { before: previousTotal, after: priced.total },
+      changes: orderChanges,
     });
 
     return NextResponse.json(
@@ -386,9 +421,17 @@ export async function POST(req, { params }) {
       action: "order.create",
       entityType: "Order",
       entityId: newOrder._id,
+      entityLabel: orderLabel(newOrder),
       summary: asDraft
-        ? `Saved a draft order worth $${priced.total.toFixed(2)}`
-        : `Created an order worth $${priced.total.toFixed(2)}`,
+        ? `Saved a draft order worth $${priced.total.toFixed(2)} for ${customer.fullName}`
+        : `Created an order worth $${priced.total.toFixed(2)} for ${customer.fullName}`,
+      changes: [
+        ...snapshotChanges("Order", await auditView("Order", newOrder), "create"),
+        ...diffOrderLines([], newOrder.products),
+        asDraft
+          ? null
+          : extraChange("customer.debt", "Customer debt", customer.debt, customer.debt + newOrder.total, "money"),
+      ],
     });
 
     return NextResponse.json(

@@ -5,6 +5,7 @@ import Order from "@/models/Orders";
 import { NextResponse } from "next/server";
 import { getUserFromCookie } from "@/lib/auth";
 import { logActivity } from "@/lib/activityLog";
+import { auditView, diffViews, snapshotChanges, describeChanges } from "@/lib/audit";
 import { requirePermission } from "@/lib/permissions";
 
 // GET a product by ID
@@ -107,20 +108,23 @@ export async function PUT(req, { params }) {
       new: true,
     });
 
-    const priceChanged =
-      body.price !== undefined && Number(body.price) !== beforeUpdate.price;
-    await logActivity({
-      admin: await getUserFromCookie(),
-      action: priceChanged ? "product.priceChange" : "product.edit",
-      entityType: "Product",
-      entityId: updatedProduct._id,
-      summary: priceChanged
-        ? `Changed the price of "${updatedProduct.name}" from $${beforeUpdate.price} to $${updatedProduct.price}`
-        : `Edited product "${updatedProduct.name}"`,
-      metadata: priceChanged
-        ? { before: beforeUpdate.price, after: updatedProduct.price }
-        : undefined,
-    });
+    const changes = diffViews(
+      "Product",
+      await auditView("Product", beforeUpdate),
+      await auditView("Product", updatedProduct)
+    );
+    if (changes.length > 0) {
+      const priceChanged = changes.some((c) => c.field === "price");
+      await logActivity({
+        admin: await getUserFromCookie(),
+        action: priceChanged ? "product.priceChange" : "product.edit",
+        entityType: "Product",
+        entityId: updatedProduct._id,
+        entityLabel: updatedProduct.name,
+        summary: `Edited product "${updatedProduct.name}": ${describeChanges(changes)}`,
+        changes,
+      });
+    }
 
     return NextResponse.json(updatedProduct, { status: 200 });
   } catch (error) {
@@ -176,7 +180,9 @@ export async function DELETE(req, { params }) {
       action: "product.delete",
       entityType: "Product",
       entityId: id,
+      entityLabel: productToDelete.name,
       summary: `Deleted product "${productToDelete.name}"`,
+      changes: snapshotChanges("Product", await auditView("Product", productToDelete), "delete"),
     });
 
     return NextResponse.json(

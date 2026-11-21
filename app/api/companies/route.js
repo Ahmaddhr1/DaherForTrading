@@ -4,6 +4,7 @@ import Purchase from "@/models/Purchase";
 import { NextResponse } from "next/server";
 import { getUserFromCookie } from "@/lib/auth";
 import { logActivity } from "@/lib/activityLog";
+import { auditView, diffViews, snapshotChanges, extraChange, describeChanges } from "@/lib/audit";
 import { requirePermission } from "@/lib/permissions";
 
 export async function POST(req) {
@@ -31,7 +32,9 @@ export async function POST(req) {
       action: "company.create",
       entityType: "Company",
       entityId: company._id,
+      entityLabel: company.name,
       summary: `Created supplier "${company.name}"`,
+      changes: snapshotChanges("Company", company.toObject(), "create"),
     });
 
     return NextResponse.json(

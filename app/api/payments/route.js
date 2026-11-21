@@ -5,6 +5,7 @@ import Payment from "@/models/Payment";
 import { NextResponse } from "next/server";
 import { getUserFromCookie } from "@/lib/auth";
 import { logActivity } from "@/lib/activityLog";
+import { auditView, diffViews, snapshotChanges, extraChange, describeChanges } from "@/lib/audit";
 import { requirePermission } from "@/lib/permissions";
 
 // Create a payment against a customer's outstanding debt.
@@ -59,7 +60,12 @@ export async function POST(req) {
       action: "payment.create",
       entityType: "Payment",
       entityId: payment._id,
+      entityLabel: customer.fullName,
       summary: `Recorded a $${paymentAmount} payment from ${customer.fullName}`,
+      changes: [
+        extraChange("amount", "Payment amount", null, paymentAmount, "money"),
+        extraChange("customer.debt", "Customer debt", previousDebt, newDebt, "money"),
+      ],
       metadata: { customerId, previousDebt, newDebt },
     });
 

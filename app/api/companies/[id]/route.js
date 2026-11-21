@@ -4,6 +4,7 @@ import Purchase from "@/models/Purchase";
 import { NextResponse } from "next/server";
 import { getUserFromCookie } from "@/lib/auth";
 import { logActivity } from "@/lib/activityLog";
+import { auditView, diffViews, snapshotChanges, extraChange, describeChanges } from "@/lib/audit";
 import { requirePermission } from "@/lib/permissions";
 
 // GET one company
@@ -36,20 +37,26 @@ export async function PUT(req, { params }) {
     delete body.debt;
     delete body.purchases;
 
+    const beforeCompany = await Company.findById(id);
+    if (!beforeCompany) {
+      return NextResponse.json({ message: "Company not found" }, { status: 404 });
+    }
     const updatedCompany = await Company.findByIdAndUpdate(id, body, {
       new: true,
     });
-    if (!updatedCompany) {
-      return NextResponse.json({ message: "Company not found" }, { status: 404 });
-    }
 
-    await logActivity({
-      admin: await getUserFromCookie(),
-      action: "company.edit",
-      entityType: "Company",
-      entityId: updatedCompany._id,
-      summary: `Edited supplier "${updatedCompany.name}"`,
-    });
+    const changes = diffViews("Company", beforeCompany.toObject(), updatedCompany.toObject());
+    if (changes.length > 0) {
+      await logActivity({
+        admin: await getUserFromCookie(),
+        action: "company.edit",
+        entityType: "Company",
+        entityId: updatedCompany._id,
+        entityLabel: updatedCompany.name,
+        summary: `Edited supplier "${updatedCompany.name}": ${describeChanges(changes)}`,
+        changes,
+      });
+    }
 
     return NextResponse.json(
       { message: "Company updated successfully", company: updatedCompany },
@@ -76,14 +83,19 @@ export async function DELETE(req, { params }) {
     if (!deletedCompany) {
       return NextResponse.json({ message: "Company not found" }, { status: 404 });
     }
-    await Purchase.deleteMany({ company: id });
+    const { deletedCount: purchasesDeleted } = await Purchase.deleteMany({ company: id });
 
     await logActivity({
       admin,
       action: "company.delete",
       entityType: "Company",
       entityId: id,
+      entityLabel: deletedCompany.name,
       summary: `Deleted supplier "${deletedCompany.name}" (and their purchase history)`,
+      changes: [
+        ...snapshotChanges("Company", deletedCompany.toObject(), "delete"),
+        extraChange("purchases", "Purchases removed", purchasesDeleted, null, "number"),
+      ],
     });
 
     return NextResponse.json(

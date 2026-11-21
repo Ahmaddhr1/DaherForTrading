@@ -5,6 +5,8 @@ import Product from "@/models/Products";
 import { NextResponse } from "next/server";
 import { getUserFromCookie } from "@/lib/auth";
 import { requirePermission } from "@/lib/permissions";
+import { logActivity } from "@/lib/activityLog";
+import { auditView, diffViews, snapshotChanges, diffOrderLines, extraChange, describeChanges, orderLabel } from "@/lib/audit";
 
 // Converts a draft into a real pending order: validates stock against the
 // draft's saved line items (stock was never reserved while it was a draft),
@@ -68,12 +70,28 @@ export async function PUT(_, { params }) {
       await Product.bulkWrite(productUpdates);
     }
 
+    const beforeView = await auditView("Order", order);
+    const debtBefore = (await Customer.findById(order.customer).select("debt").lean())?.debt ?? 0;
+
     order.status = "pending";
     order.remainingBalance = order.total;
     await order.save();
 
     await Customer.findByIdAndUpdate(order.customer, {
       $inc: { debt: order.total },
+    });
+
+    await logActivity({
+      admin: await getUserFromCookie(),
+      action: "order.finalize",
+      entityType: "Order",
+      entityId: order._id,
+      entityLabel: orderLabel(order),
+      summary: `Finalized draft ${orderLabel(order)} into an order worth $${order.total.toFixed(2)}`,
+      changes: [
+        ...diffViews("Order", beforeView, await auditView("Order", order)),
+        extraChange("customer.debt", "Customer debt", debtBefore, debtBefore + order.total, "money"),
+      ],
     });
 
     return NextResponse.json(

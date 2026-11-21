@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import { connectToDB } from "@/lib/connectDb";
 import ActivityLog from "@/models/ActivityLog";
 import { NextResponse } from "next/server";
@@ -16,11 +17,20 @@ export async function GET(req) {
     const entityType = searchParams.get("entityType") || "";
     const startDateParam = searchParams.get("startDate");
     const endDateParam = searchParams.get("endDate");
+    const entityId = searchParams.get("entityId") || "";
+    const search = (searchParams.get("search") || "").trim();
     const skip = (page - 1) * limit;
 
     const query = {};
     if (admin) query.adminName = admin;
     if (entityType) query.entityType = entityType;
+    if (entityId && mongoose.isValidObjectId(entityId)) {
+      query.entityId = new mongoose.Types.ObjectId(entityId);
+    }
+    if (search) {
+      const pattern = new RegExp(search.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "i");
+      query.$or = [{ summary: pattern }, { entityLabel: pattern }, { "changes.label": pattern }];
+    }
     if (startDateParam || endDateParam) {
       query.createdAt = {};
       if (startDateParam) query.createdAt.$gte = new Date(startDateParam);
@@ -28,11 +38,20 @@ export async function GET(req) {
     }
 
     const total = await ActivityLog.countDocuments(query);
-    const entries = await ActivityLog.find(query)
-      .sort({ createdAt: -1 })
-      .skip(skip)
-      .limit(limit)
-      .lean();
+    // Rows only need a count and a short preview of the changes - the full
+    // list (which can be long for bulk actions) loads on the detail page.
+    const entries = await ActivityLog.aggregate([
+      { $match: query },
+      { $sort: { createdAt: -1 } },
+      { $skip: skip },
+      { $limit: limit },
+      {
+        $addFields: {
+          changeCount: { $size: { $ifNull: ["$changes", []] } },
+          changes: { $slice: [{ $ifNull: ["$changes", []] }, 3] },
+        },
+      },
+    ]);
 
     const admins = await ActivityLog.distinct("adminName");
 

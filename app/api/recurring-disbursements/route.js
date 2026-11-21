@@ -3,6 +3,7 @@ import RecurringDisbursement from "@/models/RecurringDisbursement";
 import { NextResponse } from "next/server";
 import { getUserFromCookie } from "@/lib/auth";
 import { logActivity } from "@/lib/activityLog";
+import { diffViews, snapshotChanges, extraChange, describeChanges } from "@/lib/audit";
 import { requirePermission } from "@/lib/permissions";
 
 export async function GET() {
@@ -51,8 +52,10 @@ export async function POST(req) {
     await logActivity({
       admin,
       action: "recurringDisbursement.create",
-      entityType: "Disbursement",
+      entityType: "RecurringDisbursement",
       entityId: template._id,
+      entityLabel: template.description,
+      changes: snapshotChanges("RecurringDisbursement", template.toObject(), "create"),
       summary: `Set up a recurring $${numericAmount} disbursement (${template.category}) on day ${parsedDay} of each month: ${template.description}`,
     });
 

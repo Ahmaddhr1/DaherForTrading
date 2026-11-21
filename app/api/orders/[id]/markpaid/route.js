@@ -5,6 +5,8 @@ import Payment from "@/models/Payment";
 import { connectToDB } from "@/lib/connectDb";
 import { getUserFromCookie } from "@/lib/auth";
 import { requirePermission } from "@/lib/permissions";
+import { logActivity } from "@/lib/activityLog";
+import { auditView, diffViews, snapshotChanges, diffOrderLines, extraChange, describeChanges, orderLabel } from "@/lib/audit";
 
 export async function PUT(req, { params }) {
   await connectToDB();
@@ -43,6 +45,8 @@ export async function PUT(req, { params }) {
     const actualDebtReduction = Math.min(remainingToPay, customer.debt);
     const finalDebt = Math.max(0, newDebt);
 
+    const beforeView = await auditView("Order", order);
+
     // Update order payment status
     order.amountpaid = order.total;
     order.remainingBalance = 0;
@@ -56,6 +60,19 @@ export async function PUT(req, { params }) {
       { $set: { debt: finalDebt } },
       { new: true }
     );
+
+    await logActivity({
+      admin: await getUserFromCookie(),
+      action: "order.markPaid",
+      entityType: "Order",
+      entityId: order._id,
+      entityLabel: orderLabel(order),
+      summary: `Marked ${orderLabel(order)} as fully paid ($${remainingToPay.toFixed(2)} collected from ${customer.fullName})`,
+      changes: [
+        ...diffViews("Order", beforeView, await auditView("Order", order)),
+        extraChange("customer.debt", "Customer debt", customer.debt, finalDebt, "money"),
+      ],
+    });
 
     // Record this as a normal payment so it shows up in the payment history
     if (actualDebtReduction > 0) {

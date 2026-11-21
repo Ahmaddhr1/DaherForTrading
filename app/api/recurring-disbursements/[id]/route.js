@@ -3,6 +3,7 @@ import RecurringDisbursement from "@/models/RecurringDisbursement";
 import { NextResponse } from "next/server";
 import { getUserFromCookie } from "@/lib/auth";
 import { logActivity } from "@/lib/activityLog";
+import { diffViews, snapshotChanges, extraChange, describeChanges } from "@/lib/audit";
 import { requirePermission } from "@/lib/permissions";
 
 export async function PATCH(req, { params }) {
@@ -43,18 +44,24 @@ export async function PATCH(req, { params }) {
       update.active = !!body.active;
     }
 
-    const template = await RecurringDisbursement.findByIdAndUpdate(id, update, { new: true });
-    if (!template) {
+    const beforeTemplate = await RecurringDisbursement.findById(id);
+    if (!beforeTemplate) {
       return NextResponse.json({ message: "Recurring disbursement not found" }, { status: 404 });
     }
+    const template = await RecurringDisbursement.findByIdAndUpdate(id, update, { new: true });
 
-    await logActivity({
-      admin,
-      action: "recurringDisbursement.edit",
-      entityType: "Disbursement",
-      entityId: template._id,
-      summary: `Updated the recurring disbursement "${template.description}"`,
-    });
+    const changes = diffViews("RecurringDisbursement", beforeTemplate.toObject(), template.toObject());
+    if (changes.length > 0) {
+      await logActivity({
+        admin,
+        action: "recurringDisbursement.edit",
+        entityType: "RecurringDisbursement",
+        entityId: template._id,
+        entityLabel: template.description,
+        summary: `Updated the recurring disbursement "${template.description}": ${describeChanges(changes)}`,
+        changes,
+      });
+    }
 
     return NextResponse.json({ message: "Recurring disbursement updated", template }, { status: 200 });
   } catch (error) {
@@ -81,8 +88,10 @@ export async function DELETE(_, { params }) {
     await logActivity({
       admin,
       action: "recurringDisbursement.delete",
-      entityType: "Disbursement",
+      entityType: "RecurringDisbursement",
       entityId: id,
+      entityLabel: template.description,
+      changes: snapshotChanges("RecurringDisbursement", template.toObject(), "delete"),
       summary: `Deleted the recurring disbursement "${template.description}"`,
     });
 

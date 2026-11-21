@@ -3,6 +3,7 @@ import Disbursement from "@/models/Disbursement";
 import { NextResponse } from "next/server";
 import { getUserFromCookie } from "@/lib/auth";
 import { logActivity } from "@/lib/activityLog";
+import { diffViews, snapshotChanges, extraChange, describeChanges } from "@/lib/audit";
 import { requirePermission } from "@/lib/permissions";
 
 export async function POST(req) {
@@ -37,6 +38,8 @@ export async function POST(req) {
       action: "disbursement.create",
       entityType: "Disbursement",
       entityId: disbursement._id,
+      entityLabel: disbursement.description,
+      changes: snapshotChanges("Disbursement", disbursement.toObject(), "create"),
       summary: `Recorded a $${numericAmount} disbursement (${disbursement.category}): ${disbursement.description}`,
     });
 

@@ -4,6 +4,8 @@ import bcrypt from "bcryptjs";
 import { NextResponse } from "next/server";
 import { getUserFromCookie } from "@/lib/auth";
 import { PERMISSION_KEYS } from "@/lib/permissions";
+import { logActivity } from "@/lib/activityLog";
+import { diffViews, snapshotChanges, extraChange, describeChanges } from "@/lib/audit";
 
 // Owner-only (enforced in middleware.js). Both handlers guard against an
 // owner locking the business out of its own dashboard: you can never act
@@ -105,6 +107,24 @@ export async function PATCH(req, { params }) {
       "adminname email role active permissions createdAt"
     );
 
+    // Password hashes are never stored in the log - a reset just shows up
+    // as a "Password: (hidden) → reset" row.
+    const changes = [
+      ...diffViews("Admin", target.toObject(), updated.toObject()),
+      update.password ? extraChange("password", "Password", "(hidden)", "reset") : null,
+    ].filter(Boolean);
+    if (changes.length > 0) {
+      await logActivity({
+        admin: actingUser,
+        action: "admin.edit",
+        entityType: "Admin",
+        entityId: updated._id,
+        entityLabel: updated.adminname,
+        summary: `Edited admin "${updated.adminname}": ${describeChanges(changes)}`,
+        changes,
+      });
+    }
+
     return NextResponse.json({ message: "Admin updated successfully", admin: updated });
   } catch (error) {
     return NextResponse.json(
@@ -142,6 +162,16 @@ export async function DELETE(_, { params }) {
     }
 
     await Admin.findByIdAndDelete(id);
+
+    await logActivity({
+      admin: actingUser,
+      action: "admin.delete",
+      entityType: "Admin",
+      entityId: id,
+      entityLabel: target.adminname,
+      summary: `Deleted admin "${target.adminname}"`,
+      changes: snapshotChanges("Admin", target.toObject(), "delete"),
+    });
 
     return NextResponse.json({ message: "Admin deleted successfully" });
   } catch (error) {

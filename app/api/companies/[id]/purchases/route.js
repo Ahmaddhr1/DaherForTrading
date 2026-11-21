@@ -5,6 +5,7 @@ import Purchase from "@/models/Purchase";
 import { NextResponse } from "next/server";
 import { getUserFromCookie } from "@/lib/auth";
 import { logActivity } from "@/lib/activityLog";
+import { auditView, diffViews, snapshotChanges, extraChange, describeChanges } from "@/lib/audit";
 import { requirePermission } from "@/lib/permissions";
 
 // GET paginated purchase history for a company
@@ -148,6 +149,13 @@ export async function POST(req, { params }) {
       action: "purchase.create",
       entityType: "Purchase",
       entityId: purchase._id,
+      entityLabel: `${numericQuantity} x ${product.name}`,
+      changes: [
+        ...snapshotChanges("Purchase", await auditView("Purchase", purchase), "create"),
+        extraChange("product.quantity", `${product.name} — Stock quantity`, product.quantity, product.quantity + numericQuantity, "number"),
+        extraChange("product.initialPrice", `${product.name} — Cost price`, product.initialPrice, numericUnitPrice, "money"),
+        extraChange("company.debt", `${company.name} — Debt (owed to them)`, company.debt, company.debt + (isPaid ? 0 : total), "money"),
+      ],
       summary: `Recorded a purchase of ${numericQuantity} x "${product.name}" from ${company.name} for $${total.toFixed(2)}`,
       metadata: { companyId: id, productId, unitPrice: numericUnitPrice, quantity: numericQuantity, discount: numericDiscount, taxRate: numericTaxRate, paid: isPaid },
     });

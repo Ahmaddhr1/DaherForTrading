@@ -67,20 +67,26 @@ export async function PUT(req, { params }) {
       entityType: "Order",
       entityId: order._id,
       entityLabel: orderLabel(order),
-      summary: `Marked ${orderLabel(order)} as fully paid ($${remainingToPay.toFixed(2)} collected from ${customer.fullName})`,
+      summary:
+        actualDebtReduction > 0
+          ? `Marked ${orderLabel(order)} as fully paid ($${actualDebtReduction.toFixed(2)} collected from ${customer.fullName})`
+          : `Marked ${orderLabel(order)} as fully paid (already covered by earlier payments from ${customer.fullName} - no new payment recorded)`,
       changes: [
         ...diffViews("Order", beforeView, await auditView("Order", order)),
         extraChange("customer.debt", "Customer debt", customer.debt, finalDebt, "money"),
       ],
     });
 
-    // Always record the money collected as a payment (linked to this order)
-    // so it shows up in the Payments tab - even when the customer's running
-    // balance was already lower than this order's remainder.
-    if (remainingToPay > 0) {
+    // Only the part of this that still reduces the customer's debt is new
+    // money. If they already paid some/all of it through a manual payment on
+    // the Payments tab (which lowers their debt without touching the order),
+    // that cash is already recorded - recording it again here would count the
+    // same payment twice. So the payment is capped at the debt reduction, and
+    // none is created when the debt was already cleared.
+    if (actualDebtReduction > 0) {
       await Payment.create({
         customer: order.customer,
-        amount: remainingToPay,
+        amount: actualDebtReduction,
         previousDebt: customer.debt,
         newDebt: finalDebt,
         source: "order",

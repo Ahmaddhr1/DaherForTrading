@@ -75,23 +75,32 @@ export async function PUT(req, { params }) {
       entityType: "Order",
       entityId: order._id,
       entityLabel: orderLabel(order),
-      summary: `Recorded a $${amountpaid.toFixed(2)} payment on ${orderLabel(order)} from ${customer.fullName}`,
+      summary:
+        maxAllowedPayment > 0
+          ? `Recorded a $${maxAllowedPayment.toFixed(2)} payment on ${orderLabel(order)} from ${customer.fullName}`
+          : `Applied $${amountpaid.toFixed(2)} to ${orderLabel(order)} (already covered by earlier payments from ${customer.fullName} - no new payment recorded)`,
       changes: [
         ...diffViews("Order", beforeView, await auditView("Order", order)),
         extraChange("customer.debt", "Customer debt", customer.debt, newDebtValue, "money"),
       ],
     });
 
-    // Always record the money collected as a payment (linked to this order)
-    // so it shows up in the Payments tab.
-    await Payment.create({
-      customer: order.customer,
-      amount: amountpaid,
-      previousDebt: customer.debt,
-      newDebt: newDebtValue,
-      source: "order",
-      order: order._id,
-    });
+    // Only the part of this that still reduces the customer's debt is new
+    // money. If they already paid some/all of it through a manual payment on
+    // the Payments tab (which lowers their debt without touching the order),
+    // that cash is already recorded - recording it again here would count the
+    // same payment twice. So the payment is capped at the debt reduction, and
+    // none is created when the debt was already cleared.
+    if (maxAllowedPayment > 0) {
+      await Payment.create({
+        customer: order.customer,
+        amount: maxAllowedPayment,
+        previousDebt: customer.debt,
+        newDebt: newDebtValue,
+        source: "order",
+        order: order._id,
+      });
+    }
 
     return NextResponse.json({
       message: `Payment of ${amountpaid.toFixed(2)} applied successfully. ${newRemaining > 0 ? `Remaining balance: ${newRemaining.toFixed(2)}` : 'Order fully paid!'}`,

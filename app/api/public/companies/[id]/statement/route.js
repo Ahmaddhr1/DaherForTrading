@@ -2,6 +2,7 @@ import { connectToDB } from "@/lib/connectDb";
 import Company from "@/models/Company";
 import Purchase from "@/models/Purchase";
 import { NextResponse } from "next/server";
+import { purchasePaidAmount, purchaseRemaining } from "@/lib/paymentAllocation";
 
 // Public, unauthenticated, read-only statement for sharing (e.g. via a
 // WhatsApp link). Exposes only what's needed to read the statement - no
@@ -24,8 +25,8 @@ export async function GET(req, { params }) {
     const totals = purchases.reduce(
       (acc, p) => ({
         totalPurchased: acc.totalPurchased + p.total,
-        totalPaid: acc.totalPaid + (p.paid ? p.total : 0),
-        totalOwed: acc.totalOwed + (p.paid ? 0 : p.total),
+        totalPaid: acc.totalPaid + purchasePaidAmount(p),
+        totalOwed: acc.totalOwed + purchaseRemaining(p),
       }),
       { totalPurchased: 0, totalPaid: 0, totalOwed: 0 }
     );

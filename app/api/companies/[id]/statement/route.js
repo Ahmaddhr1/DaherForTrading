@@ -2,6 +2,7 @@ import { connectToDB } from "@/lib/connectDb";
 import Company from "@/models/Company";
 import Purchase from "@/models/Purchase";
 import { NextResponse } from "next/server";
+import { purchasePaidAmount, purchaseRemaining } from "@/lib/paymentAllocation";
 
 // Full statement for one company: every purchase made from them with
 // whether it's been paid, plus running totals. Used both by the
@@ -34,8 +35,8 @@ export async function GET(req, { params }) {
     const totals = purchases.reduce(
       (acc, p) => ({
         totalPurchased: acc.totalPurchased + p.total,
-        totalPaid: acc.totalPaid + (p.paid ? p.total : 0),
-        totalOwed: acc.totalOwed + (p.paid ? 0 : p.total),
+        totalPaid: acc.totalPaid + purchasePaidAmount(p),
+        totalOwed: acc.totalOwed + purchaseRemaining(p),
       }),
       { totalPurchased: 0, totalPaid: 0, totalOwed: 0 }
     );

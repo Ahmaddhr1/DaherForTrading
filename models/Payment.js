@@ -15,6 +15,19 @@ const paymentSchema = new mongoose.Schema(
     // (partially) paid, with `order` pointing at it.
     source: { type: String, enum: ["manual", "order"], default: "manual" },
     order: { type: mongoose.Types.ObjectId, ref: "Order", default: null },
+    // For a manual payment: which open orders it was applied to (oldest
+    // first) - see lib/paymentAllocation.js. Keeps orders in sync with the
+    // customer's debt so the same money is never collected twice.
+    allocations: {
+      type: [
+        {
+          order: { type: mongoose.Types.ObjectId, ref: "Order" },
+          amount: Number,
+          _id: false,
+        },
+      ],
+      default: [],
+    },
   },
   { timestamps: true }
 );

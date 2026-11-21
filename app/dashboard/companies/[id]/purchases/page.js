@@ -208,9 +208,18 @@ export default function CompanyPurchasesPage() {
                       <TableCell className="text-center">{purchase.quantity}</TableCell>
                       <TableCell className="text-center font-medium">${purchase.total.toFixed(2)}</TableCell>
                       <TableCell className="text-center">
-                        <Badge variant={purchase.paid ? "default" : "destructive"} className={purchase.paid ? "bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-400" : ""}>
-                          {purchase.paid ? "Paid" : "Unpaid"}
-                        </Badge>
+                        {purchase.paid ? (
+                          <Badge className="bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-400">Paid</Badge>
+                        ) : purchase.amountPaid > 0 ? (
+                          <div className="flex flex-col items-center gap-0.5">
+                            <Badge className="bg-amber-100 dark:bg-amber-900/30 text-amber-800 dark:text-amber-300">Partially paid</Badge>
+                            <span className="text-[11px] text-gray-500 dark:text-gray-400">
+                              ${purchase.amountPaid.toFixed(2)} of ${purchase.total.toFixed(2)}
+                            </span>
+                          </div>
+                        ) : (
+                          <Badge variant="destructive">Unpaid</Badge>
+                        )}
                       </TableCell>
                       <TableCell className="text-gray-500 dark:text-gray-400 text-sm">
                         {format(new Date(purchase.createdAt), "MMM d, yyyy HH:mm")}
@@ -279,7 +288,9 @@ export default function CompanyPurchasesPage() {
         title="Mark purchase as paid?"
         description={
           payTarget
-            ? `Pay ${data?.companyName || "this company"} $${payTarget.total.toFixed(2)} for ${payTarget.quantity} x ${payTarget.productName}? This reduces what you owe them and records a supplier payment.`
+            ? `Pay ${data?.companyName || "this company"} $${(payTarget.total - (payTarget.amountPaid || 0)).toFixed(2)}${
+                payTarget.amountPaid > 0 ? " (the rest still owed)" : ""
+              } for ${payTarget.quantity} x ${payTarget.productName}? This reduces what you owe them and records a supplier payment.`
             : ""
         }
         confirmLabel="Mark as Paid"

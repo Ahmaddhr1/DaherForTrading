@@ -156,7 +156,7 @@ const NewPurchasePage = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-950 py-6">
-      <div className="container mx-auto px-4 max-w-3xl">
+      <div className="container mx-auto px-4">
         <div className="mb-8">
           <div className="flex items-center gap-3 mb-2">
             <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg">

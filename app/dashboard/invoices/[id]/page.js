@@ -68,7 +68,7 @@ export default function OrderDetailsPage() {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gray-50/30 dark:bg-gray-900/30 py-8">
-        <div className="container mx-auto px-4 max-w-4xl">
+        <div className="container mx-auto px-4">
           <PageHeaderSkeleton />
           <div className="grid gap-6 lg:grid-cols-3">
             <div className="lg:col-span-2">
@@ -123,7 +123,7 @@ export default function OrderDetailsPage() {
 
   return (
     <div className="min-h-screen bg-gray-50/30 dark:bg-gray-900/30 py-8">
-      <div className="container mx-auto px-4 max-w-4xl">
+      <div className="container mx-auto px-4">
         {/* Header */}
         <div className="mb-8">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-2">

@@ -274,7 +274,7 @@ const MakeOrderPage = () => {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gray-50 dark:bg-gray-950 py-6">
-        <div className="container mx-auto px-4 max-w-4xl">
+        <div className="container mx-auto px-4">
           <PageHeaderSkeleton />
           <Card className="shadow-sm border-gray-200 dark:border-gray-800">
             <CardContent className="pt-6">
@@ -288,7 +288,7 @@ const MakeOrderPage = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-950 py-6">
-      <div className="container mx-auto px-4 max-w-4xl">
+      <div className="container mx-auto px-4">
 
         {/* Header */}
         <div className="mb-8">

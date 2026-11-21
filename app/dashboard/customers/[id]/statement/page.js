@@ -87,7 +87,7 @@ export default function CustomerStatementPage() {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gray-50/30 py-8">
-        <div className="container mx-auto px-4 max-w-4xl">
+        <div className="container mx-auto px-4">
           <PageHeaderSkeleton />
           <TableSkeleton rows={5} cols={5} />
         </div>
@@ -111,7 +111,7 @@ export default function CustomerStatementPage() {
 
   return (
     <div className="min-h-screen bg-gray-50/30 py-8">
-      <div className="container mx-auto px-4 max-w-4xl">
+      <div className="container mx-auto px-4">
         <div className="mb-8">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-2">
             <div>

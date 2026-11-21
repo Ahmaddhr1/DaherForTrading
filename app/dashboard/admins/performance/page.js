@@ -34,7 +34,7 @@ export default function EmployeePerformancePage() {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-950 py-6">
-      <div className="container mx-auto px-4 max-w-6xl">
+      <div className="container mx-auto px-4">
         <div className="mb-6">
           <div className="flex items-center gap-3">
             <div className="p-2 bg-indigo-100 dark:bg-indigo-900/30 rounded-lg">

@@ -246,7 +246,7 @@ export default function EditOrderPage() {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gray-50 dark:bg-gray-950 py-6">
-        <div className="container mx-auto px-4 max-w-4xl">
+        <div className="container mx-auto px-4">
           <PageHeaderSkeleton />
           <Card className="shadow-sm border-gray-200 dark:border-gray-800">
             <CardContent className="pt-6">
@@ -261,7 +261,7 @@ export default function EditOrderPage() {
   if (order && order.status !== "pending" && order.status !== "draft") {
     return (
       <div className="min-h-screen bg-gray-50 dark:bg-gray-950 py-6">
-        <div className="container mx-auto px-4 max-w-xl text-center">
+        <div className="container mx-auto px-4 text-center">
           <p className="text-gray-600 dark:text-gray-400 mb-4">Only pending orders or drafts can be updated. This order is {order.status}.</p>
           <Link href={`/dashboard/orders/${orderId}`}>
             <Button variant="outline">Back to Order</Button>
@@ -273,7 +273,7 @@ export default function EditOrderPage() {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-950 py-6">
-      <div className="container mx-auto px-4 max-w-4xl">
+      <div className="container mx-auto px-4">
         <div className="mb-8">
           <div className="flex items-center gap-3 mb-2">
             <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg">

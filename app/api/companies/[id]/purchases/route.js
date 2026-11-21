@@ -2,7 +2,7 @@ import { connectToDB } from "@/lib/connectDb";
 import Company from "@/models/Company";
 import Product from "@/models/Products";
 import Purchase from "@/models/Purchase";
-import SupplierPayment from "@/models/SupplierPayment";
+import { recordSupplierPayment } from "@/lib/recordPayment";
 import { NextResponse } from "next/server";
 import { getUserFromCookie } from "@/lib/auth";
 import { logActivity } from "@/lib/activityLog";
@@ -143,15 +143,12 @@ export async function POST(req, { params }) {
     // gets its own supplier payment (owed amount unchanged, since nothing was
     // ever owed for it). Unpaid ones get theirs later, when marked as paid.
     if (isPaid) {
-      const admin = await getUserFromCookie();
-      await SupplierPayment.create({
-        company: id,
-        purchase: purchase._id,
+      await recordSupplierPayment({
+        companyId: id,
         amount: total,
-        previousDebt: company.debt || 0,
-        newDebt: company.debt || 0,
-        admin: admin?.id,
-        adminName: admin?.adminname,
+        purchase: purchase._id,
+        admin: await getUserFromCookie(),
+        affectsDebt: false,
       });
     }
 

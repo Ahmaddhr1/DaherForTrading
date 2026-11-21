@@ -1,16 +1,20 @@
 import { NextResponse } from "next/server";
 import Order from "@/models/Orders";
-import Customer from "@/models/Customers";
-import Payment from "@/models/Payment";
 import { connectToDB } from "@/lib/connectDb";
 import { getUserFromCookie } from "@/lib/auth";
 import { requirePermission } from "@/lib/permissions";
 import { logActivity } from "@/lib/activityLog";
-import { auditView, diffViews, snapshotChanges, diffOrderLines, extraChange, describeChanges, orderLabel } from "@/lib/audit";
+import { auditView, diffViews, extraChange, orderLabel } from "@/lib/audit";
+import { recordCustomerPayment } from "@/lib/recordPayment";
 
+// Applies a partial payment to an order. The amount is recorded as ONE
+// payment (linked to the order) via recordCustomerPayment, which is also the
+// only thing that lowers the customer's debt - so the debt is updated
+// exactly once.
 export async function PUT(req, { params }) {
   await connectToDB();
-  const forbidden = await requirePermission(await getUserFromCookie(), "canFinalizeOrders");
+  const admin = await getUserFromCookie();
+  const forbidden = await requirePermission(admin, "canFinalizeOrders");
   if (forbidden) return forbidden;
 
   const { id } = await params;
@@ -21,106 +25,70 @@ export async function PUT(req, { params }) {
     if (!order) {
       return NextResponse.json({ error: "Order not found." }, { status: 404 });
     }
-
     if (order.status === "paid") {
       return NextResponse.json({ error: "Order is already fully paid." }, { status: 400 });
     }
+    if (order.status === "draft") {
+      return NextResponse.json({ error: "Finalize this draft before recording a payment." }, { status: 400 });
+    }
+    if (!order.customer) {
+      return NextResponse.json({ error: "Customer not found." }, { status: 404 });
+    }
 
+    const amount = Math.round(Number(amountpaid) * 100) / 100;
     const previousAmountPaid = order.amountpaid || 0;
-    const previousRemaining = order.remainingBalance ?? (order.total - previousAmountPaid);
+    const previousRemaining = order.remainingBalance ?? order.total - previousAmountPaid;
 
-    // Validate payment amount
-    if (
-      !amountpaid ||
-      amountpaid <= 0 ||
-      amountpaid > previousRemaining
-    ) {
+    if (!amount || amount <= 0 || amount > previousRemaining + 0.005) {
       return NextResponse.json(
         { error: `Invalid payment. You can only pay up to ${previousRemaining.toFixed(2)}.` },
         { status: 400 }
       );
     }
 
-    // Get current customer debt
-    const customer = await Customer.findById(order.customer);
-    if (!customer) {
-      return NextResponse.json({ error: "Customer not found." }, { status: 404 });
-    }
-
-    // Calculate how much we can actually deduct from debt (can't go below 0)
-    const maxAllowedPayment = Math.min(amountpaid, customer.debt);
-    const actualDebtReduction = -maxAllowedPayment; // Negative because it reduces debt
-    const newDebtValue = Math.max(0, customer.debt + actualDebtReduction);
-
-    // Calculate new values
-    const newAmountPaid = previousAmountPaid + amountpaid;
-    const newRemaining = order.total - newAmountPaid;
-
     const beforeView = await auditView("Order", order);
 
-    // Update order
+    const newAmountPaid = Math.round((previousAmountPaid + amount) * 100) / 100;
+    const newRemaining = Math.max(0, Math.round((order.total - newAmountPaid) * 100) / 100);
     order.amountpaid = newAmountPaid;
     order.remainingBalance = newRemaining;
     order.status = newRemaining === 0 ? "paid" : "partiallyPaid";
+    if (newRemaining === 0) order.paymentDate = new Date();
     await order.save();
 
-    // Update customer debt - use either $inc or $set, not both
-    await Customer.findByIdAndUpdate(order.customer, {
-      $set: { debt: newDebtValue }
-    });
+    const result = await recordCustomerPayment({ customerId: order.customer, amount, order: order._id });
 
     await logActivity({
-      admin: await getUserFromCookie(),
+      admin,
       action: "order.payment",
       entityType: "Order",
       entityId: order._id,
       entityLabel: orderLabel(order),
-      summary:
-        maxAllowedPayment > 0
-          ? `Recorded a $${maxAllowedPayment.toFixed(2)} payment on ${orderLabel(order)} from ${customer.fullName}`
-          : `Applied $${amountpaid.toFixed(2)} to ${orderLabel(order)} (already covered by earlier payments from ${customer.fullName} - no new payment recorded)`,
+      summary: `Recorded a $${amount.toFixed(2)} payment on ${orderLabel(order)} from ${result.customerName}`,
       changes: [
         ...diffViews("Order", beforeView, await auditView("Order", order)),
-        extraChange("customer.debt", "Customer debt", customer.debt, newDebtValue, "money"),
+        extraChange("payment.amount", "Payment recorded", null, amount, "money"),
+        extraChange("customer.debt", "Customer debt", result.previousDebt, result.newDebt, "money"),
       ],
     });
 
-    // Only the part of this that still reduces the customer's debt is new
-    // money. If they already paid some/all of it through a manual payment on
-    // the Payments tab (which lowers their debt without touching the order),
-    // that cash is already recorded - recording it again here would count the
-    // same payment twice. So the payment is capped at the debt reduction, and
-    // none is created when the debt was already cleared.
-    if (maxAllowedPayment > 0) {
-      await Payment.create({
-        customer: order.customer,
-        amount: maxAllowedPayment,
-        previousDebt: customer.debt,
-        newDebt: newDebtValue,
-        source: "order",
-        order: order._id,
-      });
-    }
-
     return NextResponse.json({
-      message: `Payment of ${amountpaid.toFixed(2)} applied successfully. ${newRemaining > 0 ? `Remaining balance: ${newRemaining.toFixed(2)}` : 'Order fully paid!'}`,
+      message: `Payment of ${amount.toFixed(2)} applied successfully. ${
+        newRemaining > 0 ? `Remaining balance: ${newRemaining.toFixed(2)}` : "Order fully paid!"
+      }`,
       paymentDetails: {
-        amountPaid: amountpaid,
-        debtReduction: maxAllowedPayment,
-        previousDebt: customer.debt,
-        newDebt: newDebtValue
+        amountPaid: amount,
+        previousDebt: result.previousDebt,
+        newDebt: result.newDebt,
       },
       updatedOrder: {
         amountpaid: newAmountPaid,
         remainingBalance: newRemaining,
-        status: order.status
-      }
+        status: order.status,
+      },
     });
   } catch (error) {
     console.error("Payment update error:", error.message);
-    return NextResponse.json(
-      { error: "Failed to update payment.", details: error.message }, 
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Failed to update payment.", details: error.message }, { status: 500 });
   }
 }

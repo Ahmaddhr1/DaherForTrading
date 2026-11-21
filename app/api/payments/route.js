@@ -7,6 +7,7 @@ import { getUserFromCookie } from "@/lib/auth";
 import { logActivity } from "@/lib/activityLog";
 import { auditView, diffViews, snapshotChanges, extraChange, describeChanges } from "@/lib/audit";
 import { requirePermission } from "@/lib/permissions";
+import { recordCustomerPayment } from "@/lib/recordPayment";
 
 // Create a payment against a customer's outstanding debt.
 export async function POST(req) {
@@ -43,17 +44,8 @@ export async function POST(req) {
       );
     }
 
-    const newDebt = previousDebt - paymentAmount;
-
-    customer.debt = newDebt;
-    await customer.save();
-
-    const payment = await Payment.create({
-      customer: customerId,
-      amount: paymentAmount,
-      previousDebt,
-      newDebt,
-    });
+    // One call: lowers the debt once and records one payment.
+    const { payment, newDebt } = await recordCustomerPayment({ customerId, amount: paymentAmount });
 
     await logActivity({
       admin: await getUserFromCookie(),

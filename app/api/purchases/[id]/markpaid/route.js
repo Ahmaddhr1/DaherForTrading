@@ -2,11 +2,11 @@ import { NextResponse } from "next/server";
 import { connectToDB } from "@/lib/connectDb";
 import Purchase from "@/models/Purchase";
 import Company from "@/models/Company";
-import SupplierPayment from "@/models/SupplierPayment";
 import { getUserFromCookie } from "@/lib/auth";
 import { requirePermission } from "@/lib/permissions";
 import { logActivity } from "@/lib/activityLog";
 import { extraChange } from "@/lib/audit";
+import { recordSupplierPayment } from "@/lib/recordPayment";
 
 // Marks an unpaid purchase as paid: reduces what we owe the company by the
 // purchase total and records a SupplierPayment, which shows up in the
@@ -32,23 +32,15 @@ export async function PUT(_, { params }) {
       return NextResponse.json({ message: "Company not found" }, { status: 404 });
     }
 
-    const previousDebt = company.debt || 0;
-    const newDebt = Math.max(0, Math.round((previousDebt - purchase.total) * 100) / 100);
-
     purchase.paid = true;
     await purchase.save();
 
-    company.debt = newDebt;
-    await company.save();
-
-    const payment = await SupplierPayment.create({
-      company: company._id,
-      purchase: purchase._id,
+    // One call: lowers what we owe the company once and records one payment.
+    const { payment, previousDebt, newDebt } = await recordSupplierPayment({
+      companyId: company._id,
       amount: purchase.total,
-      previousDebt,
-      newDebt,
-      admin: admin?.id,
-      adminName: admin?.adminname,
+      purchase: purchase._id,
+      admin,
     });
 
     await logActivity({

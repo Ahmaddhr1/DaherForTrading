@@ -82,15 +82,16 @@ export async function PUT(req, { params }) {
       ],
     });
 
-    // Record this as a normal payment so it shows up in the payment history
-    if (maxAllowedPayment > 0) {
-      await Payment.create({
-        customer: order.customer,
-        amount: maxAllowedPayment,
-        previousDebt: customer.debt,
-        newDebt: newDebtValue,
-      });
-    }
+    // Always record the money collected as a payment (linked to this order)
+    // so it shows up in the Payments tab.
+    await Payment.create({
+      customer: order.customer,
+      amount: amountpaid,
+      previousDebt: customer.debt,
+      newDebt: newDebtValue,
+      source: "order",
+      order: order._id,
+    });
 
     return NextResponse.json({
       message: `Payment of ${amountpaid.toFixed(2)} applied successfully. ${newRemaining > 0 ? `Remaining balance: ${newRemaining.toFixed(2)}` : 'Order fully paid!'}`,

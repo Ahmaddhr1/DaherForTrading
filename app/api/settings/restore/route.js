@@ -11,6 +11,7 @@ import Category from "@/models/Category";
 import Company from "@/models/Company";
 import Purchase from "@/models/Purchase";
 import Payment from "@/models/Payment";
+import SupplierPayment from "@/models/SupplierPayment";
 import Disbursement from "@/models/Disbursement";
 import StockAdjustment from "@/models/StockAdjustment";
 import AppSettings from "@/models/AppSettings";
@@ -25,6 +26,7 @@ const COLLECTION_MODELS = {
   companies: Company,
   purchases: Purchase,
   payments: Payment,
+  supplierPayments: SupplierPayment,
   disbursements: Disbursement,
   stockAdjustments: StockAdjustment,
   appSettings: AppSettings,

@@ -74,13 +74,17 @@ export async function PUT(req, { params }) {
       ],
     });
 
-    // Record this as a normal payment so it shows up in the payment history
-    if (actualDebtReduction > 0) {
+    // Always record the money collected as a payment (linked to this order)
+    // so it shows up in the Payments tab - even when the customer's running
+    // balance was already lower than this order's remainder.
+    if (remainingToPay > 0) {
       await Payment.create({
         customer: order.customer,
-        amount: actualDebtReduction,
+        amount: remainingToPay,
         previousDebt: customer.debt,
         newDebt: finalDebt,
+        source: "order",
+        order: order._id,
       });
     }
 

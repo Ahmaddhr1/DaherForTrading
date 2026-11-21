@@ -42,9 +42,14 @@ export function MySideBar() {
     queryFn: async () => (await axios.get("/api/admin/me")).data,
   });
   const isOwner = me?.role === "owner";
-  const visibleTabs = tabs.filter(
-    (tab) => (!tab.ownerOnly || isOwner) && (!tab.permission || hasPermission(me, tab.permission))
-  );
+  const canSee = (tab) => (!tab.ownerOnly || isOwner) && (!tab.permission || hasPermission(me, tab.permission));
+  // A hidden parent normally hides its children too, except children
+  // marked promoteIfParentHidden (e.g. Overdue Debt under Dashboard), which
+  // then show as ordinary top-level tabs in the parent's place.
+  const visibleTabs = tabs.flatMap((tab) => {
+    if (canSee(tab)) return [tab];
+    return (tab.children || []).filter((child) => child.promoteIfParentHidden && canSee(child));
+  });
 
   const toggleCollapse = () => setIsCollapsed(!isCollapsed);
 
@@ -102,17 +107,26 @@ export function MySideBar() {
     );
   };
 
+  // Sub-tabs use the same size as main tabs (same padding, icon, text) but
+  // an amber scheme with a left accent bar, so they read as part of their
+  // parent rather than separate sections.
   const renderChildLink = (child) => {
     const isActive = pathname === child.path;
     return (
       <Link
         key={child.path}
         href={child.path}
-        className={`flex items-center py-2 pl-12 pr-4 text-sm transition-colors ${
-          isActive ? "bg-primary text-white" : "text-sidebar-foreground/70 hover:bg-primary hover:text-white"
+        title={isCollapsed ? child.label : undefined}
+        className={`flex items-center p-4 border-l-4 transition-colors ${
+          isCollapsed ? "justify-center" : "pl-7"
+        } ${
+          isActive
+            ? "bg-amber-500 text-gray-900 border-amber-600"
+            : "bg-amber-500/10 border-amber-400 hover:bg-amber-500 hover:text-gray-900"
         }`}
       >
-        {child.label}
+        <span>{child.icon}</span>
+        {!isCollapsed && <span className="ml-3">{child.label}</span>}
       </Link>
     );
   };
@@ -172,7 +186,7 @@ export function MySideBar() {
             {visibleTabs.map((tab, index) => (
               <div key={index}>
                 {renderLink(tab, index)}
-                {!isCollapsed && isTabExpanded(tab) && tab.children?.map(renderChildLink)}
+                {isTabExpanded(tab) && tab.children?.filter(canSee).map(renderChildLink)}
               </div>
             ))}
           </div>

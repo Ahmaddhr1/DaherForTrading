@@ -40,6 +40,8 @@ import {
 } from "lucide-react";
 import { format } from "date-fns";
 import { useHasPermission } from "@/lib/useHasPermission";
+import Link from "next/link";
+import SupplierPaymentsView from "@/components/payments/SupplierPaymentsView";
 
 const SORT_OPTIONS = [
   { value: "newest", label: "Newest First" },
@@ -66,6 +68,9 @@ export default function PaymentsPage() {
   const [hasInteracted, setHasInteracted] = useState(false);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
+  // "customers" = payments collected from customers (manual + from orders);
+  // "suppliers" = payments made to companies when a purchase is marked paid.
+  const [view, setView] = useState("customers");
   const { hasPermission: canManagePayments } = useHasPermission("canManagePayments");
 
   const queryClient = useQueryClient();
@@ -161,11 +166,13 @@ export default function PaymentsPage() {
               </div>
               <div className="min-w-0">
                 <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-gray-100 truncate">Payments</h1>
-                <p className="text-gray-600 dark:text-gray-400 text-sm sm:text-base truncate">Payment history across all customers</p>
+                <p className="text-gray-600 dark:text-gray-400 text-sm sm:text-base truncate">
+                  {view === "suppliers" ? "Payments made to your companies (suppliers)" : "Payment history across all customers"}
+                </p>
               </div>
             </div>
 
-            {canManagePayments && (
+            {canManagePayments && view === "customers" && (
               <Button onClick={() => setIsModalOpen(true)} className="flex items-center gap-2 shrink-0">
                 <Plus className="h-4 w-4" />
                 <span className="hidden sm:inline">Make a Payment</span>
@@ -174,6 +181,31 @@ export default function PaymentsPage() {
           </div>
         </div>
 
+        {/* Customers / Suppliers switch */}
+        <div className="inline-flex rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-1 mb-6">
+          {[
+            { value: "customers", label: "Customer payments" },
+            { value: "suppliers", label: "Supplier payments" },
+          ].map((opt) => (
+            <button
+              key={opt.value}
+              type="button"
+              onClick={() => setView(opt.value)}
+              className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${
+                view === opt.value
+                  ? "bg-primary text-primary-foreground"
+                  : "text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800"
+              }`}
+            >
+              {opt.label}
+            </button>
+          ))}
+        </div>
+
+        {view === "suppliers" ? (
+          <SupplierPaymentsView />
+        ) : (
+        <>
         {/* Summary */}
         <Card className="shadow-sm border-gray-200 dark:border-gray-800 mb-6">
           <CardContent className="p-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
@@ -316,6 +348,7 @@ export default function PaymentsPage() {
                   <TableHead className="text-center">Amount Paid</TableHead>
                   <TableHead className="text-center">Debt Before</TableHead>
                   <TableHead className="text-center">Debt After</TableHead>
+                  <TableHead>Source</TableHead>
                   <TableHead>Date</TableHead>
                 </TableRow>
               </TableHeader>
@@ -346,6 +379,18 @@ export default function PaymentsPage() {
                       <Badge variant={payment.newDebt > 0 ? "destructive" : "default"} className={payment.newDebt === 0 ? "bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-400" : ""}>
                         ${payment.newDebt.toLocaleString()}
                       </Badge>
+                    </TableCell>
+                    <TableCell className="text-sm">
+                      {payment.order ? (
+                        <Link
+                          href={`/dashboard/orders/${payment.order}`}
+                          className="inline-flex items-center rounded-md bg-blue-50 dark:bg-blue-900/30 px-2 py-0.5 text-xs font-medium text-blue-700 dark:text-blue-300 hover:underline"
+                        >
+                          Order #{String(payment.order).slice(-6).toUpperCase()}
+                        </Link>
+                      ) : (
+                        <span className="text-xs text-gray-500 dark:text-gray-400">Manual payment</span>
+                      )}
                     </TableCell>
                     <TableCell className="text-gray-500 dark:text-gray-400 text-sm">
                       {format(new Date(payment.createdAt), "MMM d, yyyy HH:mm")}
@@ -383,6 +428,8 @@ export default function PaymentsPage() {
               </div>
             )}
           </Card>
+        )}
+        </>
         )}
       </div>
 

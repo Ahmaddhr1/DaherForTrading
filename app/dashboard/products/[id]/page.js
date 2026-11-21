@@ -196,7 +196,7 @@ const EditProductPage = () => {
   if (productLoading) {
     return (
       <div className="min-h-screen bg-gray-50/30 dark:bg-gray-900/30 py-8">
-        <div className="container mx-auto px-4 max-w-4xl">
+        <div className="container mx-auto px-4">
           <PageHeaderSkeleton />
           <div className="grid gap-6 lg:grid-cols-3">
             <div className="lg:col-span-2">
@@ -224,7 +224,7 @@ const EditProductPage = () => {
   if (productError) {
     return (
       <div className="min-h-screen bg-gray-50/30 dark:bg-gray-900/30 py-8">
-        <div className="container mx-auto px-4 max-w-4xl">
+        <div className="container mx-auto px-4">
           <Card className="max-w-md mx-auto">
             <CardContent className="pt-6 text-center">
               <div className="text-red-500 bg-red-50 dark:bg-red-900/20 rounded-full p-3 w-12 h-12 mx-auto mb-4 flex items-center justify-center">
@@ -242,7 +242,7 @@ const EditProductPage = () => {
 
   return (
     <div className="min-h-screen bg-gray-50/30 dark:bg-gray-900/30 py-8">
-      <div className="container mx-auto px-4 max-w-4xl">
+      <div className="container mx-auto px-4">
         {/* Header */}
         <div className="mb-8">
           <div className="flex items-center gap-3 mb-2">

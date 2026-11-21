@@ -161,7 +161,7 @@ const Page = () => {
 
   return (
     <div className="min-h-screen bg-gray-50/30 dark:bg-gray-900/30 py-8">
-      <div className="container mx-auto px-4 max-w-4xl">
+      <div className="container mx-auto px-4">
         {/* Header */}
         <div className="mb-8">
           <div className="flex items-center gap-3 mb-2">

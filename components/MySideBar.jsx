@@ -9,6 +9,7 @@ import axios from "axios";
 import tabs from "@/lib/SideBarTabs";
 import { toast } from "sonner";
 import { GlobalSearchModal } from "@/components/GlobalSearchModal";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { hasPermission } from "@/lib/permissions";
 
 // Desktop-only navigation (lg and up). On mobile, navigation is handled by
@@ -17,6 +18,7 @@ export function MySideBar() {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [expandedTabs, setExpandedTabs] = useState({});
+  const [logoutConfirmOpen, setLogoutConfirmOpen] = useState(false);
   const pathname = usePathname();
   const router = useRouter();
 
@@ -179,8 +181,8 @@ export function MySideBar() {
         {/* Footer */}
         <div className="border-t border-sidebar-border">
           <button
-            onClick={handleLogout}
-            className={`p-4 flex items-center hover:bg-destructive hover:text-white cursor-pointer duration-150 ${
+            onClick={() => setLogoutConfirmOpen(true)}
+            className={`w-full p-4 flex items-center hover:bg-destructive hover:text-white cursor-pointer duration-150 ${
               isCollapsed ? "justify-center" : ""
             }`}
           >
@@ -190,6 +192,17 @@ export function MySideBar() {
         </div>
       </div>
       <GlobalSearchModal open={searchOpen} onClose={() => setSearchOpen(false)} />
+      <ConfirmDialog
+        open={logoutConfirmOpen}
+        onClose={() => setLogoutConfirmOpen(false)}
+        title="Log out?"
+        description="You'll need to sign in again to access your dashboard."
+        confirmLabel="Logout"
+        onConfirm={() => {
+          setLogoutConfirmOpen(false);
+          handleLogout();
+        }}
+      />
     </aside>
   );
 }

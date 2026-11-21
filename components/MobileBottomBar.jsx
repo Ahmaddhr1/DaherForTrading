@@ -10,6 +10,7 @@ import axios from "axios";
 import tabs from "@/lib/SideBarTabs";
 import { useCart } from "@/lib/cartContext";
 import { GlobalSearchModal } from "@/components/GlobalSearchModal";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { hasPermission } from "@/lib/permissions";
 
 // Searches both top-level tabs and any nested `children` (see
@@ -31,6 +32,7 @@ export function MobileBottomBar() {
   const router = useRouter();
   const [openSection, setOpenSection] = useState(null);
   const [searchOpen, setSearchOpen] = useState(false);
+  const [logoutConfirmOpen, setLogoutConfirmOpen] = useState(false);
   const { itemCount, openCart } = useCart();
 
   // Drives whether ownerOnly/permission-gated tabs show up in the "More"
@@ -279,7 +281,10 @@ export function MobileBottomBar() {
               {activeSheet.key === "more" && (
                 <>
                   <button
-                    onClick={handleLogout}
+                    onClick={() => {
+                      setOpenSection(null);
+                      setLogoutConfirmOpen(true);
+                    }}
                     className="w-full flex items-center gap-3 p-3 rounded-lg text-destructive hover:bg-destructive/10"
                   >
                     <LogOut size={20} />
@@ -292,6 +297,17 @@ export function MobileBottomBar() {
         </div>
       )}
       <GlobalSearchModal open={searchOpen} onClose={() => setSearchOpen(false)} />
+      <ConfirmDialog
+        open={logoutConfirmOpen}
+        onClose={() => setLogoutConfirmOpen(false)}
+        title="Log out?"
+        description="You'll need to sign in again to access your dashboard."
+        confirmLabel="Logout"
+        onConfirm={() => {
+          setLogoutConfirmOpen(false);
+          handleLogout();
+        }}
+      />
     </>
   );
 }

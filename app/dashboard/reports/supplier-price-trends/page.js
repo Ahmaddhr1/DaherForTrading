@@ -50,7 +50,7 @@ export default function SupplierPriceTrendsPage() {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-950 py-6">
-      <div className="container mx-auto px-4 max-w-5xl">
+      <div className="container mx-auto px-4">
         <div className="mb-8 flex items-center gap-3">
           <div className="p-2 bg-violet-100 dark:bg-violet-900/30 rounded-lg">
             <TrendingUp className="h-6 w-6 text-violet-600" />

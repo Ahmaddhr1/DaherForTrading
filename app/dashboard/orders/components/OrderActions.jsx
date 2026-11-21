@@ -1,16 +1,19 @@
 "use client";
+import { t } from "@/lib/i18n";
+import { useT } from "@/lib/i18n/LangProvider";
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Loader2, CheckCircle, Edit, Eye } from "lucide-react";
-import { toast } from "sonner";
+import { toast } from "@/lib/i18n/toast";
 import Link from "next/link";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { useHasPermission } from "@/lib/useHasPermission";
 
 const OrderActions = ({ order, onStatusUpdate }) => {
+  const t = useT();
   const queryClient = useQueryClient();
   const [confirmOpen, setConfirmOpen] = useState(false);
   const { hasPermission: canFinalizeOrders } = useHasPermission("canFinalizeOrders");
@@ -51,29 +54,31 @@ const OrderActions = ({ order, onStatusUpdate }) => {
           ) : (
             <CheckCircle className="h-3 w-3" />
           )}
-          Mark Paid
+          {t("Mark Paid")}
         </Button>
       )}
 
       <Link href={`/dashboard/orders/${order._id}`}>
         <Button size="sm" variant="outline" className="flex items-center gap-1">
           <Edit className="h-3 w-3" />
-          Edit
+          {t("Edit")}
         </Button>
       </Link>
 
       <Link href={`/dashboard/invoices/${order._id}`}>
         <Button size="sm" variant="outline" className="flex items-center gap-1">
           <Eye className="h-3 w-3" />
-          View
+          {t("View")}
         </Button>
       </Link>
       <ConfirmDialog
         open={confirmOpen}
         onClose={() => setConfirmOpen(false)}
-        title="Mark as paid?"
-        description={`Mark order for ${order.customer?.fullName} as paid?`}
-        confirmLabel="Mark Paid"
+        title={t("Mark as paid?")}
+        description={t("Mark order for {0} as paid?", {
+          0: order.customer?.fullName
+        })}
+        confirmLabel={t("Mark Paid")}
         variant="default"
         onConfirm={confirmMarkAsPaid}
         loading={markPaidMutation.isLoading}

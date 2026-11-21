@@ -1,9 +1,11 @@
 "use client";
+import { t } from "@/lib/i18n";
+import { useT } from "@/lib/i18n/LangProvider";
 
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
-import { toast } from "sonner";
+import { toast } from "@/lib/i18n/toast";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -26,6 +28,7 @@ function ordinal(n) {
 }
 
 export default function RecurringDisbursementsPage() {
+  const t = useT();
   const [modalOpen, setModalOpen] = useState(false);
   const [editTarget, setEditTarget] = useState(null);
   const [deleteTarget, setDeleteTarget] = useState(null);
@@ -106,10 +109,10 @@ export default function RecurringDisbursementsPage() {
             </div>
             <div>
               <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-gray-100">
-                Recurring Disbursements
+                {t("Recurring Disbursements")}
               </h1>
               <p className="text-gray-600 dark:text-gray-400 text-sm sm:text-base">
-                Auto-create rent, salaries, and other regular expenses each month
+                {t("Auto-create rent, salaries, and other regular expenses each month")}
               </p>
             </div>
           </div>
@@ -122,7 +125,7 @@ export default function RecurringDisbursementsPage() {
               className="flex items-center gap-2"
             >
               <Plus className="h-4 w-4" />
-              <span className="hidden sm:inline">Add Recurring</span>
+              <span className="hidden sm:inline">{t("Add Recurring")}</span>
             </Button>
           )}
         </div>
@@ -132,25 +135,25 @@ export default function RecurringDisbursementsPage() {
         ) : templates.length === 0 ? (
           <div className="text-center py-16 text-gray-500 dark:text-gray-400">
             <Repeat className="h-12 w-12 mx-auto mb-3 text-gray-300 dark:text-gray-700" />
-            <p className="text-lg">No recurring disbursements set up yet</p>
+            <p className="text-lg">{t("No recurring disbursements set up yet")}</p>
           </div>
         ) : (
           <Card className="shadow-sm border-gray-200 dark:border-gray-800 overflow-hidden">
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Description</TableHead>
-                  <TableHead>Category</TableHead>
-                  <TableHead className="text-center">Amount</TableHead>
-                  <TableHead className="text-center">Runs On</TableHead>
-                  <TableHead className="text-center">Active</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
+                  <TableHead>{t("Description")}</TableHead>
+                  <TableHead>{t("Category")}</TableHead>
+                  <TableHead className="text-center">{t("Amount")}</TableHead>
+                  <TableHead className="text-center">{t("Runs On")}</TableHead>
+                  <TableHead className="text-center">{t("Active")}</TableHead>
+                  <TableHead className="text-right">{t("Actions")}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {templates.map((tpl) => (
                   <TableRow key={tpl._id}>
-                    <TableCell className="font-medium text-gray-900 dark:text-gray-100">{tpl.description}</TableCell>
+                    <TableCell className="font-medium text-gray-900 dark:text-gray-100">{t(tpl.description)}</TableCell>
                     <TableCell>
                       <Badge variant="outline">{tpl.category}</Badge>
                     </TableCell>
@@ -158,11 +161,11 @@ export default function RecurringDisbursementsPage() {
                       -${tpl.amount.toLocaleString()}
                     </TableCell>
                     <TableCell className="text-center text-gray-600 dark:text-gray-400">
-                      {ordinal(tpl.dayOfMonth)} of the month
+                      {ordinal(tpl.dayOfMonth)} {t("of the month")}
                     </TableCell>
                     <TableCell className="text-center">
                       <Badge variant={tpl.active ? "default" : "outline"}>
-                        {tpl.active ? "Active" : "Paused"}
+                        {tpl.active ? t("Active") : t("Paused")}
                       </Badge>
                     </TableCell>
                     <TableCell className="text-right">
@@ -172,7 +175,7 @@ export default function RecurringDisbursementsPage() {
                             variant="outline"
                             size="sm"
                             onClick={() => updateMutation.mutate({ id: tpl._id, active: !tpl.active })}
-                            title={tpl.active ? "Pause" : "Resume"}
+                            title={tpl.active ? t("Pause") : t("Resume")}
                           >
                             {tpl.active ? <Pause className="h-3 w-3" /> : <Play className="h-3 w-3" />}
                           </Button>
@@ -184,7 +187,7 @@ export default function RecurringDisbursementsPage() {
                           </Button>
                         </div>
                       ) : (
-                        <span className="text-xs text-gray-400 dark:text-gray-500">View only</span>
+                        <span className="text-xs text-gray-400 dark:text-gray-500">{t("View only")}</span>
                       )}
                     </TableCell>
                   </TableRow>
@@ -198,17 +201,17 @@ export default function RecurringDisbursementsPage() {
       <Modal
         open={modalOpen}
         onClose={() => setModalOpen(false)}
-        title="Add Recurring Disbursement"
-        description="Automatically creates a real disbursement on this day every month"
+        title={t("Add Recurring Disbursement")}
+        description={t("Automatically creates a real disbursement on this day every month")}
       >
         <form onSubmit={handleSubmit} className="space-y-4">
           <RecurringForm form={form} setForm={setForm} />
           <div className="flex justify-end gap-2 pt-2">
             <Button type="button" variant="outline" onClick={() => setModalOpen(false)}>
-              Cancel
+              {t("Cancel")}
             </Button>
             <Button type="submit" disabled={createMutation.isPending}>
-              {createMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : "Create"}
+              {createMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : t("Create")}
             </Button>
           </div>
         </form>
@@ -217,16 +220,16 @@ export default function RecurringDisbursementsPage() {
       <Modal
         open={!!editTarget}
         onClose={() => setEditTarget(null)}
-        title="Edit Recurring Disbursement"
+        title={t("Edit Recurring Disbursement")}
       >
         <form onSubmit={handleEditSubmit} className="space-y-4">
           <RecurringForm form={form} setForm={setForm} />
           <div className="flex justify-end gap-2 pt-2">
             <Button type="button" variant="outline" onClick={() => setEditTarget(null)}>
-              Cancel
+              {t("Cancel")}
             </Button>
             <Button type="submit" disabled={updateMutation.isPending}>
-              {updateMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : "Save"}
+              {updateMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : t("Save")}
             </Button>
           </div>
         </form>
@@ -235,8 +238,13 @@ export default function RecurringDisbursementsPage() {
       <ConfirmDialog
         open={!!deleteTarget}
         onClose={() => setDeleteTarget(null)}
-        title="Delete recurring disbursement?"
-        description={`"${deleteTarget?.description}" will no longer auto-create. Disbursements it already created stay in your history.`}
+        title={t("Delete recurring disbursement?")}
+        description={t(
+          "\"{0}\" will no longer auto-create. Disbursements it already created stay in your history.",
+          {
+            0: deleteTarget?.description
+          }
+        )}
         onConfirm={() => deleteMutation.mutate(deleteTarget._id)}
         loading={deleteMutation.isPending}
       />
@@ -245,21 +253,22 @@ export default function RecurringDisbursementsPage() {
 }
 
 function RecurringForm({ form, setForm }) {
+  const t = useT();
   return (
     <>
       <div className="space-y-2">
-        <Label htmlFor="rd-description">Description</Label>
+        <Label htmlFor="rd-description">{t("Description")}</Label>
         <Input
           id="rd-description"
           value={form.description}
           onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))}
-          placeholder="e.g. Office rent"
+          placeholder={t("e.g. Office rent")}
           required
         />
       </div>
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-2">
-          <Label htmlFor="rd-amount">Amount ($)</Label>
+          <Label htmlFor="rd-amount">{t("Amount ($)")}</Label>
           <Input
             id="rd-amount"
             type="number"
@@ -271,7 +280,7 @@ function RecurringForm({ form, setForm }) {
           />
         </div>
         <div className="space-y-2">
-          <Label htmlFor="rd-day">Day of Month</Label>
+          <Label htmlFor="rd-day">{t("Day of Month")}</Label>
           <Input
             id="rd-day"
             type="number"
@@ -284,7 +293,7 @@ function RecurringForm({ form, setForm }) {
         </div>
       </div>
       <div className="space-y-2">
-        <Label htmlFor="rd-category">Category</Label>
+        <Label htmlFor="rd-category">{t("Category")}</Label>
         <select
           id="rd-category"
           value={form.category}

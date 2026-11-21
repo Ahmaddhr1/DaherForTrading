@@ -1,9 +1,11 @@
 "use client";
+import { t } from "@/lib/i18n";
+import { useT } from "@/lib/i18n/LangProvider";
 
 import React, { useEffect, useRef, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
-import { toast } from "sonner";
+import { toast } from "@/lib/i18n/toast";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -36,6 +38,7 @@ const RESTORE_WARNING =
   "This will permanently replace all current customers, orders, products, categories, companies, purchases, payments, and disbursements with the contents of this file. This cannot be undone. Continue?";
 
 export default function SettingsPage() {
+  const t = useT();
   const queryClient = useQueryClient();
 
   // Backup/restore is owner-only server-side (middleware.js) - this just
@@ -104,7 +107,9 @@ export default function SettingsPage() {
   const sendTestBackupMutation = useMutation({
     mutationFn: async () => (await axios.post("/api/settings/backup/send-test")).data,
     onSuccess: (data) => {
-      toast.success(`Backup emailed to ${data.to}`);
+      toast.success(t("Backup emailed to {0}", {
+        0: data.to
+      }));
       queryClient.invalidateQueries({ queryKey: ["settings", "business"] });
     },
     onError: (error) => {
@@ -243,8 +248,8 @@ export default function SettingsPage() {
               <SettingsIcon className="h-6 w-6 text-blue-600" />
             </div>
             <div>
-              <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">Settings</h1>
-              <p className="text-gray-600 dark:text-gray-400">Manage your account and data</p>
+              <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">{t("Settings")}</h1>
+              <p className="text-gray-600 dark:text-gray-400">{t("Manage your account and data")}</p>
             </div>
           </div>
         </div>
@@ -254,9 +259,9 @@ export default function SettingsPage() {
           <CardHeader>
             <CardTitle className="text-lg flex items-center gap-2">
               <Moon className="h-5 w-5 text-indigo-600" />
-              Appearance
+              {t("Appearance")}
             </CardTitle>
-            <CardDescription>Switch between light and dark mode</CardDescription>
+            <CardDescription>{t("Switch between light and dark mode")}</CardDescription>
           </CardHeader>
           <CardContent>
             <ThemeToggle className="border border-gray-200 dark:border-gray-800" />
@@ -268,22 +273,23 @@ export default function SettingsPage() {
           <CardHeader>
             <CardTitle className="text-lg flex items-center gap-2">
               <DollarSign className="h-5 w-5 text-green-600" />
-              Business Settings
+              {t("Business Settings")}
             </CardTitle>
             <CardDescription>
-              Used to show an LL equivalent on receipts and order/purchase forms, and to
-              pre-fill tax on new orders and purchases
+              {t(
+                "Used to show an LL equivalent on receipts and order/purchase forms, and to pre-fill tax on new orders and purchases"
+              )}
             </CardDescription>
           </CardHeader>
           <CardContent>
             {settingsLoading ? (
-              <p className="text-sm text-gray-500 dark:text-gray-400">Loading...</p>
+              <p className="text-sm text-gray-500 dark:text-gray-400">{t("Loading...")}</p>
             ) : (
               <form onSubmit={handleSettingsSubmit} className="space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="dollarRate" className="flex items-center gap-2">
                     <DollarSign className="h-4 w-4" />
-                    Dollar Rate (LL per $1)
+                    {t("Dollar Rate (LL per $1)")}
                   </Label>
                   <Input
                     id="dollarRate"
@@ -296,7 +302,7 @@ export default function SettingsPage() {
                     disabled={!canManageSettings}
                   />
                   <p className="text-xs text-gray-500 dark:text-gray-400">
-                    e.g. 90000 means $1 = 90,000 LL. Update this whenever the rate moves.
+                    {t("e.g. 90000 means $1 = 90,000 LL. Update this whenever the rate moves.")}
                   </p>
                 </div>
 
@@ -305,7 +311,7 @@ export default function SettingsPage() {
                 <div className="space-y-2">
                   <Label htmlFor="taxRate" className="flex items-center gap-2">
                     <Percent className="h-4 w-4" />
-                    Default Tax Rate (%)
+                    {t("Default Tax Rate (%)")}
                   </Label>
                   <Input
                     id="taxRate"
@@ -319,8 +325,9 @@ export default function SettingsPage() {
                     disabled={!canManageSettings}
                   />
                   <p className="text-xs text-gray-500 dark:text-gray-400">
-                    Pre-fills the tax field when creating an order or purchase - it can
-                    still be changed per transaction.
+                    {t(
+                      "Pre-fills the tax field when creating an order or purchase - it can still be changed per transaction."
+                    )}
                   </p>
                 </div>
 
@@ -332,10 +339,10 @@ export default function SettingsPage() {
                   {settingsMutation.isPending ? (
                     <span className="flex items-center gap-2">
                       <Loader2 className="h-4 w-4 animate-spin" />
-                      Saving...
+                      {t("Saving...")}
                     </span>
                   ) : (
-                    "Save Business Settings"
+                    t("Save Business Settings")
                   )}
                 </Button>
               </form>
@@ -348,14 +355,14 @@ export default function SettingsPage() {
           <CardHeader>
             <CardTitle className="text-lg flex items-center gap-2">
               <Lock className="h-5 w-5 text-blue-600" />
-              Change Password
+              {t("Change Password")}
             </CardTitle>
-            <CardDescription>Update the password used to log in to this dashboard</CardDescription>
+            <CardDescription>{t("Update the password used to log in to this dashboard")}</CardDescription>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="currentPassword">Current Password</Label>
+                <Label htmlFor="currentPassword">{t("Current Password")}</Label>
                 <Input
                   id="currentPassword"
                   name="currentPassword"
@@ -370,7 +377,7 @@ export default function SettingsPage() {
               <Separator />
 
               <div className="space-y-2">
-                <Label htmlFor="newPassword">New Password</Label>
+                <Label htmlFor="newPassword">{t("New Password")}</Label>
                 <Input
                   id="newPassword"
                   name="newPassword"
@@ -380,11 +387,11 @@ export default function SettingsPage() {
                   autoComplete="new-password"
                   required
                 />
-                <p className="text-xs text-gray-500 dark:text-gray-400">At least 8 characters</p>
+                <p className="text-xs text-gray-500 dark:text-gray-400">{t("At least 8 characters")}</p>
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="confirmPassword">Confirm New Password</Label>
+                <Label htmlFor="confirmPassword">{t("Confirm New Password")}</Label>
                 <Input
                   id="confirmPassword"
                   name="confirmPassword"
@@ -403,10 +410,10 @@ export default function SettingsPage() {
                 {changePasswordMutation.isPending ? (
                   <span className="flex items-center gap-2">
                     <Loader2 className="h-4 w-4 animate-spin" />
-                    Updating...
+                    {t("Updating...")}
                   </span>
                 ) : (
-                  "Update Password"
+                  t("Update Password")
                 )}
               </Button>
             </form>
@@ -419,11 +426,12 @@ export default function SettingsPage() {
             <CardHeader>
               <CardTitle className="text-lg flex items-center gap-2">
                 <DatabaseBackup className="h-5 w-5 text-green-600" />
-                Database Backup
+                {t("Database Backup")}
               </CardTitle>
               <CardDescription>
-                Download a full copy of your business data (customers, orders, products,
-                categories, companies, purchases, payments, and disbursements) as a JSON file
+                {t(
+                  "Download a full copy of your business data (customers, orders, products, categories, companies, purchases, payments, and disbursements) as a JSON file"
+                )}
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -436,18 +444,18 @@ export default function SettingsPage() {
                 {isDownloading ? (
                   <>
                     <Loader2 className="h-4 w-4 animate-spin" />
-                    Preparing Backup...
+                    {t("Preparing Backup...")}
                   </>
                 ) : (
                   <>
                     <DatabaseBackup className="h-4 w-4" />
-                    Download Backup
+                    {t("Download Backup")}
                   </>
                 )}
               </Button>
               <p className="text-xs text-gray-500 dark:text-gray-400 mt-3 flex items-start gap-1">
                 <ShieldCheck className="h-3.5 w-3.5 shrink-0 mt-0.5 text-gray-400 dark:text-gray-500" />
-                Login credentials are never included in this backup file.
+                {t("Login credentials are never included in this backup file.")}
               </p>
             </CardContent>
           </Card>
@@ -459,10 +467,10 @@ export default function SettingsPage() {
             <CardHeader>
               <CardTitle className="text-lg flex items-center gap-2">
                 <Mail className="h-5 w-5 text-blue-600" />
-                Automated Backups
+                {t("Automated Backups")}
               </CardTitle>
               <CardDescription>
-                A copy of the same backup above, emailed automatically on a schedule
+                {t("A copy of the same backup above, emailed automatically on a schedule")}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -487,7 +495,7 @@ export default function SettingsPage() {
                           : "text-green-800 dark:text-green-400 font-medium"
                       }
                     >
-                      Last backup email {settings.lastScheduledBackupStatus === "failed" ? "failed" : "sent"}
+                      {t("Last backup email")} {settings.lastScheduledBackupStatus === "failed" ? t("failed") : t("sent")}
                       {" - "}
                       {new Date(settings.lastScheduledBackupAt).toLocaleString()}
                     </p>
@@ -500,8 +508,9 @@ export default function SettingsPage() {
                 <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-900/50 rounded-lg p-3 flex items-start gap-2">
                   <AlertTriangle className="h-4 w-4 text-amber-600 shrink-0 mt-0.5" />
                   <p className="text-xs text-amber-800 dark:text-amber-400">
-                    No automated backup has run yet. Once the schedule is configured on the
-                    server (see below), or you send a test email, it will show up here.
+                    {t(
+                      "No automated backup has run yet. Once the schedule is configured on the server (see below), or you send a test email, it will show up here."
+                    )}
                   </p>
                 </div>
               )}
@@ -515,20 +524,20 @@ export default function SettingsPage() {
                 {sendTestBackupMutation.isPending ? (
                   <>
                     <Loader2 className="h-4 w-4 animate-spin" />
-                    Sending...
+                    {t("Sending...")}
                   </>
                 ) : (
                   <>
                     <Send className="h-4 w-4" />
-                    Send Backup Email Now
+                    {t("Send Backup Email Now")}
                   </>
                 )}
               </Button>
 
               <p className="text-xs text-gray-500 dark:text-gray-400">
-                Runs automatically once a day. This needs a few things set up on the server
-                once (SMTP credentials for sending mail, a recipient address, and a schedule
-                secret) - ask your developer if the status above says a backup email failed.
+                {t(
+                  "Runs automatically once a day. This needs a few things set up on the server once (SMTP credentials for sending mail, a recipient address, and a schedule secret) - ask your developer if the status above says a backup email failed."
+                )}
               </p>
             </CardContent>
           </Card>
@@ -540,11 +549,12 @@ export default function SettingsPage() {
             <CardHeader>
               <CardTitle className="text-lg flex items-center gap-2">
                 <Upload className="h-5 w-5 text-amber-600" />
-                Import Backup
+                {t("Import Backup")}
               </CardTitle>
               <CardDescription>
-                Restore your business data from a previously downloaded backup file. This
-                replaces all current data.
+                {t(
+                  "Restore your business data from a previously downloaded backup file. This replaces all current data."
+                )}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -570,7 +580,7 @@ export default function SettingsPage() {
                     className="flex items-center gap-2"
                   >
                     <FileJson className="h-4 w-4" />
-                    Choose Backup File
+                    {t("Choose Backup File")}
                   </Button>
                   {restoreFile && (
                     <Badge variant="outline" className="flex items-center gap-1">
@@ -590,19 +600,19 @@ export default function SettingsPage() {
                 {restoreMutation.isPending ? (
                   <>
                     <Loader2 className="h-4 w-4 animate-spin" />
-                    Restoring...
+                    {t("Restoring...")}
                   </>
                 ) : (
                   <>
                     <Upload className="h-4 w-4" />
-                    Restore from Backup
+                    {t("Restore from Backup")}
                   </>
                 )}
               </Button>
 
               {restoreSummary && (
                 <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-900/50 rounded-lg p-3">
-                  <p className="text-sm font-medium text-green-800 dark:text-green-400 mb-2">Restored:</p>
+                  <p className="text-sm font-medium text-green-800 dark:text-green-400 mb-2">{t("Restored:")}</p>
                   <div className="flex flex-wrap gap-2">
                     {Object.entries(restoreSummary).map(([key, count]) => (
                       <Badge key={key} variant="outline" className="bg-white dark:bg-gray-900">
@@ -619,9 +629,9 @@ export default function SettingsPage() {
       <ConfirmDialog
         open={confirmRestoreOpen}
         onClose={() => setConfirmRestoreOpen(false)}
-        title="Restore backup?"
+        title={t("Restore backup?")}
         description={RESTORE_WARNING}
-        confirmLabel="Restore"
+        confirmLabel={t("Restore")}
         onConfirm={confirmRestore}
         loading={restoreMutation.isPending}
       />

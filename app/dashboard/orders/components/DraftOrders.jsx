@@ -1,4 +1,6 @@
 "use client";
+import { t } from "@/lib/i18n";
+import { useT } from "@/lib/i18n/LangProvider";
 
 import React, { useEffect, useState } from "react";
 import {
@@ -21,10 +23,10 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { TableSkeleton } from "@/components/ui/skeleton-patterns";
 import { ChevronLeft, ChevronRight, Search, FileText } from "lucide-react";
-import { format } from "date-fns";
+import { format } from "@/lib/i18n/date";
 import { useRouter } from "next/navigation";
 import axios from "axios";
-import { toast } from "sonner";
+import { toast } from "@/lib/i18n/toast";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import OrderCustomerName from "./OrderCustomerName";
 import OrderCard from "./OrderCard";
@@ -36,6 +38,7 @@ import { useHasPermission } from "@/lib/useHasPermission";
 const PAGE_SIZE_OPTIONS = [10, 20, 50];
 
 export default function DraftOrders() {
+  const t = useT();
   const router = useRouter();
   const queryClient = useQueryClient();
   const { hasPermission: canEditOrders } = useHasPermission("canEditOrders");
@@ -130,29 +133,29 @@ export default function DraftOrders() {
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="outline" size="icon" disabled={actionLoading}>
-          <span className="sr-only">Open menu</span>⋯
+          <span className="sr-only">{t("Open menu")}</span>⋯
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
         {canEditOrders && (
           <DropdownMenuItem onClick={() => handleAction("continueEditing", order._id)}>
-            Continue Editing
+            {t("Continue Editing")}
           </DropdownMenuItem>
         )}
         {canEditOrders && (
           <DropdownMenuItem onClick={() => setLinkingOrder(order)}>
-            {order.customer ? "Change Linked Customer" : "Link Customer"}
+            {order.customer ? t("Change Linked Customer") : t("Link Customer")}
           </DropdownMenuItem>
         )}
         <DropdownMenuItem
           onClick={() => handleAction("finalize", order._id)}
           disabled={!order.customer || !canFinalizeOrders}
-          title={!order.customer ? "Link a customer first" : !canFinalizeOrders ? "You don't have permission to finalize orders" : undefined}
+          title={!order.customer ? t("Link a customer first") : !canFinalizeOrders ? t("You don't have permission to finalize orders") : undefined}
         >
-          Finalize Order
+          {t("Finalize Order")}
         </DropdownMenuItem>
         <DropdownMenuItem onClick={() => handleAction("delete", order._id)}>
-          Delete Draft
+          {t("Delete Draft")}
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
@@ -164,7 +167,7 @@ export default function DraftOrders() {
         <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 h-4 w-4" />
         <Input
           type="text"
-          placeholder="Search by customer name or order # (e.g. 4F2A91)"
+          placeholder={t("Search by customer name or order # (e.g. 4F2A91)")}
           value={searchInput}
           onChange={(e) => setSearchInput(e.target.value)}
           className="pl-10"
@@ -174,11 +177,11 @@ export default function DraftOrders() {
       {isLoading ? (
         <TableSkeleton rows={pageSize} cols={5} />
       ) : isError ? (
-        <div className="text-center py-12 text-red-600">Failed to load drafts.</div>
+        <div className="text-center py-12 text-red-600">{t("Failed to load drafts.")}</div>
       ) : orders.length === 0 ? (
         <div className="text-center py-12 text-gray-500 dark:text-gray-400">
           <FileText className="h-12 w-12 mx-auto mb-3" />
-          <p>No draft orders</p>
+          <p>{t("No draft orders")}</p>
         </div>
       ) : (
         <>
@@ -192,7 +195,7 @@ export default function DraftOrders() {
                   <div className="flex items-center justify-between gap-2">
                     {canEditOrders ? (
                       <Button variant="outline" size="sm" onClick={() => handleAction("continueEditing", order._id)}>
-                        Continue Editing
+                        {t("Continue Editing")}
                       </Button>
                     ) : (
                       <span />
@@ -207,15 +210,15 @@ export default function DraftOrders() {
           {/* Desktop: table */}
           <Card className="shadow-sm border-gray-200 dark:border-gray-800 hidden sm:block">
             <Table>
-              <TableCaption>Draft orders awaiting a customer and/or finalization</TableCaption>
+              <TableCaption>{t("Draft orders awaiting a customer and/or finalization")}</TableCaption>
               <TableHeader>
                 <TableRow>
-                  <TableHead className="w-28">Order #</TableHead>
-                  <TableHead>Customer</TableHead>
-                  <TableHead className="text-center">Items</TableHead>
-                  <TableHead className="text-center">Total</TableHead>
-                  <TableHead>Date</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
+                  <TableHead className="w-28">{t("Order #")}</TableHead>
+                  <TableHead>{t("Customer")}</TableHead>
+                  <TableHead className="text-center">{t("Items")}</TableHead>
+                  <TableHead className="text-center">{t("Total")}</TableHead>
+                  <TableHead>{t("Date")}</TableHead>
+                  <TableHead className="text-right">{t("Actions")}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -244,11 +247,11 @@ export default function DraftOrders() {
               <div className="flex items-center justify-center gap-4 p-4">
                 <Button onClick={() => setPage((p) => p - 1)} disabled={page === 1} variant="outline" size="sm" className="flex items-center gap-2">
                   <ChevronLeft className="h-4 w-4" />
-                  Previous
+                  {t("Previous")}
                 </Button>
-                <span className="text-sm text-gray-600 dark:text-gray-400">Page {page} of {totalPages}</span>
+                <span className="text-sm text-gray-600 dark:text-gray-400">{t("Page")} {page} {t("of")} {totalPages}</span>
                 <Button onClick={() => setPage((p) => p + 1)} disabled={page === totalPages} variant="outline" size="sm" className="flex items-center gap-2">
-                  Next
+                  {t("Next")}
                   <ChevronRight className="h-4 w-4" />
                 </Button>
               </div>
@@ -265,17 +268,19 @@ export default function DraftOrders() {
       <ConfirmDialog
         open={!!deleteDraftId}
         onClose={() => setDeleteDraftId(null)}
-        title="Delete draft?"
-        description="Delete this draft? This cannot be undone."
+        title={t("Delete draft?")}
+        description={t("Delete this draft? This cannot be undone.")}
         onConfirm={confirmDeleteDraft}
         loading={actionLoading}
       />
       <ConfirmDialog
         open={!!finalizeOrderId}
         onClose={() => setFinalizeOrderId(null)}
-        title="Finalize draft?"
-        description="Finalize this draft into a real order? This will deduct stock and add to the customer's debt."
-        confirmLabel="Finalize Order"
+        title={t("Finalize draft?")}
+        description={t(
+          "Finalize this draft into a real order? This will deduct stock and add to the customer's debt."
+        )}
+        confirmLabel={t("Finalize Order")}
         variant="default"
         onConfirm={confirmFinalize}
         loading={actionLoading}

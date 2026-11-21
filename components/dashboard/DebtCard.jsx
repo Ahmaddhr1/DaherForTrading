@@ -1,5 +1,7 @@
 // components/dashboard/DebtCard.jsx
 "use client";
+import { t } from "@/lib/i18n";
+import { useT } from "@/lib/i18n/LangProvider";
 
 import React from "react";
 import { useQuery } from "@tanstack/react-query";
@@ -14,6 +16,7 @@ const fetchDebtData = async () => {
 };
 
 const DebtCard = () => {
+  const t = useT();
   const { data, isLoading, error } = useQuery({
     queryKey: ["dashboard-debt"],
     queryFn: fetchDebtData,
@@ -23,7 +26,7 @@ const DebtCard = () => {
     return (
       <Card>
         <CardContent className="pt-6">
-          <div className="text-red-500">Error loading debt data</div>
+          <div className="text-red-500">{t("Error loading debt data")}</div>
         </CardContent>
       </Card>
     );
@@ -36,7 +39,7 @@ const DebtCard = () => {
       <CardHeader className="pb-2">
         <CardTitle className="flex items-center gap-2 text-lg font-medium">
           <CreditCard className="h-5 w-5 text-blue-600" />
-          Total Debt
+          {t("Total Debt")}
         </CardTitle>
       </CardHeader>
       <CardContent>
@@ -47,7 +50,7 @@ const DebtCard = () => {
             <div className="text-2xl font-bold text-red-600">
               ${totalDebt.toLocaleString()}
             </div>
-            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Amount owed by customers</p>
+            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">{t("Amount owed by customers")}</p>
           </>
         )}
       </CardContent>

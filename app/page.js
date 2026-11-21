@@ -1,4 +1,6 @@
 "use client";
+import { t } from "@/lib/i18n";
+import { useT } from "@/lib/i18n/LangProvider";
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -8,11 +10,12 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Loader2, Lock, User, Mail, ArrowLeft } from "lucide-react";
-import { toast } from "sonner";
+import { toast } from "@/lib/i18n/toast";
 
 const OTP_RESEND_COOLDOWN_SECONDS = 30;
 
 export default function LoginPage() {
+  const t = useT();
   const [formData, setFormData] = useState({ username: "", password: "" });
   const [otpStage, setOtpStage] = useState(null); // { adminname, maskedEmail } | null
   const [otpCode, setOtpCode] = useState("");
@@ -40,7 +43,9 @@ export default function LoginPage() {
       if (data.otpRequired) {
         setOtpStage({ adminname: data.adminname, maskedEmail: data.maskedEmail });
         setResendCooldown(OTP_RESEND_COOLDOWN_SECONDS);
-        toast.success(`Code sent to ${data.maskedEmail}`);
+        toast.success(t("Code sent to {0}", {
+          0: data.maskedEmail
+        }));
         return;
       }
       toast.success("Logged in successfully!");
@@ -132,28 +137,28 @@ export default function LoginPage() {
             <rect x="69" y="64" width="22" height="68" rx="6" fill="#F5F5F7" />
             <rect x="100" y="38" width="22" height="94" rx="6" fill="#E8A33D" />
           </svg>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Invento</h1>
-          <p className="text-gray-600 dark:text-gray-400 text-sm mt-1">Sign in to manage your business</p>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">{t("Invento")}</h1>
+          <p className="text-gray-600 dark:text-gray-400 text-sm mt-1">{t("Sign in to manage your business")}</p>
         </div>
 
         {!otpStage ? (
           <Card className="shadow-sm border-gray-200 dark:border-gray-800">
             <CardHeader>
-              <CardTitle className="text-lg">Welcome back</CardTitle>
-              <CardDescription>Enter your credentials to continue</CardDescription>
+              <CardTitle className="text-lg">{t("Welcome back")}</CardTitle>
+              <CardDescription>{t("Enter your credentials to continue")}</CardDescription>
             </CardHeader>
             <CardContent>
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="username" className="text-sm font-medium flex items-center gap-2">
                     <User className="h-4 w-4" />
-                    Username or Email
+                    {t("Username or Email")}
                   </Label>
                   <Input
                     id="username"
                     type="text"
                     name="username"
-                    placeholder="Enter your username or email"
+                    placeholder={t("Enter your username or email")}
                     value={formData.username}
                     onChange={handleChange}
                     disabled={isLoading}
@@ -166,13 +171,13 @@ export default function LoginPage() {
                 <div className="space-y-2">
                   <Label htmlFor="password" className="text-sm font-medium flex items-center gap-2">
                     <Lock className="h-4 w-4" />
-                    Password
+                    {t("Password")}
                   </Label>
                   <Input
                     id="password"
                     type="password"
                     name="password"
-                    placeholder="Enter your password"
+                    placeholder={t("Enter your password")}
                     value={formData.password}
                     onChange={handleChange}
                     disabled={isLoading}
@@ -185,10 +190,10 @@ export default function LoginPage() {
                   {isLoading ? (
                     <span className="flex items-center gap-2">
                       <Loader2 className="h-4 w-4 animate-spin" />
-                      Logging In...
+                      {t("Logging In...")}
                     </span>
                   ) : (
-                    "Login"
+                    t("Login")
                   )}
                 </Button>
               </form>
@@ -199,17 +204,17 @@ export default function LoginPage() {
             <CardHeader>
               <CardTitle className="text-lg flex items-center gap-2">
                 <Mail className="h-5 w-5 text-blue-600" />
-                Check your email
+                {t("Check your email")}
               </CardTitle>
               <CardDescription>
-                We sent a 6-digit code to <span className="font-medium text-gray-700 dark:text-gray-300">{otpStage.maskedEmail}</span>
+                {t("We sent a 6-digit code to")} <span className="font-medium text-gray-700 dark:text-gray-300">{otpStage.maskedEmail}</span>
               </CardDescription>
             </CardHeader>
             <CardContent>
               <form onSubmit={handleVerify} className="space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="otp" className="text-sm font-medium">
-                    Verification code
+                    {t("Verification code")}
                   </Label>
                   <Input
                     id="otp"
@@ -235,10 +240,10 @@ export default function LoginPage() {
                   {verifyMutation.isPending ? (
                     <span className="flex items-center gap-2">
                       <Loader2 className="h-4 w-4 animate-spin" />
-                      Verifying...
+                      {t("Verifying...")}
                     </span>
                   ) : (
-                    "Verify & Log In"
+                    t("Verify & Log In")
                   )}
                 </Button>
 
@@ -249,7 +254,7 @@ export default function LoginPage() {
                     className="flex items-center gap-1 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"
                   >
                     <ArrowLeft className="h-3.5 w-3.5" />
-                    Back
+                    {t("Back")}
                   </button>
                   <button
                     type="button"
@@ -257,7 +262,9 @@ export default function LoginPage() {
                     disabled={resendCooldown > 0 || resendMutation.isPending}
                     className="text-blue-600 hover:text-blue-700 disabled:text-gray-400 dark:disabled:text-gray-600 disabled:cursor-not-allowed"
                   >
-                    {resendCooldown > 0 ? `Resend code (${resendCooldown}s)` : "Resend code"}
+                    {resendCooldown > 0 ? t("Resend code ({0}s)", {
+                      0: resendCooldown
+                    }) : t("Resend code")}
                   </button>
                 </div>
               </form>
@@ -266,7 +273,7 @@ export default function LoginPage() {
         )}
 
         <p className="text-center text-xs text-gray-400 dark:text-gray-500 mt-6">
-          Access is restricted to authorized administrators only.
+          {t("Access is restricted to authorized administrators only.")}
         </p>
       </div>
     </div>

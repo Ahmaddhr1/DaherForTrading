@@ -1,8 +1,10 @@
 "use client";
+import { t } from "@/lib/i18n";
+import { useT } from "@/lib/i18n/LangProvider";
 
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { toast } from "sonner";
+import { toast } from "@/lib/i18n/toast";
 import { useRouter } from "next/navigation";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Modal } from "@/components/ui/modal";
@@ -14,6 +16,7 @@ import { useCart } from "@/lib/cartContext";
 import { useHasPermission } from "@/lib/useHasPermission";
 
 export default function CartDrawer() {
+  const t = useT();
   const router = useRouter();
   const queryClient = useQueryClient();
   const { cart, updateQty: onUpdateQty, removeFromCart: onRemove, clearCart: onClear, itemCount, open, openCart, closeCart } = useCart();
@@ -124,9 +127,9 @@ export default function CartDrawer() {
         )}
       </Button>
 
-      <Modal open={open} onClose={handleClose} title="Cart" maxWidth="max-w-md">
+      <Modal open={open} onClose={handleClose} title={t("Cart")} maxWidth="max-w-md">
         {cart.length === 0 ? (
-          <p className="text-center text-gray-500 dark:text-gray-400 py-8">Your cart is empty.</p>
+          <p className="text-center text-gray-500 dark:text-gray-400 py-8">{t("Your cart is empty.")}</p>
         ) : !checkingOut ? (
           <div className="space-y-4">
             <div className="space-y-3 max-h-80 overflow-y-auto">
@@ -134,7 +137,7 @@ export default function CartDrawer() {
                 <div key={item.productId} className="flex items-center justify-between gap-2">
                   <div className="min-w-0">
                     <p className="font-medium text-gray-900 dark:text-gray-100 truncate">{item.name}</p>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">${item.price.toFixed(2)} each</p>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">${item.price.toFixed(2)} {t("each")}</p>
                   </div>
                   <div className="flex items-center gap-2 shrink-0">
                     <Button variant="outline" size="icon" className="h-7 w-7" onClick={() => onUpdateQty(item.productId, -1)}>
@@ -152,31 +155,31 @@ export default function CartDrawer() {
               ))}
             </div>
             <div className="flex items-center justify-between pt-3 border-t">
-              <span className="font-medium text-gray-700 dark:text-gray-300">Total</span>
+              <span className="font-medium text-gray-700 dark:text-gray-300">{t("Total")}</span>
               <span className="font-bold text-lg text-gray-900 dark:text-gray-100">${total.toFixed(2)}</span>
             </div>
             <Button className="w-full" onClick={() => setCheckingOut(true)} disabled={!canCreateOrders}>
-              Create Draft Order
+              {t("Create Draft Order")}
             </Button>
             {!canCreateOrders && (
               <p className="text-xs text-gray-500 dark:text-gray-400 text-center">
-                You don't have permission to create orders.
+                {t("You don't have permission to create orders.")}
               </p>
             )}
           </div>
         ) : !checkoutMode ? (
           <div className="space-y-3">
-            <p className="text-sm text-gray-600 dark:text-gray-400">Who is this order for?</p>
+            <p className="text-sm text-gray-600 dark:text-gray-400">{t("Who is this order for?")}</p>
             <Button variant="outline" className="w-full flex items-center gap-2" onClick={() => setCheckoutMode("search")}>
               <Search className="h-4 w-4" />
-              Search Existing Customer
+              {t("Search Existing Customer")}
             </Button>
             <Button variant="outline" className="w-full flex items-center gap-2" onClick={() => setCheckoutMode("type")}>
               <User className="h-4 w-4" />
-              Type a Name
+              {t("Type a Name")}
             </Button>
             <Button variant="ghost" className="w-full" onClick={() => setCheckingOut(false)}>
-              Back to Cart
+              {t("Back to Cart")}
             </Button>
           </div>
         ) : checkoutMode === "search" ? (
@@ -196,7 +199,7 @@ export default function CartDrawer() {
                 <div className="relative">
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500 h-4 w-4" />
                   <Input
-                    placeholder="Search customers by name..."
+                    placeholder={t("Search customers by name...")}
                     value={searchInput}
                     onChange={(e) => setSearchInput(e.target.value)}
                     className="pl-10"
@@ -211,7 +214,7 @@ export default function CartDrawer() {
                       </div>
                     )}
                     {!searching && !isSearchPending && customers.length === 0 && (
-                      <div className="p-4 text-center text-gray-500 dark:text-gray-400 text-sm">No customers found</div>
+                      <div className="p-4 text-center text-gray-500 dark:text-gray-400 text-sm">{t("No customers found")}</div>
                     )}
                     {!searching && !isSearchPending &&
                       customers.map((customer) => (
@@ -239,31 +242,33 @@ export default function CartDrawer() {
               disabled={!selectedCustomer || submitting}
               onClick={submitWithCustomer}
             >
-              {submitting ? <Loader2 className="h-4 w-4 animate-spin" /> : "Create Draft Order"}
+              {submitting ? <Loader2 className="h-4 w-4 animate-spin" /> : t("Create Draft Order")}
             </Button>
             <Button variant="ghost" className="w-full" onClick={() => setCheckoutMode(null)}>
-              Back
+              {t("Back")}
             </Button>
           </div>
         ) : (
           <div className="space-y-3">
             <div className="space-y-2">
-              <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Customer Name</label>
+              <label className="text-sm font-medium text-gray-700 dark:text-gray-300">{t("Customer Name")}</label>
               <Input
                 value={typedName}
                 onChange={(e) => setTypedName(e.target.value)}
-                placeholder="Enter customer name"
+                placeholder={t("Enter customer name")}
                 autoFocus
               />
               <p className="text-xs text-gray-500 dark:text-gray-400">
-                No customer selected yet - you can link a real customer later from the Drafts tab.
+                {t(
+                  "No customer selected yet - you can link a real customer later from the Drafts tab."
+                )}
               </p>
             </div>
             <Button className="w-full" disabled={submitting} onClick={submitWithTypedName}>
-              {submitting ? <Loader2 className="h-4 w-4 animate-spin" /> : "Create Draft Order"}
+              {submitting ? <Loader2 className="h-4 w-4 animate-spin" /> : t("Create Draft Order")}
             </Button>
             <Button variant="ghost" className="w-full" onClick={() => setCheckoutMode(null)}>
-              Back
+              {t("Back")}
             </Button>
           </div>
         )}

@@ -1,4 +1,6 @@
 "use client";
+import { t } from "@/lib/i18n";
+import { useT } from "@/lib/i18n/LangProvider";
 
 import React, { useState, useEffect } from "react";
 import axios from "axios";
@@ -9,7 +11,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { toast } from "sonner";
+import { toast } from "@/lib/i18n/toast";
 import { Loader2, ShoppingBag, Plus, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { useMutation, useQuery } from "@tanstack/react-query";
@@ -21,6 +23,7 @@ let nextRowId = 1;
 const emptyRow = () => ({ id: nextRowId++, productId: "", unitPrice: "", quantity: "1", discount: "" });
 
 const NewPurchasePage = () => {
+  const t = useT();
   const { id: companyId } = useParams();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -167,9 +170,11 @@ const NewPurchasePage = () => {
               <ShoppingBag className="h-6 w-6 text-blue-600" />
             </div>
             <div>
-              <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">New Purchase</h1>
+              <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">{t("New Purchase")}</h1>
               <p className="text-gray-600 dark:text-gray-400">
-                Record a restock purchase{company?.name ? ` from ${company.name}` : ""}
+                {t("Record a restock purchase")}{company?.name ? t(" from {0}", {
+                  0: company.name
+                }) : ""}
               </p>
             </div>
           </div>
@@ -177,8 +182,8 @@ const NewPurchasePage = () => {
 
         <Card className="shadow-sm border-gray-200 dark:border-gray-800">
           <CardHeader>
-            <CardTitle className="text-xl">Purchase Details</CardTitle>
-            <CardDescription>Select the products and enter purchase quantity and pricing</CardDescription>
+            <CardTitle className="text-xl">{t("Purchase Details")}</CardTitle>
+            <CardDescription>{t("Select the products and enter purchase quantity and pricing")}</CardDescription>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-6">
@@ -188,7 +193,7 @@ const NewPurchasePage = () => {
                   return (
                     <div key={row.id} className="p-4 border rounded-lg bg-gray-50 dark:bg-gray-950 space-y-4">
                       <div className="flex items-center justify-between">
-                        <Label className="text-sm font-medium">Product {index + 1} *</Label>
+                        <Label className="text-sm font-medium">{t("Product")} {index + 1} *</Label>
                         <Button
                           type="button"
                           variant="ghost"
@@ -205,19 +210,19 @@ const NewPurchasePage = () => {
                         options={products}
                         value={row.productId}
                         onChange={(value) => updateRow(row.id, "productId", value)}
-                        placeholder="Select a product"
+                        placeholder={t("Select a product")}
                         disabled={productsLoading}
                         renderOption={(product) => (
                           <span>
                             {product.name}{" "}
-                            <span className="text-gray-400 dark:text-gray-500">(current stock: {product.quantity})</span>
+                            <span className="text-gray-400 dark:text-gray-500">{t("(current stock:")} {product.quantity})</span>
                           </span>
                         )}
                       />
 
                       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <div className="space-y-2">
-                          <Label className="text-sm font-medium">Unit Price ($) *</Label>
+                          <Label className="text-sm font-medium">{t("Unit Price ($) *")}</Label>
                           <Input
                             type="text"
                             inputMode="decimal"
@@ -228,13 +233,13 @@ const NewPurchasePage = () => {
                           />
                           {rowProduct && (
                             <p className="text-xs text-gray-500 dark:text-gray-400">
-                              Current cost on file: ${rowProduct.initialPrice?.toFixed(2)}
+                              {t("Current cost on file: $")}{rowProduct.initialPrice?.toFixed(2)}
                             </p>
                           )}
                         </div>
 
                         <div className="space-y-2">
-                          <Label className="text-sm font-medium">Quantity Purchased *</Label>
+                          <Label className="text-sm font-medium">{t("Quantity Purchased *")}</Label>
                           <Input
                             type="number"
                             min="1"
@@ -245,7 +250,7 @@ const NewPurchasePage = () => {
                         </div>
 
                         <div className="space-y-2">
-                          <Label className="text-sm font-medium">Discount ($)</Label>
+                          <Label className="text-sm font-medium">{t("Discount ($)")}</Label>
                           <Input
                             type="text"
                             inputMode="decimal"
@@ -267,14 +272,14 @@ const NewPurchasePage = () => {
                 className="flex items-center gap-2"
               >
                 <Plus className="h-4 w-4" />
-                Add Another Product
+                {t("Add Another Product")}
               </Button>
 
               <Separator />
 
               <div className="space-y-2 max-w-xs">
                 <Label htmlFor="tax-rate" className="text-sm font-medium">
-                  Tax Rate (%)
+                  {t("Tax Rate (%)")}
                 </Label>
                 <Input
                   id="tax-rate"
@@ -297,34 +302,36 @@ const NewPurchasePage = () => {
                   className="h-4 w-4"
                 />
                 <Label htmlFor="paid" className="text-sm font-medium">
-                  Paid in full at time of purchase
+                  {t("Paid in full at time of purchase")}
                 </Label>
               </div>
               {!paid && (
                 <p className="text-xs text-amber-700 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-900/50 rounded-md p-2">
-                  This purchase is unpaid — the full total will be added to what we owe this company.
+                  {t(
+                    "This purchase is unpaid — the full total will be added to what we owe this company."
+                  )}
                 </p>
               )}
 
               <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4 border border-blue-200 dark:border-blue-900/50 space-y-2">
                 <div className="flex justify-between items-center text-sm text-blue-900/80">
-                  <span>Subtotal</span>
+                  <span>{t("Subtotal")}</span>
                   <span>${subtotal.toFixed(2)}</span>
                 </div>
                 {discountTotal > 0 && (
                   <div className="flex justify-between items-center text-sm text-amber-700">
-                    <span>Discount</span>
+                    <span>{t("Discount")}</span>
                     <span>-${discountTotal.toFixed(2)}</span>
                   </div>
                 )}
                 {taxAmountTotal > 0 && (
                   <div className="flex justify-between items-center text-sm text-blue-900/80">
-                    <span>Tax ({parseFloat(taxRate) || 0}%)</span>
+                    <span>{t("Tax (")}{parseFloat(taxRate) || 0}%)</span>
                     <span>+${taxAmountTotal.toFixed(2)}</span>
                   </div>
                 )}
                 <div className="flex justify-between items-center pt-2 border-t border-blue-200 dark:border-blue-900/50">
-                  <span className="text-lg font-semibold text-blue-900 dark:text-blue-300">Total Amount:</span>
+                  <span className="text-lg font-semibold text-blue-900 dark:text-blue-300">{t("Total Amount:")}</span>
                   <span className="text-2xl font-bold text-blue-900 dark:text-blue-300">${total.toFixed(2)}</span>
                 </div>
                 {settings?.dollarRate > 0 && (
@@ -335,7 +342,7 @@ const NewPurchasePage = () => {
                 )}
                 {!paid && (
                   <div className="flex justify-between items-center pt-2 text-sm">
-                    <span className="text-amber-700">Added to company debt</span>
+                    <span className="text-amber-700">{t("Added to company debt")}</span>
                     <Badge variant="destructive">+${total.toFixed(2)}</Badge>
                   </div>
                 )}
@@ -344,7 +351,7 @@ const NewPurchasePage = () => {
               <div className="flex gap-3 pt-2">
                 <Link href={`/dashboard/companies/${companyId}`} className="flex-1">
                   <Button type="button" variant="outline" className="w-full">
-                    Cancel
+                    {t("Cancel")}
                   </Button>
                 </Link>
                 <Button
@@ -355,12 +362,12 @@ const NewPurchasePage = () => {
                   {mutation.isPending ? (
                     <span className="flex items-center gap-2">
                       <Loader2 className="animate-spin h-4 w-4" />
-                      Recording Purchase...
+                      {t("Recording Purchase...")}
                     </span>
                   ) : (
                     <span className="flex items-center gap-2">
                       <ShoppingBag className="h-4 w-4" />
-                      Record Purchase
+                      {t("Record Purchase")}
                     </span>
                   )}
                 </Button>
@@ -372,9 +379,15 @@ const NewPurchasePage = () => {
       <ConfirmDialog
         open={confirmOpen}
         onClose={() => setConfirmOpen(false)}
-        title="Record purchase?"
-        description={`Record ${rows.length > 1 ? "these purchases" : "this purchase"} for $${total.toFixed(2)}? Stock will increase and the company's balance will be updated.`}
-        confirmLabel="Record Purchase"
+        title={t("Record purchase?")}
+        description={t(
+          "Record {0} for ${1}? Stock will increase and the company's balance will be updated.",
+          {
+            0: rows.length > 1 ? "these purchases" : "this purchase",
+            1: total.toFixed(2)
+          }
+        )}
+        confirmLabel={t("Record Purchase")}
         variant="default"
         onConfirm={confirmSubmit}
         loading={mutation.isPending}

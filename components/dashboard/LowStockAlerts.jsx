@@ -1,5 +1,7 @@
 // components/dashboard/LowStockAlerts.jsx
 "use client";
+import { t } from "@/lib/i18n";
+import { useT } from "@/lib/i18n/LangProvider";
 
 import React, { useState } from "react";
 import Link from "next/link";
@@ -19,6 +21,7 @@ const fetchLowStock = async () => {
 };
 
 export default function LowStockAlerts() {
+  const t = useT();
   const [page, setPage] = useState(1);
 
   const { data, isLoading, error } = useQuery({
@@ -37,7 +40,7 @@ export default function LowStockAlerts() {
       <CardHeader className="pb-3">
         <CardTitle className="text-lg flex items-center gap-2">
           <AlertTriangle className="h-5 w-5 text-amber-600" />
-          Low Stock Alerts
+          {t("Low Stock Alerts")}
         </CardTitle>
       </CardHeader>
       <CardContent>
@@ -49,7 +52,7 @@ export default function LowStockAlerts() {
         ) : products.length === 0 ? (
           <div className="flex items-center gap-2 text-sm text-green-700 py-2">
             <PackageCheck className="h-4 w-4" />
-            All products are sufficiently stocked.
+            {t("All products are sufficiently stocked.")}
           </div>
         ) : (
           <>
@@ -79,7 +82,7 @@ export default function LowStockAlerts() {
                           : "bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-400 shrink-0"
                       }
                     >
-                      {product.quantity} {product.unit || "pcs"} left
+                      {product.quantity} {product.unit || t("pcs")} {t("left")}
                       {!outOfStock && ` (≤ ${threshold})`}
                     </Badge>
                   </Link>
@@ -97,10 +100,10 @@ export default function LowStockAlerts() {
                   className="flex items-center gap-2"
                 >
                   <ChevronLeft className="h-4 w-4" />
-                  Previous
+                  {t("Previous")}
                 </Button>
                 <span className="text-sm text-gray-600 dark:text-gray-400">
-                  Page {page} of {totalPages}
+                  {t("Page")} {page} {t("of")} {totalPages}
                 </span>
                 <Button
                   onClick={() => setPage((p) => p + 1)}
@@ -109,7 +112,7 @@ export default function LowStockAlerts() {
                   size="sm"
                   className="flex items-center gap-2"
                 >
-                  Next
+                  {t("Next")}
                   <ChevronRight className="h-4 w-4" />
                 </Button>
               </div>

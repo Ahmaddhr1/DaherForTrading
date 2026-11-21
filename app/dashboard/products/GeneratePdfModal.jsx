@@ -1,8 +1,10 @@
 "use client";
+import { t } from "@/lib/i18n";
+import { useT } from "@/lib/i18n/LangProvider";
 
 import { useState } from "react";
 import axios from "axios";
-import { toast } from "sonner";
+import { toast } from "@/lib/i18n/toast";
 import { Modal } from "@/components/ui/modal";
 import { Button } from "@/components/ui/button";
 import { Loader2, FileDown } from "lucide-react";
@@ -12,6 +14,7 @@ import { sharePdfOrDownload } from "@/lib/thermalPdf";
 const DEFAULT_SELECTION = Object.fromEntries(CATALOG_FIELDS.map((f) => [f.key, true]));
 
 export default function GeneratePdfModal({ open, onClose }) {
+  const t = useT();
   const [selectedFields, setSelectedFields] = useState(DEFAULT_SELECTION);
   const [generating, setGenerating] = useState(false);
 
@@ -48,8 +51,8 @@ export default function GeneratePdfModal({ open, onClose }) {
     <Modal
       open={open}
       onClose={onClose}
-      title="Generate Product Catalog PDF"
-      description="Choose which fields to include - products are grouped by category"
+      title={t("Generate Product Catalog PDF")}
+      description={t("Choose which fields to include - products are grouped by category")}
     >
       <div className="space-y-3">
         {CATALOG_FIELDS.map((field) => (
@@ -63,13 +66,13 @@ export default function GeneratePdfModal({ open, onClose }) {
               onChange={() => toggleField(field.key)}
               className="h-4 w-4 rounded border-gray-300 dark:border-gray-700"
             />
-            <span className="text-sm text-gray-900 dark:text-gray-100">{field.label}</span>
+            <span className="text-sm text-gray-900 dark:text-gray-100">{t(field.label)}</span>
           </label>
         ))}
 
         <Button className="w-full flex items-center gap-2 mt-2" onClick={handleGenerate} disabled={generating}>
           {generating ? <Loader2 className="h-4 w-4 animate-spin" /> : <FileDown className="h-4 w-4" />}
-          Generate PDF
+          {t("Generate PDF")}
         </Button>
       </div>
     </Modal>

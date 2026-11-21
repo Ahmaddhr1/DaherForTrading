@@ -1,4 +1,6 @@
 "use client";
+import { t } from "@/lib/i18n";
+import { useT } from "@/lib/i18n/LangProvider";
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
@@ -6,7 +8,7 @@ import { useRouter } from "next/navigation";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { History, ChevronLeft, ChevronRight, AlertCircle, Trash2, Search } from "lucide-react";
-import { toast } from "sonner";
+import { toast } from "@/lib/i18n/toast";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { TableSkeleton } from "@/components/ui/skeleton-patterns";
@@ -34,6 +36,7 @@ const KIND_DOT = {
 const ENTITY_TYPES = AUDIT_ENTITY_TYPES;
 
 export default function ActivityPage() {
+  const t = useT();
   const [page, setPage] = useState(1);
   const [adminFilter, setAdminFilter] = useState("");
   const [entityTypeFilter, setEntityTypeFilter] = useState("");
@@ -90,7 +93,10 @@ export default function ActivityPage() {
   const clearMutation = useMutation({
     mutationFn: async () => (await axios.delete("/api/activity")).data,
     onSuccess: (result) => {
-      toast.success(`Cleared ${result.deletedCount} activity log ${result.deletedCount === 1 ? "entry" : "entries"}`);
+      toast.success(t("Cleared {0} activity log {1}", {
+        0: result.deletedCount,
+        1: result.deletedCount === 1 ? "entry" : "entries"
+      }));
       setClearOpen(false);
       setPage(1);
       queryClient.invalidateQueries({ queryKey: ["activity"] });
@@ -109,9 +115,11 @@ export default function ActivityPage() {
               <History className="h-6 w-6 text-blue-600" />
             </div>
             <div>
-              <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-gray-100">Activity Log</h1>
+              <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-gray-100">{t("Activity Log")}</h1>
               <p className="text-gray-600 dark:text-gray-400 text-sm sm:text-base">
-                Who changed what, exactly - open any entry to see previous vs current values
+                {t(
+                  "Who changed what, exactly - open any entry to see previous vs current values"
+                )}
               </p>
             </div>
           </div>
@@ -124,7 +132,7 @@ export default function ActivityPage() {
               className="flex items-center gap-2 text-destructive hover:bg-destructive/10"
             >
               <Trash2 className="h-4 w-4" />
-              Clear All Logs
+              {t("Clear All Logs")}
             </Button>
           )}
         </div>
@@ -132,8 +140,11 @@ export default function ActivityPage() {
         <Modal
           open={clearOpen}
           onClose={() => !clearMutation.isPending && setClearOpen(false)}
-          title="Clear all activity logs?"
-          description={`This permanently deletes all ${total} recorded ${total === 1 ? "entry" : "entries"}. This cannot be undone.`}
+          title={t("Clear all activity logs?")}
+          description={t("This permanently deletes all {0} recorded {1}. This cannot be undone.", {
+            0: total,
+            1: total === 1 ? "entry" : "entries"
+          })}
         >
           <div className="flex justify-end gap-3">
             <Button
@@ -141,21 +152,21 @@ export default function ActivityPage() {
               onClick={() => setClearOpen(false)}
               disabled={clearMutation.isPending}
             >
-              Cancel
+              {t("Cancel")}
             </Button>
             <Button
               onClick={() => clearMutation.mutate()}
               disabled={clearMutation.isPending}
               className="bg-destructive text-white hover:bg-destructive/90"
             >
-              {clearMutation.isPending ? "Clearing..." : "Yes, clear everything"}
+              {clearMutation.isPending ? t("Clearing...") : t("Yes, clear everything")}
             </Button>
           </div>
         </Modal>
 
         {scopedToToday && (
           <p className="text-sm text-gray-500 dark:text-gray-400 mb-3">
-            Showing today&apos;s activity only. Pick a date range below to see more.
+            {t("Showing today's activity only. Pick a date range below to see more.")}
           </p>
         )}
 
@@ -166,7 +177,7 @@ export default function ActivityPage() {
               type="search"
               value={searchInput}
               onChange={(e) => setSearchInput(e.target.value)}
-              placeholder="Search product, customer, field..."
+              placeholder={t("Search product, customer, field...")}
               className="border-input h-9 w-full rounded-md border bg-transparent pl-9 pr-3 text-sm shadow-xs"
             />
           </div>
@@ -179,7 +190,7 @@ export default function ActivityPage() {
             }}
             className="border-input h-9 rounded-md border bg-transparent px-3 text-sm shadow-xs w-full sm:w-auto"
           >
-            <option value="">All admins</option>
+            <option value="">{t("All admins")}</option>
             {admins.map((name) => (
               <option key={name} value={name}>
                 {name}
@@ -196,7 +207,7 @@ export default function ActivityPage() {
             }}
             className="border-input h-9 rounded-md border bg-transparent px-3 text-sm shadow-xs w-full sm:w-auto"
           >
-            <option value="">All types</option>
+            <option value="">{t("All types")}</option>
             {ENTITY_TYPES.map((type) => (
               <option key={type} value={type}>
                 {type}
@@ -226,7 +237,7 @@ export default function ActivityPage() {
           <Card>
             <CardContent className="pt-6 text-center text-red-600 flex flex-col items-center gap-2">
               <AlertCircle className="h-8 w-8" />
-              Failed to load the activity log.
+              {t("Failed to load the activity log.")}
             </CardContent>
           </Card>
         )}
@@ -235,16 +246,16 @@ export default function ActivityPage() {
           <Card>
             <CardContent className="p-0">
               {entries.length === 0 ? (
-                <div className="text-center py-12 text-gray-500 dark:text-gray-400">No activity recorded yet.</div>
+                <div className="text-center py-12 text-gray-500 dark:text-gray-400">{t("No activity recorded yet.")}</div>
               ) : (
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>When</TableHead>
-                      <TableHead>Admin</TableHead>
-                      <TableHead>Type</TableHead>
-                      <TableHead>Details</TableHead>
-                      <TableHead className="text-right">Changes</TableHead>
+                      <TableHead>{t("When")}</TableHead>
+                      <TableHead>{t("Admin")}</TableHead>
+                      <TableHead>{t("Type")}</TableHead>
+                      <TableHead>{t("Details")}</TableHead>
+                      <TableHead className="text-right">{t("Changes")}</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -281,8 +292,11 @@ export default function ActivityPage() {
                             className="text-sm text-blue-600 hover:underline"
                           >
                             {entry.changeCount > 0
-                              ? `View ${entry.changeCount} ${entry.changeCount === 1 ? "change" : "changes"}`
-                              : "View"}
+                              ? t("View {0} {1}", {
+                              0: entry.changeCount,
+                              1: entry.changeCount === 1 ? "change" : "changes"
+                            })
+                              : t("View")}
                           </Link>
                         </TableCell>
                       </TableRow>
@@ -304,10 +318,10 @@ export default function ActivityPage() {
               className="flex items-center gap-2"
             >
               <ChevronLeft className="h-4 w-4" />
-              Previous
+              {t("Previous")}
             </Button>
             <span className="text-sm text-gray-600 dark:text-gray-400">
-              Page {page} of {totalPages}
+              {t("Page")} {page} {t("of")} {totalPages}
             </span>
             <Button
               onClick={() => setPage((p) => p + 1)}
@@ -316,7 +330,7 @@ export default function ActivityPage() {
               size="sm"
               className="flex items-center gap-2"
             >
-              Next
+              {t("Next")}
               <ChevronRight className="h-4 w-4" />
             </Button>
           </div>

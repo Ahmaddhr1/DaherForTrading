@@ -1,10 +1,12 @@
 "use client";
+import { t } from "@/lib/i18n";
+import { useT } from "@/lib/i18n/LangProvider";
 
 import { useQuery } from "@tanstack/react-query";
 import { useParams } from "next/navigation";
-import { format } from "date-fns";
+import { format } from "@/lib/i18n/date";
 import { FileText, Calendar, Printer, MessageCircle, Receipt, Loader2 } from "lucide-react";
-import { toast } from "sonner";
+import { toast } from "@/lib/i18n/toast";
 import { useState } from "react";
 import { generateStatementPdf, sharePdfOrDownload } from "@/lib/thermalPdf";
 import {
@@ -41,6 +43,7 @@ const statusConfig = {
 };
 
 export default function CustomerStatementPage() {
+  const t = useT();
   const { id } = useParams();
   const [isSharingPdf, setIsSharingPdf] = useState(false);
   const [startDate, setStartDate] = useState("");
@@ -123,7 +126,7 @@ export default function CustomerStatementPage() {
       <div className="flex justify-center items-center min-h-96">
         <Card className="w-full max-w-md">
           <CardContent className="pt-6 text-center">
-            <p className="text-gray-600">Unable to load statement. Please try again.</p>
+            <p className="text-gray-600">{t("Unable to load statement. Please try again.")}</p>
           </CardContent>
         </Card>
       </div>
@@ -138,36 +141,36 @@ export default function CustomerStatementPage() {
         <div className="mb-8">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-2">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">Account Statement</h1>
+              <h1 className="text-3xl font-bold text-gray-900">{t("Account Statement")}</h1>
               <p className="text-gray-600 mt-1">{fullName}</p>
             </div>
           </div>
           <div className="flex items-center text-gray-500 text-sm">
             <Calendar className="h-4 w-4 mr-1" />
-            Generated {format(new Date(), "EEEE, MMMM d, yyyy")}
+            {t("Generated")} {format(new Date(), "EEEE, MMMM d, yyyy")}
           </div>
           <div className="flex flex-wrap items-end gap-3 mt-4 print:hidden">
             <div className="space-y-1">
-              <Label htmlFor="statement-start" className="text-xs font-medium text-gray-600">From</Label>
+              <Label htmlFor="statement-start" className="text-xs font-medium text-gray-600">{t("From")}</Label>
               <Input id="statement-start" type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} className="w-40" />
             </div>
             <div className="space-y-1">
-              <Label htmlFor="statement-end" className="text-xs font-medium text-gray-600">To</Label>
+              <Label htmlFor="statement-end" className="text-xs font-medium text-gray-600">{t("To")}</Label>
               <Input id="statement-end" type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} className="w-40" />
             </div>
-            <p className="text-xs text-gray-500 pb-2">Leave blank for all time. Period: {periodLabel}</p>
+            <p className="text-xs text-gray-500 pb-2">{t("Leave blank for all time. Period:")} {periodLabel}</p>
           </div>
           <div className="flex flex-wrap gap-2 mt-2">
             <Button variant="outline" onClick={() => window.print()} className="flex items-center gap-2">
               <Printer className="h-4 w-4" />
-              Print
+              {t("Print")}
             </Button>
             <Button
               onClick={handleShareWhatsApp}
               className="flex items-center gap-2 bg-green-600 hover:bg-green-700"
             >
               <MessageCircle className="h-4 w-4" />
-              Share via WhatsApp
+              {t("Share via WhatsApp")}
             </Button>
             <Button
               variant="outline"
@@ -176,7 +179,7 @@ export default function CustomerStatementPage() {
               className="flex items-center gap-2"
             >
               {isSharingPdf ? <Loader2 className="h-4 w-4 animate-spin" /> : <Receipt className="h-4 w-4" />}
-              Share as PDF
+              {t("Share as PDF")}
             </Button>
           </div>
         </div>
@@ -185,20 +188,20 @@ export default function CustomerStatementPage() {
           <CardHeader className="pb-4">
             <CardTitle className="flex items-center text-lg">
               <FileText className="h-5 w-5 mr-2 text-blue-600" />
-              Order History
+              {t("Order History")}
             </CardTitle>
           </CardHeader>
           <CardContent className="p-0">
             <div className="overflow-x-auto">
               <Table>
-                <TableCaption>{orders.length === 0 ? "No orders on file." : "All orders for this customer"}</TableCaption>
+                <TableCaption>{orders.length === 0 ? t("No orders on file.") : t("All orders for this customer")}</TableCaption>
                 <TableHeader className="bg-gray-50/50">
                   <TableRow>
-                    <TableHead className="font-semibold text-gray-700">Date</TableHead>
-                    <TableHead className="text-right font-semibold text-gray-700">Total</TableHead>
-                    <TableHead className="text-right font-semibold text-gray-700">Paid</TableHead>
-                    <TableHead className="text-right font-semibold text-gray-700">Remaining</TableHead>
-                    <TableHead className="text-center font-semibold text-gray-700">Status</TableHead>
+                    <TableHead className="font-semibold text-gray-700">{t("Date")}</TableHead>
+                    <TableHead className="text-right font-semibold text-gray-700">{t("Total")}</TableHead>
+                    <TableHead className="text-right font-semibold text-gray-700">{t("Paid")}</TableHead>
+                    <TableHead className="text-right font-semibold text-gray-700">{t("Remaining")}</TableHead>
+                    <TableHead className="text-center font-semibold text-gray-700">{t("Status")}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -215,7 +218,7 @@ export default function CustomerStatementPage() {
                           ${order.remainingBalance.toFixed(2)}
                         </TableCell>
                         <TableCell className="text-center whitespace-nowrap">
-                          <Badge className={status.color}>{status.label}</Badge>
+                          <Badge className={status.color}>{t(status.label)}</Badge>
                         </TableCell>
                       </TableRow>
                     );
@@ -228,19 +231,19 @@ export default function CustomerStatementPage() {
 
         <Card className="shadow-sm border-gray-200 mt-6">
           <CardHeader className="pb-4">
-            <CardTitle className="text-lg">Summary</CardTitle>
+            <CardTitle className="text-lg">{t("Summary")}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
             <div className="flex justify-between items-center">
-              <span className="text-gray-600">Total Billed</span>
+              <span className="text-gray-600">{t("Total Billed")}</span>
               <span className="font-medium text-gray-900">${totals.totalAmount.toFixed(2)}</span>
             </div>
             <div className="flex justify-between items-center pt-2 border-t">
-              <span className="text-gray-600">Total Paid</span>
+              <span className="text-gray-600">{t("Total Paid")}</span>
               <span className="text-green-600 font-medium">${totals.totalPaid.toFixed(2)}</span>
             </div>
             <div className="flex justify-between items-center pt-2 border-t">
-              <span className="font-semibold text-gray-900">Total Remaining (Debt)</span>
+              <span className="font-semibold text-gray-900">{t("Total Remaining (Debt)")}</span>
               <span className={`font-semibold ${totals.totalRemaining > 0 ? "text-red-600" : "text-gray-900"}`}>
                 ${totals.totalRemaining.toFixed(2)}
               </span>
@@ -249,7 +252,7 @@ export default function CustomerStatementPage() {
         </Card>
 
         <div className="mt-12 pt-6 border-t border-gray-200 text-center">
-          <p className="text-gray-500 text-sm">Order management system • Powered by Ahmad Daher</p>
+          <p className="text-gray-500 text-sm">{t("Order management system • Powered by Ahmad Daher")}</p>
         </div>
       </div>
     </div>

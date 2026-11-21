@@ -1,4 +1,6 @@
 "use client";
+import { t } from "@/lib/i18n";
+import { useT } from "@/lib/i18n/LangProvider";
 
 import { useMemo, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -26,6 +28,7 @@ const currencyFormatter = (value) => `$${value.toLocaleString(undefined, { maxim
 const percentFormatter = (value) => `${value.toFixed(1)}%`;
 
 export default function ProfitMarginPage() {
+  const t = useT();
   const [months, setMonths] = useState(6);
   const queryClient = useQueryClient();
 
@@ -67,17 +70,17 @@ export default function ProfitMarginPage() {
             </div>
             <div>
               <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-gray-100">
-                Profit Margin Breakdown
+                {t("Profit Margin Breakdown")}
               </h1>
               <p className="text-gray-600 dark:text-gray-400 text-sm sm:text-base">
-                Margin by category and product over time
+                {t("Margin by category and product over time")}
               </p>
             </div>
           </div>
           <div className="flex gap-2">
             {MONTH_OPTIONS.map((m) => (
               <Button key={m} size="sm" variant={months === m ? "default" : "outline"} onClick={() => setMonths(m)}>
-                Last {m}mo
+                {t("Last")} {m}{t("mo")}
               </Button>
             ))}
           </div>
@@ -85,13 +88,13 @@ export default function ProfitMarginPage() {
 
         {error && (
           <div className="text-center py-12 text-red-600">
-            Failed to load the profit margin report.
+            {t("Failed to load the profit margin report.")}
             <Button
               onClick={() => queryClient.refetchQueries(["profit-margin-report"])}
               variant="outline"
               className="mt-4 mx-auto block"
             >
-              Try Again
+              {t("Try Again")}
             </Button>
           </div>
         )}
@@ -102,7 +105,7 @@ export default function ProfitMarginPage() {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-lg font-medium">
                   <Percent className="h-5 w-5 text-emerald-600" />
-                  Margin % by Category
+                  {t("Margin % by Category")}
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -110,7 +113,7 @@ export default function ProfitMarginPage() {
                   <Skeleton className="h-72 rounded-lg" />
                 ) : chartData.length === 0 ? (
                   <div className="text-gray-500 dark:text-gray-400 text-center py-10">
-                    No orders in this range yet
+                    {t("No orders in this range yet")}
                   </div>
                 ) : (
                   <LineChart
@@ -128,21 +131,21 @@ export default function ProfitMarginPage() {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <Card className="shadow-sm border-gray-200 dark:border-gray-800 overflow-hidden">
                 <CardHeader>
-                  <CardTitle className="text-lg font-medium">By Category</CardTitle>
+                  <CardTitle className="text-lg font-medium">{t("By Category")}</CardTitle>
                 </CardHeader>
                 <CardContent className="p-0">
                   {isLoading ? (
                     <div className="p-4"><Skeleton className="h-48 rounded-lg" /></div>
                   ) : byCategory.length === 0 ? (
-                    <p className="text-gray-500 dark:text-gray-400 text-center py-8">No data yet</p>
+                    <p className="text-gray-500 dark:text-gray-400 text-center py-8">{t("No data yet")}</p>
                   ) : (
                     <Table>
                       <TableHeader>
                         <TableRow>
-                          <TableHead>Category</TableHead>
-                          <TableHead className="text-right">Revenue</TableHead>
-                          <TableHead className="text-right">Profit</TableHead>
-                          <TableHead className="text-right">Margin</TableHead>
+                          <TableHead>{t("Category")}</TableHead>
+                          <TableHead className="text-right">{t("Revenue")}</TableHead>
+                          <TableHead className="text-right">{t("Profit")}</TableHead>
+                          <TableHead className="text-right">{t("Margin")}</TableHead>
                         </TableRow>
                       </TableHeader>
                       <TableBody>
@@ -168,21 +171,21 @@ export default function ProfitMarginPage() {
 
               <Card className="shadow-sm border-gray-200 dark:border-gray-800 overflow-hidden">
                 <CardHeader>
-                  <CardTitle className="text-lg font-medium">Top Products by Profit</CardTitle>
+                  <CardTitle className="text-lg font-medium">{t("Top Products by Profit")}</CardTitle>
                 </CardHeader>
                 <CardContent className="p-0">
                   {isLoading ? (
                     <div className="p-4"><Skeleton className="h-48 rounded-lg" /></div>
                   ) : byProduct.length === 0 ? (
-                    <p className="text-gray-500 dark:text-gray-400 text-center py-8">No data yet</p>
+                    <p className="text-gray-500 dark:text-gray-400 text-center py-8">{t("No data yet")}</p>
                   ) : (
                     <Table>
                       <TableHeader>
                         <TableRow>
-                          <TableHead>Product</TableHead>
-                          <TableHead className="text-right">Revenue</TableHead>
-                          <TableHead className="text-right">Profit</TableHead>
-                          <TableHead className="text-right">Margin</TableHead>
+                          <TableHead>{t("Product")}</TableHead>
+                          <TableHead className="text-right">{t("Revenue")}</TableHead>
+                          <TableHead className="text-right">{t("Profit")}</TableHead>
+                          <TableHead className="text-right">{t("Margin")}</TableHead>
                         </TableRow>
                       </TableHeader>
                       <TableBody>

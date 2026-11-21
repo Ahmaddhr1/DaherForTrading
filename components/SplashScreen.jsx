@@ -1,4 +1,6 @@
 "use client";
+import { t } from "@/lib/i18n";
+import { useT } from "@/lib/i18n/LangProvider";
 
 import { useEffect, useState } from "react";
 import { useIsFetching } from "@tanstack/react-query";
@@ -13,6 +15,7 @@ import { useIsFetching } from "@tanstack/react-query";
 // in this app fetches via react-query) is still loading past that - hides
 // only once both the minimum time has elapsed AND nothing is fetching.
 export function SplashScreen() {
+  const t = useT();
   const [minTimeElapsed, setMinTimeElapsed] = useState(false);
   const [fading, setFading] = useState(false);
   const [visible, setVisible] = useState(true);
@@ -53,7 +56,7 @@ export function SplashScreen() {
           className="invento-splash-wordmark text-4xl font-bold leading-none text-white"
           style={{ fontFamily: "var(--font-space-grotesk, sans-serif)" }}
         >
-          Invento
+          {t("Invento")}
         </span>
       </div>
 

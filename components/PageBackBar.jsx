@@ -1,4 +1,6 @@
 "use client";
+import { t } from "@/lib/i18n";
+import { useT } from "@/lib/i18n/LangProvider";
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -39,6 +41,7 @@ function humanize(segment) {
 // "Customers / Edit Customer") back up to Dashboard, without repeating
 // this per page.
 export function PageBackBar() {
+  const t = useT();
   const pathname = usePathname();
 
   if (pathname === "/dashboard") return null;
@@ -56,7 +59,7 @@ export function PageBackBar() {
   ];
 
   return (
-    <nav aria-label="Breadcrumb" className="mb-4 flex flex-wrap items-center gap-1 text-sm font-medium">
+    <nav aria-label={t("Breadcrumb")} className="mb-4 flex flex-wrap items-center gap-1 text-sm font-medium">
       {crumbs.map((crumb, index) => (
         <span key={crumb.href} className="flex items-center gap-1">
           {index > 0 && <ChevronRight className="h-3.5 w-3.5 text-gray-400 dark:text-gray-600" />}
@@ -64,7 +67,7 @@ export function PageBackBar() {
             href={crumb.href}
             className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:underline"
           >
-            {crumb.label}
+            {t(crumb.label)}
           </Link>
         </span>
       ))}

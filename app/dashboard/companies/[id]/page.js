@@ -1,4 +1,6 @@
 "use client";
+import { t } from "@/lib/i18n";
+import { useT } from "@/lib/i18n/LangProvider";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -23,12 +25,13 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
-import { toast } from "sonner";
+import { toast } from "@/lib/i18n/toast";
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import { useHasPermission } from "@/lib/useHasPermission";
 
 const EditCompanyPage = () => {
+  const t = useT();
   const router = useRouter();
   const { id } = useParams();
   const queryClient = useQueryClient();
@@ -137,8 +140,8 @@ const EditCompanyPage = () => {
                 <Building2 className="h-6 w-6 text-blue-600" />
               </div>
               <div className="min-w-0">
-                <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-gray-100 truncate">{data?.name || "Company"}</h1>
-                <p className="text-gray-600 dark:text-gray-400 text-sm sm:text-base truncate">Supplier details and purchase history</p>
+                <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-gray-100 truncate">{data?.name || t("Company")}</h1>
+                <p className="text-gray-600 dark:text-gray-400 text-sm sm:text-base truncate">{t("Supplier details and purchase history")}</p>
               </div>
             </div>
 
@@ -146,7 +149,7 @@ const EditCompanyPage = () => {
               <Link href={`/dashboard/companies/${id}/purchases`} className="flex-1 sm:flex-none">
                 <Button variant="outline" className="flex items-center gap-2 w-full sm:w-auto justify-center">
                   <History className="h-4 w-4" />
-                  <span className="hidden sm:inline">Purchase History</span>
+                  <span className="hidden sm:inline">{t("Purchase History")}</span>
                   <Badge variant="secondary" className="ml-1">{purchasesCount}</Badge>
                 </Button>
               </Link>
@@ -154,14 +157,14 @@ const EditCompanyPage = () => {
                 <Link href={`/dashboard/companies/${id}/addpurchase`} className="flex-1 sm:flex-none">
                   <Button className="flex items-center gap-2 w-full sm:w-auto justify-center">
                     <Plus className="h-4 w-4" />
-                    <span className="hidden sm:inline">New Purchase</span>
+                    <span className="hidden sm:inline">{t("New Purchase")}</span>
                   </Button>
                 </Link>
               )}
               <Link href={`/dashboard/companies/${id}/statement`} className="flex-1 sm:flex-none">
                 <Button variant="outline" className="flex items-center gap-2 w-full sm:w-auto justify-center">
                   <FileText className="h-4 w-4" />
-                  <span className="hidden sm:inline">Statement</span>
+                  <span className="hidden sm:inline">{t("Statement")}</span>
                 </Button>
               </Link>
             </div>
@@ -174,7 +177,7 @@ const EditCompanyPage = () => {
               <CardHeader className="pb-4">
                 <CardTitle className="text-xl flex items-center gap-2">
                   <Building2 className="h-5 w-5" />
-                  Company Information
+                  {t("Company Information")}
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -182,7 +185,7 @@ const EditCompanyPage = () => {
                   <div className="space-y-2">
                     <Label htmlFor="name" className="text-sm font-medium flex items-center gap-2">
                       <Building2 className="h-4 w-4" />
-                      Company Name *
+                      {t("Company Name *")}
                     </Label>
                     <Input id="name" name="name" value={form.name} onChange={handleChange} disabled={!canEditCompanies} required />
                   </div>
@@ -190,7 +193,7 @@ const EditCompanyPage = () => {
                   <div className="space-y-2">
                     <Label htmlFor="phoneNumber" className="text-sm font-medium flex items-center gap-2">
                       <Phone className="h-4 w-4" />
-                      Phone Number
+                      {t("Phone Number")}
                     </Label>
                     <Input id="phoneNumber" name="phoneNumber" value={form.phoneNumber} onChange={handleChange} disabled={!canEditCompanies} />
                   </div>
@@ -198,7 +201,7 @@ const EditCompanyPage = () => {
                   <div className="space-y-2">
                     <Label htmlFor="address" className="text-sm font-medium flex items-center gap-2">
                       <MapPin className="h-4 w-4" />
-                      Address
+                      {t("Address")}
                     </Label>
                     <Input id="address" name="address" value={form.address} onChange={handleChange} disabled={!canEditCompanies} />
                   </div>
@@ -207,7 +210,7 @@ const EditCompanyPage = () => {
 
                   <div className="space-y-2">
                     <Label htmlFor="debt" className="text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center gap-2">
-                      Amount We Owe ($)
+                      {t("Amount We Owe ($)")}
                       <Lock className="h-3 w-3 text-gray-400 dark:text-gray-500" />
                     </Label>
                     <Input
@@ -219,7 +222,9 @@ const EditCompanyPage = () => {
                       className="max-w-xs bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400 cursor-not-allowed"
                     />
                     <p className="text-xs text-gray-500 dark:text-gray-400">
-                      This is tracked automatically from unpaid purchases and can&apos;t be edited directly.
+                      {t(
+                        "This is tracked automatically from unpaid purchases and can't be edited directly."
+                      )}
                     </p>
                   </div>
 
@@ -227,16 +232,16 @@ const EditCompanyPage = () => {
 
                   <div className="flex gap-3 pt-2">
                     <Button type="button" variant="outline" onClick={() => router.back()} className="flex-1">
-                      Cancel
+                      {t("Cancel")}
                     </Button>
                     <Button type="submit" disabled={mutation.isPending || !canEditCompanies} className="flex-1">
                       {mutation.isPending ? (
                         <span className="flex items-center gap-2">
                           <Loader2 className="animate-spin h-4 w-4" />
-                          Updating...
+                          {t("Updating...")}
                         </span>
                       ) : (
-                        "Update Company"
+                        t("Update Company")
                       )}
                     </Button>
                   </div>
@@ -248,12 +253,12 @@ const EditCompanyPage = () => {
           <div className="lg:col-span-1">
             <Card className="shadow-sm border-gray-200 dark:border-gray-800 sticky top-6">
               <CardHeader className="pb-4">
-                <CardTitle className="text-lg">Summary</CardTitle>
-                <CardDescription>Current standing with this supplier</CardDescription>
+                <CardTitle className="text-lg">{t("Summary")}</CardTitle>
+                <CardDescription>{t("Current standing with this supplier")}</CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
                 <div className="flex justify-between items-center pt-2 border-t">
-                  <span className="text-sm text-gray-600 dark:text-gray-400">Total Purchases</span>
+                  <span className="text-sm text-gray-600 dark:text-gray-400">{t("Total Purchases")}</span>
                   <Badge variant="outline" className="flex items-center gap-1">
                     <ShoppingBag className="h-3 w-3" />
                     {purchasesCount}
@@ -261,7 +266,7 @@ const EditCompanyPage = () => {
                 </div>
 
                 <div className="flex justify-between items-center p-3 rounded-lg bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-900/50">
-                  <span className="text-sm font-medium text-amber-800 dark:text-amber-400">We Owe</span>
+                  <span className="text-sm font-medium text-amber-800 dark:text-amber-400">{t("We Owe")}</span>
                   <span className="text-lg font-bold text-amber-900 dark:text-amber-300">
                     ${(parseFloat(form.debt) || 0).toLocaleString()}
                   </span>
@@ -271,7 +276,7 @@ const EditCompanyPage = () => {
                   variant={hasDebt ? "destructive" : "default"}
                   className="w-full justify-center text-sm px-3 py-1"
                 >
-                  {hasDebt ? "Outstanding Balance" : "Settled"}
+                  {hasDebt ? t("Outstanding Balance") : t("Settled")}
                 </Badge>
               </CardContent>
             </Card>

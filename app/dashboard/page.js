@@ -1,5 +1,7 @@
 // app/dashboard/page.jsx
 "use client";
+import { t } from "@/lib/i18n";
+import { useT } from "@/lib/i18n/LangProvider";
 
 import React, { useState } from "react";
 import SummaryCards from "@/components/dashboard/SummaryCards";
@@ -29,6 +31,7 @@ const DEFAULT_FILTERS = {
 };
 
 export default function DashboardPage() {
+  const t = useT();
   const [filters, setFilters] = useState(DEFAULT_FILTERS);
 
   // Resolved to precise UTC instants here (in the browser) rather than
@@ -43,8 +46,8 @@ export default function DashboardPage() {
       <div className="container mx-auto px-4">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">Business Dashboard</h1>
-          <p className="text-gray-600 dark:text-gray-400">Overview of your business performance</p>
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">{t("Business Dashboard")}</h1>
+          <p className="text-gray-600 dark:text-gray-400">{t("Overview of your business performance")}</p>
         </div>
 
         {/* Filters */}
@@ -100,32 +103,36 @@ export default function DashboardPage() {
             companies (what we bought from them + expected profit) */}
         <div className="grid grid-cols-1 xl:grid-cols-2 gap-8 mb-8">
           <TopPartiesChart
-            title="Top 10 Customers"
+            title={t("Top 10 Customers")}
             icon={Users}
             iconClassName="text-blue-600"
             endpoint="/api/dashboard/top-buyers"
             dataKey="topBuyers"
-            purchasedLabel="Purchased"
-            profitLabel="Profit"
-            countLabel="Orders"
+            purchasedLabel={t("Purchased")}
+            profitLabel={t("Profit")}
+            countLabel={t("Orders")}
             countKey="ordersCount"
             hrefFor={(row) => `/dashboard/customers/${row.customerId}/orders`}
-            emptyText="No orders in this range"
-            footnote="Purchased = total of their orders (drafts excluded). Profit = the real margin those orders made (selling price minus cost at the time of sale)."
+            emptyText={t("No orders in this range")}
+            footnote={t(
+              "Purchased = total of their orders (drafts excluded). Profit = the real margin those orders made (selling price minus cost at the time of sale)."
+            )}
           />
           <TopPartiesChart
-            title="Top 10 Companies"
+            title={t("Top 10 Companies")}
             icon={Building2}
             iconClassName="text-violet-600"
             endpoint="/api/dashboard/top-suppliers"
             dataKey="topSuppliers"
-            purchasedLabel="Bought"
-            profitLabel="Expected profit"
-            countLabel="Purchases"
+            purchasedLabel={t("Bought")}
+            profitLabel={t("Expected profit")}
+            countLabel={t("Purchases")}
             countKey="purchasesCount"
             hrefFor={(row) => `/dashboard/companies/${row.companyId}/purchases`}
-            emptyText="No purchases in this range"
-            footnote="Bought = total of your purchases from them. Expected profit = that stock sold at today's prices minus what you paid - an estimate, since prices can change before it sells."
+            emptyText={t("No purchases in this range")}
+            footnote={t(
+              "Bought = total of your purchases from them. Expected profit = that stock sold at today's prices minus what you paid - an estimate, since prices can change before it sells."
+            )}
           />
         </div>
 

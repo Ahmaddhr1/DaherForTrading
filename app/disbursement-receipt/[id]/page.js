@@ -1,8 +1,10 @@
 "use client";
+import { t } from "@/lib/i18n";
+import { useT } from "@/lib/i18n/LangProvider";
 
 import { useQuery } from "@tanstack/react-query";
 import { useParams } from "next/navigation";
-import { format } from "date-fns";
+import { format } from "@/lib/i18n/date";
 import { Calendar, Loader2, Receipt } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -18,6 +20,7 @@ const fetchPublicDisbursement = async (id) => {
 // Public, unauthenticated, read-only disbursement receipt - mirrors
 // app/invoice/[id]/page.js and app/purchase-receipt/[id]/page.js.
 export default function PublicDisbursementReceiptPage() {
+  const t = useT();
   const { id } = useParams();
 
   const { data: disbursement, isLoading, isError } = useQuery({
@@ -39,7 +42,7 @@ export default function PublicDisbursementReceiptPage() {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
         <Card className="w-full max-w-md">
           <CardContent className="pt-6 text-center">
-            <p className="text-gray-600">This receipt link is invalid or no longer available.</p>
+            <p className="text-gray-600">{t("This receipt link is invalid or no longer available.")}</p>
           </CardContent>
         </Card>
       </div>
@@ -54,9 +57,9 @@ export default function PublicDisbursementReceiptPage() {
             <div className="flex items-center justify-between">
               <CardTitle className="flex items-center gap-2 text-xl">
                 <Receipt className="h-5 w-5 text-blue-600" />
-                Disbursement Receipt
+                {t("Disbursement Receipt")}
               </CardTitle>
-              <Badge className="bg-green-100 text-green-800">Paid</Badge>
+              <Badge className="bg-green-100 text-green-800">{t("Paid")}</Badge>
             </div>
             <p className="text-sm text-gray-500 flex items-center gap-1 mt-1">
               <Calendar className="h-3.5 w-3.5" />
@@ -65,18 +68,18 @@ export default function PublicDisbursementReceiptPage() {
           </CardHeader>
           <CardContent className="space-y-4">
             <div>
-              <p className="text-sm text-gray-500">Description</p>
-              <p className="font-medium text-gray-900">{disbursement.description}</p>
+              <p className="text-sm text-gray-500">{t("Description")}</p>
+              <p className="font-medium text-gray-900">{t(disbursement.description)}</p>
             </div>
             <div>
-              <p className="text-sm text-gray-500">Category</p>
+              <p className="text-sm text-gray-500">{t("Category")}</p>
               <Badge variant="outline">{disbursement.category}</Badge>
             </div>
 
             <Separator />
 
             <div className="flex justify-between">
-              <span className="text-gray-600">Amount</span>
+              <span className="text-gray-600">{t("Amount")}</span>
               <span className="font-semibold text-gray-900">${disbursement.amount.toFixed(2)}</span>
             </div>
             {disbursement.dollarRate > 0 && (

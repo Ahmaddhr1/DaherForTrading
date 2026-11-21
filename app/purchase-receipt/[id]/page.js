@@ -1,8 +1,10 @@
 "use client";
+import { t } from "@/lib/i18n";
+import { useT } from "@/lib/i18n/LangProvider";
 
 import { useQuery } from "@tanstack/react-query";
 import { useParams } from "next/navigation";
-import { format } from "date-fns";
+import { format } from "@/lib/i18n/date";
 import { Package, Calendar, Loader2, Receipt } from "lucide-react";
 import {
   Table,
@@ -27,6 +29,7 @@ const fetchPublicPurchase = async (id) => {
 // elsewhere in the app - intentionally a dead end, mirroring
 // app/invoice/[id]/page.js.
 export default function PublicPurchaseReceiptPage() {
+  const t = useT();
   const { id } = useParams();
 
   const { data: purchase, isLoading, isError } = useQuery({
@@ -48,7 +51,7 @@ export default function PublicPurchaseReceiptPage() {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
         <Card className="w-full max-w-md">
           <CardContent className="pt-6 text-center">
-            <p className="text-gray-600">This receipt link is invalid or no longer available.</p>
+            <p className="text-gray-600">{t("This receipt link is invalid or no longer available.")}</p>
           </CardContent>
         </Card>
       </div>
@@ -65,10 +68,10 @@ export default function PublicPurchaseReceiptPage() {
             <div className="flex items-center justify-between">
               <CardTitle className="flex items-center gap-2 text-xl">
                 <Receipt className="h-5 w-5 text-blue-600" />
-                Purchase Receipt
+                {t("Purchase Receipt")}
               </CardTitle>
               <Badge className={purchase.paid ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"}>
-                {purchase.paid ? "Paid" : "Unpaid"}
+                {purchase.paid ? t("Paid") : t("Unpaid")}
               </Badge>
             </div>
             <p className="text-sm text-gray-500 flex items-center gap-1 mt-1">
@@ -78,7 +81,7 @@ export default function PublicPurchaseReceiptPage() {
           </CardHeader>
           <CardContent className="space-y-4">
             <div>
-              <p className="text-sm text-gray-500">Supplier</p>
+              <p className="text-sm text-gray-500">{t("Supplier")}</p>
               <p className="font-medium text-gray-900">{purchase.companyName}</p>
             </div>
 
@@ -87,22 +90,22 @@ export default function PublicPurchaseReceiptPage() {
             <div>
               <p className="text-sm font-medium text-gray-700 flex items-center gap-2 mb-2">
                 <Package className="h-4 w-4" />
-                Item
+                {t("Item")}
               </p>
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Product</TableHead>
-                    <TableHead className="text-center">Qty</TableHead>
-                    <TableHead className="text-center">Discount</TableHead>
-                    <TableHead className="text-right">Total</TableHead>
+                    <TableHead>{t("Product")}</TableHead>
+                    <TableHead className="text-center">{t("Qty")}</TableHead>
+                    <TableHead className="text-center">{t("Discount")}</TableHead>
+                    <TableHead className="text-right">{t("Total")}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   <TableRow>
                     <TableCell className="font-medium">{purchase.productName}</TableCell>
                     <TableCell className="text-center">
-                      {purchase.quantity} x ${purchase.unitPrice.toFixed(2)}
+                      {purchase.quantity} {t("x $")}{purchase.unitPrice.toFixed(2)}
                     </TableCell>
                     <TableCell className="text-center text-amber-700">
                       {purchase.discount ? `-$${purchase.discount.toFixed(2)}` : "—"}
@@ -120,18 +123,18 @@ export default function PublicPurchaseReceiptPage() {
             <div className="space-y-2">
               {purchase.discount > 0 && (
                 <div className="flex justify-between">
-                  <span className="text-gray-600">Discount</span>
+                  <span className="text-gray-600">{t("Discount")}</span>
                   <span className="text-amber-700 font-medium">-${purchase.discount.toFixed(2)}</span>
                 </div>
               )}
               {purchase.taxAmount > 0 && (
                 <div className="flex justify-between">
-                  <span className="text-gray-600">Tax ({purchase.taxRate}%)</span>
+                  <span className="text-gray-600">{t("Tax (")}{purchase.taxRate}%)</span>
                   <span className="text-gray-900 font-medium">+${purchase.taxAmount.toFixed(2)}</span>
                 </div>
               )}
               <div className="flex justify-between">
-                <span className="text-gray-600">Total</span>
+                <span className="text-gray-600">{t("Total")}</span>
                 <span className="font-semibold text-gray-900">${purchase.total.toFixed(2)}</span>
               </div>
             </div>

@@ -1,10 +1,12 @@
 "use client";
+import { t } from "@/lib/i18n";
+import { useT } from "@/lib/i18n/LangProvider";
 
 import { useState } from "react";
 import { useParams } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
-import { format } from "date-fns";
+import { format } from "@/lib/i18n/date";
 import {
   Table,
   TableBody,
@@ -37,6 +39,7 @@ const ADJUSTMENT_LABELS = {
 };
 
 export default function ProductStockHistoryPage() {
+  const t = useT();
   const { id } = useParams();
 
   const [startDate, setStartDate] = useState("");
@@ -75,20 +78,20 @@ export default function ProductStockHistoryPage() {
     if (type === "purchase") {
       return (
         <Badge className="bg-orange-100 dark:bg-orange-900/30 text-orange-800 dark:text-orange-400 flex items-center gap-1 w-fit">
-          <Truck className="h-3 w-3" /> Purchase
+          <Truck className="h-3 w-3" /> {t("Purchase")}
         </Badge>
       );
     }
     if (type === "sale") {
       return (
         <Badge className="bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-400 flex items-center gap-1 w-fit">
-          <ShoppingCart className="h-3 w-3" /> Sale
+          <ShoppingCart className="h-3 w-3" /> {t("Sale")}
         </Badge>
       );
     }
     return (
       <Badge className="bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-400 flex items-center gap-1 w-fit">
-        <Wrench className="h-3 w-3" /> Adjustment
+        <Wrench className="h-3 w-3" /> {t("Adjustment")}
       </Badge>
     );
   };
@@ -102,8 +105,10 @@ export default function ProductStockHistoryPage() {
             {e.quantity} {unit} @ ${e.unitPrice.toFixed(2)}
           </div>
           <div className="text-xs text-gray-500 dark:text-gray-400">
-            Total ${e.total.toFixed(2)}
-            {e.company ? ` · from ${e.company}` : ""}
+            {t("Total $")}{e.total.toFixed(2)}
+            {e.company ? t(" · from {0}", {
+              0: e.company
+            }) : ""}
           </div>
         </div>
       );
@@ -115,11 +120,11 @@ export default function ProductStockHistoryPage() {
             {e.quantity} {unit} @ ${e.price.toFixed(2)}
             {e.free && (
               <Badge variant="outline" className="ml-1.5 text-[10px] px-1.5 py-0">
-                FREE
+                {t("FREE")}
               </Badge>
             )}
           </div>
-          <div className="text-xs text-gray-500 dark:text-gray-400">to {e.customer}</div>
+          <div className="text-xs text-gray-500 dark:text-gray-400">{t("to")} {e.customer}</div>
         </div>
       );
     }
@@ -131,7 +136,7 @@ export default function ProductStockHistoryPage() {
         </div>
         <div className="text-xs text-gray-500 dark:text-gray-400">
           {e.reason ? `${e.reason} · ` : ""}
-          {e.adminName || "unknown"}
+          {e.adminName || t("unknown")}
         </div>
       </div>
     );
@@ -146,10 +151,12 @@ export default function ProductStockHistoryPage() {
           </div>
           <div>
             <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
-              Stock History{product ? ` — ${product.name}` : ""}
+              {t("Stock History")}{product ? ` — ${product.name}` : ""}
             </h1>
             <p className="text-gray-600 dark:text-gray-400">
-              Every purchase, sale, and stock adjustment, in order, with the stock level before and after each one
+              {t(
+                "Every purchase, sale, and stock adjustment, in order, with the stock level before and after each one"
+              )}
             </p>
           </div>
         </div>
@@ -157,7 +164,7 @@ export default function ProductStockHistoryPage() {
         <Card className="shadow-sm border-gray-200 dark:border-gray-800 mb-6">
           <CardContent className="p-4 flex flex-col sm:flex-row sm:flex-wrap sm:items-center gap-3">
             <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-2 w-full sm:w-auto">
-              <span className="text-sm font-medium text-gray-700 dark:text-gray-300">From</span>
+              <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{t("From")}</span>
               <input
                 type="date"
                 value={startDate}
@@ -169,7 +176,7 @@ export default function ProductStockHistoryPage() {
               />
             </div>
             <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-2 w-full sm:w-auto">
-              <span className="text-sm font-medium text-gray-700 dark:text-gray-300">To</span>
+              <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{t("To")}</span>
               <input
                 type="date"
                 value={endDate}
@@ -182,12 +189,12 @@ export default function ProductStockHistoryPage() {
             </div>
             {hasDateFilter && (
               <Button variant="ghost" size="sm" onClick={clearFilter} className="text-gray-500 dark:text-gray-400 self-start sm:self-auto">
-                Clear
+                {t("Clear")}
               </Button>
             )}
             {product && (
               <div className="sm:ml-auto text-sm text-gray-600 dark:text-gray-400">
-                Current stock: <span className="font-semibold text-gray-900 dark:text-gray-100">{product.quantity} {product.unit}</span>
+                {t("Current stock:")} <span className="font-semibold text-gray-900 dark:text-gray-100">{product.quantity} {product.unit}</span>
               </div>
             )}
           </CardContent>
@@ -196,26 +203,26 @@ export default function ProductStockHistoryPage() {
         {isLoading ? (
           <TableSkeleton rows={pageSize} cols={4} />
         ) : isError ? (
-          <div className="text-center py-12 text-red-600">Failed to load stock history.</div>
+          <div className="text-center py-12 text-red-600">{t("Failed to load stock history.")}</div>
         ) : events.length === 0 ? (
           <div className="text-center py-12 text-gray-500 dark:text-gray-400">
             <History className="h-12 w-12 mx-auto mb-3" />
-            <p>No stock movements found{hasDateFilter ? " in this date range" : ""}</p>
+            <p>{t("No stock movements found")}{hasDateFilter ? t(" in this date range") : ""}</p>
           </div>
         ) : (
           <>
             <Card className="shadow-sm border-gray-200 dark:border-gray-800">
               <Table>
                 <TableCaption>
-                  Starting stock before the earliest recorded event: {data.startingStock} {product?.unit || ""}
+                  {t("Starting stock before the earliest recorded event:")} {data.startingStock} {product?.unit || ""}
                 </TableCaption>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Date</TableHead>
-                    <TableHead>Type</TableHead>
-                    <TableHead>Details</TableHead>
-                    <TableHead className="text-center">Stock Before</TableHead>
-                    <TableHead className="text-center">Stock After</TableHead>
+                    <TableHead>{t("Date")}</TableHead>
+                    <TableHead>{t("Type")}</TableHead>
+                    <TableHead>{t("Details")}</TableHead>
+                    <TableHead className="text-center">{t("Stock Before")}</TableHead>
+                    <TableHead className="text-center">{t("Stock After")}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -244,10 +251,10 @@ export default function ProductStockHistoryPage() {
                   className="flex items-center gap-2"
                 >
                   <ChevronLeft className="h-4 w-4" />
-                  Previous
+                  {t("Previous")}
                 </Button>
                 <span className="text-sm text-gray-600 dark:text-gray-400">
-                  Page {page} of {totalPages}
+                  {t("Page")} {page} {t("of")} {totalPages}
                 </span>
                 <Button
                   onClick={() => setPage((p) => p + 1)}
@@ -256,7 +263,7 @@ export default function ProductStockHistoryPage() {
                   size="sm"
                   className="flex items-center gap-2"
                 >
-                  Next
+                  {t("Next")}
                   <ChevronRight className="h-4 w-4" />
                 </Button>
               </div>

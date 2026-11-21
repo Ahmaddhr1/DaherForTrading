@@ -1,4 +1,6 @@
 "use client";
+import { t } from "@/lib/i18n";
+import { useT } from "@/lib/i18n/LangProvider";
 
 import { useEffect, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -14,6 +16,7 @@ import OrderCard from "./OrderCard";
 import { useIsOwner } from "@/lib/useIsOwner";
 
 const PartiallyPaidOrders = () => {
+  const t = useT();
   const [page, setPage] = useState(1);
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
@@ -60,13 +63,13 @@ const PartiallyPaidOrders = () => {
     return (
       <div className="text-center py-12 text-red-600">
         <AlertCircle className="h-12 w-12 mx-auto mb-3" />
-        <p>Failed to load partially paid orders</p>
+        <p>{t("Failed to load partially paid orders")}</p>
         <Button
           onClick={() => queryClient.refetchQueries(["orders", "partially-paid"])}
           variant="outline"
           className="mt-2"
         >
-          Try Again
+          {t("Try Again")}
         </Button>
       </div>
     );
@@ -78,7 +81,7 @@ const PartiallyPaidOrders = () => {
   return (
     <div className="space-y-4">
       {isOwner && (
-        <OrdersTotalsCard totalAmount={totals.totalAmount} totalProfit={totals.totalProfit} label="Total Partially Paid" />
+        <OrdersTotalsCard totalAmount={totals.totalAmount} totalProfit={totals.totalProfit} label={t("Total Partially Paid")} />
       )}
 
       <Card className="shadow-sm border-gray-200 dark:border-gray-800">
@@ -92,7 +95,7 @@ const PartiallyPaidOrders = () => {
           {hasDateFilter && (
             <Button variant="ghost" size="sm" onClick={clearDateFilter} className="flex items-center gap-1 text-gray-500 dark:text-gray-400 self-start sm:self-auto">
               <X className="h-3.5 w-3.5" />
-              Clear
+              {t("Clear")}
             </Button>
           )}
         </CardContent>
@@ -101,7 +104,7 @@ const PartiallyPaidOrders = () => {
       {orders.length === 0 ? (
         <div className="text-center py-12 text-gray-500 dark:text-gray-400">
           <DollarSign className="h-12 w-12 mx-auto mb-3" />
-          <p>No partially paid orders</p>
+          <p>{t("No partially paid orders")}</p>
         </div>
       ) : (
         <>
@@ -125,10 +128,10 @@ const PartiallyPaidOrders = () => {
                 className="flex items-center gap-2"
               >
                 <ChevronLeft className="h-4 w-4" />
-                Previous
+                {t("Previous")}
               </Button>
               <span className="text-sm text-gray-600 dark:text-gray-400">
-                Page {page} of {totalPages}
+                {t("Page")} {page} {t("of")} {totalPages}
               </span>
               <Button
                 onClick={() => setPage((p) => p + 1)}
@@ -137,7 +140,7 @@ const PartiallyPaidOrders = () => {
                 size="sm"
                 className="flex items-center gap-2"
               >
-                Next
+                {t("Next")}
                 <ChevronRight className="h-4 w-4" />
               </Button>
             </div>

@@ -1,4 +1,6 @@
 "use client";
+import { t } from "@/lib/i18n";
+import { useT } from "@/lib/i18n/LangProvider";
 
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -10,7 +12,7 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { Loader2, PackagePlus, DollarSign, Tag, Package, TrendingUp, Box, Ruler, AlertTriangle, Truck, Layers, ImagePlus, X, Percent } from "lucide-react";
 import React, { useState } from "react";
-import { toast } from "sonner";
+import { toast } from "@/lib/i18n/toast";
 import { useRouter } from "next/navigation";
 
 const fetchCategories = async () => {
@@ -28,6 +30,7 @@ const fetchCompanies = async () => {
 const UNIT_SUGGESTIONS = ["pcs", "kg", "g", "box", "carton", "liter", "ml", "meter", "pack", "bag"];
 
 const Page = () => {
+  const t = useT();
   const router = useRouter();
 
   const { data: categories, isLoading: categoriesLoading, isError: categoriesError } = useQuery({
@@ -171,8 +174,8 @@ const Page = () => {
               <PackagePlus className="h-6 w-6 text-blue-600" />
             </div>
             <div>
-              <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">Add New Product</h1>
-              <p className="text-gray-600 dark:text-gray-400">Add a new product to your inventory</p>
+              <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">{t("Add New Product")}</h1>
+              <p className="text-gray-600 dark:text-gray-400">{t("Add a new product to your inventory")}</p>
             </div>
           </div>
         </div>
@@ -184,10 +187,10 @@ const Page = () => {
               <CardHeader className="pb-4">
                 <CardTitle className="text-xl flex items-center gap-2">
                   <Package className="h-5 w-5" />
-                  Product Information
+                  {t("Product Information")}
                 </CardTitle>
                 <CardDescription>
-                  Enter product details, pricing, and category information
+                  {t("Enter product details, pricing, and category information")}
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -196,18 +199,18 @@ const Page = () => {
                   <div className="space-y-4">
                     <div className="flex items-center gap-2 text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">
                       <div className="w-1 h-4 bg-blue-600 rounded"></div>
-                      Basic Information
+                      {t("Basic Information")}
                     </div>
                     
                     <div className="grid gap-4">
                       <div className="space-y-2">
                         <Label htmlFor="name" className="text-sm font-medium flex items-center gap-2">
                           <Tag className="h-4 w-4" />
-                          Product Name *
+                          {t("Product Name *")}
                         </Label>
                         <Input
                           id="name"
-                          placeholder="Enter product name"
+                          placeholder={t("Enter product name")}
                           name="name"
                           value={form.name}
                           onChange={handleChange}
@@ -219,7 +222,7 @@ const Page = () => {
                       <div className="space-y-2">
                         <Label htmlFor="category" className="text-sm font-medium flex items-center gap-2">
                           <Box className="h-4 w-4" />
-                          Category *
+                          {t("Category *")}
                         </Label>
                         <select
                           id="category"
@@ -230,9 +233,9 @@ const Page = () => {
                           disabled={categoriesLoading || categoriesError}
                           required
                         >
-                          <option value="">Select a category</option>
-                          {categoriesLoading && <option>Loading categories...</option>}
-                          {categoriesError && <option>Error loading categories</option>}
+                          <option value="">{t("Select a category")}</option>
+                          {categoriesLoading && <option>{t("Loading categories...")}</option>}
+                          {categoriesError && <option>{t("Error loading categories")}</option>}
                           {categories && categories.map((cat) => (
                             <option key={cat._id} value={cat._id}>
                               {cat.name}
@@ -244,7 +247,7 @@ const Page = () => {
                       <div className="space-y-2">
                         <Label htmlFor="quantity" className="text-sm font-medium flex items-center gap-2">
                           <Package className="h-4 w-4" />
-                          Quantity in Stock (optional)
+                          {t("Quantity in Stock (optional)")}
                         </Label>
                         <Input
                           id="quantity"
@@ -255,24 +258,24 @@ const Page = () => {
                           inputMode="numeric"
                           className="focus:border-blue-500 transition-colors"
                         />
-                        <p className="text-xs text-gray-500 dark:text-gray-400">Leave blank to start at 0 and add stock later via a purchase</p>
+                        <p className="text-xs text-gray-500 dark:text-gray-400">{t("Leave blank to start at 0 and add stock later via a purchase")}</p>
                       </div>
 
                       <div className="space-y-2">
                         <Label htmlFor="productImage" className="text-sm font-medium flex items-center gap-2">
                           <ImagePlus className="h-4 w-4" />
-                          Product Image (optional)
+                          {t("Product Image (optional)")}
                         </Label>
                         {imagePreview ? (
                           <div className="flex items-center gap-3">
                             <img
                               src={imagePreview}
-                              alt="Preview"
+                              alt={t("Preview")}
                               className="h-20 w-20 rounded-md border border-gray-200 dark:border-gray-800 object-cover"
                             />
                             <Button type="button" variant="outline" size="sm" onClick={handleRemoveImage} className="flex items-center gap-1">
                               <X className="h-3.5 w-3.5" />
-                              Remove
+                              {t("Remove")}
                             </Button>
                           </div>
                         ) : (
@@ -294,19 +297,19 @@ const Page = () => {
                   <div className="space-y-4">
                     <div className="flex items-center gap-2 text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">
                       <div className="w-1 h-4 bg-purple-600 rounded"></div>
-                      Inventory Details
+                      {t("Inventory Details")}
                     </div>
 
                     <div className="grid gap-4 sm:grid-cols-2">
                       <div className="space-y-2">
                         <Label htmlFor="unit" className="text-sm font-medium flex items-center gap-2">
                           <Ruler className="h-4 w-4" />
-                          Unit of Measure
+                          {t("Unit of Measure")}
                         </Label>
                         <Input
                           id="unit"
                           list="unit-suggestions"
-                          placeholder="pcs"
+                          placeholder={t("pcs")}
                           name="unit"
                           value={form.unit}
                           onChange={handleChange}
@@ -322,7 +325,7 @@ const Page = () => {
                       <div className="space-y-2">
                         <Label htmlFor="lowStockThreshold" className="text-sm font-medium flex items-center gap-2">
                           <AlertTriangle className="h-4 w-4" />
-                          Low Stock Threshold
+                          {t("Low Stock Threshold")}
                         </Label>
                         <Input
                           id="lowStockThreshold"
@@ -334,13 +337,13 @@ const Page = () => {
                           onChange={handleChange}
                           className="focus:border-purple-500 transition-colors"
                         />
-                        <p className="text-xs text-gray-500 dark:text-gray-400">Alerts you when stock falls to or below this number</p>
+                        <p className="text-xs text-gray-500 dark:text-gray-400">{t("Alerts you when stock falls to or below this number")}</p>
                       </div>
 
                       <div className="space-y-2">
                         <Label htmlFor="discount" className="text-sm font-medium flex items-center gap-2">
                           <Percent className="h-4 w-4" />
-                          Default Discount (%)
+                          {t("Default Discount (%)")}
                         </Label>
                         <Input
                           id="discount"
@@ -354,14 +357,14 @@ const Page = () => {
                           onChange={handleChange}
                           className="focus:border-purple-500 transition-colors"
                         />
-                        <p className="text-xs text-gray-500 dark:text-gray-400">Pre-fills this product&apos;s discount when added to an order</p>
+                        <p className="text-xs text-gray-500 dark:text-gray-400">{t("Pre-fills this product's discount when added to an order")}</p>
                       </div>
                     </div>
 
                     <div className="space-y-2">
                       <Label htmlFor="defaultSupplier" className="text-sm font-medium flex items-center gap-2">
                         <Truck className="h-4 w-4" />
-                        Default Supplier
+                        {t("Default Supplier")}
                       </Label>
                       <select
                         id="defaultSupplier"
@@ -370,14 +373,14 @@ const Page = () => {
                         onChange={handleChange}
                         className="w-full p-2 border border-gray-300 dark:border-gray-700 rounded-md focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-colors"
                       >
-                        <option value="">No default supplier</option>
+                        <option value="">{t("No default supplier")}</option>
                         {companies.map((c) => (
                           <option key={c._id} value={c._id}>
                             {c.name}
                           </option>
                         ))}
                       </select>
-                      <p className="text-xs text-gray-500 dark:text-gray-400">Lets you quickly reorder this product from a supplier later</p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400">{t("Lets you quickly reorder this product from a supplier later")}</p>
                     </div>
                   </div>
 
@@ -387,14 +390,14 @@ const Page = () => {
                   <div className="space-y-4">
                     <div className="flex items-center gap-2 text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">
                       <div className="w-1 h-4 bg-green-600 rounded"></div>
-                      Pricing Information
+                      {t("Pricing Information")}
                     </div>
                     
                     <div className="grid gap-4">
                       <div className="space-y-2">
                         <Label htmlFor="initialPrice" className="text-sm font-medium flex items-center gap-2">
                           <DollarSign className="h-4 w-4" />
-                          Cost Price *
+                          {t("Cost Price *")}
                         </Label>
                         <Input
                           id="initialPrice"
@@ -406,13 +409,13 @@ const Page = () => {
                           className="focus:border-green-500 transition-colors"
                           required
                         />
-                        <p className="text-xs text-gray-500 dark:text-gray-400">The price you paid to acquire the product</p>
+                        <p className="text-xs text-gray-500 dark:text-gray-400">{t("The price you paid to acquire the product")}</p>
                       </div>
 
                       <div className="space-y-2">
                         <Label htmlFor="price" className="text-sm font-medium flex items-center gap-2">
                           <DollarSign className="h-4 w-4" />
-                          Selling Price *
+                          {t("Selling Price *")}
                         </Label>
                         <Input
                           id="price"
@@ -424,7 +427,7 @@ const Page = () => {
                           className="focus:border-green-500 transition-colors"
                           required
                         />
-                        <p className="text-xs text-gray-500 dark:text-gray-400">The price customers will pay</p>
+                        <p className="text-xs text-gray-500 dark:text-gray-400">{t("The price customers will pay")}</p>
                       </div>
                     </div>
                   </div>
@@ -435,18 +438,19 @@ const Page = () => {
                   <div className="space-y-4">
                     <div className="flex items-center gap-2 text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">
                       <div className="w-1 h-4 bg-teal-600 rounded"></div>
-                      Price Tiers
+                      {t("Price Tiers")}
                     </div>
                     <p className="text-xs text-gray-500 dark:text-gray-400 -mt-2">
-                      Selling Price above is the Retail price. Set different prices for other customer
-                      tiers here, or leave a field blank to use the Retail price for that tier.
+                      {t(
+                        "Selling Price above is the Retail price. Set different prices for other customer tiers here, or leave a field blank to use the Retail price for that tier."
+                      )}
                     </p>
 
                     <div className="grid gap-4 sm:grid-cols-3">
                       <div className="space-y-2">
                         <Label htmlFor="priceWholesale" className="text-sm font-medium flex items-center gap-2">
                           <Layers className="h-4 w-4" />
-                          Wholesale
+                          {t("Wholesale")}
                         </Label>
                         <Input
                           id="priceWholesale"
@@ -462,7 +466,7 @@ const Page = () => {
                       <div className="space-y-2">
                         <Label htmlFor="priceDistributor" className="text-sm font-medium flex items-center gap-2">
                           <Layers className="h-4 w-4" />
-                          Distributor
+                          {t("Distributor")}
                         </Label>
                         <Input
                           id="priceDistributor"
@@ -478,7 +482,7 @@ const Page = () => {
                       <div className="space-y-2">
                         <Label htmlFor="priceVip" className="text-sm font-medium flex items-center gap-2">
                           <Layers className="h-4 w-4" />
-                          VIP
+                          {t("VIP")}
                         </Label>
                         <Input
                           id="priceVip"
@@ -503,7 +507,7 @@ const Page = () => {
                       onClick={() => router.back()}
                       className="flex-1"
                     >
-                      Cancel
+                      {t("Cancel")}
                     </Button>
                     <Button
                       type="submit"
@@ -513,12 +517,12 @@ const Page = () => {
                       {mutation.isPending ? (
                         <span className="flex items-center gap-2">
                           <Loader2 className="animate-spin h-4 w-4" />
-                          Creating Product...
+                          {t("Creating Product...")}
                         </span>
                       ) : (
                         <span className="flex items-center gap-2">
                           <PackagePlus className="h-4 w-4" />
-                          Create Product
+                          {t("Create Product")}
                         </span>
                       )}
                     </Button>
@@ -532,21 +536,21 @@ const Page = () => {
           <div className="lg:col-span-1">
             <Card className="shadow-sm border-gray-200 dark:border-gray-800 sticky top-6">
               <CardHeader className="pb-4">
-                <CardTitle className="text-lg">Product Summary</CardTitle>
-                <CardDescription>Pricing and profit overview</CardDescription>
+                <CardTitle className="text-lg">{t("Product Summary")}</CardTitle>
+                <CardDescription>{t("Pricing and profit overview")}</CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
                 {/* Basic Info */}
                 <div className="space-y-3">
                   <h4 className="font-medium text-gray-900 dark:text-gray-100 flex items-center gap-2">
                     <Package className="h-4 w-4" />
-                    Product Details
+                    {t("Product Details")}
                   </h4>
                   <div className="space-y-2">
                     <div className="flex justify-between items-center">
-                      <span className="text-sm text-gray-600 dark:text-gray-400">Name</span>
+                      <span className="text-sm text-gray-600 dark:text-gray-400">{t("Name")}</span>
                       <span className="font-medium text-gray-900 dark:text-gray-100 truncate max-w-[120px] text-right">
-                        {form.name || "Not provided"}
+                        {form.name || t("Not provided")}
                       </span>
                     </div>
                   </div>
@@ -558,16 +562,16 @@ const Page = () => {
                 <div className="space-y-3">
                   <h4 className="font-medium text-gray-900 dark:text-gray-100 flex items-center gap-2">
                     <DollarSign className="h-4 w-4" />
-                    Pricing
+                    {t("Pricing")}
                   </h4>
                   <div className="space-y-2">
                     <div className="flex justify-between items-center">
-                      <span className="text-sm text-gray-600 dark:text-gray-400">Cost Price</span>
+                      <span className="text-sm text-gray-600 dark:text-gray-400">{t("Cost Price")}</span>
                       <span className="font-medium text-gray-900 dark:text-gray-100">${costPrice.toFixed(2)}</span>
                     </div>
                     
                     <div className="flex justify-between items-center">
-                      <span className="text-sm text-gray-600 dark:text-gray-400">Selling Price</span>
+                      <span className="text-sm text-gray-600 dark:text-gray-400">{t("Selling Price")}</span>
                       <span className="font-medium text-gray-900 dark:text-gray-100">${sellingPrice.toFixed(2)}</span>
                     </div>
                   </div>
@@ -579,19 +583,19 @@ const Page = () => {
                 <div className="space-y-3">
                   <h4 className="font-medium text-gray-900 dark:text-gray-100 flex items-center gap-2">
                     <TrendingUp className="h-4 w-4" />
-                    Profit Analysis
+                    {t("Profit Analysis")}
                   </h4>
                   
                   <div className="bg-green-50 dark:bg-green-900/20 rounded-lg p-3 border border-green-200 dark:border-green-900/50">
                     <div className="flex justify-between items-center mb-1">
-                      <span className="text-sm font-medium text-green-800 dark:text-green-400">Profit per Unit</span>
+                      <span className="text-sm font-medium text-green-800 dark:text-green-400">{t("Profit per Unit")}</span>
                       <Badge variant={profit >= 0 ? "default" : "destructive"} className="bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-400">
                         ${Math.abs(profit).toFixed(2)}
                       </Badge>
                     </div>
                     
                     <div className="flex justify-between items-center mb-2">
-                      <span className="text-sm text-green-700">Profit Margin</span>
+                      <span className="text-sm text-green-700">{t("Profit Margin")}</span>
                       <span className={`text-sm font-medium ${profitMargin >= 0 ? 'text-green-800 dark:text-green-400' : 'text-red-800 dark:text-red-400'}`}>
                         {profitMargin.toFixed(1)}%
                       </span>
@@ -603,11 +607,11 @@ const Page = () => {
 
                 {/* Validation Status */}
                 <div className="bg-gray-50 dark:bg-gray-950 rounded-lg p-3">
-                  <h4 className="font-medium text-gray-900 dark:text-gray-100 text-sm mb-2">Form Status</h4>
+                  <h4 className="font-medium text-gray-900 dark:text-gray-100 text-sm mb-2">{t("Form Status")}</h4>
                   <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-600 dark:text-gray-400">All fields completed</span>
+                    <span className="text-sm text-gray-600 dark:text-gray-400">{t("All fields completed")}</span>
                     <Badge variant={isFormValid ? "default" : "outline"} className={isFormValid ? 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-400' : ''}>
-                      {isFormValid ? "Ready" : "Incomplete"}
+                      {isFormValid ? t("Ready") : t("Incomplete")}
                     </Badge>
                   </div>
                 </div>

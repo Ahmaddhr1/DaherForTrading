@@ -1,10 +1,12 @@
 // app/dashboard/disbursements/page.jsx
 "use client";
+import { t } from "@/lib/i18n";
+import { useT } from "@/lib/i18n/LangProvider";
 
 import React, { useEffect, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
-import { toast } from "sonner";
+import { toast } from "@/lib/i18n/toast";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -40,7 +42,7 @@ import {
   Eye,
   Repeat,
 } from "lucide-react";
-import { format } from "date-fns";
+import { format } from "@/lib/i18n/date";
 import Link from "next/link";
 
 const CATEGORY_OPTIONS = ["Salaries", "Rent", "Utilities", "Maintenance", "Transport", "Other"];
@@ -55,6 +57,7 @@ const SORT_OPTIONS = [
 const PAGE_SIZE_OPTIONS = [10, 20, 50];
 
 export default function DisbursementsPage() {
+  const t = useT();
   const [searchInput, setSearchInput] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const [category, setCategory] = useState("");
@@ -191,8 +194,8 @@ export default function DisbursementsPage() {
                 <TrendingDown className="h-6 w-6 text-red-600" />
               </div>
               <div className="min-w-0">
-                <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-gray-100 truncate">Disbursements</h1>
-                <p className="text-gray-600 dark:text-gray-400 text-sm sm:text-base truncate">Cash paid out — deducted from revenue in hand</p>
+                <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-gray-100 truncate">{t("Disbursements")}</h1>
+                <p className="text-gray-600 dark:text-gray-400 text-sm sm:text-base truncate">{t("Cash paid out — deducted from revenue in hand")}</p>
               </div>
             </div>
 
@@ -201,12 +204,12 @@ export default function DisbursementsPage() {
                 <Link href="/dashboard/disbursements/recurring">
                   <Button variant="outline" className="flex items-center gap-2">
                     <Repeat className="h-4 w-4" />
-                    <span className="hidden sm:inline">Recurring</span>
+                    <span className="hidden sm:inline">{t("Recurring")}</span>
                   </Button>
                 </Link>
                 <Button onClick={() => setIsModalOpen(true)} className="bg-red-600 hover:bg-red-700 flex items-center gap-2">
                   <Plus className="h-4 w-4" />
-                  <span className="hidden sm:inline">Add Disbursement</span>
+                  <span className="hidden sm:inline">{t("Add Disbursement")}</span>
                 </Button>
               </div>
             )}
@@ -219,11 +222,11 @@ export default function DisbursementsPage() {
             <div className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
               <Receipt className="h-4 w-4 text-gray-500 dark:text-gray-400" />
               <span className="text-sm font-medium">
-                {totalCount} disbursement{totalCount === 1 ? "" : "s"} matching current filters
+                {totalCount} {t("disbursement")}{totalCount === 1 ? "" : t("s")} {t("matching current filters")}
               </span>
             </div>
             <div className="text-sm text-gray-600 dark:text-gray-400">
-              Total Disbursed:{" "}
+              {t("Total Disbursed:")}{" "}
               <span className="font-bold text-red-600">${totalAmount.toLocaleString()}</span>
             </div>
           </CardContent>
@@ -231,7 +234,7 @@ export default function DisbursementsPage() {
 
         {!hasInteracted && (
           <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
-            Showing today&apos;s disbursements only. Pick a date range below to see more.
+            {t("Showing today's disbursements only. Pick a date range below to see more.")}
           </p>
         )}
 
@@ -243,7 +246,7 @@ export default function DisbursementsPage() {
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 h-4 w-4" />
                 <Input
                   type="text"
-                  placeholder="Search by description..."
+                  placeholder={t("Search by description...")}
                   value={searchInput}
                   onChange={(e) => handleSearchInputChange(e.target.value)}
                   className="pl-10"
@@ -254,14 +257,14 @@ export default function DisbursementsPage() {
                 <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-2">
                   <span className="flex items-center gap-1.5 text-sm font-medium text-gray-700 dark:text-gray-300">
                     <Filter className="h-4 w-4 text-gray-500 dark:text-gray-400" />
-                    Category
+                    {t("Category")}
                   </span>
                   <select
                     value={category}
                     onChange={(e) => handleCategoryChange(e.target.value)}
                     className="w-full sm:w-auto border rounded-md text-sm px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-red-500"
                   >
-                    <option value="">All Categories</option>
+                    <option value="">{t("All Categories")}</option>
                     {CATEGORY_OPTIONS.map((c) => (
                       <option key={c} value={c}>{c}</option>
                     ))}
@@ -269,7 +272,7 @@ export default function DisbursementsPage() {
                 </div>
 
                 <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-2">
-                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">From</span>
+                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{t("From")}</span>
                   <input
                     type="date"
                     value={startDate}
@@ -278,7 +281,7 @@ export default function DisbursementsPage() {
                   />
                 </div>
                 <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-2">
-                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">To</span>
+                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{t("To")}</span>
                   <input
                     type="date"
                     value={endDate}
@@ -290,7 +293,7 @@ export default function DisbursementsPage() {
                 <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-2">
                   <span className="flex items-center gap-1.5 text-sm font-medium text-gray-700 dark:text-gray-300">
                     <ArrowUpDown className="h-4 w-4 text-gray-500 dark:text-gray-400" />
-                    Sort by
+                    {t("Sort by")}
                   </span>
                   <select
                     value={sortBy}
@@ -298,13 +301,13 @@ export default function DisbursementsPage() {
                     className="w-full sm:w-auto border rounded-md text-sm px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-red-500"
                   >
                     {SORT_OPTIONS.map((option) => (
-                      <option key={option.value} value={option.value}>{option.label}</option>
+                      <option key={option.value} value={option.value}>{t(option.label)}</option>
                     ))}
                   </select>
                 </div>
 
                 <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-2">
-                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Per page</span>
+                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{t("Per page")}</span>
                   <select
                     value={pageSize}
                     onChange={(e) => setPageSize(parseInt(e.target.value))}
@@ -324,7 +327,7 @@ export default function DisbursementsPage() {
                     className="flex items-center justify-center gap-1 text-gray-500 dark:text-gray-400 w-full sm:w-auto"
                   >
                     <X className="h-3 w-3" />
-                    Clear Filters
+                    {t("Clear Filters")}
                   </Button>
                 )}
               </div>
@@ -337,30 +340,30 @@ export default function DisbursementsPage() {
           <TableSkeleton rows={pageSize} cols={6} />
         ) : error ? (
           <Card>
-            <CardContent className="pt-6 text-center text-red-500">Failed to load disbursements.</CardContent>
+            <CardContent className="pt-6 text-center text-red-500">{t("Failed to load disbursements.")}</CardContent>
           </Card>
         ) : disbursements.length === 0 ? (
           <Card>
             <CardContent className="pt-6 text-center">
               <Receipt className="h-12 w-12 text-gray-300 dark:text-gray-600 mx-auto mb-3" />
-              <p className="text-gray-500 dark:text-gray-400 text-lg mb-2">No disbursements found</p>
+              <p className="text-gray-500 dark:text-gray-400 text-lg mb-2">{t("No disbursements found")}</p>
               {hasActiveFilters && (
-                <Button variant="outline" onClick={handleClearFilters}>Clear Filters</Button>
+                <Button variant="outline" onClick={handleClearFilters}>{t("Clear Filters")}</Button>
               )}
             </CardContent>
           </Card>
         ) : (
           <Card className="shadow-sm border-gray-200 dark:border-gray-800">
             <Table>
-              <TableCaption>Disbursement history</TableCaption>
+              <TableCaption>{t("Disbursement history")}</TableCaption>
               <TableHeader>
                 <TableRow>
                   <TableHead className="w-12">#</TableHead>
-                  <TableHead>Description</TableHead>
-                  <TableHead>Category</TableHead>
-                  <TableHead className="text-center">Amount</TableHead>
-                  <TableHead>Date</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
+                  <TableHead>{t("Description")}</TableHead>
+                  <TableHead>{t("Category")}</TableHead>
+                  <TableHead className="text-center">{t("Amount")}</TableHead>
+                  <TableHead>{t("Date")}</TableHead>
+                  <TableHead className="text-right">{t("Actions")}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -371,11 +374,11 @@ export default function DisbursementsPage() {
                     </TableCell>
                     <TableCell className="font-medium text-gray-900 dark:text-gray-100">
                       <div className="flex items-center gap-2">
-                        {item.description}
+                        {t(item.description)}
                         {item.recurringSourceId && (
                           <Badge variant="outline" className="flex items-center gap-1 text-xs font-normal">
                             <Repeat className="h-3 w-3" />
-                            Auto
+                            {t("Auto")}
                           </Badge>
                         )}
                       </div>
@@ -394,7 +397,7 @@ export default function DisbursementsPage() {
                         <Link href={`/dashboard/disbursements/${item._id}`}>
                           <Button variant="ghost" size="sm" className="flex items-center gap-1">
                             <Eye className="h-3.5 w-3.5" />
-                            View
+                            {t("View")}
                           </Button>
                         </Link>
                         {canManageDisbursements && (
@@ -424,9 +427,9 @@ export default function DisbursementsPage() {
                   className="flex items-center gap-2"
                 >
                   <ChevronLeft className="h-4 w-4" />
-                  Previous
+                  {t("Previous")}
                 </Button>
-                <span className="text-sm text-gray-600 dark:text-gray-400">Page {currentPage} of {totalPages}</span>
+                <span className="text-sm text-gray-600 dark:text-gray-400">{t("Page")} {currentPage} {t("of")} {totalPages}</span>
                 <Button
                   onClick={() => setCurrentPage((p) => p + 1)}
                   disabled={currentPage === totalPages}
@@ -434,7 +437,7 @@ export default function DisbursementsPage() {
                   size="sm"
                   className="flex items-center gap-2"
                 >
-                  Next
+                  {t("Next")}
                   <ChevronRight className="h-4 w-4" />
                 </Button>
               </div>
@@ -446,8 +449,8 @@ export default function DisbursementsPage() {
       <Modal
         open={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        title="Add Disbursement"
-        description="Record cash paid out of the business"
+        title={t("Add Disbursement")}
+        description={t("Record cash paid out of the business")}
         maxWidth="max-w-md"
       >
         <AddDisbursementForm onSuccess={handleCreated} />
@@ -455,8 +458,10 @@ export default function DisbursementsPage() {
       <ConfirmDialog
         open={!!deleteTarget}
         onClose={() => setDeleteTarget(null)}
-        title="Delete disbursement?"
-        description={`Delete disbursement "${deleteTarget?.description}"?`}
+        title={t("Delete disbursement?")}
+        description={t("Delete disbursement \"{0}\"?", {
+          0: deleteTarget?.description
+        })}
         onConfirm={confirmDelete}
         loading={deleteMutation.isPending}
       />
@@ -465,6 +470,7 @@ export default function DisbursementsPage() {
 }
 
 function AddDisbursementForm({ onSuccess }) {
+  const t = useT();
   const [description, setDescription] = useState("");
   const [amount, setAmount] = useState("");
   const [category, setCategory] = useState("Other");
@@ -508,70 +514,73 @@ function AddDisbursementForm({ onSuccess }) {
 
   return (
     <>
-    <form onSubmit={handleSubmit} className="space-y-4">
-      <div className="space-y-2">
-        <Label htmlFor="description">Description *</Label>
-        <Input
-          id="description"
-          placeholder="e.g. Staff salaries for September"
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-          required
-        />
-      </div>
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <div className="space-y-2">
+          <Label htmlFor="description">{t("Description *")}</Label>
+          <Input
+            id="description"
+            placeholder={t("e.g. Staff salaries for September")}
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            required
+          />
+        </div>
 
-      <div className="space-y-2">
-        <Label htmlFor="category">Category</Label>
-        <select
-          id="category"
-          value={category}
-          onChange={(e) => setCategory(e.target.value)}
-          className="w-full p-2 border rounded-md focus:border-red-500"
+        <div className="space-y-2">
+          <Label htmlFor="category">{t("Category")}</Label>
+          <select
+            id="category"
+            value={category}
+            onChange={(e) => setCategory(e.target.value)}
+            className="w-full p-2 border rounded-md focus:border-red-500"
+          >
+            {CATEGORY_OPTIONS.map((c) => (
+              <option key={c} value={c}>{c}</option>
+            ))}
+          </select>
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="amount">{t("Amount ($) *")}</Label>
+          <Input
+            id="amount"
+            type="text"
+            inputMode="decimal"
+            placeholder="0.00"
+            value={amount}
+            onChange={(e) => setAmount(e.target.value.replace(/[^0-9.]/g, ""))}
+            required
+          />
+        </div>
+
+        <Button
+          type="submit"
+          disabled={mutation.isPending}
+          className="w-full bg-red-600 hover:bg-red-700"
         >
-          {CATEGORY_OPTIONS.map((c) => (
-            <option key={c} value={c}>{c}</option>
-          ))}
-        </select>
-      </div>
-
-      <div className="space-y-2">
-        <Label htmlFor="amount">Amount ($) *</Label>
-        <Input
-          id="amount"
-          type="text"
-          inputMode="decimal"
-          placeholder="0.00"
-          value={amount}
-          onChange={(e) => setAmount(e.target.value.replace(/[^0-9.]/g, ""))}
-          required
-        />
-      </div>
-
-      <Button
-        type="submit"
-        disabled={mutation.isPending}
-        className="w-full bg-red-600 hover:bg-red-700"
-      >
-        {mutation.isPending ? (
-          <span className="flex items-center gap-2 justify-center">
-            <Loader2 className="h-4 w-4 animate-spin" />
-            Recording...
-          </span>
-        ) : (
-          "Record Disbursement"
-        )}
-      </Button>
-    </form>
-    <ConfirmDialog
-      open={confirmOpen}
-      onClose={() => setConfirmOpen(false)}
-      title="Record disbursement?"
-      description={`Record a disbursement of $${parseFloat(amount || 0).toFixed(2)} for "${description}"?`}
-      confirmLabel="Record Disbursement"
-      variant="default"
-      onConfirm={confirmSubmit}
-      loading={mutation.isPending}
-    />
+          {mutation.isPending ? (
+            <span className="flex items-center gap-2 justify-center">
+              <Loader2 className="h-4 w-4 animate-spin" />
+              {t("Recording...")}
+            </span>
+          ) : (
+            t("Record Disbursement")
+          )}
+        </Button>
+      </form>
+      <ConfirmDialog
+        open={confirmOpen}
+        onClose={() => setConfirmOpen(false)}
+        title={t("Record disbursement?")}
+        description={t("Record a disbursement of ${0} for \"{1}\"?", {
+          0: parseFloat(amount || 0).toFixed(2),
+          1: description
+        })}
+        confirmLabel={t("Record Disbursement")}
+        variant="default"
+        onConfirm={confirmSubmit}
+        loading={mutation.isPending}
+      />
     </>
   );
 }

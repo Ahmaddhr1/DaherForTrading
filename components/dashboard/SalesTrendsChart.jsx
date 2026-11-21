@@ -1,5 +1,7 @@
 // components/dashboard/SalesTrendsChart.jsx
 "use client";
+import { t } from "@/lib/i18n";
+import { useT } from "@/lib/i18n/LangProvider";
 
 import React, { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
@@ -33,6 +35,7 @@ const currencyFormatter = (value) => `$${value.toLocaleString()}`;
 const countFormatter = (value) => value.toLocaleString();
 
 export default function SalesTrendsChart() {
+  const t = useT();
   const [granularity, setGranularity] = useState("month");
   const [limit, setLimit] = useState(12);
 
@@ -61,7 +64,7 @@ export default function SalesTrendsChart() {
         <CardHeader className="flex flex-row items-center justify-between flex-wrap gap-3">
           <CardTitle className="flex items-center gap-2 text-lg font-medium">
             <BarChart3 className="h-5 w-5 text-blue-600" />
-            Sales vs Purchases
+            {t("Sales vs Purchases")}
           </CardTitle>
           <div className="flex items-center gap-2">
             <select
@@ -70,7 +73,7 @@ export default function SalesTrendsChart() {
               className="border rounded-md text-sm px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               {GRANULARITY_OPTIONS.map((opt) => (
-                <option key={opt.value} value={opt.value}>{opt.label}</option>
+                <option key={opt.value} value={opt.value}>{t(opt.label)}</option>
               ))}
             </select>
             <select
@@ -79,7 +82,7 @@ export default function SalesTrendsChart() {
               className="border rounded-md text-sm px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               {LIMIT_OPTIONS.map((n) => (
-                <option key={n} value={n}>Last {n}</option>
+                <option key={n} value={n}>{t("Last")} {n}</option>
               ))}
             </select>
           </div>
@@ -88,9 +91,9 @@ export default function SalesTrendsChart() {
           {isLoading ? (
             <Skeleton className="h-72 rounded-lg" />
           ) : error ? (
-            <div className="text-red-500 text-center py-10">Failed to load trends</div>
+            <div className="text-red-500 text-center py-10">{t("Failed to load trends")}</div>
           ) : trends.length === 0 ? (
-            <div className="text-gray-500 dark:text-gray-400 text-center py-10">No data yet for this range</div>
+            <div className="text-gray-500 dark:text-gray-400 text-center py-10">{t("No data yet for this range")}</div>
           ) : (
             <BarChart
               data={trends}
@@ -109,16 +112,16 @@ export default function SalesTrendsChart() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-lg font-medium">
             <ShoppingCart className="h-5 w-5 text-blue-600" />
-            Orders Volume
+            {t("Orders Volume")}
           </CardTitle>
         </CardHeader>
         <CardContent>
           {isLoading ? (
             <Skeleton className="h-72 rounded-lg" />
           ) : error ? (
-            <div className="text-red-500 text-center py-10">Failed to load trends</div>
+            <div className="text-red-500 text-center py-10">{t("Failed to load trends")}</div>
           ) : trends.length === 0 ? (
-            <div className="text-gray-500 dark:text-gray-400 text-center py-10">No data yet for this range</div>
+            <div className="text-gray-500 dark:text-gray-400 text-center py-10">{t("No data yet for this range")}</div>
           ) : (
             <BarChart
               data={trends}

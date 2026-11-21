@@ -1,4 +1,6 @@
 "use client";
+import { t } from "@/lib/i18n";
+import { useT } from "@/lib/i18n/LangProvider";
 
 import React from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -6,6 +8,7 @@ import { FileText } from "lucide-react";
 import DraftOrders from "../orders/components/DraftOrders";
 
 const DraftsPage = () => {
+  const t = useT();
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-950 py-6">
       <div className="container mx-auto px-4">
@@ -15,9 +18,11 @@ const DraftsPage = () => {
               <FileText className="h-6 w-6 text-blue-600" />
             </div>
             <div>
-              <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">Draft Orders</h1>
+              <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">{t("Draft Orders")}</h1>
               <p className="text-gray-600 dark:text-gray-400">
-                Orders started from the product cart, awaiting a customer and/or finalization
+                {t(
+                  "Orders started from the product cart, awaiting a customer and/or finalization"
+                )}
               </p>
             </div>
           </div>
@@ -25,9 +30,9 @@ const DraftsPage = () => {
 
         <Card className="shadow-sm border-gray-200 dark:border-gray-800">
           <CardHeader>
-            <CardTitle className="text-xl">Drafts</CardTitle>
+            <CardTitle className="text-xl">{t("Drafts")}</CardTitle>
             <CardDescription>
-              Link a customer, continue editing, finalize into a real order, or delete
+              {t("Link a customer, continue editing, finalize into a real order, or delete")}
             </CardDescription>
           </CardHeader>
           <CardContent>

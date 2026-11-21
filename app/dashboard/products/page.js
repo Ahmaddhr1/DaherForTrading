@@ -1,12 +1,14 @@
 // app/dashboard/products/page.jsx
 "use client";
+import { t } from "@/lib/i18n";
+import { useT } from "@/lib/i18n/LangProvider";
 
 import React, { useState, useEffect, useRef } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
-import { toast } from "sonner";
+import { toast } from "@/lib/i18n/toast";
 import Link from "next/link";
-import { format } from "date-fns";
+import { format } from "@/lib/i18n/date";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
@@ -32,6 +34,7 @@ import { useIsOwner } from "@/lib/useIsOwner";
 import { useHasPermission } from "@/lib/useHasPermission";
 
 export default function ProductsPage() {
+  const t = useT();
   // State for search and pagination
   const [searchInput, setSearchInput] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
@@ -63,7 +66,9 @@ export default function ProductsPage() {
 
   const handleAddToCart = (product) => {
     addToCart(product);
-    toast.success(`Added "${product.name}" to cart`);
+    toast.success(t("Added \"{0}\" to cart", {
+      0: product.name
+    }));
   };
 
   const { data: categories = [] } = useQuery({
@@ -177,10 +182,17 @@ export default function ProductsPage() {
       const { deleted, skipped } = response.data;
       if (skipped?.length > 0) {
         toast.warning(
-          `Deleted ${deleted} product${deleted === 1 ? "" : "s"}, skipped ${skipped.length} already ordered by a customer`
+          t("Deleted {0} product{1}, skipped {2} already ordered by a customer", {
+            0: deleted,
+            1: deleted === 1 ? "" : "s",
+            2: skipped.length
+          })
         );
       } else {
-        toast.success(`Deleted ${deleted} product${deleted === 1 ? "" : "s"}`);
+        toast.success(t("Deleted {0} product{1}", {
+          0: deleted,
+          1: deleted === 1 ? "" : "s"
+        }));
       }
       queryClient.invalidateQueries(["products"]);
       setSelectedIds([]);
@@ -217,8 +229,8 @@ export default function ProductsPage() {
                 <Package className="h-6 w-6 text-blue-600" />
               </div>
               <div className="min-w-0">
-                <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-gray-100 truncate">Products</h1>
-                <p className="text-gray-600 dark:text-gray-400 text-sm sm:text-base truncate">Manage your product inventory</p>
+                <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-gray-100 truncate">{t("Products")}</h1>
+                <p className="text-gray-600 dark:text-gray-400 text-sm sm:text-base truncate">{t("Manage your product inventory")}</p>
               </div>
             </div>
 
@@ -229,13 +241,13 @@ export default function ProductsPage() {
                 className="flex items-center gap-2"
               >
                 <FileDown className="h-4 w-4" />
-                <span className="hidden sm:inline">Generate PDF</span>
+                <span className="hidden sm:inline">{t("Generate PDF")}</span>
               </Button>
               {canCreateProducts && (
                 <Link href="/dashboard/products/add">
                   <Button className="flex items-center gap-2">
                     <Plus className="h-4 w-4" />
-                    <span className="hidden sm:inline">Add Product</span>
+                    <span className="hidden sm:inline">{t("Add Product")}</span>
                   </Button>
                 </Link>
               )}
@@ -250,7 +262,7 @@ export default function ProductsPage() {
             <CardContent className="p-4 flex flex-col gap-1">
               <span className="flex items-center gap-1.5 text-xs font-medium text-gray-500 dark:text-gray-400">
                 <Wallet className="h-3.5 w-3.5" />
-                Stock Value (Cost)
+                {t("Stock Value (Cost)")}
               </span>
               <span className="text-lg font-bold text-gray-900 dark:text-gray-100">
                 ${summary.stockValueCost.toLocaleString()}
@@ -261,7 +273,7 @@ export default function ProductsPage() {
             <CardContent className="p-4 flex flex-col gap-1">
               <span className="flex items-center gap-1.5 text-xs font-medium text-gray-500 dark:text-gray-400">
                 <DollarSign className="h-3.5 w-3.5" />
-                Stock Value (Selling)
+                {t("Stock Value (Selling)")}
               </span>
               <span className="text-lg font-bold text-gray-900 dark:text-gray-100">
                 ${summary.stockValueSelling.toLocaleString()}
@@ -272,7 +284,7 @@ export default function ProductsPage() {
             <CardContent className="p-4 flex flex-col gap-1">
               <span className="flex items-center gap-1.5 text-xs font-medium text-gray-500 dark:text-gray-400">
                 <TrendingUp className="h-3.5 w-3.5" />
-                Potential Profit
+                {t("Potential Profit")}
               </span>
               <span className={`text-lg font-bold ${summary.potentialProfit >= 0 ? "text-green-600" : "text-red-600"}`}>
                 ${summary.potentialProfit.toLocaleString()}
@@ -283,7 +295,7 @@ export default function ProductsPage() {
             <CardContent className="p-4 flex flex-col gap-1">
               <span className="flex items-center gap-1.5 text-xs font-medium text-gray-500 dark:text-gray-400">
                 <Box className="h-3.5 w-3.5" />
-                Units in Stock
+                {t("Units in Stock")}
               </span>
               <span className="text-lg font-bold text-gray-900 dark:text-gray-100">
                 {summary.totalUnits.toLocaleString()}
@@ -294,13 +306,13 @@ export default function ProductsPage() {
             <CardContent className="p-4 flex flex-col gap-1">
               <span className="flex items-center gap-1.5 text-xs font-medium text-gray-500 dark:text-gray-400">
                 <AlertTriangle className="h-3.5 w-3.5" />
-                Low Stock
+                {t("Low Stock")}
               </span>
               <span className={`text-lg font-bold ${summary.lowStockCount > 0 ? "text-yellow-600" : "text-gray-900 dark:text-gray-100"}`}>
                 {summary.lowStockCount.toLocaleString()}
               </span>
               {summary.outOfStockCount > 0 && (
-                <span className="text-xs text-red-600">{summary.outOfStockCount} out of stock</span>
+                <span className="text-xs text-red-600">{summary.outOfStockCount} {t("out of stock")}</span>
               )}
             </CardContent>
           </Card>
@@ -324,7 +336,7 @@ export default function ProductsPage() {
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 h-4 w-4" />
             <Input
               type="text"
-              placeholder="Search products by name..."
+              placeholder={t("Search products by name...")}
               value={searchInput}
               onChange={(e) => setSearchInput(e.target.value)}
               className="pl-10"
@@ -338,7 +350,7 @@ export default function ProductsPage() {
               className="flex-1 sm:flex-none flex items-center justify-center gap-1.5"
             >
               <LayoutList className="h-4 w-4" />
-              <span className="hidden sm:inline">List</span>
+              <span className="hidden sm:inline">{t("List")}</span>
             </Button>
             <Button
               variant={viewMode === "grid" ? "default" : "ghost"}
@@ -347,7 +359,7 @@ export default function ProductsPage() {
               className="flex-1 sm:flex-none flex items-center justify-center gap-1.5"
             >
               <LayoutGrid className="h-4 w-4" />
-              <span className="hidden sm:inline">Grid</span>
+              <span className="hidden sm:inline">{t("Grid")}</span>
             </Button>
           </div>
         </div>
@@ -355,7 +367,7 @@ export default function ProductsPage() {
         {/* Results Count */}
         <div className="mb-4">
           <p className="text-gray-600 dark:text-gray-400">
-            Showing {products.length} of {totalCount} products
+            {t("Showing")} {products.length} {t("of")} {totalCount} {t("products")}
           </p>
         </div>
 
@@ -364,30 +376,30 @@ export default function ProductsPage() {
           <Card className="mb-4 shadow-sm border-blue-200 dark:border-blue-900/50 bg-blue-50 dark:bg-blue-900/20">
             <CardContent className="p-3 flex flex-wrap items-center gap-2">
               <span className="text-sm font-medium text-blue-900 dark:text-blue-300">
-                {selectedIds.length} selected
+                {selectedIds.length} {t("selected")}
               </span>
               <div className="flex flex-wrap gap-2 ml-auto">
                 {canEditProducts && (
                   <Button size="sm" variant="outline" onClick={() => setBulkPriceModalOpen(true)}>
                     <DollarSign className="h-3.5 w-3.5 mr-1" />
-                    Update Price
+                    {t("Update Price")}
                   </Button>
                 )}
                 {canEditProducts && (
                   <Button size="sm" variant="outline" onClick={() => setBulkCategoryModalOpen(true)}>
                     <Tag className="h-3.5 w-3.5 mr-1" />
-                    Reassign Category
+                    {t("Reassign Category")}
                   </Button>
                 )}
                 {canDelete && (
                   <Button size="sm" variant="destructive" onClick={() => setBulkDeleteConfirmOpen(true)}>
                     <Trash2 className="h-3.5 w-3.5 mr-1" />
-                    Delete
+                    {t("Delete")}
                   </Button>
                 )}
                 <Button size="sm" variant="ghost" onClick={() => setSelectedIds([])}>
                   <X className="h-3.5 w-3.5 mr-1" />
-                  Clear
+                  {t("Clear")}
                 </Button>
               </div>
             </CardContent>
@@ -407,20 +419,20 @@ export default function ProductsPage() {
             style={sidebarMaxHeight ? { maxHeight: `${sidebarMaxHeight}px` } : undefined}
           >
             <div className="flex items-center justify-between px-3 py-2 border-b shrink-0">
-              <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Categories</span>
+              <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{t("Categories")}</span>
               {categoryFilters.length > 0 && (
                 <button
                   type="button"
                   onClick={() => setCategoryFilters([])}
                   className="text-xs text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"
                 >
-                  Clear
+                  {t("Clear")}
                 </button>
               )}
             </div>
             <div className="flex-1 min-h-0 overflow-y-auto p-2 space-y-0.5">
               {categories.length === 0 ? (
-                <p className="text-sm text-gray-400 dark:text-gray-500 px-2 py-1">No categories yet</p>
+                <p className="text-sm text-gray-400 dark:text-gray-500 px-2 py-1">{t("No categories yet")}</p>
               ) : (
                 categories.map((cat) => (
                   <label
@@ -449,13 +461,13 @@ export default function ProductsPage() {
             {error && !isLoading && (
               <Card>
                 <CardContent className="pt-6 text-center">
-                  <div className="text-red-500 text-lg mb-2">Error</div>
-                  <p className="text-gray-600 dark:text-gray-400">Failed to load products. Please try again.</p>
+                  <div className="text-red-500 text-lg mb-2">{t("Error")}</div>
+                  <p className="text-gray-600 dark:text-gray-400">{t("Failed to load products. Please try again.")}</p>
                   <Button
                     onClick={() => queryClient.refetchQueries(["products"])}
                     className="mt-4"
                   >
-                    Try Again
+                    {t("Try Again")}
                   </Button>
                 </CardContent>
               </Card>
@@ -471,7 +483,7 @@ export default function ProductsPage() {
               <Card>
             <Table>
               <TableCaption>
-                {products.length === 0 ? "No products found" : "List of your products"}
+                {products.length === 0 ? t("No products found") : t("List of your products")}
               </TableCaption>
               
               <TableHeader>
@@ -482,17 +494,17 @@ export default function ProductsPage() {
                       className="h-4 w-4 rounded border-gray-300 dark:border-gray-700 accent-primary"
                       checked={products.length > 0 && products.every((p) => selectedIds.includes(p._id))}
                       onChange={() => toggleSelectAllOnPage(products)}
-                      aria-label="Select all products on this page"
+                      aria-label={t("Select all products on this page")}
                     />
                   </TableHead>
                   <TableHead className="w-12">#</TableHead>
-                  <TableHead>Product Info</TableHead>
-                  <TableHead className="text-center">Stock</TableHead>
-                  <TableHead className="text-center">Price</TableHead>
-                  <TableHead className="text-center">Cost</TableHead>
-                  <TableHead className="text-center">Profit</TableHead>
-                  <TableHead>Last Updated</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
+                  <TableHead>{t("Product Info")}</TableHead>
+                  <TableHead className="text-center">{t("Stock")}</TableHead>
+                  <TableHead className="text-center">{t("Price")}</TableHead>
+                  <TableHead className="text-center">{t("Cost")}</TableHead>
+                  <TableHead className="text-center">{t("Profit")}</TableHead>
+                  <TableHead>{t("Last Updated")}</TableHead>
+                  <TableHead className="text-right">{t("Actions")}</TableHead>
                 </TableRow>
               </TableHeader>
               
@@ -501,8 +513,8 @@ export default function ProductsPage() {
                   <TableRow>
                     <TableCell colSpan={9} className="text-center py-8 text-gray-500 dark:text-gray-400">
                       <Package className="h-12 w-12 text-gray-300 dark:text-gray-600 mx-auto mb-2" />
-                      <p>No products found</p>
-                      {searchTerm && <p className="text-sm">Try adjusting your search</p>}
+                      <p>{t("No products found")}</p>
+                      {searchTerm && <p className="text-sm">{t("Try adjusting your search")}</p>}
                     </TableCell>
                   </TableRow>
                 ) : (
@@ -520,14 +532,16 @@ export default function ProductsPage() {
                             className="h-4 w-4 rounded border-gray-300 dark:border-gray-700 accent-primary"
                             checked={selectedIds.includes(product._id)}
                             onChange={() => toggleSelectOne(product._id)}
-                            aria-label={`Select ${product.name}`}
+                            aria-label={t("Select {0}", {
+                              0: product.name
+                            })}
                           />
                         </TableCell>
                         {/* Number */}
                         <TableCell className="font-medium text-gray-500 dark:text-gray-400">
                           #{productNumber}
                         </TableCell>
-                        
+
                         {/* Product Info */}
                         <TableCell>
                           <div className="flex items-center gap-3">
@@ -545,12 +559,12 @@ export default function ProductsPage() {
                             <div>
                               <div className="font-medium text-gray-900 dark:text-gray-100">{product.name}</div>
                               <div className="text-sm text-gray-500 dark:text-gray-400">
-                                {product.category?.name || "No category"}
+                                {product.category?.name || t("No category")}
                               </div>
                             </div>
                           </div>
                         </TableCell>
-                        
+
                         {/* Stock */}
                         <TableCell className="text-center">
                           <div className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
@@ -561,10 +575,10 @@ export default function ProductsPage() {
                                 : "bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-400"
                           }`}>
                             <Box className="h-3 w-3 mr-1" />
-                            {product?.quantity} {product.unit || "pcs"} in stock
+                            {product?.quantity} {product.unit || t("pcs")} {t("in stock")}
                           </div>
                         </TableCell>
-                        
+
                         {/* Price */}
                         <TableCell className="text-center font-medium text-green-600">
                           <div className="flex items-center justify-center gap-1">
@@ -572,12 +586,12 @@ export default function ProductsPage() {
                             {product.price.toFixed(2)}
                           </div>
                         </TableCell>
-                        
+
                         {/* Cost */}
                         <TableCell className="text-center text-gray-600 dark:text-gray-400">
                           ${product.initialPrice.toFixed(2)}
                         </TableCell>
-                        
+
                         {/* Profit */}
                         <TableCell className="text-center">
                           <div className={`font-medium ${
@@ -589,19 +603,19 @@ export default function ProductsPage() {
                             </div>
                           </div>
                         </TableCell>
-                        
+
                         {/* Last Updated */}
                         <TableCell className="text-gray-500 dark:text-gray-400 text-sm">
                           {format(new Date(product.updatedAt), "MMM d, yyyy")}
                         </TableCell>
-                        
+
                         {/* Actions */}
                         <TableCell className="text-right">
                           <div className="flex justify-end gap-2">
                             <Link href={`/dashboard/products/${product._id}`}>
                               <Button variant="outline" size="sm" className="flex items-center gap-1">
                                 <Edit className="h-3 w-3" />
-                                Edit
+                                {t("Edit")}
                               </Button>
                             </Link>
                             
@@ -618,7 +632,7 @@ export default function ProductsPage() {
                                 ) : (
                                   <Trash2 className="h-3 w-3" />
                                 )}
-                                Delete
+                                {t("Delete")}
                               </Button>
                             )}
                           </div>
@@ -644,11 +658,11 @@ export default function ProductsPage() {
               className="flex items-center gap-2"
             >
               <ChevronLeft className="h-4 w-4" />
-              Previous
+              {t("Previous")}
             </Button>
 
             <span className="text-gray-600 dark:text-gray-400">
-              Page {currentPage} of {totalPages}
+              {t("Page")} {currentPage} {t("of")} {totalPages}
             </span>
 
             <Button
@@ -657,7 +671,7 @@ export default function ProductsPage() {
               variant="outline"
               className="flex items-center gap-2"
             >
-              Next
+              {t("Next")}
               <ChevronRight className="h-4 w-4" />
             </Button>
           </div>
@@ -668,8 +682,10 @@ export default function ProductsPage() {
       <ConfirmDialog
         open={!!deleteTarget}
         onClose={() => setDeleteTarget(null)}
-        title="Delete product?"
-        description={`Are you sure you want to delete "${deleteTarget?.name}"?`}
+        title={t("Delete product?")}
+        description={t("Are you sure you want to delete \"{0}\"?", {
+          0: deleteTarget?.name
+        })}
         onConfirm={confirmDelete}
         loading={deletingId === deleteTarget?._id}
       />
@@ -702,8 +718,11 @@ export default function ProductsPage() {
       <ConfirmDialog
         open={bulkDeleteConfirmOpen}
         onClose={() => setBulkDeleteConfirmOpen(false)}
-        title={`Delete ${selectedIds.length} product${selectedIds.length === 1 ? "" : "s"}?`}
-        description="Products already ordered by a customer will be skipped automatically."
+        title={t("Delete {0} product{1}?", {
+          0: selectedIds.length,
+          1: selectedIds.length === 1 ? "" : "s"
+        })}
+        description={t("Products already ordered by a customer will be skipped automatically.")}
         onConfirm={confirmBulkDelete}
         loading={bulkDeleting}
       />

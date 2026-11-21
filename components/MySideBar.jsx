@@ -1,4 +1,6 @@
 "use client";
+import { t } from "@/lib/i18n";
+import { useT } from "@/lib/i18n/LangProvider";
 
 import { useEffect, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
@@ -7,7 +9,7 @@ import { LogOut, ListCollapse, Search, ChevronDown } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import tabs from "@/lib/SideBarTabs";
-import { toast } from "sonner";
+import { toast } from "@/lib/i18n/toast";
 import { GlobalSearchModal } from "@/components/GlobalSearchModal";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { hasPermission } from "@/lib/permissions";
@@ -15,6 +17,7 @@ import { hasPermission } from "@/lib/permissions";
 // Desktop-only navigation (lg and up). On mobile, navigation is handled by
 // MobileBottomBar instead - see components/MobileBottomBar.jsx.
 export function MySideBar() {
+  const t = useT();
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [expandedTabs, setExpandedTabs] = useState({});
@@ -90,14 +93,18 @@ export function MySideBar() {
           className={`flex items-center flex-1 p-4 ${isCollapsed ? "justify-center" : ""}`}
         >
           <span>{tab.icon}</span>
-          {!isCollapsed && <span className="ml-3">{tab.label}</span>}
+          {!isCollapsed && <span className="ml-3">{t(tab.label)}</span>}
         </Link>
         {hasChildren && !isCollapsed && (
           <button
             type="button"
             onClick={() => toggleExpanded(tab)}
             className="p-4 pl-0"
-            aria-label={expanded ? `Collapse ${tab.label}` : `Expand ${tab.label}`}
+            aria-label={expanded ? t("Collapse {0}", {
+              0: tab.label
+            }) : t("Expand {0}", {
+              0: tab.label
+            })}
             aria-expanded={expanded}
           >
             <ChevronDown className={`h-4 w-4 transition-transform ${expanded ? "rotate-180" : ""}`} />
@@ -116,7 +123,7 @@ export function MySideBar() {
       <Link
         key={child.path}
         href={child.path}
-        title={isCollapsed ? child.label : undefined}
+        title={isCollapsed ? t(child.label) : undefined}
         className={`flex items-center p-4 border-l-4 transition-colors ${
           isCollapsed ? "justify-center" : "pl-7"
         } ${
@@ -126,7 +133,7 @@ export function MySideBar() {
         }`}
       >
         <span>{child.icon}</span>
-        {!isCollapsed && <span className="ml-3">{child.label}</span>}
+        {!isCollapsed && <span className="ml-3">{t(child.label)}</span>}
       </Link>
     );
   };
@@ -148,14 +155,14 @@ export function MySideBar() {
                 <rect x="96" y="30" width="26" height="102" rx="7" fill="#E8A33D" />
               </svg>
               <h1 className="text-xl font-bold whitespace-nowrap" style={{ fontFamily: "var(--font-space-grotesk, sans-serif)" }}>
-                Invento
+                {t("Invento")}
               </h1>
             </div>
           )}
           <button
             onClick={toggleCollapse}
             className="p-2 rounded-lg hover:bg-primary hover:text-white duration-150"
-            aria-label={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+            aria-label={isCollapsed ? t("Expand sidebar") : t("Collapse sidebar")}
           >
             <ListCollapse className={isCollapsed ? "" : "rotate-180"} />
           </button>
@@ -168,13 +175,13 @@ export function MySideBar() {
             className={`w-full flex items-center gap-2 rounded-lg border border-sidebar-border px-3 py-2 text-sm text-sidebar-foreground/60 hover:bg-primary hover:text-white transition-colors duration-150 ${
               isCollapsed ? "justify-center" : ""
             }`}
-            aria-label="Search"
+            aria-label={t("Search")}
           >
             <Search className="h-4 w-4 shrink-0" />
             {!isCollapsed && (
               <>
-                <span className="flex-1 text-left">Search</span>
-                <kbd className="text-xs opacity-60">⌘K</kbd>
+                <span className="flex-1 text-left">{t("Search")}</span>
+                <kbd className="text-xs opacity-60">{t("⌘K")}</kbd>
               </>
             )}
           </button>
@@ -201,7 +208,7 @@ export function MySideBar() {
             }`}
           >
             <LogOut />
-            {!isCollapsed && <span className="ml-3">Logout</span>}
+            {!isCollapsed && <span className="ml-3">{t("Logout")}</span>}
           </button>
         </div>
       </div>
@@ -209,9 +216,9 @@ export function MySideBar() {
       <ConfirmDialog
         open={logoutConfirmOpen}
         onClose={() => setLogoutConfirmOpen(false)}
-        title="Log out?"
-        description="You'll need to sign in again to access your dashboard."
-        confirmLabel="Logout"
+        title={t("Log out?")}
+        description={t("You'll need to sign in again to access your dashboard.")}
+        confirmLabel={t("Logout")}
         onConfirm={() => {
           setLogoutConfirmOpen(false);
           handleLogout();

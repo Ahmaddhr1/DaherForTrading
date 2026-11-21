@@ -1,4 +1,6 @@
 "use client";
+import { t } from "@/lib/i18n";
+import { useT } from "@/lib/i18n/LangProvider";
 
 import { Card, CardContent } from "@/components/ui/card";
 import { Calendar, Package } from "lucide-react";
@@ -34,10 +36,11 @@ export const ORDER_STATUS_STYLES = {
 };
 
 export function OrderStatusBadge({ status }) {
+  const t = useT();
   const style = ORDER_STATUS_STYLES[status] || ORDER_STATUS_STYLES.draft;
   return (
     <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold ${style.badge}`}>
-      {style.label}
+      {t(style.label)}
     </span>
   );
 }
@@ -48,6 +51,7 @@ const money = (n) =>
 // `actions`: custom footer/menu content. When omitted, the standard
 // OrderActions buttons are shown.
 const OrderCard = ({ order, onStatusUpdate, actions }) => {
+  const t = useT();
   const style = ORDER_STATUS_STYLES[order.status] || ORDER_STATUS_STYLES.draft;
   const itemsCount = order.products?.length || 0;
   const paid = order.amountpaid || 0;
@@ -78,7 +82,7 @@ const OrderCard = ({ order, onStatusUpdate, actions }) => {
               </span>
               <span className="inline-flex items-center gap-1">
                 <Package className="h-3 w-3" />
-                {itemsCount} {itemsCount === 1 ? "item" : "items"}
+                {itemsCount} {itemsCount === 1 ? t("item") : t("items")}
               </span>
             </div>
           </div>
@@ -92,8 +96,8 @@ const OrderCard = ({ order, onStatusUpdate, actions }) => {
               <div className="h-full rounded-full bg-orange-500" style={{ width: `${paidPct}%` }} />
             </div>
             <div className="mt-1 flex justify-between text-xs">
-              <span className="text-gray-600 dark:text-gray-400">Paid {money(paid)}</span>
-              <span className="font-medium text-orange-600">Remaining {money(order.remainingBalance)}</span>
+              <span className="text-gray-600 dark:text-gray-400">{t("Paid")} {money(paid)}</span>
+              <span className="font-medium text-orange-600">{t("Remaining")} {money(order.remainingBalance)}</span>
             </div>
           </div>
         )}

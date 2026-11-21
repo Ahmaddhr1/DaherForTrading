@@ -1,4 +1,6 @@
 "use client";
+import { t } from "@/lib/i18n";
+import { useT } from "@/lib/i18n/LangProvider";
 
 import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -12,6 +14,7 @@ import { localDayStartISO, localDayEndISO } from "@/lib/dateUtils";
 import { DateRangeFilter } from "@/app/dashboard/orders/components/DateRangeFilter";
 
 export default function EmployeePerformancePage() {
+  const t = useT();
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const queryClient = useQueryClient();
@@ -42,10 +45,10 @@ export default function EmployeePerformancePage() {
             </div>
             <div>
               <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-gray-100">
-                Employee Performance
+                {t("Employee Performance")}
               </h1>
               <p className="text-gray-600 dark:text-gray-400 text-sm sm:text-base">
-                Orders, payments, and other activity handled by each admin
+                {t("Orders, payments, and other activity handled by each admin")}
               </p>
             </div>
           </div>
@@ -70,7 +73,7 @@ export default function EmployeePerformancePage() {
                 className="flex items-center gap-1 text-gray-500 dark:text-gray-400 self-start sm:self-auto"
               >
                 <X className="h-3.5 w-3.5" />
-                Clear
+                {t("Clear")}
               </Button>
             )}
           </CardContent>
@@ -80,35 +83,35 @@ export default function EmployeePerformancePage() {
           <ListSkeleton rows={4} rowHeight="h-16" />
         ) : error ? (
           <div className="text-center py-12 text-red-600">
-            Failed to load performance data.
+            {t("Failed to load performance data.")}
             <Button
               onClick={() => queryClient.refetchQueries(["activity-performance"])}
               variant="outline"
               className="mt-4 mx-auto block"
             >
-              Try Again
+              {t("Try Again")}
             </Button>
           </div>
         ) : performance.length === 0 ? (
           <div className="text-center py-16 text-gray-500 dark:text-gray-400">
             <Users className="h-12 w-12 mx-auto mb-3 text-gray-300 dark:text-gray-700" />
-            <p className="text-lg">No admin activity in this range</p>
+            <p className="text-lg">{t("No admin activity in this range")}</p>
           </div>
         ) : (
           <Card className="shadow-sm border-gray-200 dark:border-gray-800 overflow-hidden">
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Admin</TableHead>
-                  <TableHead className="text-center">Orders</TableHead>
-                  <TableHead className="text-center">Orders Value</TableHead>
-                  <TableHead className="text-center">Profit</TableHead>
-                  <TableHead className="text-center">Payments</TableHead>
-                  <TableHead className="text-center">Payments Value</TableHead>
-                  <TableHead className="text-center">Disbursements</TableHead>
-                  <TableHead className="text-center">Products Added</TableHead>
-                  <TableHead className="text-center">Purchases</TableHead>
-                  <TableHead className="text-center">Total Actions</TableHead>
+                  <TableHead>{t("Admin")}</TableHead>
+                  <TableHead className="text-center">{t("Orders")}</TableHead>
+                  <TableHead className="text-center">{t("Orders Value")}</TableHead>
+                  <TableHead className="text-center">{t("Profit")}</TableHead>
+                  <TableHead className="text-center">{t("Payments")}</TableHead>
+                  <TableHead className="text-center">{t("Payments Value")}</TableHead>
+                  <TableHead className="text-center">{t("Disbursements")}</TableHead>
+                  <TableHead className="text-center">{t("Products Added")}</TableHead>
+                  <TableHead className="text-center">{t("Purchases")}</TableHead>
+                  <TableHead className="text-center">{t("Total Actions")}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>

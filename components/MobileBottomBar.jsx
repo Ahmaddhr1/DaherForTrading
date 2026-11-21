@@ -1,10 +1,12 @@
 "use client";
+import { t } from "@/lib/i18n";
+import { useT } from "@/lib/i18n/LangProvider";
 
 import { useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
 import { Home, ClipboardList, ShoppingCart, Wallet, Boxes, MoreHorizontal, LogOut, X, Search, UserRound, CreditCard } from "lucide-react";
-import { toast } from "sonner";
+import { toast } from "@/lib/i18n/toast";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import tabs from "@/lib/SideBarTabs";
@@ -28,6 +30,7 @@ const findTab = (label) => {
 // Mobile-only bottom navigation bar - see MySideBar for the desktop (lg+)
 // sidebar it replaces below that breakpoint.
 export function MobileBottomBar() {
+  const t = useT();
   const pathname = usePathname();
   const router = useRouter();
   const [openSection, setOpenSection] = useState(null);
@@ -184,12 +187,12 @@ export function MobileBottomBar() {
                   type="button"
                   onClick={section.action}
                   className="relative flex flex-col items-center justify-center"
-                  aria-label={section.label}
+                  aria-label={t(section.label)}
                 >
                   <span className="absolute -top-6 flex h-14 w-14 items-center justify-center rounded-full bg-primary text-white shadow-lg shadow-primary/40 ring-4 ring-sidebar transition-transform active:scale-95">
                     {section.icon}
                   </span>
-                  <span className="mt-9 text-[11px] font-medium text-gray-500 dark:text-gray-400">{section.label}</span>
+                  <span className="mt-9 text-[11px] font-medium text-gray-500 dark:text-gray-400">{t(section.label)}</span>
                 </button>
               );
             }
@@ -198,7 +201,7 @@ export function MobileBottomBar() {
               return (
                 <button key={section.key} type="button" onClick={section.action} className={className}>
                   {iconWithBadge}
-                  {section.label}
+                  {t(section.label)}
                 </button>
               );
             }
@@ -207,7 +210,7 @@ export function MobileBottomBar() {
               return (
                 <Link key={section.key} href={section.path} className={className}>
                   {iconWithBadge}
-                  {section.label}
+                  {t(section.label)}
                 </Link>
               );
             }
@@ -220,7 +223,7 @@ export function MobileBottomBar() {
                 className={className}
               >
                 {iconWithBadge}
-                {section.label}
+                {t(section.label)}
               </button>
             );
           })}
@@ -233,11 +236,11 @@ export function MobileBottomBar() {
           <div className="absolute inset-0 bg-black/50" onClick={() => setOpenSection(null)} />
           <div className="absolute bottom-0 inset-x-0 bg-white dark:bg-gray-900 rounded-t-2xl shadow-xl pb-[env(safe-area-inset-bottom)]">
             <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-800">
-              <h2 className="font-semibold text-gray-900 dark:text-gray-100">{activeSheet.label}</h2>
+              <h2 className="font-semibold text-gray-900 dark:text-gray-100">{t(activeSheet.label)}</h2>
               <button
                 onClick={() => setOpenSection(null)}
                 className="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 rounded-md p-1"
-                aria-label="Close"
+                aria-label={t("Close")}
               >
                 <X className="h-5 w-5" />
               </button>
@@ -262,7 +265,7 @@ export function MobileBottomBar() {
                         </span>
                       )}
                     </span>
-                    {item.label}
+                    {t(item.label)}
                   </button>
                 ) : (
                   <Link
@@ -274,7 +277,7 @@ export function MobileBottomBar() {
                     }`}
                   >
                     {item.icon}
-                    {item.label}
+                    {t(item.label)}
                   </Link>
                 )
               )}
@@ -288,7 +291,7 @@ export function MobileBottomBar() {
                     className="w-full flex items-center gap-3 p-3 rounded-lg text-destructive hover:bg-destructive/10"
                   >
                     <LogOut size={20} />
-                    Logout
+                    {t("Logout")}
                   </button>
                 </>
               )}
@@ -300,9 +303,9 @@ export function MobileBottomBar() {
       <ConfirmDialog
         open={logoutConfirmOpen}
         onClose={() => setLogoutConfirmOpen(false)}
-        title="Log out?"
-        description="You'll need to sign in again to access your dashboard."
-        confirmLabel="Logout"
+        title={t("Log out?")}
+        description={t("You'll need to sign in again to access your dashboard.")}
+        confirmLabel={t("Logout")}
         onConfirm={() => {
           setLogoutConfirmOpen(false);
           handleLogout();

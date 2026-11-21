@@ -1,10 +1,12 @@
 "use client";
+import { t } from "@/lib/i18n";
+import { useT } from "@/lib/i18n/LangProvider";
 
 import { useParams, useRouter } from "next/navigation";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { useEffect, useState } from "react";
-import { toast } from "sonner";
+import { toast } from "@/lib/i18n/toast";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -17,6 +19,7 @@ import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { useHasPermission } from "@/lib/useHasPermission";
 
 export default function OrderDetailsPage() {
+  const t = useT();
   const { orderId } = useParams();
   const queryClient = useQueryClient();
   const [amountPaid, setAmountPaid] = useState("");
@@ -142,9 +145,7 @@ export default function OrderDetailsPage() {
     );
   }
   if (error)
-    return (
-      <p className="text-center text-red-500 mt-10">Error loading order</p>
-    );
+    return (<p className="text-center text-red-500 mt-10">{t("Error loading order")}</p>);
 
   const paymentAmount = parseFloat(amountPaid) || 0;
   const remainingAfterPayment = Math.max(0, remainingBalance - paymentAmount);
@@ -153,12 +154,12 @@ export default function OrderDetailsPage() {
   return (
     <div className="max-w-xl mx-auto p-6 space-y-6">
       <h1 className="text-2xl font-semibold text-center">
-        Payment for Order #{orderId?.slice(-6).toUpperCase()}
+        {t("Payment for Order #")}{orderId?.slice(-6).toUpperCase()}
       </h1>
 
       <Card>
         <CardHeader>
-          <CardTitle className="text-lg">Order Summary</CardTitle>
+          <CardTitle className="text-lg">{t("Order Summary")}</CardTitle>
           <CardDescription>
             <OrderCustomerName order={order} />
           </CardDescription>
@@ -166,19 +167,19 @@ export default function OrderDetailsPage() {
         <CardContent className="space-y-4">
           <div className="space-y-1">
             <p>
-              <span className="font-medium">Total:</span> $
+              <span className="font-medium">{t("Total:")}</span> $
               {order.total.toFixed(2)}
             </p>
             <p>
-              <span className="font-medium">Paid:</span> $
+              <span className="font-medium">{t("Paid:")}</span> $
               {order.amountpaid?.toFixed(2) || 0}
             </p>
             <p>
-              <span className="font-medium">Remaining:</span> $
+              <span className="font-medium">{t("Remaining:")}</span> $
               {remainingBalance.toFixed(2)}
             </p>
             <p>
-              <span className="font-medium">Status:</span>
+              <span className="font-medium">{t("Status:")}</span>
               <span
                 className={`ml-1 px-2 py-1 rounded-full text-sm ${
                   order.status === "paid"
@@ -199,7 +200,7 @@ export default function OrderDetailsPage() {
             <Link href={`/dashboard/orders/${orderId}/edit`}>
               <Button variant="outline" className="w-full flex items-center gap-2">
                 <PencilLine className="h-4 w-4" />
-                Update Order
+                {t("Update Order")}
               </Button>
             </Link>
           )}
@@ -207,12 +208,14 @@ export default function OrderDetailsPage() {
           {order.status === "draft" && (
             <div className="space-y-3">
               <p className="text-sm text-gray-600 dark:text-gray-400 text-center">
-                This is a draft - it hasn&apos;t been finalized yet, so stock and the customer&apos;s debt haven&apos;t been affected.
+                {t(
+                  "This is a draft - it hasn't been finalized yet, so stock and the customer's debt haven't been affected."
+                )}
               </p>
               <Link href={`/dashboard/orders/${orderId}/edit`}>
                 <Button variant="outline" className="w-full flex items-center gap-2">
                   <PencilLine className="h-4 w-4" />
-                  Continue Editing
+                  {t("Continue Editing")}
                 </Button>
               </Link>
               <Button
@@ -225,7 +228,7 @@ export default function OrderDetailsPage() {
                 ) : (
                   <CheckCircle className="h-4 w-4" />
                 )}
-                Finalize Order
+                {t("Finalize Order")}
               </Button>
               <Button
                 variant="outline"
@@ -238,7 +241,7 @@ export default function OrderDetailsPage() {
                 ) : (
                   <Trash2 className="h-4 w-4" />
                 )}
-                Delete Draft
+                {t("Delete Draft")}
               </Button>
             </div>
           )}
@@ -246,10 +249,10 @@ export default function OrderDetailsPage() {
           {order.status !== "paid" && order.status !== "draft" && (
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
-                <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Payment Amount ($)</label>
+                <label className="text-sm font-medium text-gray-700 dark:text-gray-300">{t("Payment Amount ($)")}</label>
                 <Input
                   type="number"
-                  placeholder="Enter amount to pay"
+                  placeholder={t("Enter amount to pay")}
                   value={amountPaid}
                   onChange={(e) => {
                     const value = e.target.value;
@@ -262,12 +265,14 @@ export default function OrderDetailsPage() {
                   step="0.001"
                 />
                 <p className="text-xs text-gray-500 dark:text-gray-400">
-                  Defaults to the full remaining balance. Enter a smaller amount for a partial payment.
+                  {t(
+                    "Defaults to the full remaining balance. Enter a smaller amount for a partial payment."
+                  )}
                 </p>
               </div>
 
               <div className="bg-gray-50 dark:bg-gray-950 rounded-lg p-4 flex items-center justify-between">
-                <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Remaining After Payment</span>
+                <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{t("Remaining After Payment")}</span>
                 <span className={`font-bold ${remainingAfterPayment > 0 ? "text-red-600" : "text-green-600"}`}>
                   ${remainingAfterPayment.toLocaleString()}
                 </span>
@@ -281,10 +286,10 @@ export default function OrderDetailsPage() {
                 {mutation.isPending ? (
                   <span className="flex items-center gap-2 justify-center">
                     <Loader2 className="h-4 w-4 animate-spin" />
-                    Recording Payment...
+                    {t("Recording Payment...")}
                   </span>
                 ) : (
-                  "Record Payment"
+                  t("Record Payment")
                 )}
               </Button>
             </form>
@@ -293,7 +298,7 @@ export default function OrderDetailsPage() {
           {order.status === "paid" && (
             <p className="text-green-600 font-medium text-center mt-4 flex items-center justify-center gap-2">
               <CheckCircle className="h-4 w-4" />
-              Order is fully paid.
+              {t("Order is fully paid.")}
             </p>
           )}
         </CardContent>
@@ -301,21 +306,28 @@ export default function OrderDetailsPage() {
       <ConfirmDialog
         open={deleteDraftOpen}
         onClose={() => setDeleteDraftOpen(false)}
-        title="Delete draft?"
-        description="Delete this draft? This cannot be undone."
+        title={t("Delete draft?")}
+        description={t("Delete this draft? This cannot be undone.")}
         onConfirm={confirmDeleteDraft}
         loading={deleteDraftMutation.isPending}
       />
       <ConfirmDialog
         open={!!confirmAction}
         onClose={() => setConfirmAction(null)}
-        title={confirmAction === "finalize" ? "Finalize draft?" : "Record payment?"}
+        title={confirmAction === "finalize" ? t("Finalize draft?") : t("Record payment?")}
         description={
           confirmAction === "finalize"
-            ? `Finalize this draft into a real order for $${order?.total.toFixed(2)}? This will deduct stock and add to the customer's debt.`
-            : `Record a payment of $${Number(amountPaid || 0).toFixed(2)} for this order?`
+            ? t(
+            "Finalize this draft into a real order for ${0}? This will deduct stock and add to the customer's debt.",
+            {
+              0: order?.total.toFixed(2)
+            }
+          )
+            : t("Record a payment of ${0} for this order?", {
+            0: Number(amountPaid || 0).toFixed(2)
+          })
         }
-        confirmLabel={confirmAction === "finalize" ? "Finalize Order" : "Record Payment"}
+        confirmLabel={confirmAction === "finalize" ? t("Finalize Order") : t("Record Payment")}
         variant="default"
         onConfirm={confirmProceed}
         loading={mutation.isPending || finalizeMutation.isPending}

@@ -1,9 +1,11 @@
 "use client";
+import { t } from "@/lib/i18n";
+import { useT } from "@/lib/i18n/LangProvider";
 
 import { useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
-import { toast } from "sonner";
+import { toast } from "@/lib/i18n/toast";
 import { Modal } from "@/components/ui/modal";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -15,6 +17,7 @@ function lineKey(item) {
 }
 
 export default function ProcessReturnModal({ open, onClose, order }) {
+  const t = useT();
   const [quantities, setQuantities] = useState({});
   const [reason, setReason] = useState("");
   const [restocked, setRestocked] = useState(true);
@@ -96,10 +99,10 @@ export default function ProcessReturnModal({ open, onClose, order }) {
   if (!order) return null;
 
   return (
-    <Modal open={open} onClose={onClose} title="Process Return" description="Record stock a customer sent back">
+    <Modal open={open} onClose={onClose} title={t("Process Return")} description={t("Record stock a customer sent back")}>
       {returnableLines.length === 0 ? (
         <p className="text-sm text-gray-500 dark:text-gray-400 py-4 text-center">
-          Every item on this order has already been fully returned.
+          {t("Every item on this order has already been fully returned.")}
         </p>
       ) : (
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -108,8 +111,7 @@ export default function ProcessReturnModal({ open, onClose, order }) {
               <div key={item.key} className="flex items-center justify-between gap-3">
                 <div className="min-w-0">
                   <p className="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">{item.name}</p>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">
-                    ${item.price.toFixed(2)} each · {item.remaining} returnable
+                  <p className="text-xs text-gray-500 dark:text-gray-400">${item.price.toFixed(2)} {t("each ·")} {item.remaining} {t("returnable")}
                   </p>
                 </div>
                 <Input
@@ -128,12 +130,12 @@ export default function ProcessReturnModal({ open, onClose, order }) {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="return-reason">Reason (optional)</Label>
+            <Label htmlFor="return-reason">{t("Reason (optional)")}</Label>
             <Input
               id="return-reason"
               value={reason}
               onChange={(e) => setReason(e.target.value)}
-              placeholder="e.g. Wrong item, customer changed their mind"
+              placeholder={t("e.g. Wrong item, customer changed their mind")}
             />
           </div>
 
@@ -144,20 +146,20 @@ export default function ProcessReturnModal({ open, onClose, order }) {
               onChange={(e) => setRestocked(e.target.checked)}
               className="h-4 w-4 rounded border-gray-300 accent-primary"
             />
-            Add returned items back to inventory
+            {t("Add returned items back to inventory")}
           </label>
 
           <div className="bg-gray-50 dark:bg-gray-950 rounded-lg p-4 flex items-center justify-between">
-            <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Refund (reduces debt)</span>
+            <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{t("Refund (reduces debt)")}</span>
             <span className="font-bold text-green-600">${totalRefund.toFixed(2)}</span>
           </div>
 
           <div className="flex justify-end gap-2 pt-2">
             <Button type="button" variant="outline" onClick={onClose} disabled={mutation.isPending}>
-              Cancel
+              {t("Cancel")}
             </Button>
             <Button type="submit" disabled={mutation.isPending || totalRefund <= 0}>
-              {mutation.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : "Process Return"}
+              {mutation.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : t("Process Return")}
             </Button>
           </div>
         </form>

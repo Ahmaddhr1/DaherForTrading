@@ -1,4 +1,6 @@
 "use client";
+import { t } from "@/lib/i18n";
+import { useT } from "@/lib/i18n/LangProvider";
 
 // A writable, filterable single-select: it looks and behaves like a text
 // input (you can type to narrow the list down), but the value is always one
@@ -35,6 +37,7 @@ export function Combobox({
   className = "",
   id,
 }) {
+  const t = useT();
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
   const [highlightedIndex, setHighlightedIndex] = useState(0);
@@ -135,7 +138,7 @@ export function Combobox({
                 inputRef.current?.focus();
               }}
               className="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-400"
-              aria-label="Clear selection"
+              aria-label={t("Clear selection")}
             >
               <X className="h-3.5 w-3.5" />
             </button>

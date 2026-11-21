@@ -1,9 +1,11 @@
 "use client";
+import { t } from "@/lib/i18n";
+import { useT } from "@/lib/i18n/LangProvider";
 
 import { useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useParams } from "next/navigation";
-import { format } from "date-fns";
+import { format } from "@/lib/i18n/date";
 import { Receipt, Calendar, Printer, MessageCircle, TrendingDown } from "lucide-react";
 import DisbursementThermalReceipt from "./DisbursementThermalReceipt";
 
@@ -22,6 +24,7 @@ const fetchDisbursement = async (id) => {
 };
 
 export default function DisbursementDetailsPage() {
+  const t = useT();
   const { id } = useParams();
 
   const { data: disbursement, isLoading, isError } = useQuery({
@@ -67,8 +70,8 @@ export default function DisbursementDetailsPage() {
       <div className="flex justify-center items-center min-h-96">
         <Card className="w-full max-w-md">
           <CardContent className="pt-6 text-center">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">Error Loading Disbursement</h3>
-            <p className="text-gray-600 dark:text-gray-400">Unable to load this disbursement. Please try again.</p>
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">{t("Error Loading Disbursement")}</h3>
+            <p className="text-gray-600 dark:text-gray-400">{t("Unable to load this disbursement. Please try again.")}</p>
           </CardContent>
         </Card>
       </div>
@@ -81,11 +84,11 @@ export default function DisbursementDetailsPage() {
         <div className="mb-8">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-2">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">Disbursement Receipt</h1>
-              <p className="text-gray-600 dark:text-gray-400 mt-1">Disbursement #{disbursement._id}</p>
+              <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">{t("Disbursement Receipt")}</h1>
+              <p className="text-gray-600 dark:text-gray-400 mt-1">{t("Disbursement #")}{disbursement._id}</p>
             </div>
             <Badge className="px-3 py-1 text-sm font-medium self-start sm:self-auto bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-400">
-              Paid
+              {t("Paid")}
             </Badge>
           </div>
           <div className="flex items-center text-gray-500 dark:text-gray-400 text-sm">
@@ -95,18 +98,18 @@ export default function DisbursementDetailsPage() {
           <div className="flex flex-wrap gap-2 mt-2">
             <Button variant="outline" onClick={() => window.print()} className="flex items-center gap-2">
               <Printer className="h-4 w-4" />
-              Print
+              {t("Print")}
             </Button>
             <Button variant="outline" onClick={handlePrintThermal} className="flex items-center gap-2">
               <Receipt className="h-4 w-4" />
-              Thermal Receipt
+              {t("Thermal Receipt")}
             </Button>
             <Button
               onClick={handleShareWhatsApp}
               className="flex items-center gap-2 bg-green-600 hover:bg-green-700"
             >
               <MessageCircle className="h-4 w-4" />
-              Share via WhatsApp
+              {t("Share via WhatsApp")}
             </Button>
           </div>
         </div>
@@ -117,25 +120,27 @@ export default function DisbursementDetailsPage() {
           <CardHeader className="pb-4">
             <CardTitle className="flex items-center text-lg">
               <TrendingDown className="h-5 w-5 mr-2 text-red-600" />
-              Details
+              {t("Details")}
             </CardTitle>
             <CardDescription>
-              An internal expense - no discount, tax, or debt applies to a disbursement
+              {t(
+                "An internal expense - no discount, tax, or debt applies to a disbursement"
+              )}
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div>
-              <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Description</p>
-              <p className="text-gray-900 dark:text-gray-100">{disbursement.description}</p>
+              <p className="text-sm font-medium text-gray-500 dark:text-gray-400">{t("Description")}</p>
+              <p className="text-gray-900 dark:text-gray-100">{t(disbursement.description)}</p>
             </div>
             <Separator />
             <div>
-              <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Category</p>
+              <p className="text-sm font-medium text-gray-500 dark:text-gray-400">{t("Category")}</p>
               <Badge variant="outline">{disbursement.category}</Badge>
             </div>
             <Separator />
             <div className="flex justify-between items-center pt-2">
-              <span className="text-lg font-semibold text-gray-900 dark:text-gray-100">Amount</span>
+              <span className="text-lg font-semibold text-gray-900 dark:text-gray-100">{t("Amount")}</span>
               <span className="text-2xl font-bold text-red-600">-${disbursement.amount.toFixed(2)}</span>
             </div>
             {settings?.dollarRate > 0 && (
@@ -148,7 +153,7 @@ export default function DisbursementDetailsPage() {
         </Card>
 
         <div className="mt-12 pt-6 border-t border-gray-200 dark:border-gray-800 text-center">
-          <p className="text-gray-500 dark:text-gray-400 text-sm">Order management system • Powered by Ahmad Daher</p>
+          <p className="text-gray-500 dark:text-gray-400 text-sm">{t("Order management system • Powered by Ahmad Daher")}</p>
         </div>
       </div>
     </div>

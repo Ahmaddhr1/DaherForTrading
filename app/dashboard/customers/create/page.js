@@ -1,4 +1,6 @@
 "use client";
+import { t } from "@/lib/i18n";
+import { useT } from "@/lib/i18n/LangProvider";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -10,11 +12,12 @@ import React, { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import axios from "axios";
 import { Loader2, UserPlus, DollarSign, Phone, User, Scale, Layers } from "lucide-react";
-import { toast } from "sonner";
+import { toast } from "@/lib/i18n/toast";
 import { useRouter } from "next/navigation";
 import { PRICE_TIERS } from "@/lib/priceTiers";
 
 const AddCustomerPage = () => {
+  const t = useT();
   const router = useRouter();
   const [form, setForm] = useState({
     fullName: "",
@@ -88,8 +91,8 @@ const AddCustomerPage = () => {
               <UserPlus className="h-6 w-6 text-blue-600" />
             </div>
             <div>
-              <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">Add New Customer</h1>
-              <p className="text-gray-600 dark:text-gray-400">Create a new customer profile in the system</p>
+              <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">{t("Add New Customer")}</h1>
+              <p className="text-gray-600 dark:text-gray-400">{t("Create a new customer profile in the system")}</p>
             </div>
           </div>
         </div>
@@ -101,7 +104,7 @@ const AddCustomerPage = () => {
               <CardHeader className="pb-4">
                 <CardTitle className="text-xl flex items-center gap-2">
                   <User className="h-5 w-5" />
-                  Customer Information
+                  {t("Customer Information")}
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -110,19 +113,19 @@ const AddCustomerPage = () => {
                   <div className="space-y-4">
                     <div className="flex items-center gap-2 text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">
                       <div className="w-1 h-4 bg-blue-600 rounded"></div>
-                      Personal Details
+                      {t("Personal Details")}
                     </div>
                     
                     <div className="grid gap-4">
                       <div className="space-y-2">
                         <Label htmlFor="fullName" className="text-sm font-medium flex items-center gap-2">
                           <User className="h-4 w-4" />
-                          Full Name *
+                          {t("Full Name *")}
                         </Label>
                         <Input
                           id="fullName"
                           type="text"
-                          placeholder="Enter full name"
+                          placeholder={t("Enter full name")}
                           name="fullName"
                           value={form.fullName}
                           onChange={handleChange}
@@ -134,13 +137,13 @@ const AddCustomerPage = () => {
                       <div className="space-y-2">
                         <Label htmlFor="phoneNumber" className="text-sm font-medium flex items-center gap-2">
                           <Phone className="h-4 w-4" />
-                          Phone Number *
+                          {t("Phone Number *")}
                         </Label>
                         <Input
                           id="phoneNumber"
                           type="text"
                           inputMode="numeric"
-                          placeholder="Enter phone number"
+                          placeholder={t("Enter phone number")}
                           name="phoneNumber"
                           value={form.phoneNumber}
                           onChange={handleChange}
@@ -157,13 +160,13 @@ const AddCustomerPage = () => {
                   <div className="space-y-4">
                     <div className="flex items-center gap-2 text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">
                       <div className="w-1 h-4 bg-teal-600 rounded"></div>
-                      Pricing
+                      {t("Pricing")}
                     </div>
 
                     <div className="space-y-2 max-w-xs">
                       <Label htmlFor="priceTier" className="text-sm font-medium flex items-center gap-2">
                         <Layers className="h-4 w-4" />
-                        Price Tier
+                        {t("Price Tier")}
                       </Label>
                       <select
                         id="priceTier"
@@ -174,12 +177,12 @@ const AddCustomerPage = () => {
                       >
                         {PRICE_TIERS.map((tier) => (
                           <option key={tier.value} value={tier.value}>
-                            {tier.label}
+                            {t(tier.label)}
                           </option>
                         ))}
                       </select>
                       <p className="text-xs text-gray-500 dark:text-gray-400">
-                        Which product price this customer is charged when creating an order
+                        {t("Which product price this customer is charged when creating an order")}
                       </p>
                     </div>
                   </div>
@@ -190,7 +193,7 @@ const AddCustomerPage = () => {
                   <div className="space-y-6">
                     <div className="flex items-center gap-2 text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">
                       <div className="w-1 h-4 bg-amber-600 rounded"></div>
-                      Debt Information
+                      {t("Debt Information")}
                     </div>
                     
                     <div className="space-y-6">
@@ -198,7 +201,7 @@ const AddCustomerPage = () => {
                       <div className="space-y-4">
                         <div className="space-y-2">
                           <Label htmlFor="debt" className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                            Amount Owed ($)
+                            {t("Amount Owed ($)")}
                           </Label>
                           <Input
                             id="debt"
@@ -225,7 +228,7 @@ const AddCustomerPage = () => {
                       onClick={() => router.back()}
                       className="flex-1"
                     >
-                      Cancel
+                      {t("Cancel")}
                     </Button>
                     <Button
                       type="submit"
@@ -235,12 +238,12 @@ const AddCustomerPage = () => {
                       {mutation.isPending ? (
                         <span className="flex items-center gap-2">
                           <Loader2 className="animate-spin h-4 w-4" />
-                          Creating Customer...
+                          {t("Creating Customer...")}
                         </span>
                       ) : (
                         <span className="flex items-center gap-2">
                           <UserPlus className="h-4 w-4" />
-                          Create Customer
+                          {t("Create Customer")}
                         </span>
                       )}
                     </Button>
@@ -254,28 +257,28 @@ const AddCustomerPage = () => {
           <div className="lg:col-span-1">
             <Card className="shadow-sm border-gray-200 dark:border-gray-800 sticky top-6">
               <CardHeader className="pb-4">
-                <CardTitle className="text-lg">Debt Summary</CardTitle>
-                <CardDescription>Customer obligation overview</CardDescription>
+                <CardTitle className="text-lg">{t("Debt Summary")}</CardTitle>
+                <CardDescription>{t("Customer obligation overview")}</CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
                 {/* Customer Info */}
                 <div className="space-y-3">
                   <h4 className="font-medium text-gray-900 dark:text-gray-100 flex items-center gap-2">
                     <User className="h-4 w-4" />
-                    Customer
+                    {t("Customer")}
                   </h4>
                   <div className="space-y-2">
                     <div className="flex justify-between items-center">
-                      <span className="text-sm text-gray-600 dark:text-gray-400">Name</span>
+                      <span className="text-sm text-gray-600 dark:text-gray-400">{t("Name")}</span>
                       <span className="font-medium text-gray-900 dark:text-gray-100 truncate max-w-[120px] text-right">
-                        {form.fullName || "Not provided"}
+                        {form.fullName || t("Not provided")}
                       </span>
                     </div>
                     
                     <div className="flex justify-between items-center">
-                      <span className="text-sm text-gray-600 dark:text-gray-400">Phone</span>
+                      <span className="text-sm text-gray-600 dark:text-gray-400">{t("Phone")}</span>
                       <span className="font-medium text-gray-900 dark:text-gray-100">
-                        {form.phoneNumber || "Not provided"}
+                        {form.phoneNumber || t("Not provided")}
                       </span>
                     </div>
                   </div>
@@ -287,10 +290,10 @@ const AddCustomerPage = () => {
                 <div className="space-y-3">
                   <h4 className="font-medium text-gray-900 dark:text-gray-100 flex items-center gap-2">
                     <DollarSign className="h-4 w-4" />
-                    Money Debt
+                    {t("Money Debt")}
                   </h4>
                   <div className="flex justify-between items-center p-3 rounded-lg bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-900/50">
-                    <span className="text-sm font-medium text-amber-800 dark:text-amber-400">Amount Owed</span>
+                    <span className="text-sm font-medium text-amber-800 dark:text-amber-400">{t("Amount Owed")}</span>
                     <div className="text-right">
                       <span className="text-lg font-bold text-amber-900 dark:text-amber-300">
                         ${(parseInt(form.debt) || 0).toLocaleString()}
@@ -299,7 +302,7 @@ const AddCustomerPage = () => {
                         variant={hasAnyDebt ? "default" : "outline"}
                         className={`ml-2 ${hasAnyDebt ? 'bg-amber-100 dark:bg-amber-900/30 text-amber-800 dark:text-amber-400' : ''}`}
                       >
-                        {hasAnyDebt ? "Owes Money" : "No Money Debt"}
+                        {hasAnyDebt ? t("Owes Money") : t("No Money Debt")}
                       </Badge>
                     </div>
                   </div>
@@ -311,19 +314,19 @@ const AddCustomerPage = () => {
                 <div className="bg-gray-50 dark:bg-gray-950 rounded-lg p-4">
                   <h4 className="font-medium text-gray-900 dark:text-gray-100 flex items-center gap-2 mb-2">
                     <Scale className="h-4 w-4" />
-                    Overall Status
+                    {t("Overall Status")}
                   </h4>
                   <div className="text-center">
                     <Badge 
                       variant={hasAnyDebt ? "destructive" : "default"} 
                       className="text-sm px-3 py-1"
                     >
-                      {hasAnyDebt ? "Customer Has Debt" : "Debt-Free Customer"}
+                      {hasAnyDebt ? t("Customer Has Debt") : t("Debt-Free Customer")}
                     </Badge>
                     <p className="text-xs text-gray-600 dark:text-gray-400 mt-2">
                       {hasAnyDebt
-                        ? "This customer has an outstanding balance"
-                        : "No current debt"
+                        ? t("This customer has an outstanding balance")
+                        : t("No current debt")
                       }
                     </p>
                   </div>

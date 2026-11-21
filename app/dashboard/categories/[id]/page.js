@@ -1,11 +1,13 @@
 
 "use client";
+import { t } from "@/lib/i18n";
+import { useT } from "@/lib/i18n/LangProvider";
 
 import React, { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
-import { toast } from "sonner";
+import { toast } from "@/lib/i18n/toast";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -25,6 +27,7 @@ import {
 import { Folder, Eye, Loader2, Trash2, Package, Edit } from "lucide-react";
 
 const EditCategoryPage = () => {
+  const t = useT();
   const { id } = useParams();
   const router = useRouter();
   const queryClient = useQueryClient();
@@ -161,10 +164,10 @@ const EditCategoryPage = () => {
               <div className="text-red-500 bg-red-50 dark:bg-red-900/20 rounded-full p-3 w-12 h-12 mx-auto mb-4 flex items-center justify-center">
                 <Folder className="h-6 w-6" />
               </div>
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">Category Not Found</h3>
-              <p className="text-gray-600 dark:text-gray-400 mb-4">Unable to load category details.</p>
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">{t("Category Not Found")}</h3>
+              <p className="text-gray-600 dark:text-gray-400 mb-4">{t("Unable to load category details.")}</p>
               <Link href="/dashboard/categories">
-                <Button>Back to Categories</Button>
+                <Button>{t("Back to Categories")}</Button>
               </Link>
             </CardContent>
           </Card>
@@ -188,8 +191,8 @@ const EditCategoryPage = () => {
                 <Edit className="h-6 w-6 text-blue-600" />
               </div>
               <div>
-                <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">Edit Category</h1>
-                <p className="text-gray-600 dark:text-gray-400">Update category information and products</p>
+                <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">{t("Edit Category")}</h1>
+                <p className="text-gray-600 dark:text-gray-400">{t("Update category information and products")}</p>
               </div>
             </div>
 
@@ -199,14 +202,14 @@ const EditCategoryPage = () => {
               onClick={handleDelete}
               disabled={deleteMutation.isPending}
               className="flex items-center gap-2 shrink-0"
-              aria-label="Delete Category"
+              aria-label={t("Delete Category")}
             >
               {deleteMutation.isPending ? (
                 <Loader2 className="animate-spin h-4 w-4" />
               ) : (
                 <Trash2 className="h-4 w-4" />
               )}
-              <span className="hidden sm:inline">Delete Category</span>
+              <span className="hidden sm:inline">{t("Delete Category")}</span>
             </Button>
             )}
           </div>
@@ -219,10 +222,10 @@ const EditCategoryPage = () => {
               <CardHeader className="pb-4">
                 <CardTitle className="text-xl flex items-center gap-2">
                   <Folder className="h-5 w-5" />
-                  Category Information
+                  {t("Category Information")}
                 </CardTitle>
                 <CardDescription>
-                  Update the details for this category
+                  {t("Update the details for this category")}
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -231,12 +234,12 @@ const EditCategoryPage = () => {
                   {/* Category Name */}
                   <div className="space-y-2">
                     <Label htmlFor="name" className="text-sm font-medium">
-                      Category Name *
+                      {t("Category Name *")}
                     </Label>
                     <Input
                       id="name"
                       name="name"
-                      placeholder="Enter category name"
+                      placeholder={t("Enter category name")}
                       value={formData.name}
                       onChange={handleInputChange}
                       className="focus:border-blue-500 transition-colors"
@@ -249,7 +252,7 @@ const EditCategoryPage = () => {
                   <div className="flex gap-3 pt-4">
                     <Link href="/dashboard/categories" className="flex-1">
                       <Button type="button" variant="outline" className="w-full">
-                        Cancel
+                        {t("Cancel")}
                       </Button>
                     </Link>
                     <Button
@@ -260,12 +263,12 @@ const EditCategoryPage = () => {
                       {updateMutation.isPending ? (
                         <span className="flex items-center gap-2">
                           <Loader2 className="animate-spin h-4 w-4" />
-                          Updating...
+                          {t("Updating...")}
                         </span>
                       ) : (
                         <span className="flex items-center gap-2">
                           <Edit className="h-4 w-4" />
-                          Update Category
+                          {t("Update Category")}
                         </span>
                       )}
                     </Button>
@@ -279,15 +282,17 @@ const EditCategoryPage = () => {
               <CardHeader className="pb-4">
                 <CardTitle className="text-xl flex items-center gap-2">
                   <Package className="h-5 w-5" />
-                  Products in this Category
+                  {t("Products in this Category")}
                   <span className="bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-400 text-sm px-2 py-1 rounded-full">
                     {productCount}
                   </span>
                 </CardTitle>
                 <CardDescription>
                   {productCount === 0
-                    ? "No products are currently assigned to this category"
-                    : `Products that belong to "${formData.name}"`
+                    ? t("No products are currently assigned to this category")
+                    : t("Products that belong to \"{0}\"", {
+                    0: formData.name
+                  })
                   }
                 </CardDescription>
               </CardHeader>
@@ -295,10 +300,10 @@ const EditCategoryPage = () => {
                 {productCount === 0 ? (
                   <div className="text-center py-8 text-gray-500 dark:text-gray-400">
                     <Package className="h-12 w-12 text-gray-300 dark:text-gray-600 mx-auto mb-3" />
-                    <p>No products in this category</p>
+                    <p>{t("No products in this category")}</p>
                     <Link href="/dashboard/products/add">
                       <Button variant="outline" className="mt-3">
-                        Add Products
+                        {t("Add Products")}
                       </Button>
                     </Link>
                   </div>
@@ -309,17 +314,17 @@ const EditCategoryPage = () => {
                       variant="outline"
                       className="mb-4"
                     >
-                      {showProducts ? "Hide Products" : "View Products"}
+                      {showProducts ? t("Hide Products") : t("View Products")}
                     </Button>
 
                     {showProducts && (
                       <Table>
                         <TableHeader>
                           <TableRow>
-                            <TableHead>Product Name</TableHead>
-                            <TableHead className="text-center">Price</TableHead>
-                            <TableHead className="text-center">Stock</TableHead>
-                            <TableHead className="text-right">Actions</TableHead>
+                            <TableHead>{t("Product Name")}</TableHead>
+                            <TableHead className="text-center">{t("Price")}</TableHead>
+                            <TableHead className="text-center">{t("Stock")}</TableHead>
+                            <TableHead className="text-right">{t("Actions")}</TableHead>
                           </TableRow>
                         </TableHeader>
                         <TableBody>
@@ -341,14 +346,14 @@ const EditCategoryPage = () => {
                                     ? "bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-400"
                                     : "bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-400"
                                   }`}>
-                                  {product?.quantity} in stock
+                                  {product?.quantity} {t("in stock")}
                                 </span>
                               </TableCell>
                               <TableCell className="text-right">
                                 <Link href={`/dashboard/products/${product._id}`}>
                                   <Button variant="outline" size="sm">
                                     <Eye className="h-3 w-3 mr-1" />
-                                    View
+                                    {t("View")}
                                   </Button>
                                 </Link>
                               </TableCell>
@@ -367,7 +372,7 @@ const EditCategoryPage = () => {
       <ConfirmDialog
         open={deleteOpen}
         onClose={() => setDeleteOpen(false)}
-        title="Delete category?"
+        title={t("Delete category?")}
         description={deleteMessage}
         onConfirm={confirmDelete}
         loading={deleteMutation.isPending}

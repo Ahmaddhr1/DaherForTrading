@@ -1,4 +1,6 @@
 "use client";
+import { t } from "@/lib/i18n";
+import { useT } from "@/lib/i18n/LangProvider";
 
 import React, { useState } from "react";
 import {
@@ -15,11 +17,11 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { FiltersPanel } from "@/components/ui/filters-panel";
 import { ChevronLeft, ChevronRight, Plus, History, DollarSign, Package, Eye, CheckCircle } from "lucide-react";
-import { toast } from "sonner";
+import { toast } from "@/lib/i18n/toast";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { useHasPermission } from "@/lib/useHasPermission";
 import { TableSkeleton } from "@/components/ui/skeleton-patterns";
-import { format } from "date-fns";
+import { format } from "@/lib/i18n/date";
 import { useParams } from "next/navigation";
 import axios from "axios";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -28,6 +30,7 @@ import { localDayStartISO, localDayEndISO } from "@/lib/dateUtils";
 import ProductPurchaseBreakdown from "./ProductPurchaseBreakdown";
 
 export default function CompanyPurchasesPage() {
+  const t = useT();
   const { id } = useParams();
   const [page, setPage] = useState(1);
   const [startDate, setStartDate] = useState("");
@@ -82,16 +85,16 @@ export default function CompanyPurchasesPage() {
               </div>
               <div className="min-w-0">
                 <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-gray-100 truncate">
-                  Purchase History {data?.companyName ? `— ${data.companyName}` : ""}
+                  {t("Purchase History")} {data?.companyName ? `— ${data.companyName}` : ""}
                 </h1>
-                <p className="text-gray-600 dark:text-gray-400 text-sm sm:text-base truncate">All restocking purchases from this company</p>
+                <p className="text-gray-600 dark:text-gray-400 text-sm sm:text-base truncate">{t("All restocking purchases from this company")}</p>
               </div>
             </div>
 
             <Link href={`/dashboard/companies/${id}/addpurchase`} className="shrink-0">
               <Button className="flex items-center gap-2">
                 <Plus className="h-4 w-4" />
-                <span className="hidden sm:inline">New Purchase</span>
+                <span className="hidden sm:inline">{t("New Purchase")}</span>
               </Button>
             </Link>
           </div>
@@ -106,7 +109,7 @@ export default function CompanyPurchasesPage() {
             <div className="flex flex-col items-center sm:items-start gap-1">
               <span className="flex items-center gap-1.5 text-xs font-medium text-gray-500 dark:text-gray-400">
                 <DollarSign className="h-3.5 w-3.5" />
-                Total Purchased
+                {t("Total Purchased")}
               </span>
               <span className="text-lg font-bold text-gray-900 dark:text-gray-100">
                 ${summary.totalAmount.toLocaleString()}
@@ -115,7 +118,7 @@ export default function CompanyPurchasesPage() {
             <div className="flex flex-col items-center sm:items-start gap-1">
               <span className="flex items-center gap-1.5 text-xs font-medium text-gray-500 dark:text-gray-400">
                 <Package className="h-3.5 w-3.5" />
-                Units Purchased
+                {t("Units Purchased")}
               </span>
               <span className="text-lg font-bold text-gray-900 dark:text-gray-100">
                 {summary.totalQuantity.toLocaleString()}
@@ -130,7 +133,7 @@ export default function CompanyPurchasesPage() {
             <CardContent className="p-4">
               <div className="flex flex-col sm:flex-row sm:flex-wrap sm:items-center gap-3 sm:gap-4">
                 <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-2">
-                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">From</span>
+                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{t("From")}</span>
                   <input
                     type="date"
                     value={startDate}
@@ -142,7 +145,7 @@ export default function CompanyPurchasesPage() {
                   />
                 </div>
                 <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-2">
-                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">To</span>
+                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{t("To")}</span>
                   <input
                     type="date"
                     value={endDate}
@@ -164,7 +167,7 @@ export default function CompanyPurchasesPage() {
                     }}
                     className="w-full sm:w-auto justify-center text-gray-500 dark:text-gray-400"
                   >
-                    Clear Filters
+                    {t("Clear Filters")}
                   </Button>
                 )}
               </div>
@@ -175,28 +178,28 @@ export default function CompanyPurchasesPage() {
         {isLoading ? (
           <TableSkeleton rows={limit} cols={8} />
         ) : isError ? (
-          <div className="text-center py-10 text-red-600">Failed to load purchases.</div>
+          <div className="text-center py-10 text-red-600">{t("Failed to load purchases.")}</div>
         ) : (
           <div className="bg-white dark:bg-gray-900 rounded-lg border">
             <Table>
-              <TableCaption>{purchases.length === 0 ? "No purchases yet." : "Purchase history"}</TableCaption>
+              <TableCaption>{purchases.length === 0 ? t("No purchases yet.") : t("Purchase history")}</TableCaption>
               <TableHeader>
                 <TableRow>
                   <TableHead className="w-[60px]">#</TableHead>
-                  <TableHead>Product</TableHead>
-                  <TableHead className="text-center">Unit Price</TableHead>
-                  <TableHead className="text-center">Quantity</TableHead>
-                  <TableHead className="text-center">Total</TableHead>
-                  <TableHead className="text-center">Status</TableHead>
-                  <TableHead>Date</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
+                  <TableHead>{t("Product")}</TableHead>
+                  <TableHead className="text-center">{t("Unit Price")}</TableHead>
+                  <TableHead className="text-center">{t("Quantity")}</TableHead>
+                  <TableHead className="text-center">{t("Total")}</TableHead>
+                  <TableHead className="text-center">{t("Status")}</TableHead>
+                  <TableHead>{t("Date")}</TableHead>
+                  <TableHead className="text-right">{t("Actions")}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {purchases.length === 0 ? (
                   <TableRow>
                     <TableCell colSpan={8} className="text-center py-6">
-                      No purchases found.
+                      {t("No purchases found.")}
                     </TableCell>
                   </TableRow>
                 ) : (
@@ -209,7 +212,7 @@ export default function CompanyPurchasesPage() {
                       <TableCell className="text-center font-medium">${purchase.total.toFixed(2)}</TableCell>
                       <TableCell className="text-center">
                         <Badge variant={purchase.paid ? "default" : "destructive"} className={purchase.paid ? "bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-400" : ""}>
-                          {purchase.paid ? "Paid" : "Unpaid"}
+                          {purchase.paid ? t("Paid") : t("Unpaid")}
                         </Badge>
                       </TableCell>
                       <TableCell className="text-gray-500 dark:text-gray-400 text-sm">
@@ -225,13 +228,13 @@ export default function CompanyPurchasesPage() {
                               className="flex items-center gap-1 text-green-700 border-green-300 hover:bg-green-50 dark:text-green-400 dark:border-green-900 dark:hover:bg-green-950/40"
                             >
                               <CheckCircle className="h-3.5 w-3.5" />
-                              Mark as paid
+                              {t("Mark as paid")}
                             </Button>
                           )}
                           <Link href={`/dashboard/companies/${id}/purchases/${purchase._id}`}>
                             <Button variant="ghost" size="sm" className="flex items-center gap-1">
                               <Eye className="h-3.5 w-3.5" />
-                              View
+                              {t("View")}
                             </Button>
                           </Link>
                         </div>
@@ -252,10 +255,10 @@ export default function CompanyPurchasesPage() {
                   className="flex items-center gap-2"
                 >
                   <ChevronLeft className="h-4 w-4" />
-                  Previous
+                  {t("Previous")}
                 </Button>
                 <span className="text-sm text-gray-600 dark:text-gray-400">
-                  Page {page} of {totalPages}
+                  {t("Page")} {page} {t("of")} {totalPages}
                 </span>
                 <Button
                   onClick={() => setPage((p) => p + 1)}
@@ -264,7 +267,7 @@ export default function CompanyPurchasesPage() {
                   size="sm"
                   className="flex items-center gap-2"
                 >
-                  Next
+                  {t("Next")}
                   <ChevronRight className="h-4 w-4" />
                 </Button>
               </div>
@@ -276,13 +279,21 @@ export default function CompanyPurchasesPage() {
       <ConfirmDialog
         open={!!payTarget}
         onClose={() => !markPaidMutation.isPending && setPayTarget(null)}
-        title="Mark purchase as paid?"
+        title={t("Mark purchase as paid?")}
         description={
           payTarget
-            ? `Pay ${data?.companyName || "this company"} $${payTarget.total.toFixed(2)} for ${payTarget.quantity} x ${payTarget.productName}? This reduces what you owe them and records a supplier payment.`
+            ? t(
+            "Pay {0} ${1} for {2} x {3}? This reduces what you owe them and records a supplier payment.",
+            {
+              0: data?.companyName || "this company",
+              1: payTarget.total.toFixed(2),
+              2: payTarget.quantity,
+              3: payTarget.productName
+            }
+          )
             : ""
         }
-        confirmLabel="Mark as Paid"
+        confirmLabel={t("Mark as Paid")}
         variant="default"
         loading={markPaidMutation.isPending}
         onConfirm={() => markPaidMutation.mutate(payTarget._id)}

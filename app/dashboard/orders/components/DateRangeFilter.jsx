@@ -1,4 +1,6 @@
 "use client";
+import { t } from "@/lib/i18n";
+import { useT } from "@/lib/i18n/LangProvider";
 
 // Reusable "From" / "To" <input type="date"> pair, styled to match the
 // other filter controls on the orders pages (see e.g. the Category/Sort
@@ -8,10 +10,11 @@
 // localDayEndISO right before sending them to the API, same pattern used
 // everywhere else in this app that filters by date.
 export function DateRangeFilter({ startDate, endDate, onStartDateChange, onEndDateChange }) {
+  const t = useT();
   return (
     <>
       <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-2 w-full sm:w-auto">
-        <span className="text-sm font-medium text-gray-700 dark:text-gray-300">From</span>
+        <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{t("From")}</span>
         <input
           type="date"
           value={startDate}
@@ -20,7 +23,7 @@ export function DateRangeFilter({ startDate, endDate, onStartDateChange, onEndDa
         />
       </div>
       <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-2 w-full sm:w-auto">
-        <span className="text-sm font-medium text-gray-700 dark:text-gray-300">To</span>
+        <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{t("To")}</span>
         <input
           type="date"
           value={endDate}

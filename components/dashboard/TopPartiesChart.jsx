@@ -1,5 +1,7 @@
 // components/dashboard/TopPartiesChart.jsx
 "use client";
+import { t } from "@/lib/i18n";
+import { useT } from "@/lib/i18n/LangProvider";
 
 import React, { useMemo, useState } from "react";
 import Link from "next/link";
@@ -64,6 +66,7 @@ export default function TopPartiesChart({
   footnote,
   emptyText,
 }) {
+  const t = useT();
   const [range, setRange] = useState("month");
   const [customStart, setCustomStart] = useState(getTodayDateString());
   const [customEnd, setCustomEnd] = useState(getTodayDateString());
@@ -116,19 +119,19 @@ export default function TopPartiesChart({
             <select value={range} onChange={(e) => setRange(e.target.value)} className={selectClass}>
               {RANGE_OPTIONS.map((opt) => (
                 <option key={opt.value} value={opt.value}>
-                  {opt.label}
+                  {t(opt.label)}
                 </option>
               ))}
             </select>
             <select value={sortBy} onChange={(e) => setSortBy(e.target.value)} className={selectClass}>
-              <option value="purchased">Rank by {purchasedLabel.toLowerCase()}</option>
-              <option value="profit">Rank by {profitLabel.toLowerCase()}</option>
+              <option value="purchased">{t("Rank by")} {purchasedLabel.toLowerCase()}</option>
+              <option value="profit">{t("Rank by")} {profitLabel.toLowerCase()}</option>
             </select>
           </div>
           {range === "custom" && (
             <div className="flex flex-wrap items-center gap-2">
               <input type="date" value={customStart} onChange={(e) => setCustomStart(e.target.value)} className={selectClass} />
-              <span className="text-gray-400 dark:text-gray-500 text-sm">to</span>
+              <span className="text-gray-400 dark:text-gray-500 text-sm">{t("to")}</span>
               <input type="date" value={customEnd} onChange={(e) => setCustomEnd(e.target.value)} className={selectClass} />
             </div>
           )}
@@ -138,14 +141,14 @@ export default function TopPartiesChart({
         {isLoading ? (
           <Skeleton className="h-[26rem] rounded-lg" />
         ) : error ? (
-          <div className="text-red-500 text-center py-10">Failed to load {title.toLowerCase()}</div>
+          <div className="text-red-500 text-center py-10">{t("Failed to load")} {title.toLowerCase()}</div>
         ) : rows.length === 0 ? (
           <div className="text-gray-500 dark:text-gray-400 text-center py-10">{emptyText}</div>
         ) : (
           <>
             <div className="mb-3 flex flex-wrap gap-x-6 gap-y-1 text-sm text-gray-600 dark:text-gray-400">
               <span>
-                Top {rows.length} {purchasedLabel.toLowerCase()}:{" "}
+                {t("Top")} {rows.length} {purchasedLabel.toLowerCase()}:{" "}
                 <span className="font-bold text-blue-600">{money(totals.purchased)}</span>
               </span>
               <span>
@@ -173,7 +176,7 @@ export default function TopPartiesChart({
                 <thead>
                   <tr className="text-left text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400 border-b border-gray-200 dark:border-gray-800">
                     <th className="py-2 pr-2 w-8">#</th>
-                    <th className="py-2 pr-2">Name</th>
+                    <th className="py-2 pr-2">{t("Name")}</th>
                     <th className="py-2 pr-2 text-right">{countLabel}</th>
                     <th className="py-2 pr-2 text-right">{purchasedLabel}</th>
                     <th className="py-2 text-right">{profitLabel}</th>

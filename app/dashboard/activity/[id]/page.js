@@ -1,4 +1,6 @@
 "use client";
+import { t } from "@/lib/i18n";
+import { useT } from "@/lib/i18n/LangProvider";
 
 import Link from "next/link";
 import { useParams } from "next/navigation";
@@ -18,6 +20,7 @@ const KIND_BADGE = {
 };
 
 export default function ActivityEntryPage() {
+  const t = useT();
   const { id } = useParams();
 
   const { data, isLoading, error } = useQuery({
@@ -40,7 +43,7 @@ export default function ActivityEntryPage() {
           className="inline-flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 mb-6"
         >
           <ArrowLeft className="h-4 w-4" />
-          Back to Activity Log
+          {t("Back to Activity Log")}
         </Link>
 
         {isLoading && <TableSkeleton rows={6} cols={3} />}
@@ -49,7 +52,7 @@ export default function ActivityEntryPage() {
           <Card>
             <CardContent className="pt-6 text-center text-red-600 flex flex-col items-center gap-2">
               <AlertCircle className="h-8 w-8" />
-              {error.response?.status === 404 ? "This activity entry no longer exists." : "Failed to load this activity entry."}
+              {error.response?.status === 404 ? t("This activity entry no longer exists.") : t("Failed to load this activity entry.")}
             </CardContent>
           </Card>
         )}
@@ -82,7 +85,7 @@ export default function ActivityEntryPage() {
                   {href && (
                     <Link href={href} className="inline-flex items-center gap-1.5 text-blue-600 hover:underline">
                       <ExternalLink className="h-4 w-4" />
-                      Open {entry.entityType.toLowerCase()}
+                      {t("Open")} {entry.entityType.toLowerCase()}
                     </Link>
                   )}
                 </div>
@@ -91,7 +94,7 @@ export default function ActivityEntryPage() {
 
             <Card>
               <CardHeader className="pb-3">
-                <CardTitle className="text-base">Summary</CardTitle>
+                <CardTitle className="text-base">{t("Summary")}</CardTitle>
               </CardHeader>
               <CardContent className="text-gray-700 dark:text-gray-300">{entry.summary}</CardContent>
             </Card>
@@ -99,10 +102,10 @@ export default function ActivityEntryPage() {
             <Card>
               <CardHeader className="pb-3">
                 <CardTitle className="text-base">
-                  {kind === "create" ? "Values set" : kind === "delete" ? "Values removed" : "What changed"}
+                  {kind === "create" ? t("Values set") : kind === "delete" ? t("Values removed") : t("What changed")}
                   {changes.length > 0 && (
                     <span className="ml-2 text-sm font-normal text-gray-500">
-                      {changes.length} {changes.length === 1 ? "field" : "fields"}
+                      {changes.length} {changes.length === 1 ? t("field") : t("fields")}
                     </span>
                   )}
                 </CardTitle>
@@ -114,8 +117,9 @@ export default function ActivityEntryPage() {
                   <div className="flex items-start gap-3 rounded-lg bg-gray-50 dark:bg-gray-900/60 p-4 text-sm text-gray-600 dark:text-gray-400">
                     <Info className="h-5 w-5 shrink-0 mt-0.5" />
                     <p>
-                      No field-level details for this entry - it was recorded before detailed change tracking was
-                      added, so only the summary above is available.
+                      {t(
+                        "No field-level details for this entry - it was recorded before detailed change tracking was added, so only the summary above is available."
+                      )}
                     </p>
                   </div>
                 )}
@@ -125,7 +129,7 @@ export default function ActivityEntryPage() {
             {related.length > 0 && (
               <Card>
                 <CardHeader className="pb-3">
-                  <CardTitle className="text-base">Other activity on this {entry.entityType.toLowerCase()}</CardTitle>
+                  <CardTitle className="text-base">{t("Other activity on this")} {entry.entityType.toLowerCase()}</CardTitle>
                 </CardHeader>
                 <CardContent className="p-0">
                   <ul className="divide-y divide-gray-100 dark:divide-gray-800">
@@ -144,7 +148,7 @@ export default function ActivityEntryPage() {
                           </span>
                           {item.changeCount > 0 && (
                             <span className="text-xs text-blue-600 whitespace-nowrap">
-                              {item.changeCount} {item.changeCount === 1 ? "change" : "changes"}
+                              {item.changeCount} {item.changeCount === 1 ? t("change") : t("changes")}
                             </span>
                           )}
                         </Link>

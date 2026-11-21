@@ -1,4 +1,6 @@
 "use client";
+import { t } from "@/lib/i18n";
+import { useT } from "@/lib/i18n/LangProvider";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,10 +10,11 @@ import React, { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import axios from "axios";
 import { Loader2, Building2, Phone, MapPin } from "lucide-react";
-import { toast } from "sonner";
+import { toast } from "@/lib/i18n/toast";
 import { useRouter } from "next/navigation";
 
 const AddCompanyPage = () => {
+  const t = useT();
   const router = useRouter();
   const [form, setForm] = useState({
     name: "",
@@ -60,28 +63,28 @@ const AddCompanyPage = () => {
               <Building2 className="h-6 w-6 text-blue-600" />
             </div>
             <div>
-              <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">Add New Company</h1>
-              <p className="text-gray-600 dark:text-gray-400">Register a new supplier</p>
+              <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">{t("Add New Company")}</h1>
+              <p className="text-gray-600 dark:text-gray-400">{t("Register a new supplier")}</p>
             </div>
           </div>
         </div>
 
         <Card className="shadow-sm border-gray-200 dark:border-gray-800">
           <CardHeader>
-            <CardTitle className="text-xl">Company Information</CardTitle>
-            <CardDescription>Basic contact details for this supplier</CardDescription>
+            <CardTitle className="text-xl">{t("Company Information")}</CardTitle>
+            <CardDescription>{t("Basic contact details for this supplier")}</CardDescription>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="space-y-2">
                 <Label htmlFor="name" className="text-sm font-medium flex items-center gap-2">
                   <Building2 className="h-4 w-4" />
-                  Company Name *
+                  {t("Company Name *")}
                 </Label>
                 <Input
                   id="name"
                   name="name"
-                  placeholder="Enter company name"
+                  placeholder={t("Enter company name")}
                   value={form.name}
                   onChange={handleChange}
                   required
@@ -91,12 +94,12 @@ const AddCompanyPage = () => {
               <div className="space-y-2">
                 <Label htmlFor="phoneNumber" className="text-sm font-medium flex items-center gap-2">
                   <Phone className="h-4 w-4" />
-                  Phone Number
+                  {t("Phone Number")}
                 </Label>
                 <Input
                   id="phoneNumber"
                   name="phoneNumber"
-                  placeholder="Enter phone number"
+                  placeholder={t("Enter phone number")}
                   value={form.phoneNumber}
                   onChange={handleChange}
                 />
@@ -105,12 +108,12 @@ const AddCompanyPage = () => {
               <div className="space-y-2">
                 <Label htmlFor="address" className="text-sm font-medium flex items-center gap-2">
                   <MapPin className="h-4 w-4" />
-                  Address
+                  {t("Address")}
                 </Label>
                 <Input
                   id="address"
                   name="address"
-                  placeholder="Enter address"
+                  placeholder={t("Enter address")}
                   value={form.address}
                   onChange={handleChange}
                 />
@@ -118,16 +121,16 @@ const AddCompanyPage = () => {
 
               <div className="flex gap-3 pt-2">
                 <Button type="button" variant="outline" onClick={() => router.back()} className="flex-1">
-                  Cancel
+                  {t("Cancel")}
                 </Button>
                 <Button type="submit" disabled={mutation.isPending} className="flex-1">
                   {mutation.isPending ? (
                     <span className="flex items-center gap-2">
                       <Loader2 className="animate-spin h-4 w-4" />
-                      Creating...
+                      {t("Creating...")}
                     </span>
                   ) : (
-                    "Create Company"
+                    t("Create Company")
                   )}
                 </Button>
               </div>

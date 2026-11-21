@@ -40,6 +40,8 @@ import { localDayStartISO, localDayEndISO } from "@/lib/dateUtils";
 import { DateRangeFilter } from "./DateRangeFilter";
 import { OrdersTotalsCard } from "./OrdersTotalsCard";
 import OrderCustomerName from "./OrderCustomerName";
+import OrderCard, { OrderStatusBadge } from "./OrderCard";
+import { orderNumber } from "@/lib/orderNumber";
 import { useIsOwner } from "@/lib/useIsOwner";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 
@@ -162,21 +164,6 @@ export default function AllOrders() {
     endDate,
   ].filter(Boolean).length;
 
-  const statusBadge = (status) => (
-    <Badge
-      variant={status === "paid" ? "default" : "destructive"}
-      className={
-        status === "paid"
-          ? "bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-400"
-          : status === "partiallyPaid"
-          ? "bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-400"
-          : ""
-      }
-    >
-      {status === "paid" ? "Paid" : status === "partiallyPaid" ? "Partially Paid" : "Pending"}
-    </Badge>
-  );
-
   // Drafts never appear in this list (see /api/orders - the default query
   // excludes them; they live on their own page at /dashboard/drafts), so
   // every order here is always pending/partiallyPaid/paid.
@@ -240,7 +227,7 @@ export default function AllOrders() {
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 h-4 w-4" />
               <Input
                 type="text"
-                placeholder="Search by customer name..."
+                placeholder="Search by customer name or order # (e.g. 4F2A91)"
                 value={searchInput}
                 onChange={(e) => setSearchInput(e.target.value)}
                 className="pl-10"
@@ -342,31 +329,19 @@ export default function AllOrders() {
         <>
           {/* Mobile: card list */}
           <div className="space-y-3 sm:hidden">
-            {orders.map((order, index) => (
-              <Card key={order._id} className="shadow-sm border-gray-200 dark:border-gray-800">
-                <CardContent className="p-4">
-                  <div className="flex items-start justify-between gap-2">
-                    <div className="min-w-0">
-                      <p className="text-xs text-gray-400 dark:text-gray-500">
-                        #{(page - 1) * pageSize + index + 1}
-                      </p>
-                      <p className="font-medium text-gray-900 dark:text-gray-100 truncate">
-                        <OrderCustomerName order={order} />
-                      </p>
-                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-                        {format(new Date(order.createdAt), "MMM d, yyyy HH:mm")}
-                      </p>
-                    </div>
+            {orders.map((order) => (
+              <OrderCard
+                key={order._id}
+                order={order}
+                actions={
+                  <div className="flex items-center justify-between gap-2">
+                    <Button variant="outline" size="sm" onClick={() => handleAction("view", order._id)}>
+                      View Invoice
+                    </Button>
                     {actionsMenu(order)}
                   </div>
-                  <div className="flex items-center justify-between mt-3">
-                    {statusBadge(order.status)}
-                    <span className="font-semibold text-gray-900 dark:text-gray-100">
-                      ${Number(order.total).toFixed(2)}
-                    </span>
-                  </div>
-                </CardContent>
-              </Card>
+                }
+              />
             ))}
           </div>
 
@@ -376,7 +351,7 @@ export default function AllOrders() {
               <TableCaption>All orders across all customers</TableCaption>
               <TableHeader>
                 <TableRow>
-                  <TableHead className="w-12">#</TableHead>
+                  <TableHead className="w-28">Order #</TableHead>
                   <TableHead>Customer</TableHead>
                   <TableHead className="text-center">Total</TableHead>
                   <TableHead className="text-center">Status</TableHead>
@@ -385,16 +360,16 @@ export default function AllOrders() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {orders.map((order, index) => (
+                {orders.map((order) => (
                   <TableRow key={order._id} className="hover:bg-gray-50 dark:hover:bg-gray-800/60">
-                    <TableCell className="font-medium text-gray-500 dark:text-gray-400">
-                      {(page - 1) * pageSize + index + 1}
+                    <TableCell className="font-mono text-xs font-semibold text-gray-500 dark:text-gray-400">
+                      #{orderNumber(order._id)}
                     </TableCell>
                     <TableCell className="font-medium text-gray-900 dark:text-gray-100">
                       <OrderCustomerName order={order} />
                     </TableCell>
                     <TableCell className="text-center font-medium">${Number(order.total).toFixed(2)}</TableCell>
-                    <TableCell className="text-center">{statusBadge(order.status)}</TableCell>
+                    <TableCell className="text-center"><OrderStatusBadge status={order.status} /></TableCell>
                     <TableCell className="text-gray-500 dark:text-gray-400 text-sm">
                       {format(new Date(order.createdAt), "MMM d, yyyy HH:mm")}
                     </TableCell>

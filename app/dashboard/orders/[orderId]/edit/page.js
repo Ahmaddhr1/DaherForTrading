@@ -110,7 +110,15 @@ export default function EditOrderPage() {
         if (field === "productId") {
           updatedRow.productId = value;
           const selectedProduct = products.find((p) => p._id === value);
-          if (selectedProduct && !updatedRow.free) updatedRow.price = getTierPrice(selectedProduct, priceTier).toString();
+          if (selectedProduct && !updatedRow.free) {
+            const tierPrice = getTierPrice(selectedProduct, priceTier);
+            updatedRow.price = tierPrice.toString();
+            // Pre-fill the line's $ discount from the product's own default
+            // discount % - still just a starting point, editable afterward.
+            const discountPercent = Number(selectedProduct.discount) || 0;
+            const lineSubtotal = tierPrice * (updatedRow.quantity || 1);
+            updatedRow.discount = discountPercent > 0 ? (Math.round(lineSubtotal * (discountPercent / 100) * 100) / 100).toString() : "";
+          }
         } else if (field === "customName") {
           updatedRow.customName = value;
         } else if (field === "quantity") {

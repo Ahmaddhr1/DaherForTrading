@@ -16,6 +16,7 @@ const FIELD_OPTIONS = [
   { value: "priceDistributor", label: "Price (Distributor)" },
   { value: "priceVip", label: "Price (VIP)" },
   { value: "initialPrice", label: "Cost Price" },
+  { value: "discount", label: "Discount (%)" },
 ];
 
 const MODE_OPTIONS = [
@@ -129,8 +130,9 @@ export default function BulkPriceUpdateModal({ open, onClose, productIds, onDone
         </div>
 
         <p className="text-xs text-gray-500 dark:text-gray-400">
-          Products where this would make the cost price exceed the selling price are skipped
-          automatically and reported after applying.
+          {field === "discount"
+            ? "Products where this would push the discount above 100% are skipped automatically and reported after applying."
+            : "Products where this would make the cost price exceed the selling price are skipped automatically and reported after applying."}
         </p>
 
         <div className="flex justify-end gap-2 pt-2">

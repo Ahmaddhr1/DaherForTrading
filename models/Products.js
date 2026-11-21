@@ -31,6 +31,10 @@ const productSchema = new mongoose.Schema(
     // on the product edit page, which pre-fills a purchase form).
     defaultSupplier: { type: mongoose.Types.ObjectId, ref: "Company", default: null },
     img: { type: [String], default: [] },
+    // Default discount percentage (0-100) applied to this product's line
+    // when it's added to an order - see addorder/page.js, which pre-fills
+    // the line's $ discount from this instead of starting at 0.
+    discount: { type: Number, default: 0, min: 0, max: 100 },
   },
   { timestamps: true }
 );

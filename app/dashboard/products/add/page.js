@@ -8,7 +8,7 @@ import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import axios from "axios";
-import { Loader2, PackagePlus, DollarSign, Tag, Package, TrendingUp, Box, Ruler, AlertTriangle, Truck, Layers, ImagePlus, X } from "lucide-react";
+import { Loader2, PackagePlus, DollarSign, Tag, Package, TrendingUp, Box, Ruler, AlertTriangle, Truck, Layers, ImagePlus, X, Percent } from "lucide-react";
 import React, { useState } from "react";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
@@ -53,6 +53,7 @@ const Page = () => {
     unit: "pcs",
     lowStockThreshold: "5",
     defaultSupplier: "",
+    discount: "",
   });
 
   const [imageFile, setImageFile] = useState(null);
@@ -97,6 +98,7 @@ const Page = () => {
         unit: form.unit,
         lowStockThreshold: form.lowStockThreshold,
         defaultSupplier: form.defaultSupplier || null,
+        discount: form.discount === "" ? 0 : parseFloat(form.discount),
         img,
       };
 
@@ -333,6 +335,26 @@ const Page = () => {
                           className="focus:border-purple-500 transition-colors"
                         />
                         <p className="text-xs text-gray-500 dark:text-gray-400">Alerts you when stock falls to or below this number</p>
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor="discount" className="text-sm font-medium flex items-center gap-2">
+                          <Percent className="h-4 w-4" />
+                          Default Discount (%)
+                        </Label>
+                        <Input
+                          id="discount"
+                          type="number"
+                          min="0"
+                          max="100"
+                          step="0.01"
+                          placeholder="0"
+                          name="discount"
+                          value={form.discount}
+                          onChange={handleChange}
+                          className="focus:border-purple-500 transition-colors"
+                        />
+                        <p className="text-xs text-gray-500 dark:text-gray-400">Pre-fills this product&apos;s discount when added to an order</p>
                       </div>
                     </div>
 

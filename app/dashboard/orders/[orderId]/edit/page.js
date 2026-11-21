@@ -16,6 +16,8 @@ import { useSettings, formatLL } from "@/lib/currency";
 import { Combobox } from "@/components/ui/combobox";
 import { getTierPrice, getTierLabel } from "@/lib/priceTiers";
 import OrderCustomerName from "../../components/OrderCustomerName";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
+import { useHasPermission } from "@/lib/useHasPermission";
 
 let rowIdCounter = 1;
 
@@ -34,6 +36,8 @@ export default function EditOrderPage() {
     queryFn: async () => (await axios.get("/api/admin/me")).data,
   });
   const isOwner = me?.role === "owner";
+  const { hasPermission: canFinalizeOrders } = useHasPermission("canFinalizeOrders");
+  const { hasPermission: canCreateOrders } = useHasPermission("canCreateOrders");
 
   const [products, setProducts] = useState([]);
   const [orderRows, setOrderRows] = useState([]);
@@ -192,17 +196,9 @@ export default function EditOrderPage() {
       free: row.free,
     }));
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!validateRows()) return;
+  const [confirmAction, setConfirmAction] = useState(null); // "update" | "finalize" | null
 
-    // A draft is just a scratchpad, so it's saved without asking - but a
-    // pending order already reserves stock and counts toward debt, so
-    // changing its line items is confirmed first.
-    if (!isDraft && !window.confirm(`Update this order to $${calculateTotal().toFixed(2)}? Stock and the customer's debt will be adjusted for the difference.`)) {
-      return;
-    }
-
+  const doUpdate = async () => {
     setIsSubmitting(true);
     try {
       await axios.put(`/api/orders/${orderId}`, {
@@ -222,12 +218,21 @@ export default function EditOrderPage() {
     }
   };
 
-  const handleFinalize = async () => {
+  const handleSubmit = (e) => {
+    e.preventDefault();
     if (!validateRows()) return;
-    if (!window.confirm(`Finalize this draft into a real order for $${calculateTotal().toFixed(2)}? This will deduct stock and add to the customer's debt.`)) {
+
+    // A draft is just a scratchpad, so it's saved without asking - but a
+    // pending order already reserves stock and counts toward debt, so
+    // changing its line items is confirmed first.
+    if (!isDraft) {
+      setConfirmAction("update");
       return;
     }
+    doUpdate();
+  };
 
+  const doFinalize = async () => {
     setIsFinalizing(true);
     try {
       // Save any in-progress edits first, then finalize.
@@ -247,6 +252,18 @@ export default function EditOrderPage() {
     } finally {
       setIsFinalizing(false);
     }
+  };
+
+  const handleFinalize = () => {
+    if (!validateRows()) return;
+    setConfirmAction("finalize");
+  };
+
+  const confirmProceed = () => {
+    const action = confirmAction;
+    setConfirmAction(null);
+    if (action === "update") doUpdate();
+    if (action === "finalize") doFinalize();
   };
 
   const isLoading = isLoadingOrder || isLoadingProducts || orderRows.length === 0;
@@ -486,7 +503,7 @@ export default function EditOrderPage() {
                     Cancel
                   </Button>
                 </Link>
-                <Button type="submit" disabled={isSubmitting || isFinalizing} className="sm:flex-1">
+                <Button type="submit" disabled={isSubmitting || isFinalizing || !canCreateOrders} className="sm:flex-1">
                   {isSubmitting ? (
                     <span className="flex items-center gap-2">
                       <Loader2 className="animate-spin h-4 w-4" />
@@ -503,7 +520,7 @@ export default function EditOrderPage() {
                   <Button
                     type="button"
                     onClick={handleFinalize}
-                    disabled={isSubmitting || isFinalizing}
+                    disabled={isSubmitting || isFinalizing || !canFinalizeOrders}
                     className="sm:flex-1 bg-green-600 hover:bg-green-700"
                   >
                     {isFinalizing ? (
@@ -524,6 +541,20 @@ export default function EditOrderPage() {
           </CardContent>
         </Card>
       </div>
+      <ConfirmDialog
+        open={!!confirmAction}
+        onClose={() => setConfirmAction(null)}
+        title={confirmAction === "finalize" ? "Finalize draft?" : "Update order?"}
+        description={
+          confirmAction === "finalize"
+            ? `Finalize this draft into a real order for $${calculateTotal().toFixed(2)}? This will deduct stock and add to the customer's debt.`
+            : `Update this order to $${calculateTotal().toFixed(2)}? Stock and the customer's debt will be adjusted for the difference.`
+        }
+        confirmLabel={confirmAction === "finalize" ? "Finalize Order" : "Update Order"}
+        variant="default"
+        onConfirm={confirmProceed}
+        loading={isSubmitting || isFinalizing}
+      />
     </div>
   );
 }

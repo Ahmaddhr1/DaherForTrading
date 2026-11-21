@@ -11,11 +11,13 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { ShoppingCart, Minus, Plus, Trash2, Search, Loader2, User, X } from "lucide-react";
 import { useCart } from "@/lib/cartContext";
+import { useHasPermission } from "@/lib/useHasPermission";
 
 export default function CartDrawer() {
   const router = useRouter();
   const queryClient = useQueryClient();
   const { cart, updateQty: onUpdateQty, removeFromCart: onRemove, clearCart: onClear, itemCount, open, openCart, closeCart } = useCart();
+  const { hasPermission: canCreateOrders } = useHasPermission("canCreateOrders");
   const [checkingOut, setCheckingOut] = useState(false);
   const [checkoutMode, setCheckoutMode] = useState(null); // null | "search" | "type"
   const [searchInput, setSearchInput] = useState("");
@@ -153,9 +155,14 @@ export default function CartDrawer() {
               <span className="font-medium text-gray-700 dark:text-gray-300">Total</span>
               <span className="font-bold text-lg text-gray-900 dark:text-gray-100">${total.toFixed(2)}</span>
             </div>
-            <Button className="w-full" onClick={() => setCheckingOut(true)}>
+            <Button className="w-full" onClick={() => setCheckingOut(true)} disabled={!canCreateOrders}>
               Create Draft Order
             </Button>
+            {!canCreateOrders && (
+              <p className="text-xs text-gray-500 dark:text-gray-400 text-center">
+                You don't have permission to create orders.
+              </p>
+            )}
           </div>
         ) : !checkoutMode ? (
           <div className="space-y-3">

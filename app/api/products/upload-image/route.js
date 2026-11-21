@@ -1,10 +1,15 @@
 import { NextResponse } from "next/server";
 import { uploadImage } from "@/lib/uploadthing";
+import { getUserFromCookie } from "@/lib/auth";
+import { requirePermission } from "@/lib/permissions";
 
 const MAX_SIZE_BYTES = 8 * 1024 * 1024; // 8MB
 
 export async function POST(req) {
   try {
+    const forbidden = await requirePermission(await getUserFromCookie(), "canManageProducts");
+    if (forbidden) return forbidden;
+
     const formData = await req.formData();
     const file = formData.get("file");
 

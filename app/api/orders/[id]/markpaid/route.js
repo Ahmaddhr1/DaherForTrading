@@ -3,9 +3,14 @@ import Order from "@/models/Orders";
 import Customer from "@/models/Customers";
 import Payment from "@/models/Payment";
 import { connectToDB } from "@/lib/connectDb";
+import { getUserFromCookie } from "@/lib/auth";
+import { requirePermission } from "@/lib/permissions";
 
 export async function PUT(req, { params }) {
   await connectToDB();
+  const forbidden = await requirePermission(await getUserFromCookie(), "canFinalizeOrders");
+  if (forbidden) return forbidden;
+
   const { id } = await params;
 
   try {

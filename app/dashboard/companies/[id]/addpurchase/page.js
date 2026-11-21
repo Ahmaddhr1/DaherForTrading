@@ -15,6 +15,7 @@ import Link from "next/link";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useSettings, formatLL } from "@/lib/currency";
 import { Combobox } from "@/components/ui/combobox";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 
 let nextRowId = 1;
 const emptyRow = () => ({ id: nextRowId++, productId: "", unitPrice: "", quantity: "1", discount: "" });
@@ -120,6 +121,8 @@ const NewPurchasePage = () => {
     },
   });
 
+  const [confirmOpen, setConfirmOpen] = useState(false);
+
   const handleSubmit = (e) => {
     e.preventDefault();
 
@@ -142,10 +145,11 @@ const NewPurchasePage = () => {
       }
     }
 
-    if (!window.confirm(`Record ${rows.length > 1 ? "these purchases" : "this purchase"} for $${total.toFixed(2)}? Stock will increase and the company's balance will be updated.`)) {
-      return;
-    }
+    setConfirmOpen(true);
+  };
 
+  const confirmSubmit = () => {
+    setConfirmOpen(false);
     mutation.mutate();
   };
 
@@ -365,6 +369,16 @@ const NewPurchasePage = () => {
           </CardContent>
         </Card>
       </div>
+      <ConfirmDialog
+        open={confirmOpen}
+        onClose={() => setConfirmOpen(false)}
+        title="Record purchase?"
+        description={`Record ${rows.length > 1 ? "these purchases" : "this purchase"} for $${total.toFixed(2)}? Stock will increase and the company's balance will be updated.`}
+        confirmLabel="Record Purchase"
+        variant="default"
+        onConfirm={confirmSubmit}
+        loading={mutation.isPending}
+      />
     </div>
   );
 };

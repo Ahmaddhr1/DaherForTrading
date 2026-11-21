@@ -3,12 +3,16 @@ import Customer from "@/models/Customers";
 import Order from "@/models/Orders";
 import Product from "@/models/Products";
 import { NextResponse } from "next/server";
+import { getUserFromCookie } from "@/lib/auth";
+import { requirePermission } from "@/lib/permissions";
 
 // Converts a draft into a real pending order: validates stock against the
 // draft's saved line items (stock was never reserved while it was a draft),
 // deducts it, and only then counts the order toward the customer's debt.
 export async function PUT(_, { params }) {
   await connectToDB();
+  const forbidden = await requirePermission(await getUserFromCookie(), "canFinalizeOrders");
+  if (forbidden) return forbidden;
 
   try {
     const { id } = await params;

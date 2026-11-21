@@ -16,6 +16,7 @@ import Link from "next/link";
 import { useSettings, formatLL } from "@/lib/currency";
 import { Combobox } from "@/components/ui/combobox";
 import { getTierPrice, getTierLabel } from "@/lib/priceTiers";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 
 let rowIdCounter = 1;
 
@@ -70,6 +71,7 @@ const MakeOrderPage = () => {
   const [isLoadingProducts, setIsLoadingProducts] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSavingDraft, setIsSavingDraft] = useState(false);
+  const [confirmOpen, setConfirmOpen] = useState(false);
 
   // Pre-fill the tax rate from business settings once, unless the user has
   // already changed it for this order.
@@ -234,14 +236,14 @@ const MakeOrderPage = () => {
   });
 
   // Submit order (real order - deducts stock and adds to the customer's debt)
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
     if (!validateRows()) return;
+    setConfirmOpen(true);
+  };
 
-    if (!window.confirm(`Create this order for $${calculateTotal().toFixed(2)}? This will deduct stock and add to the customer's debt.`)) {
-      return;
-    }
-
+  const confirmSubmit = async () => {
+    setConfirmOpen(false);
     setIsSubmitting(true);
 
     try {
@@ -558,6 +560,16 @@ const MakeOrderPage = () => {
           </CardContent>
         </Card>
       </div>
+      <ConfirmDialog
+        open={confirmOpen}
+        onClose={() => setConfirmOpen(false)}
+        title="Create order?"
+        description={`Create this order for $${calculateTotal().toFixed(2)}? This will deduct stock and add to the customer's debt.`}
+        confirmLabel="Create Order"
+        variant="default"
+        onConfirm={confirmSubmit}
+        loading={isSubmitting}
+      />
     </div>
   );
 };

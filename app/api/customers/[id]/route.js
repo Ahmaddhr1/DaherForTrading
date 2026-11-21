@@ -48,6 +48,9 @@ export async function GET(req, { params }) {
 // UPDATE customer
 export async function PUT(req, { params }) {
   await connectToDB();
+  const forbidden = await requirePermission(await getUserFromCookie(), "canManageCustomers");
+  if (forbidden) return forbidden;
+
   try {
     const id = params.id;
     const body = await req.json();

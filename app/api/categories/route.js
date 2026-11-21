@@ -1,10 +1,14 @@
 import { connectToDB } from "@/lib/connectDb";
 import Category from "@/models/Category";
 import { NextResponse } from "next/server";
+import { getUserFromCookie } from "@/lib/auth";
+import { requirePermission } from "@/lib/permissions";
 
 export async function POST(req) {
   try {
     await connectToDB();
+    const forbidden = await requirePermission(await getUserFromCookie(), "canManageCategories");
+    if (forbidden) return forbidden;
 
     const body = await req.json();
     const { name } = body;

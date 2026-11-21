@@ -54,6 +54,7 @@ export default function CompaniesPage() {
   const [endDate, setEndDate] = useState("");
   const queryClient = useQueryClient();
   const { hasPermission: canDelete } = useHasPermission("canDelete");
+  const { hasPermission: canManageCompanies } = useHasPermission("canManageCompanies");
 
   const { data, isLoading, error } = useQuery({
     queryKey: ["companies", currentPage, pageSize, searchTerm, debtFilter, sortBy, startDate, endDate],
@@ -145,12 +146,14 @@ export default function CompaniesPage() {
               </div>
             </div>
 
-            <Link href="/dashboard/companies/create">
-              <Button className="flex items-center gap-2 shrink-0">
-                <Plus className="h-4 w-4" />
-                <span className="hidden sm:inline">Add Company</span>
-              </Button>
-            </Link>
+            {canManageCompanies && (
+              <Link href="/dashboard/companies/create">
+                <Button className="flex items-center gap-2 shrink-0">
+                  <Plus className="h-4 w-4" />
+                  <span className="hidden sm:inline">Add Company</span>
+                </Button>
+              </Link>
+            )}
           </div>
         </div>
 
@@ -377,11 +380,11 @@ export default function CompaniesPage() {
                     Clear Filters
                   </Button>
                 </div>
-              ) : (
+              ) : canManageCompanies ? (
                 <Link href="/dashboard/companies/create">
                   <Button className="mt-2">Add Your First Company</Button>
                 </Link>
-              )}
+              ) : null}
             </CardContent>
           </Card>
         )}

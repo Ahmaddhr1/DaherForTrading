@@ -27,6 +27,9 @@ export async function GET(req, { params }) {
 // UPDATE company info (debt is not editable here — managed by purchases)
 export async function PUT(req, { params }) {
   await connectToDB();
+  const forbidden = await requirePermission(await getUserFromCookie(), "canManageCompanies");
+  if (forbidden) return forbidden;
+
   try {
     const { id } = params;
     const body = await req.json();

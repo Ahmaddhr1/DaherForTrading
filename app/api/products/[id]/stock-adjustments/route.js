@@ -4,6 +4,7 @@ import StockAdjustment from "@/models/StockAdjustment";
 import { NextResponse } from "next/server";
 import { getUserFromCookie } from "@/lib/auth";
 import { logActivity } from "@/lib/activityLog";
+import { requirePermission } from "@/lib/permissions";
 
 const VALID_TYPES = ["damaged", "lost", "expired", "correction", "other"];
 
@@ -12,6 +13,9 @@ const VALID_TYPES = ["damaged", "lost", "expired", "correction", "other"];
 // the audit trail can never drift apart.
 export async function POST(req, { params }) {
   await connectToDB();
+  const forbidden = await requirePermission(await getUserFromCookie(), "canManageProducts");
+  if (forbidden) return forbidden;
+
   try {
     const { id } = params;
     const { type, quantityChange, reason } = await req.json();

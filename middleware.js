@@ -74,6 +74,16 @@ const PERMISSION_GATED_PATHS = [
   { test: (p) => p === '/api/dashboard' || p.startsWith('/api/dashboard/'), permission: 'canViewStats' },
   { test: (p) => p === '/api/reports' || p.startsWith('/api/reports/'), permission: 'canViewStats' },
   { test: (p) => p === '/dashboard/reports' || p.startsWith('/dashboard/reports/'), permission: 'canViewStats' },
+  // Dedicated create/edit pages for the new per-page permissions below - the
+  // record lists themselves stay open to every employee; only the pages
+  // whose entire purpose is the gated action redirect away without it, so
+  // an employee can't land on a form that would just 403 on submit.
+  { test: (p) => p === '/dashboard/customers/create', permission: 'canManageCustomers' },
+  { test: (p) => /^\/dashboard\/customers\/[^/]+\/addorder$/.test(p), permission: 'canCreateOrders' },
+  { test: (p) => p === '/dashboard/companies/create', permission: 'canManageCompanies' },
+  { test: (p) => /^\/dashboard\/companies\/[^/]+\/addpurchase$/.test(p), permission: 'canManageCompanies' },
+  { test: (p) => p === '/dashboard/products/add', permission: 'canManageProducts' },
+  { test: (p) => p === '/dashboard/categories/add', permission: 'canManageCategories' },
 ]
 
 function permissionGateFor(pathname) {

@@ -14,12 +14,14 @@ import { Loader2, CheckCircle, PencilLine, Trash2 } from "lucide-react";
 import Link from "next/link";
 import OrderCustomerName from "../components/OrderCustomerName";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
+import { useHasPermission } from "@/lib/useHasPermission";
 
 export default function OrderDetailsPage() {
   const { orderId } = useParams();
   const queryClient = useQueryClient();
   const [amountPaid, setAmountPaid] = useState("");
   const router = useRouter();
+  const { hasPermission: canFinalizeOrders } = useHasPermission("canFinalizeOrders");
 
   const {
     data: order,
@@ -66,11 +68,12 @@ export default function OrderDetailsPage() {
     },
   });
 
+  const [confirmAction, setConfirmAction] = useState(null); // "payment" | "finalize" | null
+
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!amountPaid || Number(amountPaid) <= 0) return toast.error("Please enter a valid amount");
-    if (!window.confirm(`Record a payment of $${Number(amountPaid).toFixed(2)} for this order?`)) return;
-    mutation.mutate(amountPaid);
+    setConfirmAction("payment");
   };
 
   const finalizeMutation = useMutation({
@@ -104,8 +107,14 @@ export default function OrderDetailsPage() {
   });
 
   const handleFinalize = () => {
-    if (!window.confirm(`Finalize this draft into a real order for $${order?.total.toFixed(2)}? This will deduct stock and add to the customer's debt.`)) return;
-    finalizeMutation.mutate();
+    setConfirmAction("finalize");
+  };
+
+  const confirmProceed = () => {
+    const action = confirmAction;
+    setConfirmAction(null);
+    if (action === "payment") mutation.mutate(amountPaid);
+    if (action === "finalize") finalizeMutation.mutate();
   };
 
   const [deleteDraftOpen, setDeleteDraftOpen] = useState(false);
@@ -208,7 +217,7 @@ export default function OrderDetailsPage() {
               </Link>
               <Button
                 onClick={handleFinalize}
-                disabled={finalizeMutation.isPending}
+                disabled={finalizeMutation.isPending || !canFinalizeOrders}
                 className="w-full flex items-center gap-2 bg-green-600 hover:bg-green-700"
               >
                 {finalizeMutation.isPending ? (
@@ -266,7 +275,7 @@ export default function OrderDetailsPage() {
 
               <Button
                 type="submit"
-                disabled={mutation.isPending || !isValidAmount}
+                disabled={mutation.isPending || !isValidAmount || !canFinalizeOrders}
                 className="w-full"
               >
                 {mutation.isPending ? (
@@ -296,6 +305,20 @@ export default function OrderDetailsPage() {
         description="Delete this draft? This cannot be undone."
         onConfirm={confirmDeleteDraft}
         loading={deleteDraftMutation.isPending}
+      />
+      <ConfirmDialog
+        open={!!confirmAction}
+        onClose={() => setConfirmAction(null)}
+        title={confirmAction === "finalize" ? "Finalize draft?" : "Record payment?"}
+        description={
+          confirmAction === "finalize"
+            ? `Finalize this draft into a real order for $${order?.total.toFixed(2)}? This will deduct stock and add to the customer's debt.`
+            : `Record a payment of $${Number(amountPaid || 0).toFixed(2)} for this order?`
+        }
+        confirmLabel={confirmAction === "finalize" ? "Finalize Order" : "Record Payment"}
+        variant="default"
+        onConfirm={confirmProceed}
+        loading={mutation.isPending || finalizeMutation.isPending}
       />
     </div>
   );

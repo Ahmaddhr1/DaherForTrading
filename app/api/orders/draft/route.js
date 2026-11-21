@@ -4,6 +4,7 @@ import { NextResponse } from "next/server";
 import { getUserFromCookie } from "@/lib/auth";
 import { logActivity } from "@/lib/activityLog";
 import { priceOrderItems, PricingError } from "@/lib/orderPricing";
+import { requirePermission } from "@/lib/permissions";
 
 // Creates a draft order with no real customer yet - just a hand-typed name,
 // for the product-grid cart's "type a name" checkout path. The customer
@@ -11,6 +12,8 @@ import { priceOrderItems, PricingError } from "@/lib/orderPricing";
 // POST /api/orders/[customerId] path instead (unchanged).
 export async function POST(req) {
   await connectToDB();
+  const forbidden = await requirePermission(await getUserFromCookie(), "canCreateOrders");
+  if (forbidden) return forbidden;
 
   try {
     const { products, taxRate, customerNameText } = await req.json();

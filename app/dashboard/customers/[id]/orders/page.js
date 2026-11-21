@@ -38,6 +38,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { localDayStartISO, localDayEndISO } from "@/lib/dateUtils";
 import ProductBreakdown from "./ProductBreakdown";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
+import { useHasPermission } from "@/lib/useHasPermission";
 
 const SORT_OPTIONS = [
   { value: "newest", label: "Newest First" },
@@ -54,6 +55,8 @@ export default function CustomerOrdersTable() {
   const queryClient = useQueryClient();
 
   const [actionLoading, setActionLoading] = useState(false);
+  const { hasPermission: canCreateOrders } = useHasPermission("canCreateOrders");
+  const { hasPermission: canFinalizeOrders } = useHasPermission("canFinalizeOrders");
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [statusFilter, setStatusFilter] = useState("all"); // all | pending | partiallyPaid | paid
@@ -102,16 +105,15 @@ export default function CustomerOrdersTable() {
   const activeFilterCount = [category, startDate, endDate].filter(Boolean).length;
 
   const [deletePending, setDeletePending] = useState(null); // { action, orderId } | null
+  const [actionPending, setActionPending] = useState(null); // { action, orderId } | null
 
   const handleAction = async (action, orderId) => {
     if (action === "delete" || action === "deleteDraft") {
       setDeletePending({ action, orderId });
       return;
     }
-    if (action === "markPaid" && !window.confirm("Mark this order as fully paid?")) {
-      return;
-    }
-    if (action === "finalize" && !window.confirm("Finalize this draft into a real order? This will deduct stock and add to the customer's debt.")) {
+    if (action === "markPaid" || action === "finalize") {
+      setActionPending({ action, orderId });
       return;
     }
     await runAction(action, orderId);
@@ -121,6 +123,13 @@ export default function CustomerOrdersTable() {
     if (!deletePending) return;
     const { action, orderId } = deletePending;
     setDeletePending(null);
+    await runAction(action, orderId);
+  };
+
+  const confirmActionPending = async () => {
+    if (!actionPending) return;
+    const { action, orderId } = actionPending;
+    setActionPending(null);
     await runAction(action, orderId);
   };
 
@@ -399,13 +408,17 @@ export default function CustomerOrdersTable() {
                         <DropdownMenuContent align="end">
                           {order.status === "draft" ? (
                             <>
-                              <DropdownMenuItem onClick={() => handleAction("continueEditing", order._id)}>
-                                Continue Editing
-                              </DropdownMenuItem>
-                              <DropdownMenuItem onClick={() => handleAction("finalize", order._id)}>
-                                {actionLoading && <Loader2 className="animate-spin h-4 w-4 mr-2" />}
-                                Finalize Order
-                              </DropdownMenuItem>
+                              {canCreateOrders && (
+                                <DropdownMenuItem onClick={() => handleAction("continueEditing", order._id)}>
+                                  Continue Editing
+                                </DropdownMenuItem>
+                              )}
+                              {canFinalizeOrders && (
+                                <DropdownMenuItem onClick={() => handleAction("finalize", order._id)}>
+                                  {actionLoading && <Loader2 className="animate-spin h-4 w-4 mr-2" />}
+                                  Finalize Order
+                                </DropdownMenuItem>
+                              )}
                               <DropdownMenuItem onClick={() => handleAction("deleteDraft", order._id)}>
                                 {actionLoading && <Loader2 className="animate-spin h-4 w-4 mr-2" />}
                                 Delete Draft
@@ -420,7 +433,7 @@ export default function CustomerOrdersTable() {
                                 {actionLoading && <Loader2 className="animate-spin h-4 w-4 mr-2" />}
                                 Print
                               </DropdownMenuItem>
-                              {order.status === "pending" && (
+                              {order.status === "pending" && canCreateOrders && (
                                 <DropdownMenuItem onClick={() => router.push(`/dashboard/orders/${order._id}/edit`)}>
                                   Update Order
                                 </DropdownMenuItem>
@@ -433,12 +446,14 @@ export default function CustomerOrdersTable() {
                                     )}
                                     Undo Order
                                   </DropdownMenuItem>
-                                  <DropdownMenuItem onClick={() => handleAction("markPaid", order._id)}>
-                                    {actionLoading && (
-                                      <Loader2 className="animate-spin h-4 w-4 mr-2" />
-                                    )}
-                                    Mark as Paid
-                                  </DropdownMenuItem>
+                                  {canFinalizeOrders && (
+                                    <DropdownMenuItem onClick={() => handleAction("markPaid", order._id)}>
+                                      {actionLoading && (
+                                        <Loader2 className="animate-spin h-4 w-4 mr-2" />
+                                      )}
+                                      Mark as Paid
+                                    </DropdownMenuItem>
+                                  )}
                                 </>
                               )}
                               <DropdownMenuItem onClick={() => handleAction("edit", order._id)}>
@@ -495,6 +510,20 @@ export default function CustomerOrdersTable() {
         }
         confirmLabel={deletePending?.action === "deleteDraft" ? "Delete" : "Undo Order"}
         onConfirm={confirmDeletePending}
+        loading={actionLoading}
+      />
+      <ConfirmDialog
+        open={!!actionPending}
+        onClose={() => setActionPending(null)}
+        title={actionPending?.action === "finalize" ? "Finalize draft?" : "Mark as paid?"}
+        description={
+          actionPending?.action === "finalize"
+            ? "Finalize this draft into a real order? This will deduct stock and add to the customer's debt."
+            : "Mark this order as fully paid?"
+        }
+        confirmLabel={actionPending?.action === "finalize" ? "Finalize Order" : "Mark as Paid"}
+        variant="default"
+        onConfirm={confirmActionPending}
         loading={actionLoading}
       />
     </div>

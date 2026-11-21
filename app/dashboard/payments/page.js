@@ -10,6 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Modal } from "@/components/ui/modal";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { TableSkeleton } from "@/components/ui/skeleton-patterns";
 import { FiltersPanel } from "@/components/ui/filters-panel";
 import { getTodayDateString, localDayStartISO, localDayEndISO } from "@/lib/dateUtils";
@@ -38,6 +39,7 @@ import {
   History,
 } from "lucide-react";
 import { format } from "date-fns";
+import { useHasPermission } from "@/lib/useHasPermission";
 
 const SORT_OPTIONS = [
   { value: "newest", label: "Newest First" },
@@ -64,6 +66,7 @@ export default function PaymentsPage() {
   const [hasInteracted, setHasInteracted] = useState(false);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const { hasPermission: canManagePayments } = useHasPermission("canManagePayments");
 
   const queryClient = useQueryClient();
 
@@ -162,10 +165,12 @@ export default function PaymentsPage() {
               </div>
             </div>
 
-            <Button onClick={() => setIsModalOpen(true)} className="flex items-center gap-2 shrink-0">
-              <Plus className="h-4 w-4" />
-              <span className="hidden sm:inline">Make a Payment</span>
-            </Button>
+            {canManagePayments && (
+              <Button onClick={() => setIsModalOpen(true)} className="flex items-center gap-2 shrink-0">
+                <Plus className="h-4 w-4" />
+                <span className="hidden sm:inline">Make a Payment</span>
+              </Button>
+            )}
           </div>
         </div>
 
@@ -400,6 +405,7 @@ function MakePaymentForm({ onSuccess }) {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCustomer, setSelectedCustomer] = useState(null);
   const [amount, setAmount] = useState("");
+  const [confirmOpen, setConfirmOpen] = useState(false);
 
   // Debounce the raw typed input before it drives the request.
   useEffect(() => {
@@ -477,10 +483,11 @@ function MakePaymentForm({ onSuccess }) {
       toast.error("Enter a valid payment amount (up to the current debt)");
       return;
     }
-    if (!window.confirm(`Record a payment of $${paymentAmount.toFixed(2)} for ${selectedCustomer.fullName}?`)) {
-      return;
-    }
-    paymentMutation.mutate();
+    setConfirmOpen(true);
+  };
+
+  const confirmSubmit = () => {
+    paymentMutation.mutate(undefined, { onSuccess: () => setConfirmOpen(false) });
   };
 
   const customers = searchData?.customers || [];
@@ -604,6 +611,16 @@ function MakePaymentForm({ onSuccess }) {
           )}
         </div>
       )}
+      <ConfirmDialog
+        open={confirmOpen}
+        onClose={() => setConfirmOpen(false)}
+        title="Record payment?"
+        description={`Record a payment of $${paymentAmount.toFixed(2)} for ${selectedCustomer?.fullName}?`}
+        confirmLabel="Record Payment"
+        variant="default"
+        onConfirm={confirmSubmit}
+        loading={paymentMutation.isPending}
+      />
     </div>
   );
 }

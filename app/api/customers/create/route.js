@@ -1,9 +1,14 @@
 import { connectToDB } from "@/lib/connectDb";
 import Customer from "@/models/Customers";
 import { NextResponse } from "next/server";
+import { getUserFromCookie } from "@/lib/auth";
+import { requirePermission } from "@/lib/permissions";
 
 export async function POST(req) {
   await connectToDB();
+  const forbidden = await requirePermission(await getUserFromCookie(), "canManageCustomers");
+  if (forbidden) return forbidden;
+
   try {
     const { fullName, phoneNumber, debt, priceTier } = await req.json();
 

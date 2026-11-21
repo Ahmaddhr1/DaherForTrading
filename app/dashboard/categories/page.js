@@ -19,12 +19,14 @@ import {
   ChevronLeft,
   ChevronRight,
 } from "lucide-react";
+import { useHasPermission } from "@/lib/useHasPermission";
 
 const CategoriesPage = () => {
   const [searchInput, setSearchInput] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const limit = 12;
+  const { hasPermission: canManageCategories } = useHasPermission("canManageCategories");
 
   // Fetch categories data
   const { data, isLoading, error } = useQuery({
@@ -75,12 +77,14 @@ const CategoriesPage = () => {
               </div>
             </div>
 
-            <Link href="/dashboard/categories/add">
-              <Button className="flex items-center gap-2 shrink-0">
-                <Plus className="h-4 w-4" />
-                <span className="hidden sm:inline">Add Category</span>
-              </Button>
-            </Link>
+            {canManageCategories && (
+              <Link href="/dashboard/categories/add">
+                <Button className="flex items-center gap-2 shrink-0">
+                  <Plus className="h-4 w-4" />
+                  <span className="hidden sm:inline">Add Category</span>
+                </Button>
+              </Link>
+            )}
           </div>
         </div>
 
@@ -139,7 +143,7 @@ const CategoriesPage = () => {
                   ? "Try adjusting your search."
                   : "Categories help you organize your products. Create your first category to get started."}
               </p>
-              {!searchTerm && (
+              {!searchTerm && canManageCategories && (
                 <Link href="/dashboard/categories/add">
                   <Button>
                     <Plus className="h-4 w-4 mr-2" />

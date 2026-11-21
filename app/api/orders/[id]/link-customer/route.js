@@ -4,6 +4,7 @@ import Order from "@/models/Orders";
 import { NextResponse } from "next/server";
 import { logActivity } from "@/lib/activityLog";
 import { getUserFromCookie } from "@/lib/auth";
+import { requirePermission } from "@/lib/permissions";
 
 // Attaches a real customer to a draft that only has a hand-typed
 // customerNameText (from the product-grid cart's "type a name" checkout).
@@ -11,6 +12,8 @@ import { getUserFromCookie } from "@/lib/auth";
 // separate explicit action (PUT /api/orders/[id]/finalize).
 export async function PATCH(req, { params }) {
   await connectToDB();
+  const forbidden = await requirePermission(await getUserFromCookie(), "canCreateOrders");
+  if (forbidden) return forbidden;
 
   try {
     const { id } = await params;

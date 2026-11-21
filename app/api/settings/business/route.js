@@ -3,11 +3,14 @@ import AppSettings from "@/models/AppSettings";
 import { NextResponse } from "next/server";
 import { getUserFromCookie } from "@/lib/auth";
 import { logActivity } from "@/lib/activityLog";
+import { requirePermission } from "@/lib/permissions";
 
-// Business-wide settings (dollar->LL rate, default tax rate). Open to any
-// logged-in admin (owner or employee) - see middleware.js, which does not
-// list this path as owner-only, since the exchange rate is day-to-day
-// operational data rather than an admin/security setting.
+// Business-wide settings (dollar->LL rate, default tax rate). Viewable (GET)
+// by any logged-in admin - see middleware.js, which does not list this path
+// as owner-only, since the exchange rate is day-to-day operational data
+// rather than an admin/security setting. Editing (PUT) still needs the
+// canManageSettings permission, same opt-in-extra-capability pattern as
+// canManageDisbursements etc. (see lib/permissions.js).
 
 async function getOrCreateSettings() {
   let settings = await AppSettings.findOne({ key: "app" });
@@ -32,6 +35,9 @@ export async function GET() {
 
 export async function PUT(req) {
   await connectToDB();
+  const forbidden = await requirePermission(await getUserFromCookie(), "canManageSettings");
+  if (forbidden) return forbidden;
+
   try {
     const { dollarRate, taxRate } = await req.json();
 

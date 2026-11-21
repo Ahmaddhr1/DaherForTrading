@@ -4,9 +4,13 @@ import Purchase from "@/models/Purchase";
 import { NextResponse } from "next/server";
 import { getUserFromCookie } from "@/lib/auth";
 import { logActivity } from "@/lib/activityLog";
+import { requirePermission } from "@/lib/permissions";
 
 export async function POST(req) {
   await connectToDB();
+  const forbidden = await requirePermission(await getUserFromCookie(), "canManageCompanies");
+  if (forbidden) return forbidden;
+
   try {
     const { name, phoneNumber, address } = await req.json();
 

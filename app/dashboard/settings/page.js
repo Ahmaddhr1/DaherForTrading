@@ -29,6 +29,8 @@ import {
 } from "lucide-react";
 import { useSettings } from "@/lib/currency";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
+import { useHasPermission } from "@/lib/useHasPermission";
 
 const RESTORE_WARNING =
   "This will permanently replace all current customers, orders, products, categories, companies, purchases, payments, and disbursements with the contents of this file. This cannot be undone. Continue?";
@@ -43,6 +45,7 @@ export default function SettingsPage() {
     queryFn: async () => (await axios.get("/api/admin/me")).data,
   });
   const isOwner = me?.role === "owner";
+  const { hasPermission: canManageSettings } = useHasPermission("canManageSettings");
 
   const [passwordForm, setPasswordForm] = useState({
     currentPassword: "",
@@ -209,10 +212,15 @@ export default function SettingsPage() {
     },
   });
 
+  const [confirmRestoreOpen, setConfirmRestoreOpen] = useState(false);
+
   const handleRestore = () => {
     if (!restoreFile) return;
-    if (!window.confirm(RESTORE_WARNING)) return;
+    setConfirmRestoreOpen(true);
+  };
 
+  const confirmRestore = () => {
+    setConfirmRestoreOpen(false);
     const reader = new FileReader();
     reader.onload = () => {
       try {
@@ -285,6 +293,7 @@ export default function SettingsPage() {
                     value={dollarRate}
                     onChange={(e) => setDollarRate(e.target.value)}
                     placeholder="90000"
+                    disabled={!canManageSettings}
                   />
                   <p className="text-xs text-gray-500 dark:text-gray-400">
                     e.g. 90000 means $1 = 90,000 LL. Update this whenever the rate moves.
@@ -307,6 +316,7 @@ export default function SettingsPage() {
                     value={taxRate}
                     onChange={(e) => setTaxRate(e.target.value)}
                     placeholder="0"
+                    disabled={!canManageSettings}
                   />
                   <p className="text-xs text-gray-500 dark:text-gray-400">
                     Pre-fills the tax field when creating an order or purchase - it can
@@ -316,7 +326,7 @@ export default function SettingsPage() {
 
                 <Button
                   type="submit"
-                  disabled={settingsMutation.isPending}
+                  disabled={settingsMutation.isPending || !canManageSettings}
                   className="bg-green-600 hover:bg-green-700"
                 >
                   {settingsMutation.isPending ? (
@@ -606,6 +616,15 @@ export default function SettingsPage() {
           </Card>
         )}
       </div>
+      <ConfirmDialog
+        open={confirmRestoreOpen}
+        onClose={() => setConfirmRestoreOpen(false)}
+        title="Restore backup?"
+        description={RESTORE_WARNING}
+        confirmLabel="Restore"
+        onConfirm={confirmRestore}
+        loading={restoreMutation.isPending}
+      />
     </div>
   );
 }

@@ -115,6 +115,8 @@ export async function DELETE(request, { params }) {
 // delta before any write happens.
 export async function PUT(req, { params }) {
   await connectToDB();
+  const forbiddenPermission = await requirePermission(await getUserFromCookie(), "canCreateOrders");
+  if (forbiddenPermission) return forbiddenPermission;
 
   try {
     const { id } = await params;
@@ -289,6 +291,8 @@ export async function PUT(req, { params }) {
 
 export async function POST(req, { params }) {
   await connectToDB();
+  const forbiddenPermission = await requirePermission(await getUserFromCookie(), "canCreateOrders");
+  if (forbiddenPermission) return forbiddenPermission;
 
   try {
     const customerId = params.id;

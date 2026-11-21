@@ -7,17 +7,27 @@ import { NextResponse } from "next/server";
 // whether it's been paid, plus running totals. Used both by the
 // authenticated dashboard statement page and as the source the public
 // share link is built from.
-export async function GET(_, { params }) {
+export async function GET(req, { params }) {
   await connectToDB();
   try {
     const { id } = await params;
+    const { searchParams } = new URL(req.url);
+    const startDate = searchParams.get("startDate");
+    const endDate = searchParams.get("endDate");
 
     const company = await Company.findById(id).select("name phoneNumber debt");
     if (!company) {
       return NextResponse.json({ message: "Company not found" }, { status: 404 });
     }
 
-    const purchases = await Purchase.find({ company: company._id })
+    const query = { company: company._id };
+    if (startDate || endDate) {
+      query.createdAt = {};
+      if (startDate) query.createdAt.$gte = new Date(startDate);
+      if (endDate) query.createdAt.$lte = new Date(endDate);
+    }
+
+    const purchases = await Purchase.find(query)
       .select("productName quantity unitPrice total paid createdAt")
       .sort({ createdAt: -1 });
 

@@ -6,7 +6,7 @@ import { format } from "date-fns";
 import { FileText, Calendar, Printer, MessageCircle, Receipt, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { useState } from "react";
-import { generateThermalStatementPdf, sharePdfOrDownload } from "@/lib/thermalPdf";
+import { generateStatementPdf, sharePdfOrDownload } from "@/lib/thermalPdf";
 import {
   Table,
   TableBody,
@@ -19,10 +19,17 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
 import { PageHeaderSkeleton, TableSkeleton } from "@/components/ui/skeleton-patterns";
+import { localDayStartISO, localDayEndISO } from "@/lib/dateUtils";
 
-const fetchStatement = async (id) => {
-  const res = await fetch(`/api/customers/${id}/statement`);
+const fetchStatement = async (id, startDate, endDate) => {
+  const params = new URLSearchParams();
+  if (startDate) params.set("startDate", localDayStartISO(startDate));
+  if (endDate) params.set("endDate", localDayEndISO(endDate));
+  const qs = params.toString();
+  const res = await fetch(`/api/customers/${id}/statement${qs ? `?${qs}` : ""}`);
   if (!res.ok) throw new Error("Failed to fetch statement");
   return res.json();
 };
@@ -36,12 +43,18 @@ const statusConfig = {
 export default function CustomerStatementPage() {
   const { id } = useParams();
   const [isSharingPdf, setIsSharingPdf] = useState(false);
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
 
   const { data: statement, isLoading, isError } = useQuery({
-    queryKey: ["customer-statement", id],
-    queryFn: () => fetchStatement(id),
+    queryKey: ["customer-statement", id, startDate, endDate],
+    queryFn: () => fetchStatement(id, startDate, endDate),
     enabled: !!id,
   });
+
+  const periodLabel = startDate || endDate
+    ? `${startDate ? format(new Date(startDate), "MMM d, yyyy") : "the start"} - ${endDate ? format(new Date(endDate), "MMM d, yyyy") : "today"}`
+    : "All Time";
 
   const handleShareWhatsApp = () => {
     const phoneDigits = statement?.phoneNumber?.toString().replace(/\D/g, "");
@@ -59,15 +72,25 @@ export default function CustomerStatementPage() {
   const handleShareThermalPdf = async () => {
     setIsSharingPdf(true);
     try {
-      const blob = generateThermalStatementPdf({
+      const blob = generateStatementPdf({
         title: "ACCOUNT STATEMENT",
         subtitle: statement.fullName,
-        meta: format(new Date(), "MMM d, yyyy h:mm a"),
-        rows: statement.orders.map((order) => ({
-          label: format(new Date(order.createdAt), "MMM d, yyyy"),
-          amount: `$${order.total.toFixed(2)}`,
-          sub: `Paid $${order.amountpaid.toFixed(2)}  Rem $${order.remainingBalance.toFixed(2)}  [${(statusConfig[order.status] || statusConfig.pending).label}]`,
-        })),
+        meta: `Generated ${format(new Date(), "MMM d, yyyy h:mm a")}`,
+        periodLabel,
+        columns: [
+          { header: "Date" },
+          { header: "Total", align: "right" },
+          { header: "Paid", align: "right" },
+          { header: "Remaining", align: "right" },
+          { header: "Status", align: "center" },
+        ],
+        rows: statement.orders.map((order) => [
+          format(new Date(order.createdAt), "MMM d, yyyy"),
+          `$${order.total.toFixed(2)}`,
+          `$${order.amountpaid.toFixed(2)}`,
+          `$${order.remainingBalance.toFixed(2)}`,
+          (statusConfig[order.status] || statusConfig.pending).label,
+        ]),
         totals: [
           { label: "Total Billed", value: `$${statement.totals.totalAmount.toFixed(2)}` },
           { label: "Total Paid", value: `$${statement.totals.totalPaid.toFixed(2)}` },
@@ -122,6 +145,17 @@ export default function CustomerStatementPage() {
           <div className="flex items-center text-gray-500 text-sm">
             <Calendar className="h-4 w-4 mr-1" />
             Generated {format(new Date(), "EEEE, MMMM d, yyyy")}
+          </div>
+          <div className="flex flex-wrap items-end gap-3 mt-4 print:hidden">
+            <div className="space-y-1">
+              <Label htmlFor="statement-start" className="text-xs font-medium text-gray-600">From</Label>
+              <Input id="statement-start" type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} className="w-40" />
+            </div>
+            <div className="space-y-1">
+              <Label htmlFor="statement-end" className="text-xs font-medium text-gray-600">To</Label>
+              <Input id="statement-end" type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} className="w-40" />
+            </div>
+            <p className="text-xs text-gray-500 pb-2">Leave blank for all time. Period: {periodLabel}</p>
           </div>
           <div className="flex flex-wrap gap-2 mt-2">
             <Button variant="outline" onClick={() => window.print()} className="flex items-center gap-2">

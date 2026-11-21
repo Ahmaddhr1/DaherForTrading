@@ -26,11 +26,14 @@ import axios from "axios";
 import { toast } from "sonner";
 import { useParams } from "next/navigation";
 import Link from "next/link";
+import { useHasPermission } from "@/lib/useHasPermission";
 
 const EditCompanyPage = () => {
   const router = useRouter();
   const { id } = useParams();
   const queryClient = useQueryClient();
+  const { hasPermission: canEditCompanies } = useHasPermission("canEditCompanies");
+  const { hasPermission: canRecordPurchases } = useHasPermission("canRecordPurchases");
 
   const [form, setForm] = useState({
     name: "",
@@ -147,12 +150,14 @@ const EditCompanyPage = () => {
                   <Badge variant="secondary" className="ml-1">{purchasesCount}</Badge>
                 </Button>
               </Link>
-              <Link href={`/dashboard/companies/${id}/addpurchase`} className="flex-1 sm:flex-none">
-                <Button className="flex items-center gap-2 w-full sm:w-auto justify-center">
-                  <Plus className="h-4 w-4" />
-                  <span className="hidden sm:inline">New Purchase</span>
-                </Button>
-              </Link>
+              {canRecordPurchases && (
+                <Link href={`/dashboard/companies/${id}/addpurchase`} className="flex-1 sm:flex-none">
+                  <Button className="flex items-center gap-2 w-full sm:w-auto justify-center">
+                    <Plus className="h-4 w-4" />
+                    <span className="hidden sm:inline">New Purchase</span>
+                  </Button>
+                </Link>
+              )}
               <Link href={`/dashboard/companies/${id}/statement`} className="flex-1 sm:flex-none">
                 <Button variant="outline" className="flex items-center gap-2 w-full sm:w-auto justify-center">
                   <FileText className="h-4 w-4" />
@@ -179,7 +184,7 @@ const EditCompanyPage = () => {
                       <Building2 className="h-4 w-4" />
                       Company Name *
                     </Label>
-                    <Input id="name" name="name" value={form.name} onChange={handleChange} required />
+                    <Input id="name" name="name" value={form.name} onChange={handleChange} disabled={!canEditCompanies} required />
                   </div>
 
                   <div className="space-y-2">
@@ -187,7 +192,7 @@ const EditCompanyPage = () => {
                       <Phone className="h-4 w-4" />
                       Phone Number
                     </Label>
-                    <Input id="phoneNumber" name="phoneNumber" value={form.phoneNumber} onChange={handleChange} />
+                    <Input id="phoneNumber" name="phoneNumber" value={form.phoneNumber} onChange={handleChange} disabled={!canEditCompanies} />
                   </div>
 
                   <div className="space-y-2">
@@ -195,7 +200,7 @@ const EditCompanyPage = () => {
                       <MapPin className="h-4 w-4" />
                       Address
                     </Label>
-                    <Input id="address" name="address" value={form.address} onChange={handleChange} />
+                    <Input id="address" name="address" value={form.address} onChange={handleChange} disabled={!canEditCompanies} />
                   </div>
 
                   <Separator />
@@ -224,7 +229,7 @@ const EditCompanyPage = () => {
                     <Button type="button" variant="outline" onClick={() => router.back()} className="flex-1">
                       Cancel
                     </Button>
-                    <Button type="submit" disabled={mutation.isPending} className="flex-1">
+                    <Button type="submit" disabled={mutation.isPending || !canEditCompanies} className="flex-1">
                       {mutation.isPending ? (
                         <span className="flex items-center gap-2">
                           <Loader2 className="animate-spin h-4 w-4" />

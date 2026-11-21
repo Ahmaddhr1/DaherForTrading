@@ -5,10 +5,14 @@ import Payment from "@/models/Payment";
 import { NextResponse } from "next/server";
 import { getUserFromCookie } from "@/lib/auth";
 import { logActivity } from "@/lib/activityLog";
+import { requirePermission } from "@/lib/permissions";
 
 // Create a payment against a customer's outstanding debt.
 export async function POST(req) {
   await connectToDB();
+  const forbidden = await requirePermission(await getUserFromCookie(), "canManagePayments");
+  if (forbidden) return forbidden;
+
   try {
     const { customerId, amount } = await req.json();
 

@@ -468,6 +468,7 @@ function AddDisbursementForm({ onSuccess }) {
   const [description, setDescription] = useState("");
   const [amount, setAmount] = useState("");
   const [category, setCategory] = useState("Other");
+  const [confirmOpen, setConfirmOpen] = useState(false);
 
   const mutation = useMutation({
     mutationFn: async () => {
@@ -497,13 +498,16 @@ function AddDisbursementForm({ onSuccess }) {
       toast.error("Enter a valid amount");
       return;
     }
-    if (!window.confirm(`Record a disbursement of $${parseFloat(amount).toFixed(2)} for "${description}"?`)) {
-      return;
-    }
+    setConfirmOpen(true);
+  };
+
+  const confirmSubmit = () => {
+    setConfirmOpen(false);
     mutation.mutate();
   };
 
   return (
+    <>
     <form onSubmit={handleSubmit} className="space-y-4">
       <div className="space-y-2">
         <Label htmlFor="description">Description *</Label>
@@ -558,5 +562,16 @@ function AddDisbursementForm({ onSuccess }) {
         )}
       </Button>
     </form>
+    <ConfirmDialog
+      open={confirmOpen}
+      onClose={() => setConfirmOpen(false)}
+      title="Record disbursement?"
+      description={`Record a disbursement of $${parseFloat(amount || 0).toFixed(2)} for "${description}"?`}
+      confirmLabel="Record Disbursement"
+      variant="default"
+      onConfirm={confirmSubmit}
+      loading={mutation.isPending}
+    />
+    </>
   );
 }

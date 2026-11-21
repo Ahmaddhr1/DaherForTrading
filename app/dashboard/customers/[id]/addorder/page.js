@@ -16,6 +16,8 @@ import Link from "next/link";
 import { useSettings, formatLL } from "@/lib/currency";
 import { Combobox } from "@/components/ui/combobox";
 import { getTierPrice, getTierLabel } from "@/lib/priceTiers";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
+import { useHasPermission } from "@/lib/useHasPermission";
 
 let rowIdCounter = 1;
 
@@ -47,14 +49,18 @@ const MakeOrderPage = () => {
 
   const { data: settings } = useSettings();
 
-  // Only an owner can price a catalog product away from its tier price or
-  // price a custom item at all - see priceOrderItems in the orders API,
-  // which enforces this server-side too, not just here.
+  // An owner, or an employee granted canOverrideOrderPricing, can price a
+  // catalog product away from its tier price or price a custom item at
+  // all - see priceOrderItems in the orders API, which enforces this
+  // server-side too, not just here.
   const { data: me } = useQuery({
     queryKey: ["admin", "me"],
     queryFn: async () => (await axios.get("/api/admin/me")).data,
   });
   const isOwner = me?.role === "owner";
+  const { hasPermission: canOverridePricing } = useHasPermission("canOverrideOrderPricing");
+  const canOverride = isOwner || canOverridePricing;
+  const { hasPermission: canCreateOrders } = useHasPermission("canCreateOrders");
 
   const { data: customer, isLoading: isLoadingCustomer } = useQuery({
     queryKey: ["customer", customerId],
@@ -70,6 +76,7 @@ const MakeOrderPage = () => {
   const [isLoadingProducts, setIsLoadingProducts] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSavingDraft, setIsSavingDraft] = useState(false);
+  const [confirmOpen, setConfirmOpen] = useState(false);
 
   // Pre-fill the tax rate from business settings once, unless the user has
   // already changed it for this order.
@@ -99,10 +106,11 @@ const MakeOrderPage = () => {
     setOrderRows((rows) => [...rows, makeProductRow()]);
   };
 
-  // Employees can only ever add a custom item as a giveaway (free) - pricing
-  // something outside the catalog is owner-only, enforced again server-side.
+  // Without canOverrideOrderPricing, a custom item can only ever be added
+  // as a giveaway (free) - pricing something outside the catalog needs
+  // that permission, enforced again server-side.
   const addCustomRow = () => {
-    setOrderRows((rows) => [...rows, makeCustomRow(!isOwner)]);
+    setOrderRows((rows) => [...rows, makeCustomRow(!canOverride)]);
   };
 
   // Remove product row
@@ -141,7 +149,7 @@ const MakeOrderPage = () => {
         updatedRow.quantity = parseInt(value) || 1;
       }
       else if (field === "price") {
-        if (!isOwner) return row; // price is locked for employees
+        if (!canOverride) return row; // price is locked without canOverrideOrderPricing
         updatedRow.price = value.replace(/[^0-9.]/g, "");
       }
       else if (field === "discount") {
@@ -153,8 +161,8 @@ const MakeOrderPage = () => {
           updatedRow.price = "0";
         } else if (!updatedRow.isCustom) {
           // Un-checking "Free" on a catalog product row restores its tier
-          // price. A custom row just goes back to blank (only an owner can
-          // set it, and they'll type it in).
+          // price. A custom row just goes back to blank (needs
+          // canOverrideOrderPricing to set it, and they'll type it in).
           const selectedProduct = products.find((p) => p._id === updatedRow.productId);
           updatedRow.price = selectedProduct ? getTierPrice(selectedProduct, priceTier).toString() : "";
         } else {
@@ -234,14 +242,14 @@ const MakeOrderPage = () => {
   });
 
   // Submit order (real order - deducts stock and adds to the customer's debt)
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
     if (!validateRows()) return;
+    setConfirmOpen(true);
+  };
 
-    if (!window.confirm(`Create this order for $${calculateTotal().toFixed(2)}? This will deduct stock and add to the customer's debt.`)) {
-      return;
-    }
-
+  const confirmSubmit = async () => {
+    setConfirmOpen(false);
     setIsSubmitting(true);
 
     try {
@@ -313,9 +321,9 @@ const MakeOrderPage = () => {
               Pricing for {customer.fullName}: <span className="font-medium text-gray-700 dark:text-gray-300">{getTierLabel(priceTier)}</span>
             </p>
           )}
-          {!isOwner && (
+          {!canOverride && (
             <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-              Prices are set automatically for your account. Ask an owner to override a price or price a custom item.
+              Prices are set automatically for your account. Ask an owner for the &quot;Override order pricing&quot; permission to set a price or price a custom item.
             </p>
           )}
         </div>
@@ -387,8 +395,8 @@ const MakeOrderPage = () => {
                           value={row.free ? "0" : row.price}
                           onChange={(e) => handleRowChange(row.id, "price", e.target.value)}
                           placeholder={row.isCustom ? "0.00" : "Select a product"}
-                          disabled={row.free || !isOwner}
-                          className={row.free || !isOwner ? "bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400" : ""}
+                          disabled={row.free || !canOverride}
+                          className={row.free || !canOverride ? "bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400" : ""}
                           required
                         />
                       </div>
@@ -428,7 +436,7 @@ const MakeOrderPage = () => {
                       <input
                         type="checkbox"
                         checked={row.free}
-                        disabled={row.isCustom && !isOwner}
+                        disabled={row.isCustom && !canOverride}
                         onChange={(e) => handleRowChange(row.id, "free", e.target.checked)}
                         className="h-4 w-4 rounded border-gray-300 dark:border-gray-700 text-green-600 focus:ring-green-500"
                       />
@@ -521,7 +529,7 @@ const MakeOrderPage = () => {
                   type="button"
                   variant="outline"
                   onClick={handleSaveDraft}
-                  disabled={isSubmitting || isSavingDraft}
+                  disabled={isSubmitting || isSavingDraft || !canCreateOrders}
                   className="sm:flex-1"
                 >
                   {isSavingDraft ? (
@@ -538,7 +546,7 @@ const MakeOrderPage = () => {
                 </Button>
                 <Button
                   type="submit"
-                  disabled={isSubmitting || isSavingDraft}
+                  disabled={isSubmitting || isSavingDraft || !canCreateOrders}
                   className="sm:flex-1"
                 >
                   {isSubmitting ? (
@@ -558,6 +566,16 @@ const MakeOrderPage = () => {
           </CardContent>
         </Card>
       </div>
+      <ConfirmDialog
+        open={confirmOpen}
+        onClose={() => setConfirmOpen(false)}
+        title="Create order?"
+        description={`Create this order for $${calculateTotal().toFixed(2)}? This will deduct stock and add to the customer's debt.`}
+        confirmLabel="Create Order"
+        variant="default"
+        onConfirm={confirmSubmit}
+        loading={isSubmitting}
+      />
     </div>
   );
 };

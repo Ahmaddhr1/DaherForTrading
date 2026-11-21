@@ -18,11 +18,14 @@ import { toast } from "sonner";
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import { PRICE_TIERS } from "@/lib/priceTiers";
+import { useHasPermission } from "@/lib/useHasPermission";
 
 const EditCustomerPage = () => {
   const router = useRouter();
   const { id } = useParams();
   const queryClient = useQueryClient();
+  const { hasPermission: canEditCustomers } = useHasPermission("canEditCustomers");
+  const { hasPermission: canCreateOrders } = useHasPermission("canCreateOrders");
 
   const [form, setForm] = useState({
     fullName: "",
@@ -157,14 +160,16 @@ const EditCustomerPage = () => {
               </div>
             </div>
 
-            <div className="flex items-center gap-3">
-              <Link href={`/dashboard/customers/${id}/addorder`} className="flex-1 sm:flex-none">
-                <Button className="flex items-center gap-2 w-full sm:w-auto justify-center">
-                  <Package className="h-4 w-4" />
-                  Create Order
-                </Button>
-              </Link>
-            </div>
+            {canCreateOrders && (
+              <div className="flex items-center gap-3">
+                <Link href={`/dashboard/customers/${id}/addorder`} className="flex-1 sm:flex-none">
+                  <Button className="flex items-center gap-2 w-full sm:w-auto justify-center">
+                    <Package className="h-4 w-4" />
+                    Create Order
+                  </Button>
+                </Link>
+              </div>
+            )}
           </div>
 
           {/* Customer Quick Actions */}
@@ -246,6 +251,7 @@ const EditCustomerPage = () => {
                           value={form.fullName}
                           onChange={handleChange}
                           className="focus:border-blue-500 transition-colors"
+                          disabled={!canEditCustomers}
                           required
                         />
                       </div>
@@ -264,6 +270,7 @@ const EditCustomerPage = () => {
                           value={form.phoneNumber}
                           onChange={handleChange}
                           className="focus:border-blue-500 transition-colors"
+                          disabled={!canEditCustomers}
                           required
                         />
                       </div>
@@ -289,7 +296,8 @@ const EditCustomerPage = () => {
                         name="priceTier"
                         value={form.priceTier}
                         onChange={handleChange}
-                        className="w-full p-2 border border-gray-300 dark:border-gray-700 rounded-md focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-colors"
+                        disabled={!canEditCustomers}
+                        className="w-full p-2 border border-gray-300 dark:border-gray-700 rounded-md focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
                       >
                         {PRICE_TIERS.map((tier) => (
                           <option key={tier.value} value={tier.value}>
@@ -346,7 +354,7 @@ const EditCustomerPage = () => {
                     </Button>
                     <Button
                       type="submit"
-                      disabled={mutation.isPending}
+                      disabled={mutation.isPending || !canEditCustomers}
                       className="flex-1"
                     >
                       {mutation.isPending ? (

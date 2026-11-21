@@ -16,6 +16,8 @@ import { useSettings, formatLL } from "@/lib/currency";
 import { Combobox } from "@/components/ui/combobox";
 import { getTierPrice, getTierLabel } from "@/lib/priceTiers";
 import OrderCustomerName from "../../components/OrderCustomerName";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
+import { useHasPermission } from "@/lib/useHasPermission";
 
 let rowIdCounter = 1;
 
@@ -26,14 +28,19 @@ export default function EditOrderPage() {
 
   const { data: settings } = useSettings();
 
-  // Only an owner can price a catalog product away from its tier price or
-  // price a custom item at all - see priceOrderItems in the orders API,
-  // which enforces this server-side too, not just here.
+  // An owner, or an employee granted canOverrideOrderPricing, can price a
+  // catalog product away from its tier price or price a custom item at
+  // all - see priceOrderItems in the orders API, which enforces this
+  // server-side too, not just here.
   const { data: me } = useQuery({
     queryKey: ["admin", "me"],
     queryFn: async () => (await axios.get("/api/admin/me")).data,
   });
   const isOwner = me?.role === "owner";
+  const { hasPermission: canOverridePricing } = useHasPermission("canOverrideOrderPricing");
+  const canOverride = isOwner || canOverridePricing;
+  const { hasPermission: canFinalizeOrders } = useHasPermission("canFinalizeOrders");
+  const { hasPermission: canEditOrders } = useHasPermission("canEditOrders");
 
   const [products, setProducts] = useState([]);
   const [orderRows, setOrderRows] = useState([]);
@@ -89,12 +96,13 @@ export default function EditOrderPage() {
     ]);
   };
 
-  // Employees can only ever add a custom item as a giveaway (free) - pricing
-  // something outside the catalog is owner-only, enforced again server-side.
+  // Without canOverrideOrderPricing, a custom item can only ever be added
+  // as a giveaway (free) - pricing something outside the catalog needs
+  // that permission, enforced again server-side.
   const addCustomRow = () => {
     setOrderRows((rows) => [
       ...rows,
-      { id: rowIdCounter++, isCustom: true, productId: "", customName: "", quantity: 1, price: "", discount: "", free: !isOwner },
+      { id: rowIdCounter++, isCustom: true, productId: "", customName: "", quantity: 1, price: "", discount: "", free: !canOverride },
     ]);
   };
 
@@ -124,7 +132,7 @@ export default function EditOrderPage() {
         } else if (field === "quantity") {
           updatedRow.quantity = parseInt(value) || 1;
         } else if (field === "price") {
-          if (!isOwner) return row; // price is locked for employees
+          if (!canOverride) return row; // price is locked without canOverrideOrderPricing
           updatedRow.price = value.replace(/[^0-9.]/g, "");
         } else if (field === "discount") {
           updatedRow.discount = value.replace(/[^0-9.]/g, "");
@@ -192,17 +200,9 @@ export default function EditOrderPage() {
       free: row.free,
     }));
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!validateRows()) return;
+  const [confirmAction, setConfirmAction] = useState(null); // "update" | "finalize" | null
 
-    // A draft is just a scratchpad, so it's saved without asking - but a
-    // pending order already reserves stock and counts toward debt, so
-    // changing its line items is confirmed first.
-    if (!isDraft && !window.confirm(`Update this order to $${calculateTotal().toFixed(2)}? Stock and the customer's debt will be adjusted for the difference.`)) {
-      return;
-    }
-
+  const doUpdate = async () => {
     setIsSubmitting(true);
     try {
       await axios.put(`/api/orders/${orderId}`, {
@@ -222,12 +222,21 @@ export default function EditOrderPage() {
     }
   };
 
-  const handleFinalize = async () => {
+  const handleSubmit = (e) => {
+    e.preventDefault();
     if (!validateRows()) return;
-    if (!window.confirm(`Finalize this draft into a real order for $${calculateTotal().toFixed(2)}? This will deduct stock and add to the customer's debt.`)) {
+
+    // A draft is just a scratchpad, so it's saved without asking - but a
+    // pending order already reserves stock and counts toward debt, so
+    // changing its line items is confirmed first.
+    if (!isDraft) {
+      setConfirmAction("update");
       return;
     }
+    doUpdate();
+  };
 
+  const doFinalize = async () => {
     setIsFinalizing(true);
     try {
       // Save any in-progress edits first, then finalize.
@@ -247,6 +256,18 @@ export default function EditOrderPage() {
     } finally {
       setIsFinalizing(false);
     }
+  };
+
+  const handleFinalize = () => {
+    if (!validateRows()) return;
+    setConfirmAction("finalize");
+  };
+
+  const confirmProceed = () => {
+    const action = confirmAction;
+    setConfirmAction(null);
+    if (action === "update") doUpdate();
+    if (action === "finalize") doFinalize();
   };
 
   const isLoading = isLoadingOrder || isLoadingProducts || orderRows.length === 0;
@@ -307,9 +328,9 @@ export default function EditOrderPage() {
               <OrderCustomerName order={order} />
             </p>
           ) : null}
-          {!isOwner && (
+          {!canOverride && (
             <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-              Prices are set automatically for your account. Ask an owner to override a price or price a custom item.
+              Prices are set automatically for your account. Ask an owner for the &quot;Override order pricing&quot; permission to set a price or price a custom item.
             </p>
           )}
         </div>
@@ -377,8 +398,8 @@ export default function EditOrderPage() {
                           value={row.free ? "0" : row.price}
                           onChange={(e) => handleRowChange(row.id, "price", e.target.value)}
                           placeholder={row.isCustom ? "0.00" : "Select a product"}
-                          disabled={row.free || !isOwner}
-                          className={row.free || !isOwner ? "bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400" : ""}
+                          disabled={row.free || !canOverride}
+                          className={row.free || !canOverride ? "bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400" : ""}
                           required
                         />
                       </div>
@@ -416,7 +437,7 @@ export default function EditOrderPage() {
                       <input
                         type="checkbox"
                         checked={row.free}
-                        disabled={row.isCustom && !isOwner}
+                        disabled={row.isCustom && !canOverride}
                         onChange={(e) => handleRowChange(row.id, "free", e.target.checked)}
                         className="h-4 w-4 rounded border-gray-300 dark:border-gray-700 text-green-600 focus:ring-green-500"
                       />
@@ -486,7 +507,7 @@ export default function EditOrderPage() {
                     Cancel
                   </Button>
                 </Link>
-                <Button type="submit" disabled={isSubmitting || isFinalizing} className="sm:flex-1">
+                <Button type="submit" disabled={isSubmitting || isFinalizing || !canEditOrders} className="sm:flex-1">
                   {isSubmitting ? (
                     <span className="flex items-center gap-2">
                       <Loader2 className="animate-spin h-4 w-4" />
@@ -503,7 +524,7 @@ export default function EditOrderPage() {
                   <Button
                     type="button"
                     onClick={handleFinalize}
-                    disabled={isSubmitting || isFinalizing}
+                    disabled={isSubmitting || isFinalizing || !canFinalizeOrders}
                     className="sm:flex-1 bg-green-600 hover:bg-green-700"
                   >
                     {isFinalizing ? (
@@ -524,6 +545,20 @@ export default function EditOrderPage() {
           </CardContent>
         </Card>
       </div>
+      <ConfirmDialog
+        open={!!confirmAction}
+        onClose={() => setConfirmAction(null)}
+        title={confirmAction === "finalize" ? "Finalize draft?" : "Update order?"}
+        description={
+          confirmAction === "finalize"
+            ? `Finalize this draft into a real order for $${calculateTotal().toFixed(2)}? This will deduct stock and add to the customer's debt.`
+            : `Update this order to $${calculateTotal().toFixed(2)}? Stock and the customer's debt will be adjusted for the difference.`
+        }
+        confirmLabel={confirmAction === "finalize" ? "Finalize Order" : "Update Order"}
+        variant="default"
+        onConfirm={confirmProceed}
+        loading={isSubmitting || isFinalizing}
+      />
     </div>
   );
 }

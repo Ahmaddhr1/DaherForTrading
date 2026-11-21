@@ -57,6 +57,8 @@ export default function AllOrders() {
   const queryClient = useQueryClient();
   const { isOwner } = useIsOwner();
   const { hasPermission: canDelete } = useHasPermission("canDelete");
+  const { hasPermission: canEditOrders } = useHasPermission("canEditOrders");
+  const { hasPermission: canFinalizeOrders } = useHasPermission("canFinalizeOrders");
 
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
@@ -97,6 +99,7 @@ export default function AllOrders() {
   }, [statusFilter, searchTerm, sortBy, pageSize, startDate, endDate]);
 
   const [deleteOrderId, setDeleteOrderId] = useState(null);
+  const [markPaidOrderId, setMarkPaidOrderId] = useState(null);
 
   const runAction = async (action, orderId) => {
     try {
@@ -127,7 +130,8 @@ export default function AllOrders() {
       setDeleteOrderId(orderId);
       return;
     }
-    if (action === "markPaid" && !window.confirm("Mark this order as fully paid?")) {
+    if (action === "markPaid") {
+      setMarkPaidOrderId(orderId);
       return;
     }
     await runAction(action, orderId);
@@ -137,6 +141,12 @@ export default function AllOrders() {
     const id = deleteOrderId;
     setDeleteOrderId(null);
     await runAction("delete", id);
+  };
+
+  const confirmMarkPaid = async () => {
+    const id = markPaidOrderId;
+    setMarkPaidOrderId(null);
+    await runAction("markPaid", id);
   };
 
   const orders = data?.orders || [];
@@ -181,19 +191,23 @@ export default function AllOrders() {
         <DropdownMenuItem onClick={() => handleAction("view", order._id)}>
           View Invoice
         </DropdownMenuItem>
-        {order.status === "pending" && (
+        {order.status === "pending" && canEditOrders && (
           <DropdownMenuItem onClick={() => router.push(`/dashboard/orders/${order._id}/edit`)}>
             Update Order
           </DropdownMenuItem>
         )}
         {order.status !== "paid" && (
           <>
-            <DropdownMenuItem onClick={() => handleAction("pay", order._id)}>
-              Make Payment
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => handleAction("markPaid", order._id)}>
-              Mark as Paid
-            </DropdownMenuItem>
+            {canFinalizeOrders && (
+              <DropdownMenuItem onClick={() => handleAction("pay", order._id)}>
+                Make Payment
+              </DropdownMenuItem>
+            )}
+            {canFinalizeOrders && (
+              <DropdownMenuItem onClick={() => handleAction("markPaid", order._id)}>
+                Mark as Paid
+              </DropdownMenuItem>
+            )}
             {canDelete && (
               <DropdownMenuItem onClick={() => handleAction("delete", order._id)}>
                 Undo Order
@@ -415,6 +429,16 @@ export default function AllOrders() {
         description="Undo this order? Stock will be restored and the customer's debt reduced."
         confirmLabel="Undo Order"
         onConfirm={confirmDeleteOrder}
+        loading={actionLoading}
+      />
+      <ConfirmDialog
+        open={!!markPaidOrderId}
+        onClose={() => setMarkPaidOrderId(null)}
+        title="Mark as paid?"
+        description="Mark this order as fully paid?"
+        confirmLabel="Mark as Paid"
+        variant="default"
+        onConfirm={confirmMarkPaid}
         loading={actionLoading}
       />
     </div>

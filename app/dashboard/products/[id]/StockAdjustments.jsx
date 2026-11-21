@@ -21,6 +21,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { useHasPermission } from "@/lib/useHasPermission";
 
 const TYPE_LABELS = {
   damaged: "Damaged",
@@ -50,6 +51,7 @@ export default function StockAdjustments({ productId, currentQuantity, unit }) {
   const queryClient = useQueryClient();
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState(EMPTY_FORM);
+  const { hasPermission: canEditProducts } = useHasPermission("canEditProducts");
 
   const { data, isLoading, error } = useQuery({
     queryKey: ["stock-adjustments", productId],
@@ -94,15 +96,17 @@ export default function StockAdjustments({ productId, currentQuantity, unit }) {
           <ClipboardList className="h-5 w-5 text-purple-600" />
           Stock Adjustments
         </CardTitle>
-        <Button
-          type="button"
-          size="sm"
-          onClick={() => setOpen(true)}
-          className="bg-purple-600 hover:bg-purple-700 flex items-center gap-1.5"
-        >
-          <Plus className="h-4 w-4" />
-          Adjust Stock
-        </Button>
+        {canEditProducts && (
+          <Button
+            type="button"
+            size="sm"
+            onClick={() => setOpen(true)}
+            className="bg-purple-600 hover:bg-purple-700 flex items-center gap-1.5"
+          >
+            <Plus className="h-4 w-4" />
+            Adjust Stock
+          </Button>
+        )}
       </CardHeader>
       <CardContent>
         {isLoading ? (

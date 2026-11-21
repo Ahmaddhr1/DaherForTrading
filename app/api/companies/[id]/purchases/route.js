@@ -5,6 +5,7 @@ import Purchase from "@/models/Purchase";
 import { NextResponse } from "next/server";
 import { getUserFromCookie } from "@/lib/auth";
 import { logActivity } from "@/lib/activityLog";
+import { requirePermission } from "@/lib/permissions";
 
 // GET paginated purchase history for a company
 export async function GET(req, { params }) {
@@ -74,6 +75,9 @@ export async function GET(req, { params }) {
 // Create a purchase from this company (restocking a product)
 export async function POST(req, { params }) {
   await connectToDB();
+  const forbidden = await requirePermission(await getUserFromCookie(), "canRecordPurchases");
+  if (forbidden) return forbidden;
+
   try {
     const { id } = params;
     const { productId, unitPrice, quantity, discount, taxRate, paid } = await req.json();

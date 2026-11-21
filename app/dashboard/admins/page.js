@@ -159,27 +159,37 @@ export default function AdminsPage() {
     );
   };
 
+  const [roleChangeTarget, setRoleChangeTarget] = useState(null); // admin | null
+  const [deactivateTarget, setDeactivateTarget] = useState(null); // admin | null
+
   const handleToggleRole = (admin) => {
-    const nextRole = admin.role === "owner" ? "employee" : "owner";
-    if (
-      !window.confirm(
-        `Change ${admin.adminname}'s role to "${nextRole}"? This takes effect the next time they log in.`
-      )
-    )
-      return;
-    patchMutation.mutate({ id: admin._id, role: nextRole });
+    setRoleChangeTarget(admin);
+  };
+
+  const confirmToggleRole = () => {
+    if (!roleChangeTarget) return;
+    const nextRole = roleChangeTarget.role === "owner" ? "employee" : "owner";
+    patchMutation.mutate(
+      { id: roleChangeTarget._id, role: nextRole },
+      { onSuccess: () => setRoleChangeTarget(null) }
+    );
   };
 
   const handleToggleActive = (admin) => {
     const nextActive = !admin.active;
-    if (
-      !nextActive &&
-      !window.confirm(
-        `Deactivate ${admin.adminname}? They won't be able to log in anymore (an existing session stays valid until it expires).`
-      )
-    )
+    if (!nextActive) {
+      setDeactivateTarget(admin);
       return;
+    }
     patchMutation.mutate({ id: admin._id, active: nextActive });
+  };
+
+  const confirmDeactivate = () => {
+    if (!deactivateTarget) return;
+    patchMutation.mutate(
+      { id: deactivateTarget._id, active: false },
+      { onSuccess: () => setDeactivateTarget(null) }
+    );
   };
 
   const [deleteTarget, setDeleteTarget] = useState(null);
@@ -575,6 +585,33 @@ export default function AdminsPage() {
         description={`Permanently delete ${deleteTarget?.adminname}? This can't be undone.`}
         onConfirm={confirmDelete}
         loading={deleteMutation.isPending}
+      />
+      <ConfirmDialog
+        open={!!roleChangeTarget}
+        onClose={() => setRoleChangeTarget(null)}
+        title="Change role?"
+        description={
+          roleChangeTarget
+            ? `Change ${roleChangeTarget.adminname}'s role to "${roleChangeTarget.role === "owner" ? "employee" : "owner"}"? This takes effect the next time they log in.`
+            : ""
+        }
+        confirmLabel="Change Role"
+        variant="default"
+        onConfirm={confirmToggleRole}
+        loading={patchMutation.isPending}
+      />
+      <ConfirmDialog
+        open={!!deactivateTarget}
+        onClose={() => setDeactivateTarget(null)}
+        title="Deactivate admin?"
+        description={
+          deactivateTarget
+            ? `Deactivate ${deactivateTarget.adminname}? They won't be able to log in anymore (an existing session stays valid until it expires).`
+            : ""
+        }
+        confirmLabel="Deactivate"
+        onConfirm={confirmDeactivate}
+        loading={patchMutation.isPending}
       />
     </div>
   );

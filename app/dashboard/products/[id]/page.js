@@ -17,6 +17,7 @@ import { Loader2, Package, DollarSign, Tag, Box, TrendingUp, PackageCheck, Ruler
 import Link from "next/link";
 import ProductHistory from "./ProductHistory";
 import StockAdjustments from "./StockAdjustments";
+import { useHasPermission } from "@/lib/useHasPermission";
 
 const fetchProduct = async (id) => {
   const res = await axios.get(`/api/products/${id}`);
@@ -39,6 +40,7 @@ const EditProductPage = () => {
   const router = useRouter();
   const { id } = useParams();
   const queryClient = useQueryClient();
+  const { hasPermission: canEditProducts } = useHasPermission("canEditProducts");
 
   const { data: product, isLoading: productLoading, isError: productError } = useQuery({
     queryKey: ["product", id],
@@ -273,6 +275,7 @@ const EditProductPage = () => {
               </CardHeader>
               <CardContent>
                 <form onSubmit={handleSubmit} className="space-y-6">
+                  <fieldset disabled={!canEditProducts} className="space-y-6 border-0 p-0 m-0 min-w-0 disabled:opacity-60">
                   {/* Basic Information Section */}
                   <div className="space-y-4">
                     <div className="flex items-center gap-2 text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">
@@ -580,6 +583,7 @@ const EditProductPage = () => {
                       </div>
                     </div>
                   </div>
+                  </fieldset>
 
                   <Separator />
 
@@ -595,7 +599,7 @@ const EditProductPage = () => {
                     </Button>
                     <Button
                       type="submit"
-                      disabled={mutation.isPending || !isFormValid}
+                      disabled={mutation.isPending || !isFormValid || !canEditProducts}
                       className="flex-1"
                     >
                       {mutation.isPending ? (

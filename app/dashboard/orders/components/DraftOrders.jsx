@@ -29,12 +29,15 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import OrderCustomerName from "./OrderCustomerName";
 import LinkCustomerModal from "./LinkCustomerModal";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
+import { useHasPermission } from "@/lib/useHasPermission";
 
 const PAGE_SIZE_OPTIONS = [10, 20, 50];
 
 export default function DraftOrders() {
   const router = useRouter();
   const queryClient = useQueryClient();
+  const { hasPermission: canEditOrders } = useHasPermission("canEditOrders");
+  const { hasPermission: canFinalizeOrders } = useHasPermission("canFinalizeOrders");
 
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
@@ -70,6 +73,7 @@ export default function DraftOrders() {
   }, [searchTerm, pageSize]);
 
   const [deleteDraftId, setDeleteDraftId] = useState(null);
+  const [finalizeOrderId, setFinalizeOrderId] = useState(null);
 
   const runAction = async (action, orderId) => {
     try {
@@ -98,7 +102,8 @@ export default function DraftOrders() {
       setDeleteDraftId(orderId);
       return;
     }
-    if (action === "finalize" && !window.confirm("Finalize this draft into a real order? This will deduct stock and add to the customer's debt.")) {
+    if (action === "finalize") {
+      setFinalizeOrderId(orderId);
       return;
     }
     await runAction(action, orderId);
@@ -108,6 +113,12 @@ export default function DraftOrders() {
     const id = deleteDraftId;
     setDeleteDraftId(null);
     await runAction("delete", id);
+  };
+
+  const confirmFinalize = async () => {
+    const id = finalizeOrderId;
+    setFinalizeOrderId(null);
+    await runAction("finalize", id);
   };
 
   const orders = data?.orders || [];
@@ -121,16 +132,20 @@ export default function DraftOrders() {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
-        <DropdownMenuItem onClick={() => handleAction("continueEditing", order._id)}>
-          Continue Editing
-        </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => setLinkingOrder(order)}>
-          {order.customer ? "Change Linked Customer" : "Link Customer"}
-        </DropdownMenuItem>
+        {canEditOrders && (
+          <DropdownMenuItem onClick={() => handleAction("continueEditing", order._id)}>
+            Continue Editing
+          </DropdownMenuItem>
+        )}
+        {canEditOrders && (
+          <DropdownMenuItem onClick={() => setLinkingOrder(order)}>
+            {order.customer ? "Change Linked Customer" : "Link Customer"}
+          </DropdownMenuItem>
+        )}
         <DropdownMenuItem
           onClick={() => handleAction("finalize", order._id)}
-          disabled={!order.customer}
-          title={!order.customer ? "Link a customer first" : undefined}
+          disabled={!order.customer || !canFinalizeOrders}
+          title={!order.customer ? "Link a customer first" : !canFinalizeOrders ? "You don't have permission to finalize orders" : undefined}
         >
           Finalize Order
         </DropdownMenuItem>
@@ -259,6 +274,16 @@ export default function DraftOrders() {
         title="Delete draft?"
         description="Delete this draft? This cannot be undone."
         onConfirm={confirmDeleteDraft}
+        loading={actionLoading}
+      />
+      <ConfirmDialog
+        open={!!finalizeOrderId}
+        onClose={() => setFinalizeOrderId(null)}
+        title="Finalize draft?"
+        description="Finalize this draft into a real order? This will deduct stock and add to the customer's debt."
+        confirmLabel="Finalize Order"
+        variant="default"
+        onConfirm={confirmFinalize}
         loading={actionLoading}
       />
     </div>

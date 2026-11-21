@@ -2,13 +2,18 @@
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Loader2, CheckCircle, Edit, Eye } from "lucide-react";
 import { toast } from "sonner";
 import Link from "next/link";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
+import { useHasPermission } from "@/lib/useHasPermission";
 
 const OrderActions = ({ order, onStatusUpdate }) => {
   const queryClient = useQueryClient();
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const { hasPermission: canFinalizeOrders } = useHasPermission("canFinalizeOrders");
 
   const markPaidMutation = useMutation({
     mutationFn: async () => {
@@ -25,14 +30,16 @@ const OrderActions = ({ order, onStatusUpdate }) => {
   });
 
   const handleMarkAsPaid = () => {
-    if (window.confirm(`Mark order for ${order.customer?.fullName} as paid?`)) {
-      markPaidMutation.mutate();
-    }
+    setConfirmOpen(true);
+  };
+
+  const confirmMarkAsPaid = () => {
+    markPaidMutation.mutate(undefined, { onSuccess: () => setConfirmOpen(false) });
   };
 
   return (
     <div className="flex gap-2 mt-3">
-      {(order.status === "pending" || order.status === "partiallyPaid") && (
+      {(order.status === "pending" || order.status === "partiallyPaid") && canFinalizeOrders && (
         <Button
           size="sm"
           onClick={handleMarkAsPaid}
@@ -61,6 +68,16 @@ const OrderActions = ({ order, onStatusUpdate }) => {
           View
         </Button>
       </Link>
+      <ConfirmDialog
+        open={confirmOpen}
+        onClose={() => setConfirmOpen(false)}
+        title="Mark as paid?"
+        description={`Mark order for ${order.customer?.fullName} as paid?`}
+        confirmLabel="Mark Paid"
+        variant="default"
+        onConfirm={confirmMarkAsPaid}
+        loading={markPaidMutation.isLoading}
+      />
     </div>
   );
 };

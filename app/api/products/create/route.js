@@ -4,9 +4,12 @@ import Category from "@/models/Category"; // import category model
 import { NextResponse } from "next/server";
 import { getUserFromCookie } from "@/lib/auth";
 import { logActivity } from "@/lib/activityLog";
+import { requirePermission } from "@/lib/permissions";
 
 export async function POST(req) {
   await connectToDB();
+  const forbidden = await requirePermission(await getUserFromCookie(), "canCreateProducts");
+  if (forbidden) return forbidden;
 
   try {
     const {

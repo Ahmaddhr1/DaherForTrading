@@ -7,7 +7,7 @@ import { getUserFromCookie } from "@/lib/auth";
 import { logActivity } from "@/lib/activityLog";
 import { requirePermission } from "@/lib/permissions";
 
-const PRICE_FIELDS = ["price", "priceWholesale", "priceDistributor", "priceVip", "initialPrice"];
+const PRICE_FIELDS = ["price", "priceWholesale", "priceDistributor", "priceVip", "initialPrice", "discount"];
 const PRICE_MODES = ["set", "increasePercent", "decreasePercent", "increaseAmount", "decreaseAmount"];
 
 function applyPriceMode(currentValue, mode, value) {
@@ -41,7 +41,7 @@ async function handlePriceUpdate(productIds, { field, mode, value }) {
   }
 
   const products = await Product.find({ _id: { $in: productIds } }).select(
-    "name price initialPrice priceWholesale priceDistributor priceVip"
+    "name price initialPrice priceWholesale priceDistributor priceVip discount"
   );
 
   const skipped = [];
@@ -56,11 +56,18 @@ async function handlePriceUpdate(productIds, { field, mode, value }) {
       continue;
     }
 
-    const resultingPrice = field === "price" ? newValue : product.price;
-    const resultingCost = field === "initialPrice" ? newValue : product.initialPrice;
-    if (resultingCost > resultingPrice) {
-      skipped.push({ id: product._id, name: product.name, reason: "Cost would exceed selling price" });
-      continue;
+    if (field === "discount") {
+      if (newValue > 100) {
+        skipped.push({ id: product._id, name: product.name, reason: "Discount can't exceed 100%" });
+        continue;
+      }
+    } else {
+      const resultingPrice = field === "price" ? newValue : product.price;
+      const resultingCost = field === "initialPrice" ? newValue : product.initialPrice;
+      if (resultingCost > resultingPrice) {
+        skipped.push({ id: product._id, name: product.name, reason: "Cost would exceed selling price" });
+        continue;
+      }
     }
 
     updates.push({ updateOne: { filter: { _id: product._id }, update: { $set: { [field]: newValue } } } });

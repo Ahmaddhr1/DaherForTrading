@@ -67,6 +67,18 @@ export async function PUT(req, { params }) {
     if (typeof body.unit === "string" && !body.unit.trim()) {
       body.unit = "pcs";
     }
+    if (body.discount !== undefined && body.discount !== null && body.discount !== "") {
+      const parsedDiscount = parseFloat(body.discount);
+      if (isNaN(parsedDiscount) || parsedDiscount < 0 || parsedDiscount > 100) {
+        return NextResponse.json(
+          { error: "Discount must be a number between 0 and 100." },
+          { status: 400 }
+        );
+      }
+      body.discount = parsedDiscount;
+    } else if (body.discount === "") {
+      body.discount = 0;
+    }
     if (body.img !== undefined) {
       body.img = Array.isArray(body.img) ? body.img.filter((url) => typeof url === "string" && url) : [];
     }

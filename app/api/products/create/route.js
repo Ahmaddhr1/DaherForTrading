@@ -23,6 +23,7 @@ export async function POST(req) {
       priceDistributor,
       priceVip,
       img,
+      discount,
     } = await req.json();
 
     if (!name?.trim() || price == null) {
@@ -82,6 +83,18 @@ export async function POST(req) {
     // Default supplier - optional ObjectId, normalize blank to null.
     const parsedDefaultSupplier = defaultSupplier && defaultSupplier !== "" ? defaultSupplier : null;
 
+    // Default discount % - optional, defaults to 0, clamped to 0-100.
+    let parsedDiscount = 0;
+    if (discount !== undefined && discount !== null && discount !== "") {
+      parsedDiscount = parseFloat(discount);
+      if (isNaN(parsedDiscount) || parsedDiscount < 0 || parsedDiscount > 100) {
+        return NextResponse.json(
+          { error: "Discount must be a number between 0 and 100." },
+          { status: 400 }
+        );
+      }
+    }
+
     // Wholesale/Distributor/VIP tier prices - each optional; a blank/omitted
     // one defaults to the Retail price so every tier is priced from the
     // start (lib/priceTiers.js also falls back to `price` at read time, so
@@ -118,6 +131,7 @@ export async function POST(req) {
       lowStockThreshold: parsedLowStockThreshold,
       defaultSupplier: parsedDefaultSupplier,
       img: Array.isArray(img) ? img.filter((url) => typeof url === "string" && url) : [],
+      discount: parsedDiscount,
     });
 
     await product.save();

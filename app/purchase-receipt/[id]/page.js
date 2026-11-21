@@ -98,7 +98,7 @@ export default function PublicPurchaseReceiptPage() {
                     <TableHead>{t("Product")}</TableHead>
                     <TableHead className="text-center">{t("Qty")}</TableHead>
                     <TableHead className="text-center">{t("Discount")}</TableHead>
-                    <TableHead className="text-right">{t("Total")}</TableHead>
+                    <TableHead className="text-end">{t("Total")}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -110,7 +110,7 @@ export default function PublicPurchaseReceiptPage() {
                     <TableCell className="text-center text-amber-700">
                       {purchase.discount ? `-$${purchase.discount.toFixed(2)}` : "—"}
                     </TableCell>
-                    <TableCell className="text-right">
+                    <TableCell className="text-end">
                       ${(lineSubtotal - (purchase.discount || 0)).toFixed(2)}
                     </TableCell>
                   </TableRow>

@@ -94,7 +94,7 @@ export default function PublicCompanyStatementPage() {
                       <TableRow>
                         <TableHead>{t("Date")}</TableHead>
                         <TableHead>{t("Product")}</TableHead>
-                        <TableHead className="text-right">{t("Total")}</TableHead>
+                        <TableHead className="text-end">{t("Total")}</TableHead>
                         <TableHead className="text-center">{t("Status")}</TableHead>
                       </TableRow>
                     </TableHeader>
@@ -105,7 +105,7 @@ export default function PublicCompanyStatementPage() {
                             {format(new Date(purchase.createdAt), "MMM d, yyyy")}
                           </TableCell>
                           <TableCell className="whitespace-nowrap">{purchase.productName}</TableCell>
-                          <TableCell className="text-right whitespace-nowrap">${purchase.total.toFixed(2)}</TableCell>
+                          <TableCell className="text-end whitespace-nowrap">${purchase.total.toFixed(2)}</TableCell>
                           <TableCell className="text-center whitespace-nowrap">
                             <Badge className={purchase.paid ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"}>
                               {purchase.paid ? t("Paid") : t("Unpaid")}

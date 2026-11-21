@@ -214,7 +214,7 @@ export default function CustomerOrdersTable() {
                   className="w-full sm:w-auto justify-center"
                 >
                   {t("All")}
-                  <Badge variant="secondary" className="ml-1">{totalCount}</Badge>
+                  <Badge variant="secondary" className="ms-1">{totalCount}</Badge>
                 </Button>
                 <Button
                   variant={statusFilter === "draft" ? "default" : "outline"}
@@ -223,7 +223,7 @@ export default function CustomerOrdersTable() {
                   className="w-full sm:w-auto justify-center"
                 >
                   {t("Draft")}
-                  <Badge variant="secondary" className="ml-1">{counts.draft}</Badge>
+                  <Badge variant="secondary" className="ms-1">{counts.draft}</Badge>
                 </Button>
                 <Button
                   variant={statusFilter === "pending" ? "default" : "outline"}
@@ -232,7 +232,7 @@ export default function CustomerOrdersTable() {
                   className="w-full sm:w-auto justify-center"
                 >
                   {t("Pending")}
-                  <Badge variant="secondary" className="ml-1">{counts.pending}</Badge>
+                  <Badge variant="secondary" className="ms-1">{counts.pending}</Badge>
                 </Button>
                 <Button
                   variant={statusFilter === "partiallyPaid" ? "default" : "outline"}
@@ -241,7 +241,7 @@ export default function CustomerOrdersTable() {
                   className="w-full sm:w-auto justify-center"
                 >
                   {t("Partially Paid")}
-                  <Badge variant="secondary" className="ml-1">{counts.partiallyPaid}</Badge>
+                  <Badge variant="secondary" className="ms-1">{counts.partiallyPaid}</Badge>
                 </Button>
                 <Button
                   variant={statusFilter === "paid" ? "default" : "outline"}
@@ -250,7 +250,7 @@ export default function CustomerOrdersTable() {
                   className="w-full sm:w-auto justify-center"
                 >
                   {t("Paid")}
-                  <Badge variant="secondary" className="ml-1">{counts.paid}</Badge>
+                  <Badge variant="secondary" className="ms-1">{counts.paid}</Badge>
                 </Button>
               </div>
 
@@ -418,12 +418,12 @@ export default function CustomerOrdersTable() {
                               )}
                               {canFinalizeOrders && (
                                 <DropdownMenuItem onClick={() => handleAction("finalize", order._id)}>
-                                  {actionLoading && <Loader2 className="animate-spin h-4 w-4 mr-2" />}
+                                  {actionLoading && <Loader2 className="animate-spin h-4 w-4 me-2" />}
                                   {t("Finalize Order")}
                                 </DropdownMenuItem>
                               )}
                               <DropdownMenuItem onClick={() => handleAction("deleteDraft", order._id)}>
-                                {actionLoading && <Loader2 className="animate-spin h-4 w-4 mr-2" />}
+                                {actionLoading && <Loader2 className="animate-spin h-4 w-4 me-2" />}
                                 {t("Delete Draft")}
                               </DropdownMenuItem>
                             </>
@@ -433,7 +433,7 @@ export default function CustomerOrdersTable() {
                                 {t("View Invoice")}
                               </DropdownMenuItem>
                               <DropdownMenuItem onClick={() => handleAction("print", order._id)}>
-                                {actionLoading && <Loader2 className="animate-spin h-4 w-4 mr-2" />}
+                                {actionLoading && <Loader2 className="animate-spin h-4 w-4 me-2" />}
                                 {t("Print")}
                               </DropdownMenuItem>
                               {order.status === "pending" && canEditOrders && (
@@ -445,14 +445,14 @@ export default function CustomerOrdersTable() {
                                 <>
                                   <DropdownMenuItem onClick={() => handleAction("delete", order._id)}>
                                     {actionLoading && (
-                                      <Loader2 className="animate-spin h-4 w-4 mr-2" />
+                                      <Loader2 className="animate-spin h-4 w-4 me-2" />
                                     )}
                                     {t("Undo Order")}
                                   </DropdownMenuItem>
                                   {canFinalizeOrders && (
                                     <DropdownMenuItem onClick={() => handleAction("markPaid", order._id)}>
                                       {actionLoading && (
-                                        <Loader2 className="animate-spin h-4 w-4 mr-2" />
+                                        <Loader2 className="animate-spin h-4 w-4 me-2" />
                                       )}
                                       {t("Mark as Paid")}
                                     </DropdownMenuItem>
@@ -481,7 +481,7 @@ export default function CustomerOrdersTable() {
                   size="sm"
                   className="flex items-center gap-2"
                 >
-                  <ChevronLeft className="h-4 w-4" />
+                  <ChevronLeft className="rtl-flip h-4 w-4" />
                   {t("Previous")}
                 </Button>
                 <span className="text-sm text-gray-600 dark:text-gray-400">
@@ -495,7 +495,7 @@ export default function CustomerOrdersTable() {
                   className="flex items-center gap-2"
                 >
                   {t("Next")}
-                  <ChevronRight className="h-4 w-4" />
+                  <ChevronRight className="rtl-flip h-4 w-4" />
                 </Button>
               </div>
             )}

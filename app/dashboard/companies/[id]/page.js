@@ -150,7 +150,7 @@ const EditCompanyPage = () => {
                 <Button variant="outline" className="flex items-center gap-2 w-full sm:w-auto justify-center">
                   <History className="h-4 w-4" />
                   <span className="hidden sm:inline">{t("Purchase History")}</span>
-                  <Badge variant="secondary" className="ml-1">{purchasesCount}</Badge>
+                  <Badge variant="secondary" className="ms-1">{purchasesCount}</Badge>
                 </Button>
               </Link>
               {canRecordPurchases && (

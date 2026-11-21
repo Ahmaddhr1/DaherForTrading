@@ -236,13 +236,13 @@ export default function PaymentsPage() {
           <Card className="shadow-sm border-gray-200 dark:border-gray-800 mb-6">
             <CardContent className="p-4 space-y-4">
               <div className="relative max-w-md">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 h-4 w-4" />
+                <Search className="absolute start-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 h-4 w-4" />
                 <Input
                   type="text"
                   placeholder={t("Search by customer name...")}
                   value={searchInput}
                   onChange={(e) => handleSearchInputChange(e.target.value)}
-                  className="pl-10"
+                  className="ps-10"
                 />
               </div>
 
@@ -412,7 +412,7 @@ export default function PaymentsPage() {
                   size="sm"
                   className="flex items-center gap-2"
                 >
-                  <ChevronLeft className="h-4 w-4" />
+                  <ChevronLeft className="rtl-flip h-4 w-4" />
                   {t("Previous")}
                 </Button>
                 <span className="text-sm text-gray-600 dark:text-gray-400">
@@ -426,7 +426,7 @@ export default function PaymentsPage() {
                   className="flex items-center gap-2"
                 >
                   {t("Next")}
-                  <ChevronRight className="h-4 w-4" />
+                  <ChevronRight className="rtl-flip h-4 w-4" />
                 </Button>
               </div>
             )}
@@ -561,19 +561,19 @@ function MakePaymentForm({ onSuccess }) {
             </div>
           </div>
           <Button variant="ghost" size="sm" onClick={handleClearCustomer}>
-            <X className="h-4 w-4 mr-1" />
+            <X className="h-4 w-4 me-1" />
             {t("Change")}
           </Button>
         </div>
       ) : (
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 h-4 w-4" />
+          <Search className="absolute start-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 h-4 w-4" />
           <Input
             type="text"
             placeholder={t("Search customers by name...")}
             value={searchInput}
             onChange={(e) => setSearchInput(e.target.value)}
-            className="pl-10"
+            className="ps-10"
             autoFocus
           />
 
@@ -593,7 +593,7 @@ function MakePaymentForm({ onSuccess }) {
                     key={customer._id}
                     type="button"
                     onClick={() => handleSelectCustomer(customer)}
-                    className="w-full flex items-center justify-between p-3 hover:bg-gray-50 dark:hover:bg-gray-800/60 text-left"
+                    className="w-full flex items-center justify-between p-3 hover:bg-gray-50 dark:hover:bg-gray-800/60 text-start"
                   >
                     <div>
                       <p className="font-medium text-gray-900 dark:text-gray-100">{customer.fullName}</p>

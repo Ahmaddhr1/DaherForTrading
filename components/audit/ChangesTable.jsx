@@ -19,7 +19,7 @@ export function ChangesTable({ changes, kind = "change" }) {
     <div className="overflow-hidden rounded-lg border border-gray-200 dark:border-gray-800">
       {/* Desktop / tablet: three-column table */}
       <table className="hidden md:table w-full text-sm">
-        <thead className="bg-gray-50 dark:bg-gray-900/60 text-left text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">
+        <thead className="bg-gray-50 dark:bg-gray-900/60 text-start text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">
           <tr>
             <th className="px-4 py-3 font-semibold w-1/4">{t("Field")}</th>
             <th className="px-4 py-3 font-semibold">{beforeHeading}</th>
@@ -35,7 +35,7 @@ export function ChangesTable({ changes, kind = "change" }) {
                 <ValuePill value={change.before} format={change.format} tone="before" />
               </td>
               <td className="px-2 py-3 text-gray-400">
-                <ArrowRight className="h-4 w-4 mt-1" />
+                <ArrowRight className="rtl-flip h-4 w-4 mt-1" />
               </td>
               <td className="px-4 py-3">
                 <ValuePill value={change.after} format={change.format} tone="after" />

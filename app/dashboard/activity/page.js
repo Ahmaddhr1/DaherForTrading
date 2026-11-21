@@ -172,13 +172,13 @@ export default function ActivityPage() {
 
         <div className="flex flex-col sm:flex-row sm:flex-wrap sm:items-center gap-3 mb-6">
           <div className="relative w-full sm:w-72">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+            <Search className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
             <input
               type="search"
               value={searchInput}
               onChange={(e) => setSearchInput(e.target.value)}
               placeholder={t("Search product, customer, field...")}
-              className="border-input h-9 w-full rounded-md border bg-transparent pl-9 pr-3 text-sm shadow-xs"
+              className="border-input h-9 w-full rounded-md border bg-transparent ps-9 pe-3 text-sm shadow-xs"
             />
           </div>
           <select
@@ -255,7 +255,7 @@ export default function ActivityPage() {
                       <TableHead>{t("Admin")}</TableHead>
                       <TableHead>{t("Type")}</TableHead>
                       <TableHead>{t("Details")}</TableHead>
-                      <TableHead className="text-right">{t("Changes")}</TableHead>
+                      <TableHead className="text-end">{t("Changes")}</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -285,7 +285,7 @@ export default function ActivityPage() {
                           <p className="text-gray-700 dark:text-gray-300">{entry.summary}</p>
                           <ChangePreview changes={entry.changes} total={entry.changeCount} />
                         </TableCell>
-                        <TableCell className="text-right whitespace-nowrap">
+                        <TableCell className="text-end whitespace-nowrap">
                           <Link
                             href={`/dashboard/activity/${entry._id}`}
                             onClick={(e) => e.stopPropagation()}
@@ -317,7 +317,7 @@ export default function ActivityPage() {
               size="sm"
               className="flex items-center gap-2"
             >
-              <ChevronLeft className="h-4 w-4" />
+              <ChevronLeft className="rtl-flip h-4 w-4" />
               {t("Previous")}
             </Button>
             <span className="text-sm text-gray-600 dark:text-gray-400">
@@ -331,7 +331,7 @@ export default function ActivityPage() {
               className="flex items-center gap-2"
             >
               {t("Next")}
-              <ChevronRight className="h-4 w-4" />
+              <ChevronRight className="rtl-flip h-4 w-4" />
             </Button>
           </div>
         )}

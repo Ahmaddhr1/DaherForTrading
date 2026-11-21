@@ -289,7 +289,7 @@ export default function AdminsPage() {
                       <TableRow key={admin._id}>
                         <TableCell className="font-medium">
                           {admin.adminname}
-                          {isSelf && <span className="text-gray-400 dark:text-gray-500 text-xs ml-2">{t("(you)")}</span>}
+                          {isSelf && <span className="text-gray-400 dark:text-gray-500 text-xs ms-2">{t("(you)")}</span>}
                         </TableCell>
                         <TableCell>
                           {admin.email ? (

@@ -102,7 +102,7 @@ export default function PublicInvoicePage() {
                     <TableHead>{t("Product")}</TableHead>
                     <TableHead className="text-center">{t("Qty")}</TableHead>
                     <TableHead className="text-center">{t("Discount")}</TableHead>
-                    <TableHead className="text-right">{t("Total")}</TableHead>
+                    <TableHead className="text-end">{t("Total")}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -115,7 +115,7 @@ export default function PublicInvoicePage() {
                       <TableCell className="text-center text-amber-700">
                         {item.discount ? `-$${item.discount.toFixed(2)}` : "—"}
                       </TableCell>
-                      <TableCell className="text-right">
+                      <TableCell className="text-end">
                         ${(item.price * item.quantity - (item.discount || 0)).toFixed(2)}
                       </TableCell>
                     </TableRow>

@@ -333,13 +333,13 @@ export default function ProductsPage() {
         {/* Search + view toggle - above both the category sidebar and the table */}
         <div className="mb-6 flex flex-col sm:flex-row sm:items-center gap-3">
           <div className="relative w-full sm:max-w-md sm:flex-1">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 h-4 w-4" />
+            <Search className="absolute start-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 h-4 w-4" />
             <Input
               type="text"
               placeholder={t("Search products by name...")}
               value={searchInput}
               onChange={(e) => setSearchInput(e.target.value)}
-              className="pl-10"
+              className="ps-10"
             />
           </div>
           <div className="flex items-center gap-1 border rounded-md p-1 w-full sm:w-auto sm:shrink-0">
@@ -378,27 +378,27 @@ export default function ProductsPage() {
               <span className="text-sm font-medium text-blue-900 dark:text-blue-300">
                 {selectedIds.length} {t("selected")}
               </span>
-              <div className="flex flex-wrap gap-2 ml-auto">
+              <div className="flex flex-wrap gap-2 ms-auto">
                 {canEditProducts && (
                   <Button size="sm" variant="outline" onClick={() => setBulkPriceModalOpen(true)}>
-                    <DollarSign className="h-3.5 w-3.5 mr-1" />
+                    <DollarSign className="h-3.5 w-3.5 me-1" />
                     {t("Update Price")}
                   </Button>
                 )}
                 {canEditProducts && (
                   <Button size="sm" variant="outline" onClick={() => setBulkCategoryModalOpen(true)}>
-                    <Tag className="h-3.5 w-3.5 mr-1" />
+                    <Tag className="h-3.5 w-3.5 me-1" />
                     {t("Reassign Category")}
                   </Button>
                 )}
                 {canDelete && (
                   <Button size="sm" variant="destructive" onClick={() => setBulkDeleteConfirmOpen(true)}>
-                    <Trash2 className="h-3.5 w-3.5 mr-1" />
+                    <Trash2 className="h-3.5 w-3.5 me-1" />
                     {t("Delete")}
                   </Button>
                 )}
                 <Button size="sm" variant="ghost" onClick={() => setSelectedIds([])}>
-                  <X className="h-3.5 w-3.5 mr-1" />
+                  <X className="h-3.5 w-3.5 me-1" />
                   {t("Clear")}
                 </Button>
               </div>
@@ -504,7 +504,7 @@ export default function ProductsPage() {
                   <TableHead className="text-center">{t("Cost")}</TableHead>
                   <TableHead className="text-center">{t("Profit")}</TableHead>
                   <TableHead>{t("Last Updated")}</TableHead>
-                  <TableHead className="text-right">{t("Actions")}</TableHead>
+                  <TableHead className="text-end">{t("Actions")}</TableHead>
                 </TableRow>
               </TableHeader>
               
@@ -574,7 +574,7 @@ export default function ProductsPage() {
                                 ? "bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-400"
                                 : "bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-400"
                           }`}>
-                            <Box className="h-3 w-3 mr-1" />
+                            <Box className="h-3 w-3 me-1" />
                             {product?.quantity} {product.unit || t("pcs")} {t("in stock")}
                           </div>
                         </TableCell>
@@ -610,7 +610,7 @@ export default function ProductsPage() {
                         </TableCell>
 
                         {/* Actions */}
-                        <TableCell className="text-right">
+                        <TableCell className="text-end">
                           <div className="flex justify-end gap-2">
                             <Link href={`/dashboard/products/${product._id}`}>
                               <Button variant="outline" size="sm" className="flex items-center gap-1">
@@ -657,7 +657,7 @@ export default function ProductsPage() {
               variant="outline"
               className="flex items-center gap-2"
             >
-              <ChevronLeft className="h-4 w-4" />
+              <ChevronLeft className="rtl-flip h-4 w-4" />
               {t("Previous")}
             </Button>
 
@@ -672,7 +672,7 @@ export default function ProductsPage() {
               className="flex items-center gap-2"
             >
               {t("Next")}
-              <ChevronRight className="h-4 w-4" />
+              <ChevronRight className="rtl-flip h-4 w-4" />
             </Button>
           </div>
         )}

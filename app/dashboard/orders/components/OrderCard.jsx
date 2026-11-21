@@ -15,22 +15,22 @@ import { orderNumber } from "@/lib/orderNumber";
 export const ORDER_STATUS_STYLES = {
   paid: {
     label: "Paid",
-    accent: "border-l-green-500",
+    accent: "border-s-green-500",
     badge: "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300",
   },
   pending: {
     label: "Pending",
-    accent: "border-l-amber-500",
+    accent: "border-s-amber-500",
     badge: "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300",
   },
   partiallyPaid: {
     label: "Partially Paid",
-    accent: "border-l-orange-500",
+    accent: "border-s-orange-500",
     badge: "bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300",
   },
   draft: {
     label: "Draft",
-    accent: "border-l-gray-400",
+    accent: "border-s-gray-400",
     badge: "bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300",
   },
 };
@@ -59,7 +59,7 @@ const OrderCard = ({ order, onStatusUpdate, actions }) => {
   const created = new Date(order.createdAt);
 
   return (
-    <Card className={`border-l-4 ${style.accent} shadow-sm hover:shadow-md transition-shadow`}>
+    <Card className={`border-s-4 ${style.accent} shadow-sm hover:shadow-md transition-shadow`}>
       <CardContent className="p-4">
         {/* Top row: order number + status */}
         <div className="flex items-center justify-between gap-2">

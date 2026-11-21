@@ -60,8 +60,8 @@ export default function ReturnsPage() {
                     <TableHead>{t("Customer")}</TableHead>
                     <TableHead>{t("Items")}</TableHead>
                     <TableHead className="text-center">{t("Restocked")}</TableHead>
-                    <TableHead className="text-right">{t("Refund")}</TableHead>
-                    <TableHead className="text-right">{t("Order")}</TableHead>
+                    <TableHead className="text-end">{t("Refund")}</TableHead>
+                    <TableHead className="text-end">{t("Order")}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -79,10 +79,10 @@ export default function ReturnsPage() {
                       <TableCell className="text-center">
                         {ret.restocked ? t("Yes") : t("No")}
                       </TableCell>
-                      <TableCell className="text-right font-semibold text-green-600">
+                      <TableCell className="text-end font-semibold text-green-600">
                         -${ret.totalRefundAmount.toFixed(2)}
                       </TableCell>
-                      <TableCell className="text-right">
+                      <TableCell className="text-end">
                         <Link href={`/dashboard/invoices/${ret.order}`}>
                           <Button variant="outline" size="sm">{t("View Order")}</Button>
                         </Link>
@@ -102,7 +102,7 @@ export default function ReturnsPage() {
                   size="sm"
                   className="flex items-center gap-2"
                 >
-                  <ChevronLeft className="h-4 w-4" />
+                  <ChevronLeft className="rtl-flip h-4 w-4" />
                   {t("Previous")}
                 </Button>
                 <span className="text-sm text-gray-600 dark:text-gray-400">
@@ -116,7 +116,7 @@ export default function ReturnsPage() {
                   className="flex items-center gap-2"
                 >
                   {t("Next")}
-                  <ChevronRight className="h-4 w-4" />
+                  <ChevronRight className="rtl-flip h-4 w-4" />
                 </Button>
               </div>
             )}

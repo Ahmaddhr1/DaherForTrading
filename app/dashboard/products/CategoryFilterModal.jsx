@@ -34,12 +34,12 @@ export default function CategoryFilterModal({ open, onClose, categories, value, 
     <Modal open={open} onClose={handleClose} title={t("Filter by Category")}>
       <div className="space-y-3">
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500 h-4 w-4" />
+          <Search className="absolute start-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500 h-4 w-4" />
           <Input
             placeholder={t("Search categories...")}
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            className="pl-10"
+            className="ps-10"
             autoFocus
           />
         </div>
@@ -47,7 +47,7 @@ export default function CategoryFilterModal({ open, onClose, categories, value, 
           <button
             type="button"
             onClick={() => handleSelect("")}
-            className={`w-full flex items-center justify-between px-3 py-2 text-left hover:bg-gray-50 dark:hover:bg-gray-800/60 ${
+            className={`w-full flex items-center justify-between px-3 py-2 text-start hover:bg-gray-50 dark:hover:bg-gray-800/60 ${
               !value ? "font-medium text-blue-700" : "text-gray-900 dark:text-gray-100"
             }`}
           >
@@ -62,7 +62,7 @@ export default function CategoryFilterModal({ open, onClose, categories, value, 
                 key={cat._id}
                 type="button"
                 onClick={() => handleSelect(cat._id)}
-                className={`w-full flex items-center justify-between px-3 py-2 text-left hover:bg-gray-50 dark:hover:bg-gray-800/60 ${
+                className={`w-full flex items-center justify-between px-3 py-2 text-start hover:bg-gray-50 dark:hover:bg-gray-800/60 ${
                   value === cat._id ? "font-medium text-blue-700" : "text-gray-900 dark:text-gray-100"
                 }`}
               >

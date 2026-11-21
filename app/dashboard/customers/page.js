@@ -179,13 +179,13 @@ export default function CustomersPage() {
           <div className="mb-6 space-y-4">
             {/* Search Bar */}
             <div className="relative max-w-md">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 h-4 w-4" />
+              <Search className="absolute start-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 h-4 w-4" />
               <Input
                 type="text"
                 placeholder={t("Search customers by name...")}
                 value={searchInput}
                 onChange={(e) => setSearchInput(e.target.value)}
-                className="pl-10"
+                className="ps-10"
               />
             </div>
 
@@ -280,12 +280,12 @@ export default function CustomersPage() {
           <p className="text-gray-600 dark:text-gray-400">
             {t("Showing")} {customers.length} {t("of")} {totalCount} {t("customers")}
             {debtFilter !== "all" && (
-              <span className="ml-2 text-blue-600">
+              <span className="ms-2 text-blue-600">
                 {t("• Filtered by:")} {debtFilter === "hasDebt" ? t("Has Debt") : t("No Debt")}
               </span>
             )}
             {sortBy === "debtDesc" && (
-              <span className="ml-2 text-amber-600">{t("• Sorted by debt: high to low")}</span>
+              <span className="ms-2 text-amber-600">{t("• Sorted by debt: high to low")}</span>
             )}
           </p>
         </div>
@@ -356,8 +356,8 @@ export default function CustomersPage() {
                         number + status on top, amount on the right, actions
                         in a footer. */}
                     <Card
-                      className={`border-l-4 ${
-                        hasDebt ? "border-l-red-500" : "border-l-green-500"
+                      className={`border-s-4 ${
+                        hasDebt ? "border-s-red-500" : "border-s-green-500"
                       } shadow-sm hover:shadow-md transition-shadow cursor-pointer h-full`}
                     >
                       <CardContent className="p-4 flex flex-col h-full">
@@ -403,7 +403,7 @@ export default function CustomersPage() {
                               </div>
                             </div>
                           </div>
-                          <div className="text-right shrink-0">
+                          <div className="text-end shrink-0">
                             <p className={`text-lg font-bold ${hasDebt ? "text-red-600" : "text-gray-900 dark:text-gray-100"}`}>
                               ${Number(customer.debt || 0).toLocaleString()}
                             </p>
@@ -458,7 +458,7 @@ export default function CustomersPage() {
                   variant="outline"
                   className="flex items-center gap-2"
                 >
-                  <ChevronLeft className="h-4 w-4" />
+                  <ChevronLeft className="rtl-flip h-4 w-4" />
                   {t("Previous")}
                 </Button>
 
@@ -473,7 +473,7 @@ export default function CustomersPage() {
                   className="flex items-center gap-2"
                 >
                   {t("Next")}
-                  <ChevronRight className="h-4 w-4" />
+                  <ChevronRight className="rtl-flip h-4 w-4" />
                 </Button>
               </div>
             )}

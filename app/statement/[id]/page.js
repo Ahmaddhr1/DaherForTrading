@@ -99,9 +99,9 @@ export default function PublicStatementPage() {
                     <TableHeader>
                       <TableRow>
                         <TableHead>{t("Date")}</TableHead>
-                        <TableHead className="text-right">{t("Total")}</TableHead>
-                        <TableHead className="text-right">{t("Paid")}</TableHead>
-                        <TableHead className="text-right">{t("Remaining")}</TableHead>
+                        <TableHead className="text-end">{t("Total")}</TableHead>
+                        <TableHead className="text-end">{t("Paid")}</TableHead>
+                        <TableHead className="text-end">{t("Remaining")}</TableHead>
                         <TableHead className="text-center">{t("Status")}</TableHead>
                       </TableRow>
                     </TableHeader>
@@ -113,9 +113,9 @@ export default function PublicStatementPage() {
                             <TableCell className="text-gray-600 text-sm whitespace-nowrap">
                               {format(new Date(order.createdAt), "MMM d, yyyy")}
                             </TableCell>
-                            <TableCell className="text-right whitespace-nowrap">${order.total.toFixed(2)}</TableCell>
-                            <TableCell className="text-right text-green-600 whitespace-nowrap">${order.amountpaid.toFixed(2)}</TableCell>
-                            <TableCell className={`text-right whitespace-nowrap ${order.remainingBalance > 0 ? "text-red-600" : ""}`}>
+                            <TableCell className="text-end whitespace-nowrap">${order.total.toFixed(2)}</TableCell>
+                            <TableCell className="text-end text-green-600 whitespace-nowrap">${order.amountpaid.toFixed(2)}</TableCell>
+                            <TableCell className={`text-end whitespace-nowrap ${order.remainingBalance > 0 ? "text-red-600" : ""}`}>
                               ${order.remainingBalance.toFixed(2)}
                             </TableCell>
                             <TableCell className="text-center whitespace-nowrap">

@@ -138,7 +138,7 @@ export default function CompanyStatementPage() {
             </div>
           </div>
           <div className="flex items-center text-gray-500 text-sm">
-            <Calendar className="h-4 w-4 mr-1" />
+            <Calendar className="h-4 w-4 me-1" />
             {t("Generated")} {format(new Date(), "EEEE, MMMM d, yyyy")}
           </div>
           <div className="flex flex-wrap items-end gap-3 mt-4 print:hidden">
@@ -179,7 +179,7 @@ export default function CompanyStatementPage() {
         <Card className="shadow-sm border-gray-200">
           <CardHeader className="pb-4">
             <CardTitle className="flex items-center text-lg">
-              <FileText className="h-5 w-5 mr-2 text-blue-600" />
+              <FileText className="h-5 w-5 me-2 text-blue-600" />
               {t("Purchase History")}
             </CardTitle>
           </CardHeader>
@@ -191,7 +191,7 @@ export default function CompanyStatementPage() {
                   <TableRow>
                     <TableHead className="font-semibold text-gray-700">{t("Date")}</TableHead>
                     <TableHead className="font-semibold text-gray-700">{t("Product")}</TableHead>
-                    <TableHead className="text-right font-semibold text-gray-700">{t("Total")}</TableHead>
+                    <TableHead className="text-end font-semibold text-gray-700">{t("Total")}</TableHead>
                     <TableHead className="text-center font-semibold text-gray-700">{t("Status")}</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -202,7 +202,7 @@ export default function CompanyStatementPage() {
                         {format(new Date(purchase.createdAt), "MMM d, yyyy HH:mm")}
                       </TableCell>
                       <TableCell className="font-medium text-gray-900 whitespace-nowrap">{purchase.productName}</TableCell>
-                      <TableCell className="text-right font-medium text-gray-900 whitespace-nowrap">${purchase.total.toFixed(2)}</TableCell>
+                      <TableCell className="text-end font-medium text-gray-900 whitespace-nowrap">${purchase.total.toFixed(2)}</TableCell>
                       <TableCell className="text-center whitespace-nowrap">
                         <Badge className={purchase.paid ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"}>
                           {purchase.paid ? t("Paid") : t("Unpaid")}

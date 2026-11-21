@@ -87,7 +87,7 @@ const TopCustomers = ({ limit = 10, minDebt = 0 }) => {
                         <p className="text-sm text-gray-500 dark:text-gray-400">{customer.phoneNumber}</p>
                       </div>
                     </div>
-                    <div className="text-right font-semibold text-red-600">
+                    <div className="text-end font-semibold text-red-600">
                       ${customer.debt.toLocaleString()}
                     </div>
                   </div>
@@ -104,7 +104,7 @@ const TopCustomers = ({ limit = 10, minDebt = 0 }) => {
                   size="sm"
                   className="flex items-center gap-2"
                 >
-                  <ChevronLeft className="h-4 w-4" />
+                  <ChevronLeft className="rtl-flip h-4 w-4" />
                   {t("Previous")}
                 </Button>
                 <span className="text-sm text-gray-600 dark:text-gray-400">
@@ -118,7 +118,7 @@ const TopCustomers = ({ limit = 10, minDebt = 0 }) => {
                   className="flex items-center gap-2"
                 >
                   {t("Next")}
-                  <ChevronRight className="h-4 w-4" />
+                  <ChevronRight className="rtl-flip h-4 w-4" />
                 </Button>
               </div>
             )}

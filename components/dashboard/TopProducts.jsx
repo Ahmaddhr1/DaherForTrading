@@ -98,7 +98,7 @@ const TopProducts = ({ limit = 10, sort = "orders", category = "" }) => {
                       </p>
                     </div>
                   </div>
-                  <div className="text-right">
+                  <div className="text-end">
                     {sort === "profit" ? (
                       <p className="font-semibold text-green-600">
                         ${(product.totalProfit || 0).toFixed(2)}
@@ -123,7 +123,7 @@ const TopProducts = ({ limit = 10, sort = "orders", category = "" }) => {
                   size="sm"
                   className="flex items-center gap-2"
                 >
-                  <ChevronLeft className="h-4 w-4" />
+                  <ChevronLeft className="rtl-flip h-4 w-4" />
                   {t("Previous")}
                 </Button>
                 <span className="text-sm text-gray-600 dark:text-gray-400">
@@ -137,7 +137,7 @@ const TopProducts = ({ limit = 10, sort = "orders", category = "" }) => {
                   className="flex items-center gap-2"
                 >
                   {t("Next")}
-                  <ChevronRight className="h-4 w-4" />
+                  <ChevronRight className="rtl-flip h-4 w-4" />
                 </Button>
               </div>
             )}

@@ -117,11 +117,11 @@ export default function CartDrawer() {
           bottom nav (MobileBottomBar) opens this same drawer instead. */}
       <Button
         onClick={openCart}
-        className="hidden lg:flex fixed bottom-6 right-6 z-40 h-14 w-14 rounded-full shadow-lg p-0 items-center justify-center"
+        className="hidden lg:flex fixed bottom-6 end-6 z-40 h-14 w-14 rounded-full shadow-lg p-0 items-center justify-center"
       >
         <ShoppingCart className="h-6 w-6" />
         {itemCount > 0 && (
-          <span className="absolute -top-1 -right-1 bg-red-600 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
+          <span className="absolute -top-1 -end-1 bg-red-600 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
             {itemCount}
           </span>
         )}
@@ -197,12 +197,12 @@ export default function CartDrawer() {
             ) : (
               <>
                 <div className="relative">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500 h-4 w-4" />
+                  <Search className="absolute start-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500 h-4 w-4" />
                   <Input
                     placeholder={t("Search customers by name...")}
                     value={searchInput}
                     onChange={(e) => setSearchInput(e.target.value)}
-                    className="pl-10"
+                    className="ps-10"
                     autoFocus
                   />
                 </div>
@@ -222,7 +222,7 @@ export default function CartDrawer() {
                           key={customer._id}
                           type="button"
                           onClick={() => setSelectedCustomer(customer)}
-                          className="w-full flex items-center justify-between p-3 hover:bg-gray-50 dark:hover:bg-gray-800/60 text-left"
+                          className="w-full flex items-center justify-between p-3 hover:bg-gray-50 dark:hover:bg-gray-800/60 text-start"
                         >
                           <div>
                             <p className="font-medium text-gray-900 dark:text-gray-100">{customer.fullName}</p>

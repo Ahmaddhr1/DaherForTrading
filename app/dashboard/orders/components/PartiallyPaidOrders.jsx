@@ -127,7 +127,7 @@ const PartiallyPaidOrders = () => {
                 size="sm"
                 className="flex items-center gap-2"
               >
-                <ChevronLeft className="h-4 w-4" />
+                <ChevronLeft className="rtl-flip h-4 w-4" />
                 {t("Previous")}
               </Button>
               <span className="text-sm text-gray-600 dark:text-gray-400">
@@ -141,7 +141,7 @@ const PartiallyPaidOrders = () => {
                 className="flex items-center gap-2"
               >
                 {t("Next")}
-                <ChevronRight className="h-4 w-4" />
+                <ChevronRight className="rtl-flip h-4 w-4" />
               </Button>
             </div>
           )}

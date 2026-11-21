@@ -549,7 +549,7 @@ const Page = () => {
                   <div className="space-y-2">
                     <div className="flex justify-between items-center">
                       <span className="text-sm text-gray-600 dark:text-gray-400">{t("Name")}</span>
-                      <span className="font-medium text-gray-900 dark:text-gray-100 truncate max-w-[120px] text-right">
+                      <span className="font-medium text-gray-900 dark:text-gray-100 truncate max-w-[120px] text-end">
                         {form.name || t("Not provided")}
                       </span>
                     </div>

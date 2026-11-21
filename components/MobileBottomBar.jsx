@@ -173,7 +173,7 @@ export function MobileBottomBar() {
               <span className="relative">
                 {section.icon}
                 {section.badge > 0 && (
-                  <span className="absolute -top-1.5 -right-2 bg-red-600 text-white text-[10px] font-bold rounded-full h-4 min-w-4 px-1 flex items-center justify-center">
+                  <span className="absolute -top-1.5 -end-2 bg-red-600 text-white text-[10px] font-bold rounded-full h-4 min-w-4 px-1 flex items-center justify-center">
                     {section.badge}
                   </span>
                 )}
@@ -260,7 +260,7 @@ export function MobileBottomBar() {
                     <span className="relative">
                       {item.icon}
                       {item.badge > 0 && (
-                        <span className="absolute -top-1.5 -right-2 bg-red-600 text-white text-[10px] font-bold rounded-full h-4 min-w-4 px-1 flex items-center justify-center">
+                        <span className="absolute -top-1.5 -end-2 bg-red-600 text-white text-[10px] font-bold rounded-full h-4 min-w-4 px-1 flex items-center justify-center">
                           {item.badge}
                         </span>
                       )}

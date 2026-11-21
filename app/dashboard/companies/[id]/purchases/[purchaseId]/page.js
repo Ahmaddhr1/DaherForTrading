@@ -117,7 +117,7 @@ export default function PurchaseDetailsPage() {
             </Badge>
           </div>
           <div className="flex items-center text-gray-500 dark:text-gray-400 text-sm">
-            <Calendar className="h-4 w-4 mr-1" />
+            <Calendar className="h-4 w-4 me-1" />
             {format(new Date(purchase.createdAt), "EEEE, MMMM d, yyyy 'at' h:mm a")}
           </div>
           <div className="flex flex-wrap gap-2 mt-2">
@@ -146,7 +146,7 @@ export default function PurchaseDetailsPage() {
             <Card className="shadow-sm border-gray-200 dark:border-gray-800">
               <CardHeader className="pb-4">
                 <CardTitle className="flex items-center text-lg">
-                  <Package className="h-5 w-5 mr-2 text-blue-600" />
+                  <Package className="h-5 w-5 me-2 text-blue-600" />
                   {t("Purchase Item")}
                 </CardTitle>
                 <CardDescription>{t("Product included in this purchase")}</CardDescription>
@@ -159,7 +159,7 @@ export default function PurchaseDetailsPage() {
                       <TableHead className="text-center font-semibold text-gray-700 dark:text-gray-300">{t("Quantity")}</TableHead>
                       <TableHead className="text-center font-semibold text-gray-700 dark:text-gray-300">{t("Unit Price")}</TableHead>
                       <TableHead className="text-center font-semibold text-gray-700 dark:text-gray-300">{t("Discount")}</TableHead>
-                      <TableHead className="text-right font-semibold text-gray-700 dark:text-gray-300">{t("Total")}</TableHead>
+                      <TableHead className="text-end font-semibold text-gray-700 dark:text-gray-300">{t("Total")}</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -170,7 +170,7 @@ export default function PurchaseDetailsPage() {
                       <TableCell className="text-center text-amber-700">
                         {purchase.discount ? `-$${purchase.discount.toFixed(2)}` : "—"}
                       </TableCell>
-                      <TableCell className="text-right font-medium text-gray-900 dark:text-gray-100">
+                      <TableCell className="text-end font-medium text-gray-900 dark:text-gray-100">
                         ${(lineSubtotal - (purchase.discount || 0)).toFixed(2)}
                       </TableCell>
                     </TableRow>
@@ -184,7 +184,7 @@ export default function PurchaseDetailsPage() {
             <Card className="shadow-sm border-gray-200 dark:border-gray-800">
               <CardHeader className="pb-4">
                 <CardTitle className="flex items-center text-lg">
-                  <Building2 className="h-5 w-5 mr-2 text-blue-600" />
+                  <Building2 className="h-5 w-5 me-2 text-blue-600" />
                   {t("Supplier")}
                 </CardTitle>
               </CardHeader>

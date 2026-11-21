@@ -147,7 +147,7 @@ export default function RecurringDisbursementsPage() {
                   <TableHead className="text-center">{t("Amount")}</TableHead>
                   <TableHead className="text-center">{t("Runs On")}</TableHead>
                   <TableHead className="text-center">{t("Active")}</TableHead>
-                  <TableHead className="text-right">{t("Actions")}</TableHead>
+                  <TableHead className="text-end">{t("Actions")}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -168,7 +168,7 @@ export default function RecurringDisbursementsPage() {
                         {tpl.active ? t("Active") : t("Paused")}
                       </Badge>
                     </TableCell>
-                    <TableCell className="text-right">
+                    <TableCell className="text-end">
                       {canManageDisbursements ? (
                         <div className="flex justify-end gap-2">
                           <Button

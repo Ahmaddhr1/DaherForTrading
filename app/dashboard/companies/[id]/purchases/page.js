@@ -192,7 +192,7 @@ export default function CompanyPurchasesPage() {
                   <TableHead className="text-center">{t("Total")}</TableHead>
                   <TableHead className="text-center">{t("Status")}</TableHead>
                   <TableHead>{t("Date")}</TableHead>
-                  <TableHead className="text-right">{t("Actions")}</TableHead>
+                  <TableHead className="text-end">{t("Actions")}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -218,7 +218,7 @@ export default function CompanyPurchasesPage() {
                       <TableCell className="text-gray-500 dark:text-gray-400 text-sm">
                         {format(new Date(purchase.createdAt), "MMM d, yyyy HH:mm")}
                       </TableCell>
-                      <TableCell className="text-right">
+                      <TableCell className="text-end">
                         <div className="flex items-center justify-end gap-1">
                           {!purchase.paid && canRecordPurchases && (
                             <Button
@@ -254,7 +254,7 @@ export default function CompanyPurchasesPage() {
                   size="sm"
                   className="flex items-center gap-2"
                 >
-                  <ChevronLeft className="h-4 w-4" />
+                  <ChevronLeft className="rtl-flip h-4 w-4" />
                   {t("Previous")}
                 </Button>
                 <span className="text-sm text-gray-600 dark:text-gray-400">
@@ -268,7 +268,7 @@ export default function CompanyPurchasesPage() {
                   className="flex items-center gap-2"
                 >
                   {t("Next")}
-                  <ChevronRight className="h-4 w-4" />
+                  <ChevronRight className="rtl-flip h-4 w-4" />
                 </Button>
               </div>
             )}

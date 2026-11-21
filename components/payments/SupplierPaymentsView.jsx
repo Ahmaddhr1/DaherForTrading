@@ -91,12 +91,12 @@ export default function SupplierPaymentsView() {
       <Card className="shadow-sm border-gray-200 dark:border-gray-800 mb-6">
         <CardContent className="p-4 flex flex-col sm:flex-row sm:flex-wrap sm:items-center gap-3">
           <div className="relative w-full sm:max-w-sm">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 h-4 w-4" />
+            <Search className="absolute start-3 top-1/2 -translate-y-1/2 text-gray-400 h-4 w-4" />
             <Input
               placeholder={t("Search by company name...")}
               value={searchInput}
               onChange={touch(setSearchInput)}
-              className="pl-10"
+              className="ps-10"
             />
           </div>
           <div className="flex items-center gap-2">
@@ -205,7 +205,7 @@ export default function SupplierPaymentsView() {
           {totalPages > 1 && (
             <div className="flex items-center justify-center gap-4 p-4 border-t">
               <Button onClick={() => setPage((x) => x - 1)} disabled={page === 1} variant="outline" size="sm">
-                <ChevronLeft className="h-4 w-4" />
+                <ChevronLeft className="rtl-flip h-4 w-4" />
                 {t("Previous")}
               </Button>
               <span className="text-sm text-gray-600 dark:text-gray-400">
@@ -213,7 +213,7 @@ export default function SupplierPaymentsView() {
               </span>
               <Button onClick={() => setPage((x) => x + 1)} disabled={page === totalPages} variant="outline" size="sm">
                 {t("Next")}
-                <ChevronRight className="h-4 w-4" />
+                <ChevronRight className="rtl-flip h-4 w-4" />
               </Button>
             </div>
           )}

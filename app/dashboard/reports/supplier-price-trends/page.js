@@ -127,10 +127,10 @@ export default function SupplierPriceTrendsPage() {
                   <TableRow>
                     <TableHead>{t("Supplier")}</TableHead>
                     <TableHead className="text-center">{t("Purchases")}</TableHead>
-                    <TableHead className="text-right">{t("First Price")}</TableHead>
-                    <TableHead className="text-right">{t("Latest Price")}</TableHead>
-                    <TableHead className="text-right">{t("Avg Price")}</TableHead>
-                    <TableHead className="text-right">{t("Change")}</TableHead>
+                    <TableHead className="text-end">{t("First Price")}</TableHead>
+                    <TableHead className="text-end">{t("Latest Price")}</TableHead>
+                    <TableHead className="text-end">{t("Avg Price")}</TableHead>
+                    <TableHead className="text-end">{t("Change")}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -140,12 +140,12 @@ export default function SupplierPriceTrendsPage() {
                         {c.companyName}
                       </TableCell>
                       <TableCell className="text-center">{c.purchaseCount}</TableCell>
-                      <TableCell className="text-right">{currencyFormatter(c.firstPrice)}</TableCell>
-                      <TableCell className="text-right">{currencyFormatter(c.latestPrice)}</TableCell>
-                      <TableCell className="text-right text-gray-600 dark:text-gray-400">
+                      <TableCell className="text-end">{currencyFormatter(c.firstPrice)}</TableCell>
+                      <TableCell className="text-end">{currencyFormatter(c.latestPrice)}</TableCell>
+                      <TableCell className="text-end text-gray-600 dark:text-gray-400">
                         {currencyFormatter(c.avgPrice)}
                       </TableCell>
-                      <TableCell className="text-right">
+                      <TableCell className="text-end">
                         <Badge
                           variant="outline"
                           className={

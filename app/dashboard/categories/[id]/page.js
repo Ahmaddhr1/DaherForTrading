@@ -324,7 +324,7 @@ const EditCategoryPage = () => {
                             <TableHead>{t("Product Name")}</TableHead>
                             <TableHead className="text-center">{t("Price")}</TableHead>
                             <TableHead className="text-center">{t("Stock")}</TableHead>
-                            <TableHead className="text-right">{t("Actions")}</TableHead>
+                            <TableHead className="text-end">{t("Actions")}</TableHead>
                           </TableRow>
                         </TableHeader>
                         <TableBody>
@@ -349,10 +349,10 @@ const EditCategoryPage = () => {
                                   {product?.quantity} {t("in stock")}
                                 </span>
                               </TableCell>
-                              <TableCell className="text-right">
+                              <TableCell className="text-end">
                                 <Link href={`/dashboard/products/${product._id}`}>
                                   <Button variant="outline" size="sm">
-                                    <Eye className="h-3 w-3 mr-1" />
+                                    <Eye className="h-3 w-3 me-1" />
                                     {t("View")}
                                   </Button>
                                 </Link>

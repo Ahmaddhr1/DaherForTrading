@@ -42,7 +42,7 @@ export default function ActivityEntryPage() {
           href="/dashboard/activity"
           className="inline-flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 mb-6"
         >
-          <ArrowLeft className="h-4 w-4" />
+          <ArrowLeft className="rtl-flip h-4 w-4" />
           {t("Back to Activity Log")}
         </Link>
 
@@ -104,7 +104,7 @@ export default function ActivityEntryPage() {
                 <CardTitle className="text-base">
                   {kind === "create" ? t("Values set") : kind === "delete" ? t("Values removed") : t("What changed")}
                   {changes.length > 0 && (
-                    <span className="ml-2 text-sm font-normal text-gray-500">
+                    <span className="ms-2 text-sm font-normal text-gray-500">
                       {changes.length} {changes.length === 1 ? t("field") : t("fields")}
                     </span>
                   )}

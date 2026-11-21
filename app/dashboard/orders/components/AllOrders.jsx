@@ -227,13 +227,13 @@ export default function AllOrders() {
         <Card className="shadow-sm border-gray-200 dark:border-gray-800">
           <CardContent className="p-4 space-y-4">
             <div className="relative max-w-md">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 h-4 w-4" />
+              <Search className="absolute start-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 h-4 w-4" />
               <Input
                 type="text"
                 placeholder={t("Search by customer name or order # (e.g. 4F2A91)")}
                 value={searchInput}
                 onChange={(e) => setSearchInput(e.target.value)}
-                className="pl-10"
+                className="ps-10"
               />
             </div>
 
@@ -249,7 +249,7 @@ export default function AllOrders() {
                 className="w-full sm:w-auto justify-center"
               >
                 {t("All")}
-                <Badge variant="secondary" className="ml-1">{totalCount}</Badge>
+                <Badge variant="secondary" className="ms-1">{totalCount}</Badge>
               </Button>
               <Button
                 variant={statusFilter === "pending" ? "default" : "outline"}
@@ -258,7 +258,7 @@ export default function AllOrders() {
                 className="w-full sm:w-auto justify-center"
               >
                 {t("Pending")}
-                <Badge variant="secondary" className="ml-1">{counts.pending}</Badge>
+                <Badge variant="secondary" className="ms-1">{counts.pending}</Badge>
               </Button>
               <Button
                 variant={statusFilter === "partiallyPaid" ? "default" : "outline"}
@@ -267,7 +267,7 @@ export default function AllOrders() {
                 className="w-full sm:w-auto justify-center"
               >
                 {t("Partially Paid")}
-                <Badge variant="secondary" className="ml-1">{counts.partiallyPaid}</Badge>
+                <Badge variant="secondary" className="ms-1">{counts.partiallyPaid}</Badge>
               </Button>
               <Button
                 variant={statusFilter === "paid" ? "default" : "outline"}
@@ -276,7 +276,7 @@ export default function AllOrders() {
                 className="w-full sm:w-auto justify-center"
               >
                 {t("Paid")}
-                <Badge variant="secondary" className="ml-1">{counts.paid}</Badge>
+                <Badge variant="secondary" className="ms-1">{counts.paid}</Badge>
               </Button>
             </div>
 
@@ -359,7 +359,7 @@ export default function AllOrders() {
                   <TableHead className="text-center">{t("Total")}</TableHead>
                   <TableHead className="text-center">{t("Status")}</TableHead>
                   <TableHead>{t("Date")}</TableHead>
-                  <TableHead className="text-right">{t("Actions")}</TableHead>
+                  <TableHead className="text-end">{t("Actions")}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -376,7 +376,7 @@ export default function AllOrders() {
                     <TableCell className="text-gray-500 dark:text-gray-400 text-sm">
                       {format(new Date(order.createdAt), "MMM d, yyyy HH:mm")}
                     </TableCell>
-                    <TableCell className="text-right">{actionsMenu(order)}</TableCell>
+                    <TableCell className="text-end">{actionsMenu(order)}</TableCell>
                   </TableRow>
                 ))}
               </TableBody>
@@ -387,13 +387,13 @@ export default function AllOrders() {
             <Card className="shadow-sm border-gray-200 dark:border-gray-800">
               <div className="flex items-center justify-center gap-4 p-4">
                 <Button onClick={() => setPage((p) => p - 1)} disabled={page === 1} variant="outline" size="sm" className="flex items-center gap-2">
-                  <ChevronLeft className="h-4 w-4" />
+                  <ChevronLeft className="rtl-flip h-4 w-4" />
                   {t("Previous")}
                 </Button>
                 <span className="text-sm text-gray-600 dark:text-gray-400">{t("Page")} {page} {t("of")} {totalPages}</span>
                 <Button onClick={() => setPage((p) => p + 1)} disabled={page === totalPages} variant="outline" size="sm" className="flex items-center gap-2">
                   {t("Next")}
-                  <ChevronRight className="h-4 w-4" />
+                  <ChevronRight className="rtl-flip h-4 w-4" />
                 </Button>
               </div>
             </Card>

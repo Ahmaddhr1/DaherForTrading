@@ -399,7 +399,7 @@ const EditCustomerPage = () => {
                   <div className="space-y-2">
                     <div className="flex justify-between items-center">
                       <span className="text-sm text-gray-600 dark:text-gray-400">{t("Name")}</span>
-                      <span className="font-medium text-gray-900 dark:text-gray-100 truncate max-w-[120px] text-right">
+                      <span className="font-medium text-gray-900 dark:text-gray-100 truncate max-w-[120px] text-end">
                         {form.fullName || t("Not provided")}
                       </span>
                     </div>
@@ -428,13 +428,13 @@ const EditCustomerPage = () => {
                   </h4>
                   <div className="flex justify-between items-center p-3 rounded-lg bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-900/50">
                     <span className="text-sm font-medium text-amber-800 dark:text-amber-400">{t("Amount Owed")}</span>
-                    <div className="text-right">
+                    <div className="text-end">
                       <span className="text-lg font-bold text-amber-900 dark:text-amber-300">
                         ${(parseInt(form.debt) || 0).toLocaleString()}
                       </span>
                       <Badge
                         variant={hasAnyDebt ? "default" : "outline"}
-                        className={`ml-2 ${hasAnyDebt ? 'bg-amber-100 dark:bg-amber-900/30 text-amber-800 dark:text-amber-400' : ''}`}
+                        className={`ms-2 ${hasAnyDebt ? 'bg-amber-100 dark:bg-amber-900/30 text-amber-800 dark:text-amber-400' : ''}`}
                       >
                         {hasAnyDebt ? t("Owes Money") : t("No Money Debt")}
                       </Badge>

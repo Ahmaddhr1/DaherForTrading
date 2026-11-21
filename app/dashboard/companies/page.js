@@ -201,13 +201,13 @@ export default function CompaniesPage() {
         <FiltersPanel activeCount={activeFilterCount}>
           <div className="mb-6 space-y-4">
             <div className="relative max-w-md">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 h-4 w-4" />
+              <Search className="absolute start-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 h-4 w-4" />
               <Input
                 type="text"
                 placeholder={t("Search companies by name...")}
                 value={searchInput}
                 onChange={(e) => setSearchInput(e.target.value)}
-                className="pl-10"
+                className="ps-10"
               />
             </div>
 
@@ -333,12 +333,12 @@ export default function CompaniesPage() {
           <p className="text-gray-600 dark:text-gray-400">
             {t("Showing")} {companies.length} {t("of")} {totalCount} {t("companies")}
             {debtFilter !== "all" && (
-              <span className="ml-2 text-blue-600">
+              <span className="ms-2 text-blue-600">
                 {t("• Filtered by:")} {debtFilter === "hasDebt" ? t("We Owe Them") : t("Settled")}
               </span>
             )}
             {sortBy === "debtDesc" && (
-              <span className="ml-2 text-amber-600">{t("• Sorted by debt: high to low")}</span>
+              <span className="ms-2 text-amber-600">{t("• Sorted by debt: high to low")}</span>
             )}
           </p>
         </div>
@@ -408,7 +408,7 @@ export default function CompaniesPage() {
                     <Card className="hover:shadow-md transition-shadow cursor-pointer h-full relative">
                       <CardContent className="p-4">
                         {sortBy === "debtDesc" && (
-                          <Badge className="absolute top-2 left-2 bg-amber-500 hover:bg-amber-500">
+                          <Badge className="absolute top-2 start-2 bg-amber-500 hover:bg-amber-500">
                             #{companyNumber}
                           </Badge>
                         )}
@@ -440,7 +440,7 @@ export default function CompaniesPage() {
                             </p>
                           ) : (
                             <div className="text-green-600 font-medium">
-                              <CheckCircle className="h-4 w-4 inline mr-1" />
+                              <CheckCircle className="h-4 w-4 inline me-1" />
                               {t("Settled")}
                             </div>
                           )}
@@ -457,7 +457,7 @@ export default function CompaniesPage() {
                             disabled={deleteMutation.isPending}
                             className="w-full"
                           >
-                            <Trash2 className="h-4 w-4 mr-1" />
+                            <Trash2 className="h-4 w-4 me-1" />
                             {deleteMutation.isPending ? t("Deleting...") : t("Delete")}
                           </Button>
                         )}
@@ -476,7 +476,7 @@ export default function CompaniesPage() {
                   variant="outline"
                   className="flex items-center gap-2"
                 >
-                  <ChevronLeft className="h-4 w-4" />
+                  <ChevronLeft className="rtl-flip h-4 w-4" />
                   {t("Previous")}
                 </Button>
 
@@ -491,7 +491,7 @@ export default function CompaniesPage() {
                   className="flex items-center gap-2"
                 >
                   {t("Next")}
-                  <ChevronRight className="h-4 w-4" />
+                  <ChevronRight className="rtl-flip h-4 w-4" />
                 </Button>
               </div>
             )}

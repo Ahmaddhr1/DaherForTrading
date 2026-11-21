@@ -50,17 +50,17 @@ export function GlobalSearchModal({ open, onClose }) {
     <Modal open={open} onClose={onClose} title={t("Search")} maxWidth="max-w-xl">
       <div className="space-y-4">
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 h-4 w-4" />
+          <Search className="absolute start-3 top-1/2 -translate-y-1/2 text-gray-400 h-4 w-4" />
           <Input
             type="text"
             placeholder={t("Search customers, products, companies, orders...")}
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            className="pl-10"
+            className="ps-10"
             autoFocus
           />
           {isFetching && (
-            <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 h-4 w-4 animate-spin" />
+            <Loader2 className="absolute end-3 top-1/2 -translate-y-1/2 text-gray-400 h-4 w-4 animate-spin" />
           )}
         </div>
 
@@ -154,7 +154,7 @@ function ResultRow({ onClick, primary, secondary, trailing, trailingClassName = 
     <button
       type="button"
       onClick={onClick}
-      className="w-full flex items-center justify-between gap-3 px-2 py-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 text-left"
+      className="w-full flex items-center justify-between gap-3 px-2 py-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 text-start"
     >
       <div className="min-w-0">
         <div className="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">{primary}</div>

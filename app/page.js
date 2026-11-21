@@ -253,7 +253,7 @@ export default function LoginPage() {
                     onClick={handleBack}
                     className="flex items-center gap-1 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"
                   >
-                    <ArrowLeft className="h-3.5 w-3.5" />
+                    <ArrowLeft className="rtl-flip h-3.5 w-3.5" />
                     {t("Back")}
                   </button>
                   <button

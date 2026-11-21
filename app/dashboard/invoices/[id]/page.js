@@ -141,7 +141,7 @@ export default function OrderDetailsPage() {
 
           </div>
           <div className="flex items-center text-gray-500 dark:text-gray-400 text-sm">
-            <Calendar className="h-4 w-4 mr-1" />
+            <Calendar className="h-4 w-4 me-1" />
             {format(new Date(order.createdAt), "EEEE, MMMM d, yyyy 'at' h:mm a")}
           </div>
           <div className="flex flex-wrap gap-2 mt-2">
@@ -182,7 +182,7 @@ export default function OrderDetailsPage() {
             <Card className="shadow-sm border-gray-200 dark:border-gray-800">
               <CardHeader className="pb-4">
                 <CardTitle className="flex items-center text-lg">
-                  <Package className="h-5 w-5 mr-2 text-blue-600" />
+                  <Package className="h-5 w-5 me-2 text-blue-600" />
                   {t("Order Items")}
                 </CardTitle>
                 <CardDescription>{t("Products included in this order")}</CardDescription>
@@ -195,7 +195,7 @@ export default function OrderDetailsPage() {
                       <TableHead className="text-center font-semibold text-gray-700 dark:text-gray-300">{t("Quantity")}</TableHead>
                       <TableHead className="text-center font-semibold text-gray-700 dark:text-gray-300">{t("Unit Price")}</TableHead>
                       <TableHead className="text-center font-semibold text-gray-700 dark:text-gray-300">{t("Discount")}</TableHead>
-                      <TableHead className="text-right font-semibold text-gray-700 dark:text-gray-300">{t("Total")}</TableHead>
+                      <TableHead className="text-end font-semibold text-gray-700 dark:text-gray-300">{t("Total")}</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -209,7 +209,7 @@ export default function OrderDetailsPage() {
                         <TableCell className="text-center text-amber-700">
                           {item.discount ? `-$${item.discount.toFixed(2)}` : "—"}
                         </TableCell>
-                        <TableCell className="text-right font-medium text-gray-900 dark:text-gray-100">
+                        <TableCell className="text-end font-medium text-gray-900 dark:text-gray-100">
                           ${(item.price * item.quantity - (item.discount || 0)).toFixed(2)}
                         </TableCell>
                       </TableRow>
@@ -223,7 +223,7 @@ export default function OrderDetailsPage() {
               <Card className="shadow-sm border-gray-200 dark:border-gray-800">
                 <CardHeader className="pb-4">
                   <CardTitle className="flex items-center text-lg">
-                    <RotateCcw className="h-5 w-5 mr-2 text-amber-600" />
+                    <RotateCcw className="h-5 w-5 me-2 text-amber-600" />
                     {t("Returns")}
                   </CardTitle>
                   <CardDescription>{t("Stock this customer has sent back from this order")}</CardDescription>
@@ -260,7 +260,7 @@ export default function OrderDetailsPage() {
             <Card className="shadow-sm border-gray-200 dark:border-gray-800">
               <CardHeader className="pb-4">
                 <CardTitle className="flex items-center text-lg">
-                  <User className="h-5 w-5 mr-2 text-blue-600" />
+                  <User className="h-5 w-5 me-2 text-blue-600" />
                   {t("Customer Information")}
                 </CardTitle>
               </CardHeader>
@@ -281,7 +281,7 @@ export default function OrderDetailsPage() {
             <Card className="shadow-sm border-gray-200 dark:border-gray-800">
               <CardHeader className="pb-4">
                 <CardTitle className="flex items-center text-lg">
-                  <CreditCard className="h-5 w-5 mr-2 text-blue-600" />
+                  <CreditCard className="h-5 w-5 me-2 text-blue-600" />
                   {t("Payment Summary")}
                 </CardTitle>
               </CardHeader>

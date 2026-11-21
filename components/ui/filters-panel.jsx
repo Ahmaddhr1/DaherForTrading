@@ -27,7 +27,7 @@ export function FiltersPanel({ children, activeCount = 0 }) {
           <SlidersHorizontal className="h-4 w-4" />
           {t("Filters")}
           {activeCount > 0 && (
-            <Badge variant="secondary" className="ml-1">
+            <Badge variant="secondary" className="ms-1">
               {activeCount}
             </Badge>
           )}

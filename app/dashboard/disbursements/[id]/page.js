@@ -92,7 +92,7 @@ export default function DisbursementDetailsPage() {
             </Badge>
           </div>
           <div className="flex items-center text-gray-500 dark:text-gray-400 text-sm">
-            <Calendar className="h-4 w-4 mr-1" />
+            <Calendar className="h-4 w-4 me-1" />
             {format(new Date(disbursement.createdAt), "EEEE, MMMM d, yyyy 'at' h:mm a")}
           </div>
           <div className="flex flex-wrap gap-2 mt-2">
@@ -119,7 +119,7 @@ export default function DisbursementDetailsPage() {
         <Card className="shadow-sm border-gray-200 dark:border-gray-800">
           <CardHeader className="pb-4">
             <CardTitle className="flex items-center text-lg">
-              <TrendingDown className="h-5 w-5 mr-2 text-red-600" />
+              <TrendingDown className="h-5 w-5 me-2 text-red-600" />
               {t("Details")}
             </CardTitle>
             <CardDescription>

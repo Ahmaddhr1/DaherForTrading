@@ -181,7 +181,7 @@ export default function OrderDetailsPage() {
             <p>
               <span className="font-medium">{t("Status:")}</span>
               <span
-                className={`ml-1 px-2 py-1 rounded-full text-sm ${
+                className={`ms-1 px-2 py-1 rounded-full text-sm ${
                   order.status === "paid"
                     ? "bg-green-100 dark:bg-green-900/30 text-green-700"
                     : order.status === "partiallyPaid"

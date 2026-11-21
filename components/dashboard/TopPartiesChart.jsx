@@ -174,12 +174,12 @@ export default function TopPartiesChart({
             <div className="mt-6 overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="text-left text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400 border-b border-gray-200 dark:border-gray-800">
-                    <th className="py-2 pr-2 w-8">#</th>
-                    <th className="py-2 pr-2">{t("Name")}</th>
-                    <th className="py-2 pr-2 text-right">{countLabel}</th>
-                    <th className="py-2 pr-2 text-right">{purchasedLabel}</th>
-                    <th className="py-2 text-right">{profitLabel}</th>
+                  <tr className="text-start text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400 border-b border-gray-200 dark:border-gray-800">
+                    <th className="py-2 pe-2 w-8">#</th>
+                    <th className="py-2 pe-2">{t("Name")}</th>
+                    <th className="py-2 pe-2 text-end">{countLabel}</th>
+                    <th className="py-2 pe-2 text-end">{purchasedLabel}</th>
+                    <th className="py-2 text-end">{profitLabel}</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
@@ -187,8 +187,8 @@ export default function TopPartiesChart({
                     const href = hrefFor?.(row);
                     return (
                       <tr key={String(row.customerId || row.companyId || i)}>
-                        <td className="py-2 pr-2 text-gray-500">{i + 1}</td>
-                        <td className="py-2 pr-2 font-medium text-gray-900 dark:text-gray-100">
+                        <td className="py-2 pe-2 text-gray-500">{i + 1}</td>
+                        <td className="py-2 pe-2 font-medium text-gray-900 dark:text-gray-100">
                           {href ? (
                             <Link href={href} className="hover:underline">
                               {row.name}
@@ -197,9 +197,9 @@ export default function TopPartiesChart({
                             row.name
                           )}
                         </td>
-                        <td className="py-2 pr-2 text-right text-gray-600 dark:text-gray-400">{row[countKey]}</td>
-                        <td className="py-2 pr-2 text-right font-semibold text-blue-600">{money(row.purchased)}</td>
-                        <td className={`py-2 text-right font-semibold ${row.profit >= 0 ? "text-green-600" : "text-red-600"}`}>
+                        <td className="py-2 pe-2 text-end text-gray-600 dark:text-gray-400">{row[countKey]}</td>
+                        <td className="py-2 pe-2 text-end font-semibold text-blue-600">{money(row.purchased)}</td>
+                        <td className={`py-2 text-end font-semibold ${row.profit >= 0 ? "text-green-600" : "text-red-600"}`}>
                           {money(row.profit)}
                         </td>
                       </tr>

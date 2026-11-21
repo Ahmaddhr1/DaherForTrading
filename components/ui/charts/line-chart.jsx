@@ -213,7 +213,7 @@ const Legend = React.forwardRef((props, ref) => {
           "flex h-full",
           enableLegendSlider
             ? hasScroll?.right || hasScroll?.left
-              ? "snap-mandatory items-center overflow-auto pl-4 pr-12 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+              ? "snap-mandatory items-center overflow-auto ps-4 pe-12 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
               : ""
             : "flex-wrap"
         )}
@@ -229,7 +229,7 @@ const Legend = React.forwardRef((props, ref) => {
         ))}
       </div>
       {enableLegendSlider && (hasScroll?.right || hasScroll?.left) ? (
-        <div className={cx("absolute bottom-0 right-0 top-0 flex h-full items-center justify-center pr-1", "bg-white dark:bg-gray-900")}>
+        <div className={cx("absolute bottom-0 end-0 top-0 flex h-full items-center justify-center pe-1", "bg-white dark:bg-gray-900")}>
           <ScrollButton
             icon={ChevronLeft}
             onClick={() => {
@@ -308,9 +308,9 @@ const ChartTooltip = ({ active, payload, label, valueFormatter }) => {
             <div key={`id-${index}`} className="flex items-center justify-between space-x-8">
               <div className="flex items-center space-x-2">
                 <span aria-hidden="true" className={cx("h-[3px] w-3.5 shrink-0 rounded-full", getColorClassName(color, "bg"))} />
-                <p className={cx("whitespace-nowrap text-right", "text-gray-700 dark:text-gray-300")}>{category}</p>
+                <p className={cx("whitespace-nowrap text-end", "text-gray-700 dark:text-gray-300")}>{category}</p>
               </div>
-              <p className={cx("whitespace-nowrap text-right font-medium tabular-nums", "text-gray-900 dark:text-gray-100")}>
+              <p className={cx("whitespace-nowrap text-end font-medium tabular-nums", "text-gray-900 dark:text-gray-100")}>
                 {valueFormatter(value)}
               </p>
             </div>

@@ -93,13 +93,13 @@ export function MySideBar() {
           className={`flex items-center flex-1 p-4 ${isCollapsed ? "justify-center" : ""}`}
         >
           <span>{tab.icon}</span>
-          {!isCollapsed && <span className="ml-3">{t(tab.label)}</span>}
+          {!isCollapsed && <span className="ms-3">{t(tab.label)}</span>}
         </Link>
         {hasChildren && !isCollapsed && (
           <button
             type="button"
             onClick={() => toggleExpanded(tab)}
-            className="p-4 pl-0"
+            className="p-4 ps-0"
             aria-label={expanded ? t("Collapse {0}", {
               0: tab.label
             }) : t("Expand {0}", {
@@ -124,8 +124,8 @@ export function MySideBar() {
         key={child.path}
         href={child.path}
         title={isCollapsed ? t(child.label) : undefined}
-        className={`flex items-center p-4 border-l-4 transition-colors ${
-          isCollapsed ? "justify-center" : "pl-7"
+        className={`flex items-center p-4 border-s-4 transition-colors ${
+          isCollapsed ? "justify-center" : "ps-7"
         } ${
           isActive
             ? "bg-amber-500 text-gray-900 border-amber-600"
@@ -133,14 +133,14 @@ export function MySideBar() {
         }`}
       >
         <span>{child.icon}</span>
-        {!isCollapsed && <span className="ml-3">{t(child.label)}</span>}
+        {!isCollapsed && <span className="ms-3">{t(child.label)}</span>}
       </Link>
     );
   };
 
   return (
     <aside
-      className={`hidden lg:flex lg:sticky top-0 left-0 h-screen z-40 bg-sidebar text-sidebar-foreground
+      className={`hidden lg:flex lg:sticky top-0 start-0 h-screen z-40 bg-sidebar text-sidebar-foreground
                   transition-all duration-300 ease-in-out
                   ${isCollapsed ? "w-20" : "w-64"}`}
     >
@@ -180,7 +180,7 @@ export function MySideBar() {
             <Search className="h-4 w-4 shrink-0" />
             {!isCollapsed && (
               <>
-                <span className="flex-1 text-left">{t("Search")}</span>
+                <span className="flex-1 text-start">{t("Search")}</span>
                 <kbd className="text-xs opacity-60">{t("⌘K")}</kbd>
               </>
             )}
@@ -208,7 +208,7 @@ export function MySideBar() {
             }`}
           >
             <LogOut />
-            {!isCollapsed && <span className="ml-3">{t("Logout")}</span>}
+            {!isCollapsed && <span className="ms-3">{t("Logout")}</span>}
           </button>
         </div>
       </div>

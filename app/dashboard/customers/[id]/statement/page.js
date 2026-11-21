@@ -146,7 +146,7 @@ export default function CustomerStatementPage() {
             </div>
           </div>
           <div className="flex items-center text-gray-500 text-sm">
-            <Calendar className="h-4 w-4 mr-1" />
+            <Calendar className="h-4 w-4 me-1" />
             {t("Generated")} {format(new Date(), "EEEE, MMMM d, yyyy")}
           </div>
           <div className="flex flex-wrap items-end gap-3 mt-4 print:hidden">
@@ -187,7 +187,7 @@ export default function CustomerStatementPage() {
         <Card className="shadow-sm border-gray-200">
           <CardHeader className="pb-4">
             <CardTitle className="flex items-center text-lg">
-              <FileText className="h-5 w-5 mr-2 text-blue-600" />
+              <FileText className="h-5 w-5 me-2 text-blue-600" />
               {t("Order History")}
             </CardTitle>
           </CardHeader>
@@ -198,9 +198,9 @@ export default function CustomerStatementPage() {
                 <TableHeader className="bg-gray-50/50">
                   <TableRow>
                     <TableHead className="font-semibold text-gray-700">{t("Date")}</TableHead>
-                    <TableHead className="text-right font-semibold text-gray-700">{t("Total")}</TableHead>
-                    <TableHead className="text-right font-semibold text-gray-700">{t("Paid")}</TableHead>
-                    <TableHead className="text-right font-semibold text-gray-700">{t("Remaining")}</TableHead>
+                    <TableHead className="text-end font-semibold text-gray-700">{t("Total")}</TableHead>
+                    <TableHead className="text-end font-semibold text-gray-700">{t("Paid")}</TableHead>
+                    <TableHead className="text-end font-semibold text-gray-700">{t("Remaining")}</TableHead>
                     <TableHead className="text-center font-semibold text-gray-700">{t("Status")}</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -212,9 +212,9 @@ export default function CustomerStatementPage() {
                         <TableCell className="text-gray-600 text-sm whitespace-nowrap">
                           {format(new Date(order.createdAt), "MMM d, yyyy HH:mm")}
                         </TableCell>
-                        <TableCell className="text-right font-medium text-gray-900 whitespace-nowrap">${order.total.toFixed(2)}</TableCell>
-                        <TableCell className="text-right text-green-600 font-medium whitespace-nowrap">${order.amountpaid.toFixed(2)}</TableCell>
-                        <TableCell className={`text-right font-medium whitespace-nowrap ${order.remainingBalance > 0 ? "text-red-600" : "text-gray-900"}`}>
+                        <TableCell className="text-end font-medium text-gray-900 whitespace-nowrap">${order.total.toFixed(2)}</TableCell>
+                        <TableCell className="text-end text-green-600 font-medium whitespace-nowrap">${order.amountpaid.toFixed(2)}</TableCell>
+                        <TableCell className={`text-end font-medium whitespace-nowrap ${order.remainingBalance > 0 ? "text-red-600" : "text-gray-900"}`}>
                           ${order.remainingBalance.toFixed(2)}
                         </TableCell>
                         <TableCell className="text-center whitespace-nowrap">

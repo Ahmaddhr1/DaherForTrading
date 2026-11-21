@@ -119,7 +119,7 @@ export default function ProductStockHistoryPage() {
           <div>
             {e.quantity} {unit} @ ${e.price.toFixed(2)}
             {e.free && (
-              <Badge variant="outline" className="ml-1.5 text-[10px] px-1.5 py-0">
+              <Badge variant="outline" className="ms-1.5 text-[10px] px-1.5 py-0">
                 {t("FREE")}
               </Badge>
             )}
@@ -193,7 +193,7 @@ export default function ProductStockHistoryPage() {
               </Button>
             )}
             {product && (
-              <div className="sm:ml-auto text-sm text-gray-600 dark:text-gray-400">
+              <div className="sm:ms-auto text-sm text-gray-600 dark:text-gray-400">
                 {t("Current stock:")} <span className="font-semibold text-gray-900 dark:text-gray-100">{product.quantity} {product.unit}</span>
               </div>
             )}
@@ -250,7 +250,7 @@ export default function ProductStockHistoryPage() {
                   size="sm"
                   className="flex items-center gap-2"
                 >
-                  <ChevronLeft className="h-4 w-4" />
+                  <ChevronLeft className="rtl-flip h-4 w-4" />
                   {t("Previous")}
                 </Button>
                 <span className="text-sm text-gray-600 dark:text-gray-400">
@@ -264,7 +264,7 @@ export default function ProductStockHistoryPage() {
                   className="flex items-center gap-2"
                 >
                   {t("Next")}
-                  <ChevronRight className="h-4 w-4" />
+                  <ChevronRight className="rtl-flip h-4 w-4" />
                 </Button>
               </div>
             )}

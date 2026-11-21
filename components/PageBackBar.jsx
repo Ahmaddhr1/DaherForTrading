@@ -62,7 +62,7 @@ export function PageBackBar() {
     <nav aria-label={t("Breadcrumb")} className="mb-4 flex flex-wrap items-center gap-1 text-sm font-medium">
       {crumbs.map((crumb, index) => (
         <span key={crumb.href} className="flex items-center gap-1">
-          {index > 0 && <ChevronRight className="h-3.5 w-3.5 text-gray-400 dark:text-gray-600" />}
+          {index > 0 && <ChevronRight className="rtl-flip h-3.5 w-3.5 text-gray-400 dark:text-gray-600" />}
           <Link
             href={crumb.href}
             className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:underline"

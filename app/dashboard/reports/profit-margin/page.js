@@ -143,9 +143,9 @@ export default function ProfitMarginPage() {
                       <TableHeader>
                         <TableRow>
                           <TableHead>{t("Category")}</TableHead>
-                          <TableHead className="text-right">{t("Revenue")}</TableHead>
-                          <TableHead className="text-right">{t("Profit")}</TableHead>
-                          <TableHead className="text-right">{t("Margin")}</TableHead>
+                          <TableHead className="text-end">{t("Revenue")}</TableHead>
+                          <TableHead className="text-end">{t("Profit")}</TableHead>
+                          <TableHead className="text-end">{t("Margin")}</TableHead>
                         </TableRow>
                       </TableHeader>
                       <TableBody>
@@ -154,11 +154,11 @@ export default function ProfitMarginPage() {
                             <TableCell className="font-medium text-gray-900 dark:text-gray-100">
                               {row.categoryName}
                             </TableCell>
-                            <TableCell className="text-right">{currencyFormatter(row.revenue)}</TableCell>
-                            <TableCell className={`text-right ${row.profit >= 0 ? "text-green-600" : "text-red-600"}`}>
+                            <TableCell className="text-end">{currencyFormatter(row.revenue)}</TableCell>
+                            <TableCell className={`text-end ${row.profit >= 0 ? "text-green-600" : "text-red-600"}`}>
                               {currencyFormatter(row.profit)}
                             </TableCell>
-                            <TableCell className="text-right text-gray-600 dark:text-gray-400">
+                            <TableCell className="text-end text-gray-600 dark:text-gray-400">
                               {percentFormatter(row.marginPercent)}
                             </TableCell>
                           </TableRow>
@@ -183,9 +183,9 @@ export default function ProfitMarginPage() {
                       <TableHeader>
                         <TableRow>
                           <TableHead>{t("Product")}</TableHead>
-                          <TableHead className="text-right">{t("Revenue")}</TableHead>
-                          <TableHead className="text-right">{t("Profit")}</TableHead>
-                          <TableHead className="text-right">{t("Margin")}</TableHead>
+                          <TableHead className="text-end">{t("Revenue")}</TableHead>
+                          <TableHead className="text-end">{t("Profit")}</TableHead>
+                          <TableHead className="text-end">{t("Margin")}</TableHead>
                         </TableRow>
                       </TableHeader>
                       <TableBody>
@@ -197,11 +197,11 @@ export default function ProfitMarginPage() {
                               </div>
                               <div className="text-xs text-gray-500 dark:text-gray-400">{row.categoryName}</div>
                             </TableCell>
-                            <TableCell className="text-right">{currencyFormatter(row.revenue)}</TableCell>
-                            <TableCell className={`text-right ${row.profit >= 0 ? "text-green-600" : "text-red-600"}`}>
+                            <TableCell className="text-end">{currencyFormatter(row.revenue)}</TableCell>
+                            <TableCell className={`text-end ${row.profit >= 0 ? "text-green-600" : "text-red-600"}`}>
                               {currencyFormatter(row.profit)}
                             </TableCell>
-                            <TableCell className="text-right text-gray-600 dark:text-gray-400">
+                            <TableCell className="text-end text-gray-600 dark:text-gray-400">
                               {percentFormatter(row.marginPercent)}
                             </TableCell>
                           </TableRow>

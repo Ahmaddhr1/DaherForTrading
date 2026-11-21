@@ -104,13 +104,13 @@ export default function LinkCustomerModal({ open, onClose, order }) {
       {mode === "search" ? (
         <div className="space-y-3">
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500 h-4 w-4" />
+            <Search className="absolute start-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500 h-4 w-4" />
             <Input
               type="text"
               placeholder={t("Search customers by name...")}
               value={searchInput}
               onChange={(e) => setSearchInput(e.target.value)}
-              className="pl-10"
+              className="ps-10"
               autoFocus
             />
           </div>
@@ -132,7 +132,7 @@ export default function LinkCustomerModal({ open, onClose, order }) {
                     type="button"
                     disabled={linking}
                     onClick={() => linkCustomer(customer._id)}
-                    className="w-full flex items-center justify-between p-3 hover:bg-gray-50 dark:hover:bg-gray-800/60 text-left disabled:opacity-50"
+                    className="w-full flex items-center justify-between p-3 hover:bg-gray-50 dark:hover:bg-gray-800/60 text-start disabled:opacity-50"
                   >
                     <div>
                       <p className="font-medium text-gray-900 dark:text-gray-100">{customer.fullName}</p>
@@ -153,8 +153,8 @@ export default function LinkCustomerModal({ open, onClose, order }) {
         </div>
       ) : (
         <form onSubmit={handleCreateAndLink} className="space-y-3">
-          <Button type="button" variant="ghost" size="sm" className="flex items-center gap-1 -ml-2" onClick={() => setMode("search")}>
-            <ArrowLeft className="h-3.5 w-3.5" />
+          <Button type="button" variant="ghost" size="sm" className="flex items-center gap-1 -ms-2" onClick={() => setMode("search")}>
+            <ArrowLeft className="rtl-flip h-3.5 w-3.5" />
             {t("Back to search")}
           </Button>
           <div className="space-y-2">

@@ -5,6 +5,10 @@ import Order from "@/models/Orders";
 import { NextResponse } from "next/server";
 import { getUserFromCookie } from "@/lib/auth";
 import { logActivity } from "@/lib/activityLog";
+import { extraChange } from "@/lib/audit";
+import { AUDIT_FIELDS } from "@/lib/auditFields";
+
+const fieldMeta = (field) => AUDIT_FIELDS.Product.find(([key]) => key === field) || [field, field, "money"];
 import { requirePermission } from "@/lib/permissions";
 
 const PRICE_FIELDS = ["price", "priceWholesale", "priceDistributor", "priceVip", "initialPrice", "discount"];
@@ -46,6 +50,8 @@ async function handlePriceUpdate(productIds, { field, mode, value }) {
 
   const skipped = [];
   const updates = [];
+  const changes = [];
+  const [, fieldLabel, fieldFormat] = fieldMeta(field);
 
   for (const product of products) {
     let newValue = applyPriceMode(product[field], mode, parsedValue);
@@ -71,6 +77,9 @@ async function handlePriceUpdate(productIds, { field, mode, value }) {
     }
 
     updates.push({ updateOne: { filter: { _id: product._id }, update: { $set: { [field]: newValue } } } });
+    changes.push(
+      extraChange(`${product._id}.${field}`, `${product.name} — ${fieldLabel}`, product[field], newValue, fieldFormat)
+    );
   }
 
   if (updates.length > 0) {
@@ -81,8 +90,9 @@ async function handlePriceUpdate(productIds, { field, mode, value }) {
     admin: await getUserFromCookie(),
     action: "product.bulkPriceUpdate",
     entityType: "Product",
-    summary: `Bulk-updated ${field} on ${updates.length} product${updates.length === 1 ? "" : "s"} (${mode})`,
+    summary: `Bulk-updated ${fieldLabel.toLowerCase()} on ${updates.length} product${updates.length === 1 ? "" : "s"} (${mode} ${parsedValue})`,
     metadata: { field, mode, value: parsedValue, productIds, skipped },
+    changes,
   });
 
   return NextResponse.json({ updated: updates.length, skipped }, { status: 200 });
@@ -91,16 +101,23 @@ async function handlePriceUpdate(productIds, { field, mode, value }) {
 async function handleCategoryReassign(productIds, { categoryId }) {
   const normalizedCategoryId = categoryId || null;
 
+  let newCategoryName = null;
   if (normalizedCategoryId) {
     const category = await Category.findById(normalizedCategoryId);
     if (!category) {
       return NextResponse.json({ message: "Category not found" }, { status: 404 });
     }
+    newCategoryName = category.name;
   }
 
-  const products = await Product.find({ _id: { $in: productIds } }).select("category");
+  const products = await Product.find({ _id: { $in: productIds } })
+    .select("name category")
+    .populate({ path: "category", select: "name" });
+  const changes = products.map((p) =>
+    extraChange(`${p._id}.category`, `${p.name} — Category`, p.category?.name || null, newCategoryName)
+  );
   const oldCategoryIds = [
-    ...new Set(products.map((p) => p.category?.toString()).filter(Boolean)),
+    ...new Set(products.map((p) => (p.category?._id || p.category)?.toString()).filter(Boolean)),
   ];
 
   await Product.updateMany({ _id: { $in: productIds } }, { $set: { category: normalizedCategoryId } });
@@ -121,17 +138,18 @@ async function handleCategoryReassign(productIds, { categoryId }) {
     admin: await getUserFromCookie(),
     action: "product.bulkCategoryReassign",
     entityType: "Product",
-    summary: `Reassigned ${productIds.length} product${productIds.length === 1 ? "" : "s"} to ${
-      normalizedCategoryId ? "a new category" : "no category"
+    summary: `Moved ${productIds.length} product${productIds.length === 1 ? "" : "s"} to ${
+      newCategoryName ? `category "${newCategoryName}"` : "no category"
     }`,
     metadata: { categoryId: normalizedCategoryId, productIds },
+    changes,
   });
 
   return NextResponse.json({ updated: productIds.length }, { status: 200 });
 }
 
 async function handleBulkDelete(productIds) {
-  const products = await Product.find({ _id: { $in: productIds } }).select("name category");
+  const products = await Product.find({ _id: { $in: productIds } }).select("name category price quantity");
 
   const orderedIds = new Set(
     (await Order.find({ "products.productId": { $in: productIds } }).select("products.productId"))
@@ -163,6 +181,9 @@ async function handleBulkDelete(productIds) {
     entityType: "Product",
     summary: `Bulk-deleted ${deletableIds.length} product${deletableIds.length === 1 ? "" : "s"}`,
     metadata: { productIds: deletableIds, skipped },
+    changes: deletable.map((p) =>
+      extraChange(`${p._id}`, `Deleted: ${p.name}`, `${p.quantity} in stock @ $${Number(p.price || 0).toFixed(2)}`, null)
+    ),
   });
 
   return NextResponse.json({ deleted: deletableIds.length, skipped }, { status: 200 });

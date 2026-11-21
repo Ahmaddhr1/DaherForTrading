@@ -6,6 +6,8 @@ import { getCustomerOverdueInfo, DEFAULT_OVERDUE_DAYS } from "@/lib/overdueCusto
 import { NextResponse } from "next/server";
 import { getUserFromCookie } from "@/lib/auth";
 import { requirePermission } from "@/lib/permissions";
+import { logActivity } from "@/lib/activityLog";
+import { auditView, diffViews, snapshotChanges, extraChange, describeChanges } from "@/lib/audit";
 
 // GET one customer
 export async function GET(req, { params }) {
@@ -69,14 +71,32 @@ export async function PUT(req, { params }) {
       body.priceTier = parsedPriceTier;
     }
 
-    const updatedCustomer = await Customer.findByIdAndUpdate(id, body, {
-      new: true,
-    });
-    if (!updatedCustomer) {
+    const beforeCustomer = await Customer.findById(id);
+    if (!beforeCustomer) {
       return NextResponse.json(
         { message: "Customer not found" },
         { status: 404 }
       );
+    }
+    const updatedCustomer = await Customer.findByIdAndUpdate(id, body, {
+      new: true,
+    });
+
+    const changes = diffViews(
+      "Customer",
+      await auditView("Customer", beforeCustomer),
+      await auditView("Customer", updatedCustomer)
+    );
+    if (changes.length > 0) {
+      await logActivity({
+        admin: await getUserFromCookie(),
+        action: "customer.edit",
+        entityType: "Customer",
+        entityId: updatedCustomer._id,
+        entityLabel: updatedCustomer.fullName,
+        summary: `Edited customer "${updatedCustomer.fullName}": ${describeChanges(changes)}`,
+        changes,
+      });
     }
     return NextResponse.json(
       { message: "Customer updated successfully" },
@@ -105,8 +125,22 @@ export async function DELETE(req, { params }) {
         { status: 404 }
       );
     }
-    await Order.deleteMany({ customer: id });
-    await Payment.deleteMany({ customer: id });
+    const { deletedCount: ordersDeleted } = await Order.deleteMany({ customer: id });
+    const { deletedCount: paymentsDeleted } = await Payment.deleteMany({ customer: id });
+
+    await logActivity({
+      admin: await getUserFromCookie(),
+      action: "customer.delete",
+      entityType: "Customer",
+      entityId: id,
+      entityLabel: deletedCustomer.fullName,
+      summary: `Deleted customer "${deletedCustomer.fullName}" (with ${ordersDeleted} order${ordersDeleted === 1 ? "" : "s"} and ${paymentsDeleted} payment${paymentsDeleted === 1 ? "" : "s"})`,
+      changes: [
+        ...snapshotChanges("Customer", await auditView("Customer", deletedCustomer), "delete"),
+        extraChange("orders", "Orders removed", ordersDeleted, null, "number"),
+        extraChange("payments", "Payments removed", paymentsDeleted, null, "number"),
+      ],
+    });
     return NextResponse.json(
       { message: "Customer deleted successfully" },
       { status: 200 }

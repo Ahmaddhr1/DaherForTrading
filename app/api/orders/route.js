@@ -2,6 +2,7 @@ import { connectToDB } from "@/lib/connectDb";
 import Customer from "@/models/Customers";
 import Order from "@/models/Orders";
 import { NextResponse } from "next/server";
+import { orderNumberSearchTerm } from "@/lib/orderNumber";
 
 const SORT_MAP = {
   newest: { createdAt: -1 },
@@ -38,16 +39,26 @@ export async function GET(req) {
     }
 
     if (search) {
+      const searchPattern = new RegExp(search.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "i");
       const matchingCustomers = await Customer.find({
-        fullName: { $regex: new RegExp(search, "i") },
+        fullName: { $regex: searchPattern },
       }).select("_id");
       // Also match a draft's hand-typed name (customerNameText) - it has no
       // linked customer yet, so the customer-id match above alone would
       // never find it.
       query.$or = [
         { customer: { $in: matchingCustomers.map((c) => c._id) } },
-        { customerNameText: { $regex: new RegExp(search, "i") } },
+        { customerNameText: { $regex: searchPattern } },
       ];
+      // Order number search: the number shown everywhere is the last 6
+      // characters of the order id, so a hex term (with or without "#")
+      // also matches orders whose id contains it.
+      const numberTerm = orderNumberSearchTerm(search);
+      if (numberTerm) {
+        query.$or.push({
+          $expr: { $regexMatch: { input: { $toString: "$_id" }, regex: numberTerm, options: "i" } },
+        });
+      }
     }
 
     if (startDateParam || endDateParam) {

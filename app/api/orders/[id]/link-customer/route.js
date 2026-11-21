@@ -3,6 +3,7 @@ import Customer from "@/models/Customers";
 import Order from "@/models/Orders";
 import { NextResponse } from "next/server";
 import { logActivity } from "@/lib/activityLog";
+import { auditView, diffViews, snapshotChanges, diffOrderLines, extraChange, describeChanges, orderLabel } from "@/lib/audit";
 import { getUserFromCookie } from "@/lib/auth";
 import { requirePermission } from "@/lib/permissions";
 
@@ -39,6 +40,7 @@ export async function PATCH(req, { params }) {
       return NextResponse.json({ message: "Customer not found" }, { status: 404 });
     }
 
+    const beforeView = await auditView("Order", order);
     order.customer = customer._id;
     await order.save();
 
@@ -51,7 +53,9 @@ export async function PATCH(req, { params }) {
       action: "order.edit",
       entityType: "Order",
       entityId: order._id,
-      summary: `Linked draft order to customer "${customer.fullName}"`,
+      entityLabel: orderLabel(order),
+      summary: `Linked draft ${orderLabel(order)} to customer "${customer.fullName}"`,
+      changes: diffViews("Order", beforeView, await auditView("Order", order)),
     });
 
     return NextResponse.json({ message: "Customer linked successfully", order }, { status: 200 });

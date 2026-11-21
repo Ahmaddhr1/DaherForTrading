@@ -3,6 +3,7 @@ import AppSettings from "@/models/AppSettings";
 import { NextResponse } from "next/server";
 import { getUserFromCookie } from "@/lib/auth";
 import { logActivity } from "@/lib/activityLog";
+import { diffViews, snapshotChanges, extraChange, describeChanges } from "@/lib/audit";
 import { requirePermission } from "@/lib/permissions";
 
 // Business-wide settings (dollar->LL rate, default tax rate). Viewable (GET)
@@ -54,12 +55,19 @@ export async function PUT(req) {
     if (taxRate !== undefined) settings.taxRate = taxRate;
     await settings.save();
 
+    const changes = diffViews("Settings", before, settings.toObject());
+    if (changes.length === 0) {
+      return NextResponse.json(settings, { status: 200 });
+    }
+
     await logActivity({
       admin: await getUserFromCookie(),
       action: "settings.update",
+      entityLabel: "Business settings",
+      changes,
       entityType: "Settings",
       entityId: settings._id,
-      summary: `Updated business settings (dollar rate ${before.dollarRate} -> ${settings.dollarRate}, tax rate ${before.taxRate}% -> ${settings.taxRate}%)`,
+      summary: `Updated business settings: ${describeChanges(changes)}`,
       metadata: { before, after: { dollarRate: settings.dollarRate, taxRate: settings.taxRate } },
     });
 

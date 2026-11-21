@@ -4,6 +4,7 @@ import StockAdjustment from "@/models/StockAdjustment";
 import { NextResponse } from "next/server";
 import { getUserFromCookie } from "@/lib/auth";
 import { logActivity } from "@/lib/activityLog";
+import { extraChange } from "@/lib/audit";
 import { requirePermission } from "@/lib/permissions";
 
 const VALID_TYPES = ["damaged", "lost", "expired", "correction", "other"];
@@ -73,6 +74,12 @@ export async function POST(req, { params }) {
       action: "product.stockAdjustment",
       entityType: "Product",
       entityId: product._id,
+      entityLabel: product.name,
+      changes: [
+        extraChange("quantity", "Stock quantity", quantityBefore, quantityAfter, "number"),
+        extraChange("adjustment.type", "Adjustment type", null, type),
+        extraChange("adjustment.reason", "Reason", null, reason?.trim() || null),
+      ],
       summary: `Adjusted stock of "${product.name}" by ${parsedChange > 0 ? "+" : ""}${parsedChange} (${type}): ${quantityBefore} → ${quantityAfter}`,
       metadata: { type, quantityChange: parsedChange, quantityBefore, quantityAfter, reason },
     });

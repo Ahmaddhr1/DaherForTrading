@@ -6,6 +6,8 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { toast } from "sonner";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { getTierLabel } from "@/lib/priceTiers";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
@@ -41,7 +43,17 @@ const SORT_OPTIONS = [
 
 const PAGE_SIZE_OPTIONS = [10, 20, 50];
 
+// "Rami's Hardware" -> "RH"
+const initials = (name = "") =>
+  name
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((w) => w[0].toUpperCase())
+    .join("") || "?";
+
 export default function CustomersPage() {
+  const router = useRouter();
   // State for search, pagination, sorting and filters
   const [searchInput, setSearchInput] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
@@ -327,7 +339,7 @@ export default function CustomersPage() {
         {/* Customers Grid */}
         {!isLoading && !error && customers.length > 0 && (
           <>
-            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
               {customers.map((customer, index) => {
                 const customerNumber = (currentPage - 1) * pageSize + index + 1;
                 const hasDebt = customer.debt > 0;
@@ -337,66 +349,94 @@ export default function CustomersPage() {
                     href={`/dashboard/customers/${customer._id}`}
                     key={customer._id}
                   >
-                    <Card className="hover:shadow-md transition-shadow cursor-pointer h-full relative">
-                      <CardContent className="p-4">
-                        {sortBy === "debtDesc" && (
-                          <Badge className="absolute top-2 left-2 bg-amber-500 hover:bg-amber-500">
+                    {/* Same card design as orders: status-coloured left edge,
+                        number + status on top, amount on the right, actions
+                        in a footer. */}
+                    <Card
+                      className={`border-l-4 ${
+                        hasDebt ? "border-l-red-500" : "border-l-green-500"
+                      } shadow-sm hover:shadow-md transition-shadow cursor-pointer h-full`}
+                    >
+                      <CardContent className="p-4 flex flex-col h-full">
+                        <div className="flex items-center justify-between gap-2">
+                          <span className="font-mono text-xs font-semibold tracking-wide text-gray-500 dark:text-gray-400">
                             #{customerNumber}
-                          </Badge>
-                        )}
+                          </span>
+                          {hasDebt ? (
+                            <span className="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300">
+                              Owes money
+                            </span>
+                          ) : (
+                            <span className="inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-semibold bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300">
+                              <CheckCircle className="h-3 w-3" />
+                              No debt
+                            </span>
+                          )}
+                        </div>
 
-                        {/* Customer Avatar */}
-                        <div className="flex justify-center mb-3">
-                          <div className={`w-16 h-16 rounded-full flex items-center justify-center ${hasDebt ? "bg-red-100 dark:bg-red-900/30" : "bg-green-100 dark:bg-green-900/30"
-                            }`}>
-                            <User className={`h-8 w-8 ${hasDebt ? "text-red-600" : "text-green-600"}`} />
+                        <div className="mt-2 flex items-start justify-between gap-3">
+                          <div className="flex items-start gap-3 min-w-0">
+                            <div
+                              className={`w-10 h-10 shrink-0 rounded-full flex items-center justify-center text-sm font-semibold ${
+                                hasDebt
+                                  ? "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300"
+                                  : "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300"
+                              }`}
+                            >
+                              {initials(customer.fullName)}
+                            </div>
+                            <div className="min-w-0">
+                              <h3 className="font-semibold text-gray-900 dark:text-gray-100 line-clamp-2 break-words">
+                                {customer.fullName}
+                              </h3>
+                              <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-0.5 text-xs text-gray-500 dark:text-gray-400">
+                                {customer.phoneNumber && (
+                                  <span className="inline-flex items-center gap-1">
+                                    <Phone className="h-3 w-3" />
+                                    {customer.phoneNumber}
+                                  </span>
+                                )}
+                                <span>{getTierLabel(customer.priceTier)}</span>
+                              </div>
+                            </div>
+                          </div>
+                          <div className="text-right shrink-0">
+                            <p className={`text-lg font-bold ${hasDebt ? "text-red-600" : "text-gray-900 dark:text-gray-100"}`}>
+                              ${Number(customer.debt || 0).toLocaleString()}
+                            </p>
+                            <p className="text-[11px] text-gray-500 dark:text-gray-400">debt</p>
                           </div>
                         </div>
 
-                        {/* Customer Info */}
-                        <div className="text-center mb-3">
-                          <h3 className="font-semibold text-gray-900 dark:text-gray-100 mb-1">
-                            #{customerNumber} - {customer.fullName}
-                          </h3>
-
-                          {customer.phoneNumber && (
-                            <p className="text-sm text-gray-600 dark:text-gray-400 flex items-center justify-center gap-1">
-                              <Phone className="h-3 w-3" />
-                              {customer.phoneNumber}
-                            </p>
-                          )}
+                        <div className="mt-auto pt-3">
+                          <div className="pt-3 border-t border-gray-100 dark:border-gray-800 flex items-center justify-between gap-2">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={(e) => {
+                                e.preventDefault();
+                                router.push(`/dashboard/customers/${customer._id}/orders`);
+                              }}
+                            >
+                              View orders
+                            </Button>
+                            {canDelete && (
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                aria-label={`Delete ${customer.fullName}`}
+                                onClick={(e) => {
+                                  e.preventDefault();
+                                  setDeleteTarget(customer);
+                                }}
+                                disabled={deleteMutation.isPending}
+                                className="text-red-600 hover:bg-red-50 hover:text-red-700 dark:hover:bg-red-950/40"
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            )}
+                          </div>
                         </div>
-
-                        {/* Debt Information */}
-                        <div className="text-center mb-4">
-                          {hasDebt ? (
-                            <p className="text-red-600 font-medium">
-                              Debt: ${customer.debt}
-                            </p>
-                          ) : (
-                            <div className="text-green-600 font-medium">
-                              <CheckCircle className="h-4 w-4 inline mr-1" />
-                              No debt
-                            </div>
-                          )}
-                        </div>
-
-                        {/* Delete Button */}
-                        {canDelete && (
-                          <Button
-                            variant="destructive"
-                            size="sm"
-                            onClick={(e) => {
-                              e.preventDefault();
-                              setDeleteTarget(customer);
-                            }}
-                            disabled={deleteMutation.isPending}
-                            className="w-full"
-                          >
-                            <Trash2 className="h-4 w-4 mr-1" />
-                            {deleteMutation.isPending ? "Deleting..." : "Delete"}
-                          </Button>
-                        )}
                       </CardContent>
                     </Card>
                   </Link>

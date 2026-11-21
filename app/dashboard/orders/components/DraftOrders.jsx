@@ -27,6 +27,8 @@ import axios from "axios";
 import { toast } from "sonner";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import OrderCustomerName from "./OrderCustomerName";
+import OrderCard from "./OrderCard";
+import { orderNumber } from "@/lib/orderNumber";
 import LinkCustomerModal from "./LinkCustomerModal";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { useHasPermission } from "@/lib/useHasPermission";
@@ -162,7 +164,7 @@ export default function DraftOrders() {
         <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 h-4 w-4" />
         <Input
           type="text"
-          placeholder="Search by customer name..."
+          placeholder="Search by customer name or order # (e.g. 4F2A91)"
           value={searchInput}
           onChange={(e) => setSearchInput(e.target.value)}
           className="pl-10"
@@ -182,31 +184,23 @@ export default function DraftOrders() {
         <>
           {/* Mobile: card list */}
           <div className="space-y-3 sm:hidden">
-            {orders.map((order, index) => (
-              <Card key={order._id} className="shadow-sm border-gray-200 dark:border-gray-800">
-                <CardContent className="p-4">
-                  <div className="flex items-start justify-between gap-2">
-                    <div className="min-w-0">
-                      <p className="text-xs text-gray-400 dark:text-gray-500">
-                        #{(page - 1) * pageSize + index + 1}
-                      </p>
-                      <p className="font-medium text-gray-900 dark:text-gray-100 truncate">
-                        <OrderCustomerName order={order} />
-                      </p>
-                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-                        {order.products?.length || 0} item{order.products?.length === 1 ? "" : "s"} ·{" "}
-                        {format(new Date(order.createdAt), "MMM d, yyyy HH:mm")}
-                      </p>
-                    </div>
+            {orders.map((order) => (
+              <OrderCard
+                key={order._id}
+                order={order}
+                actions={
+                  <div className="flex items-center justify-between gap-2">
+                    {canEditOrders ? (
+                      <Button variant="outline" size="sm" onClick={() => handleAction("continueEditing", order._id)}>
+                        Continue Editing
+                      </Button>
+                    ) : (
+                      <span />
+                    )}
                     {actionsMenu(order)}
                   </div>
-                  <div className="flex items-center justify-end mt-3">
-                    <span className="font-semibold text-gray-900 dark:text-gray-100">
-                      ${Number(order.total).toFixed(2)}
-                    </span>
-                  </div>
-                </CardContent>
-              </Card>
+                }
+              />
             ))}
           </div>
 
@@ -216,7 +210,7 @@ export default function DraftOrders() {
               <TableCaption>Draft orders awaiting a customer and/or finalization</TableCaption>
               <TableHeader>
                 <TableRow>
-                  <TableHead className="w-12">#</TableHead>
+                  <TableHead className="w-28">Order #</TableHead>
                   <TableHead>Customer</TableHead>
                   <TableHead className="text-center">Items</TableHead>
                   <TableHead className="text-center">Total</TableHead>
@@ -225,10 +219,10 @@ export default function DraftOrders() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {orders.map((order, index) => (
+                {orders.map((order) => (
                   <TableRow key={order._id} className="hover:bg-gray-50 dark:hover:bg-gray-800/60">
-                    <TableCell className="font-medium text-gray-500 dark:text-gray-400">
-                      {(page - 1) * pageSize + index + 1}
+                    <TableCell className="font-mono text-xs font-semibold text-gray-500 dark:text-gray-400">
+                      #{orderNumber(order._id)}
                     </TableCell>
                     <TableCell className="font-medium text-gray-900 dark:text-gray-100">
                       <OrderCustomerName order={order} />

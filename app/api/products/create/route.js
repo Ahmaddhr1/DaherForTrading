@@ -4,6 +4,7 @@ import Category from "@/models/Category"; // import category model
 import { NextResponse } from "next/server";
 import { getUserFromCookie } from "@/lib/auth";
 import { logActivity } from "@/lib/activityLog";
+import { auditView, snapshotChanges } from "@/lib/audit";
 import { requirePermission } from "@/lib/permissions";
 
 export async function POST(req) {
@@ -151,7 +152,9 @@ export async function POST(req) {
       action: "product.create",
       entityType: "Product",
       entityId: product._id,
+      entityLabel: product.name,
       summary: `Created product "${product.name}"`,
+      changes: snapshotChanges("Product", await auditView("Product", product), "create"),
     });
 
     return NextResponse.json(product, { status: 201 });

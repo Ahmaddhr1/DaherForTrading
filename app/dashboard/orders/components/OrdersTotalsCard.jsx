@@ -16,8 +16,10 @@ export function OrdersTotalsCard({ totalAmount = 0, totalProfit = 0, collectedAm
   const showCollected = collectedAmount !== undefined;
   return (
     <Card className="shadow-sm border-gray-200 dark:border-gray-800">
-      <CardContent className={`p-4 grid gap-4 ${showCollected ? "grid-cols-3" : "grid-cols-2"}`}>
-        <div className="flex flex-col items-center sm:items-start gap-1">
+      <CardContent
+        className={`p-4 grid grid-cols-1 gap-3 sm:gap-4 ${showCollected ? "sm:grid-cols-3" : "sm:grid-cols-2"}`}
+      >
+        <div className="flex sm:flex-col items-center sm:items-start justify-between gap-1">
           <span className="flex items-center gap-1.5 text-xs font-medium text-gray-500 dark:text-gray-400">
             <Receipt className="h-3.5 w-3.5" />
             {label}
@@ -26,7 +28,7 @@ export function OrdersTotalsCard({ totalAmount = 0, totalProfit = 0, collectedAm
             ${totalAmount.toLocaleString()}
           </span>
         </div>
-        <div className="flex flex-col items-center sm:items-start gap-1">
+        <div className="flex sm:flex-col items-center sm:items-start justify-between gap-1">
           <span className="flex items-center gap-1.5 text-xs font-medium text-gray-500 dark:text-gray-400">
             <TrendingUp className="h-3.5 w-3.5" />
             Profit Made
@@ -36,7 +38,7 @@ export function OrdersTotalsCard({ totalAmount = 0, totalProfit = 0, collectedAm
           </span>
         </div>
         {showCollected && (
-          <div className="flex flex-col items-center sm:items-start gap-1">
+          <div className="flex sm:flex-col items-center sm:items-start justify-between gap-1">
             <span className="flex items-center gap-1.5 text-xs font-medium text-gray-500 dark:text-gray-400">
               <Wallet className="h-3.5 w-3.5" />
               Paid + Partially Paid

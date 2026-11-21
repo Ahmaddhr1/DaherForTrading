@@ -3,6 +3,8 @@ import Category from "@/models/Category";
 import { NextResponse } from "next/server";
 import { getUserFromCookie } from "@/lib/auth";
 import { requirePermission } from "@/lib/permissions";
+import { logActivity } from "@/lib/activityLog";
+import { auditView, diffViews, snapshotChanges, extraChange, describeChanges } from "@/lib/audit";
 
 export async function POST(req) {
   try {
@@ -29,6 +31,16 @@ export async function POST(req) {
     }
 
     const category = await Category.create({ name});
+
+    await logActivity({
+      admin: await getUserFromCookie(),
+      action: "category.create",
+      entityType: "Category",
+      entityId: category._id,
+      entityLabel: category.name,
+      summary: `Created category "${category.name}"`,
+      changes: snapshotChanges("Category", category, "create"),
+    });
 
     return NextResponse.json(category, { status: 201 });
   } catch (err) {

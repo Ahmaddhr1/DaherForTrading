@@ -14,12 +14,15 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { FiltersPanel } from "@/components/ui/filters-panel";
-import { ChevronLeft, ChevronRight, Plus, History, DollarSign, Package, Eye } from "lucide-react";
+import { ChevronLeft, ChevronRight, Plus, History, DollarSign, Package, Eye, CheckCircle } from "lucide-react";
+import { toast } from "sonner";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
+import { useHasPermission } from "@/lib/useHasPermission";
 import { TableSkeleton } from "@/components/ui/skeleton-patterns";
 import { format } from "date-fns";
 import { useParams } from "next/navigation";
 import axios from "axios";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import Link from "next/link";
 import { localDayStartISO, localDayEndISO } from "@/lib/dateUtils";
 import ProductPurchaseBreakdown from "./ProductPurchaseBreakdown";
@@ -30,6 +33,22 @@ export default function CompanyPurchasesPage() {
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const limit = 10;
+  const [payTarget, setPayTarget] = useState(null);
+  const queryClient = useQueryClient();
+  const { hasPermission: canRecordPurchases } = useHasPermission("canRecordPurchases");
+
+  // Paying an unpaid purchase reduces what we owe this company and records a
+  // supplier payment (listed under Payments > Supplier payments).
+  const markPaidMutation = useMutation({
+    mutationFn: async (purchaseId) => (await axios.put(`/api/purchases/${purchaseId}/markpaid`)).data,
+    onSuccess: () => {
+      toast.success("Purchase marked as paid - supplier payment recorded");
+      setPayTarget(null);
+      queryClient.invalidateQueries({ queryKey: ["company-purchases", id] });
+      queryClient.invalidateQueries({ queryKey: ["supplier-payments"] });
+    },
+    onError: (err) => toast.error(err.response?.data?.message || "Failed to mark purchase as paid"),
+  });
 
   const { data, isLoading, isError } = useQuery({
     queryKey: ["company-purchases", id, page, startDate, endDate],
@@ -170,7 +189,7 @@ export default function CompanyPurchasesPage() {
                   <TableHead className="text-center">Total</TableHead>
                   <TableHead className="text-center">Status</TableHead>
                   <TableHead>Date</TableHead>
-                  <TableHead className="text-right">Receipt</TableHead>
+                  <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -197,12 +216,25 @@ export default function CompanyPurchasesPage() {
                         {format(new Date(purchase.createdAt), "MMM d, yyyy HH:mm")}
                       </TableCell>
                       <TableCell className="text-right">
-                        <Link href={`/dashboard/companies/${id}/purchases/${purchase._id}`}>
-                          <Button variant="ghost" size="sm" className="flex items-center gap-1">
-                            <Eye className="h-3.5 w-3.5" />
-                            View
-                          </Button>
-                        </Link>
+                        <div className="flex items-center justify-end gap-1">
+                          {!purchase.paid && canRecordPurchases && (
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => setPayTarget(purchase)}
+                              className="flex items-center gap-1 text-green-700 border-green-300 hover:bg-green-50 dark:text-green-400 dark:border-green-900 dark:hover:bg-green-950/40"
+                            >
+                              <CheckCircle className="h-3.5 w-3.5" />
+                              Mark as paid
+                            </Button>
+                          )}
+                          <Link href={`/dashboard/companies/${id}/purchases/${purchase._id}`}>
+                            <Button variant="ghost" size="sm" className="flex items-center gap-1">
+                              <Eye className="h-3.5 w-3.5" />
+                              View
+                            </Button>
+                          </Link>
+                        </div>
                       </TableCell>
                     </TableRow>
                   ))
@@ -240,6 +272,21 @@ export default function CompanyPurchasesPage() {
           </div>
         )}
       </div>
+
+      <ConfirmDialog
+        open={!!payTarget}
+        onClose={() => !markPaidMutation.isPending && setPayTarget(null)}
+        title="Mark purchase as paid?"
+        description={
+          payTarget
+            ? `Pay ${data?.companyName || "this company"} $${payTarget.total.toFixed(2)} for ${payTarget.quantity} x ${payTarget.productName}? This reduces what you owe them and records a supplier payment.`
+            : ""
+        }
+        confirmLabel="Mark as Paid"
+        variant="default"
+        loading={markPaidMutation.isPending}
+        onConfirm={() => markPaidMutation.mutate(payTarget._id)}
+      />
     </div>
   );
 }

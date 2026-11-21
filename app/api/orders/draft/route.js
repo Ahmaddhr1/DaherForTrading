@@ -3,6 +3,7 @@ import Order from "@/models/Orders";
 import { NextResponse } from "next/server";
 import { getUserFromCookie } from "@/lib/auth";
 import { logActivity } from "@/lib/activityLog";
+import { auditView, diffViews, snapshotChanges, diffOrderLines, extraChange, describeChanges, orderLabel } from "@/lib/audit";
 import { priceOrderItems, PricingError } from "@/lib/orderPricing";
 import { requirePermission, hasPermission } from "@/lib/permissions";
 
@@ -59,6 +60,11 @@ export async function POST(req) {
       action: "order.create",
       entityType: "Order",
       entityId: newOrder._id,
+      entityLabel: orderLabel(newOrder),
+      changes: [
+        ...snapshotChanges("Order", await auditView("Order", newOrder), "create"),
+        ...diffOrderLines([], newOrder.products),
+      ],
       summary: `Saved a draft order worth $${priced.total.toFixed(2)} for "${newOrder.customerNameText}" (no customer linked yet)`,
     });
 

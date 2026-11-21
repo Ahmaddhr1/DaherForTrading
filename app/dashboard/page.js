@@ -13,6 +13,8 @@ import TopCustomers from "@/components/dashboard/TopCustomers";
 import DashboardFilters from "@/components/dashboard/DashboardFilters";
 import SalesTrendsChart from "@/components/dashboard/SalesTrendsChart";
 import RealProfitChart from "@/components/dashboard/RealProfitChart";
+import TopPartiesChart from "@/components/dashboard/TopPartiesChart";
+import { Users, Building2 } from "lucide-react";
 import { getTodayDateString, localDayStartISO, localDayEndISO } from "@/lib/dateUtils";
 
 const DEFAULT_FILTERS = {
@@ -92,6 +94,39 @@ export default function DashboardPage() {
         {/* Real profit: sum of (selling price - initial cost) per unit sold */}
         <div className="mb-8">
           <RealProfitChart />
+        </div>
+
+        {/* Top 10 customers (what they bought + real profit) and top 10
+            companies (what we bought from them + expected profit) */}
+        <div className="grid grid-cols-1 xl:grid-cols-2 gap-8 mb-8">
+          <TopPartiesChart
+            title="Top 10 Customers"
+            icon={Users}
+            iconClassName="text-blue-600"
+            endpoint="/api/dashboard/top-buyers"
+            dataKey="topBuyers"
+            purchasedLabel="Purchased"
+            profitLabel="Profit"
+            countLabel="Orders"
+            countKey="ordersCount"
+            hrefFor={(row) => `/dashboard/customers/${row.customerId}/orders`}
+            emptyText="No orders in this range"
+            footnote="Purchased = total of their orders (drafts excluded). Profit = the real margin those orders made (selling price minus cost at the time of sale)."
+          />
+          <TopPartiesChart
+            title="Top 10 Companies"
+            icon={Building2}
+            iconClassName="text-violet-600"
+            endpoint="/api/dashboard/top-suppliers"
+            dataKey="topSuppliers"
+            purchasedLabel="Bought"
+            profitLabel="Expected profit"
+            countLabel="Purchases"
+            countKey="purchasesCount"
+            hrefFor={(row) => `/dashboard/companies/${row.companyId}/purchases`}
+            emptyText="No purchases in this range"
+            footnote="Bought = total of your purchases from them. Expected profit = that stock sold at today's prices minus what you paid - an estimate, since prices can change before it sells."
+          />
         </div>
 
         {/* Top Products & Top Debtors */}

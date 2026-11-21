@@ -2,9 +2,11 @@ import { connectToDB } from "@/lib/connectDb";
 import Company from "@/models/Company";
 import Product from "@/models/Products";
 import Purchase from "@/models/Purchase";
+import { recordSupplierPayment } from "@/lib/recordPayment";
 import { NextResponse } from "next/server";
 import { getUserFromCookie } from "@/lib/auth";
 import { logActivity } from "@/lib/activityLog";
+import { auditView, diffViews, snapshotChanges, extraChange, describeChanges } from "@/lib/audit";
 import { requirePermission } from "@/lib/permissions";
 
 // GET paginated purchase history for a company
@@ -137,6 +139,19 @@ export async function POST(req, { params }) {
       $set: { initialPrice: numericUnitPrice },
     });
 
+    // A purchase paid upfront is money paid to the supplier on the spot, so it
+    // gets its own supplier payment (owed amount unchanged, since nothing was
+    // ever owed for it). Unpaid ones get theirs later, when marked as paid.
+    if (isPaid) {
+      await recordSupplierPayment({
+        companyId: id,
+        amount: total,
+        purchase: purchase._id,
+        admin: await getUserFromCookie(),
+        affectsDebt: false,
+      });
+    }
+
     // Track what we owe the company if the purchase wasn't paid upfront.
     await Company.findByIdAndUpdate(id, {
       $push: { purchases: purchase._id },
@@ -148,6 +163,13 @@ export async function POST(req, { params }) {
       action: "purchase.create",
       entityType: "Purchase",
       entityId: purchase._id,
+      entityLabel: `${numericQuantity} x ${product.name}`,
+      changes: [
+        ...snapshotChanges("Purchase", await auditView("Purchase", purchase), "create"),
+        extraChange("product.quantity", `${product.name} — Stock quantity`, product.quantity, product.quantity + numericQuantity, "number"),
+        extraChange("product.initialPrice", `${product.name} — Cost price`, product.initialPrice, numericUnitPrice, "money"),
+        extraChange("company.debt", `${company.name} — Debt (owed to them)`, company.debt, company.debt + (isPaid ? 0 : total), "money"),
+      ],
       summary: `Recorded a purchase of ${numericQuantity} x "${product.name}" from ${company.name} for $${total.toFixed(2)}`,
       metadata: { companyId: id, productId, unitPrice: numericUnitPrice, quantity: numericQuantity, discount: numericDiscount, taxRate: numericTaxRate, paid: isPaid },
     });

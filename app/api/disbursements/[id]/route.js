@@ -3,6 +3,7 @@ import Disbursement from "@/models/Disbursement";
 import { NextResponse } from "next/server";
 import { getUserFromCookie } from "@/lib/auth";
 import { logActivity } from "@/lib/activityLog";
+import { diffViews, snapshotChanges, extraChange, describeChanges } from "@/lib/audit";
 import { requirePermission } from "@/lib/permissions";
 
 // GET one disbursement - used by the disbursement receipt page.
@@ -41,6 +42,8 @@ export async function DELETE(req, { params }) {
       action: "disbursement.delete",
       entityType: "Disbursement",
       entityId: id,
+      entityLabel: deleted.description,
+      changes: snapshotChanges("Disbursement", deleted.toObject(), "delete"),
       summary: `Deleted a $${deleted.amount} disbursement (${deleted.category}): ${deleted.description}`,
     });
 

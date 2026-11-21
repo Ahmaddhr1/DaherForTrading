@@ -105,14 +105,15 @@ const PartiallyPaidOrders = () => {
         </div>
       ) : (
         <>
-          {orders.map((order) => (
-            <OrderCard
-              key={order._id}
-              order={order}
-              borderColor="border-orange-200 dark:border-orange-900/50"
-              onStatusUpdate={handleStatusUpdate}
-            />
-          ))}
+          <div className="grid gap-4 md:grid-cols-2 2xl:grid-cols-3">
+            {orders.map((order) => (
+              <OrderCard
+                key={order._id}
+                order={order}
+                onStatusUpdate={handleStatusUpdate}
+              />
+            ))}
+          </div>
 
           {totalPages > 1 && (
             <div className="flex items-center justify-center gap-4 pt-4">

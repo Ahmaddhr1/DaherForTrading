@@ -1,9 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
-import { History, ChevronLeft, ChevronRight, AlertCircle, Trash2 } from "lucide-react";
+import { History, ChevronLeft, ChevronRight, AlertCircle, Trash2, Search } from "lucide-react";
 import { toast } from "sonner";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -20,8 +22,16 @@ import { Button } from "@/components/ui/button";
 import { Modal } from "@/components/ui/modal";
 import { DateRangeFilter } from "@/app/dashboard/orders/components/DateRangeFilter";
 import { getTodayDateString, localDayStartISO, localDayEndISO } from "@/lib/dateUtils";
+import { AUDIT_ENTITY_TYPES, describeAction, actionKind } from "@/lib/auditFields";
+import { ChangePreview } from "@/components/audit/ChangesTable";
 
-const ENTITY_TYPES = ["Order", "Payment", "Product", "Purchase", "Disbursement", "Customer", "Company"];
+const KIND_DOT = {
+  create: "bg-green-500",
+  delete: "bg-red-500",
+  change: "bg-blue-500",
+};
+
+const ENTITY_TYPES = AUDIT_ENTITY_TYPES;
 
 export default function ActivityPage() {
   const [page, setPage] = useState(1);
@@ -30,6 +40,18 @@ export default function ActivityPage() {
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [clearOpen, setClearOpen] = useState(false);
+  const [searchInput, setSearchInput] = useState("");
+  const [search, setSearch] = useState("");
+  const router = useRouter();
+
+  // Debounce the search box so each keystroke doesn't refetch.
+  useEffect(() => {
+    const t = setTimeout(() => {
+      setSearch(searchInput.trim());
+      setPage(1);
+    }, 300);
+    return () => clearTimeout(t);
+  }, [searchInput]);
   // Stays false until the user actually touches a filter. While false, the
   // log is scoped to today behind the scenes (effectiveStartDate/EndDate
   // below) without the date boxes themselves showing a value.
@@ -37,11 +59,13 @@ export default function ActivityPage() {
   const limit = 20;
   const queryClient = useQueryClient();
 
-  const effectiveStartDate = hasInteracted ? startDate : getTodayDateString();
-  const effectiveEndDate = hasInteracted ? endDate : getTodayDateString();
+  // Searching looks across all dates unless a range was picked explicitly.
+  const scopedToToday = !hasInteracted && !search;
+  const effectiveStartDate = scopedToToday ? getTodayDateString() : startDate;
+  const effectiveEndDate = scopedToToday ? getTodayDateString() : endDate;
 
   const { data, isLoading, error } = useQuery({
-    queryKey: ["activity", page, adminFilter, entityTypeFilter, effectiveStartDate, effectiveEndDate],
+    queryKey: ["activity", page, adminFilter, entityTypeFilter, effectiveStartDate, effectiveEndDate, search],
     queryFn: async () => {
       const response = await axios.get("/api/activity", {
         params: {
@@ -49,8 +73,9 @@ export default function ActivityPage() {
           limit,
           admin: adminFilter,
           entityType: entityTypeFilter,
-          startDate: localDayStartISO(effectiveStartDate),
-          endDate: localDayEndISO(effectiveEndDate),
+          search,
+          startDate: effectiveStartDate ? localDayStartISO(effectiveStartDate) : undefined,
+          endDate: effectiveEndDate ? localDayEndISO(effectiveEndDate) : undefined,
         },
       });
       return response.data;
@@ -86,7 +111,7 @@ export default function ActivityPage() {
             <div>
               <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-gray-100">Activity Log</h1>
               <p className="text-gray-600 dark:text-gray-400 text-sm sm:text-base">
-                Who did what, across orders, payments, products, and more
+                Who changed what, exactly - open any entry to see previous vs current values
               </p>
             </div>
           </div>
@@ -128,13 +153,23 @@ export default function ActivityPage() {
           </div>
         </Modal>
 
-        {!hasInteracted && (
+        {scopedToToday && (
           <p className="text-sm text-gray-500 dark:text-gray-400 mb-3">
             Showing today&apos;s activity only. Pick a date range below to see more.
           </p>
         )}
 
         <div className="flex flex-col sm:flex-row sm:flex-wrap sm:items-center gap-3 mb-6">
+          <div className="relative w-full sm:w-72">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+            <input
+              type="search"
+              value={searchInput}
+              onChange={(e) => setSearchInput(e.target.value)}
+              placeholder="Search product, customer, field..."
+              className="border-input h-9 w-full rounded-md border bg-transparent pl-9 pr-3 text-sm shadow-xs"
+            />
+          </div>
           <select
             value={adminFilter}
             onChange={(e) => {
@@ -209,20 +244,46 @@ export default function ActivityPage() {
                       <TableHead>Admin</TableHead>
                       <TableHead>Type</TableHead>
                       <TableHead>Details</TableHead>
+                      <TableHead className="text-right">Changes</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {entries.map((entry) => (
-                      <TableRow key={entry._id}>
+                      <TableRow
+                        key={entry._id}
+                        onClick={() => router.push(`/dashboard/activity/${entry._id}`)}
+                        className="cursor-pointer align-top"
+                      >
                         <TableCell className="text-gray-500 dark:text-gray-400 whitespace-nowrap">
                           {new Date(entry.createdAt).toLocaleString()}
                         </TableCell>
                         <TableCell className="font-medium">{entry.adminName}</TableCell>
                         <TableCell>
-                          <Badge variant="outline">{entry.entityType}</Badge>
+                          <div className="flex items-center gap-2">
+                            <span className={`h-2 w-2 rounded-full ${KIND_DOT[actionKind(entry.action)]}`} />
+                            <Badge variant="outline">{entry.entityType}</Badge>
+                          </div>
+                          <p className="mt-1 text-xs text-gray-500 dark:text-gray-400 whitespace-nowrap">
+                            {describeAction(entry.action)}
+                          </p>
                         </TableCell>
                         <TableCell className="whitespace-normal max-w-md">
-                          {entry.summary}
+                          {entry.entityLabel && (
+                            <p className="font-medium text-gray-900 dark:text-gray-100">{entry.entityLabel}</p>
+                          )}
+                          <p className="text-gray-700 dark:text-gray-300">{entry.summary}</p>
+                          <ChangePreview changes={entry.changes} total={entry.changeCount} />
+                        </TableCell>
+                        <TableCell className="text-right whitespace-nowrap">
+                          <Link
+                            href={`/dashboard/activity/${entry._id}`}
+                            onClick={(e) => e.stopPropagation()}
+                            className="text-sm text-blue-600 hover:underline"
+                          >
+                            {entry.changeCount > 0
+                              ? `View ${entry.changeCount} ${entry.changeCount === 1 ? "change" : "changes"}`
+                              : "View"}
+                          </Link>
                         </TableCell>
                       </TableRow>
                     ))}

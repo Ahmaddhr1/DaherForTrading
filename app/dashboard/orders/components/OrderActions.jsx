@@ -38,7 +38,7 @@ const OrderActions = ({ order, onStatusUpdate }) => {
   };
 
   return (
-    <div className="flex gap-2 mt-3">
+    <div className="flex flex-wrap gap-2">
       {(order.status === "pending" || order.status === "partiallyPaid") && canFinalizeOrders && (
         <Button
           size="sm"

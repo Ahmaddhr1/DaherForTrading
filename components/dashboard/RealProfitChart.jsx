@@ -53,12 +53,12 @@ export default function RealProfitChart() {
     },
   });
 
-  const trends = (data?.trends || []).map((t) => ({
-    ...t,
-    label: formatPeriodLabel(t.period, granularity),
-    "Real Profit": t.realProfit,
+  const trends = (data?.trends || []).map((row) => ({
+    ...row,
+    label: formatPeriodLabel(row.period, granularity),
+    "Real Profit": row.realProfit,
   }));
-  const totalProfit = trends.reduce((sum, t) => sum + t.realProfit, 0);
+  const totalProfit = trends.reduce((sum, row) => sum + row.realProfit, 0);
 
   return (
     <Card className="shadow-sm border-gray-200 dark:border-gray-800">

@@ -46,11 +46,11 @@ export default function ActivityPage() {
 
   // Debounce the search box so each keystroke doesn't refetch.
   useEffect(() => {
-    const t = setTimeout(() => {
+    const timer = setTimeout(() => {
       setSearch(searchInput.trim());
       setPage(1);
     }, 300);
-    return () => clearTimeout(t);
+    return () => clearTimeout(timer);
   }, [searchInput]);
   // Stays false until the user actually touches a filter. While false, the
   // log is scoped to today behind the scenes (effectiveStartDate/EndDate

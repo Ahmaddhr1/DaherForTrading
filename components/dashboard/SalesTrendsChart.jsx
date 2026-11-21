@@ -46,12 +46,12 @@ export default function SalesTrendsChart() {
     },
   });
 
-  const trends = (data?.trends || []).map((t) => ({
-    ...t,
-    label: formatPeriodLabel(t.period, granularity),
-    Sales: t.salesTotal,
-    Purchases: t.purchasesTotal,
-    Orders: t.ordersCount,
+  const trends = (data?.trends || []).map((row) => ({
+    ...row,
+    label: formatPeriodLabel(row.period, granularity),
+    Sales: row.salesTotal,
+    Purchases: row.purchasesTotal,
+    Orders: row.ordersCount,
   }));
 
   return (

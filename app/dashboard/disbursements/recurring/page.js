@@ -148,21 +148,21 @@ export default function RecurringDisbursementsPage() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {templates.map((t) => (
-                  <TableRow key={t._id}>
-                    <TableCell className="font-medium text-gray-900 dark:text-gray-100">{t.description}</TableCell>
+                {templates.map((tpl) => (
+                  <TableRow key={tpl._id}>
+                    <TableCell className="font-medium text-gray-900 dark:text-gray-100">{tpl.description}</TableCell>
                     <TableCell>
-                      <Badge variant="outline">{t.category}</Badge>
+                      <Badge variant="outline">{tpl.category}</Badge>
                     </TableCell>
                     <TableCell className="text-center font-semibold text-red-600">
-                      -${t.amount.toLocaleString()}
+                      -${tpl.amount.toLocaleString()}
                     </TableCell>
                     <TableCell className="text-center text-gray-600 dark:text-gray-400">
-                      {ordinal(t.dayOfMonth)} of the month
+                      {ordinal(tpl.dayOfMonth)} of the month
                     </TableCell>
                     <TableCell className="text-center">
-                      <Badge variant={t.active ? "default" : "outline"}>
-                        {t.active ? "Active" : "Paused"}
+                      <Badge variant={tpl.active ? "default" : "outline"}>
+                        {tpl.active ? "Active" : "Paused"}
                       </Badge>
                     </TableCell>
                     <TableCell className="text-right">
@@ -171,15 +171,15 @@ export default function RecurringDisbursementsPage() {
                           <Button
                             variant="outline"
                             size="sm"
-                            onClick={() => updateMutation.mutate({ id: t._id, active: !t.active })}
-                            title={t.active ? "Pause" : "Resume"}
+                            onClick={() => updateMutation.mutate({ id: tpl._id, active: !tpl.active })}
+                            title={tpl.active ? "Pause" : "Resume"}
                           >
-                            {t.active ? <Pause className="h-3 w-3" /> : <Play className="h-3 w-3" />}
+                            {tpl.active ? <Pause className="h-3 w-3" /> : <Play className="h-3 w-3" />}
                           </Button>
-                          <Button variant="outline" size="sm" onClick={() => openEdit(t)}>
+                          <Button variant="outline" size="sm" onClick={() => openEdit(tpl)}>
                             <Edit className="h-3 w-3" />
                           </Button>
-                          <Button variant="destructive" size="sm" onClick={() => setDeleteTarget(t)}>
+                          <Button variant="destructive" size="sm" onClick={() => setDeleteTarget(tpl)}>
                             <Trash2 className="h-3 w-3" />
                           </Button>
                         </div>

@@ -26,8 +26,8 @@ export default function SupplierPaymentsView() {
   const limit = 10;
 
   useEffect(() => {
-    const t = setTimeout(() => setSearchTerm(searchInput.trim()), 400);
-    return () => clearTimeout(t);
+    const timer = setTimeout(() => setSearchTerm(searchInput.trim()), 400);
+    return () => clearTimeout(timer);
   }, [searchInput]);
 
   useEffect(() => setPage(1), [searchTerm, startDate, endDate]);

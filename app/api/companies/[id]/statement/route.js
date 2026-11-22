@@ -28,7 +28,7 @@ export async function GET(req, { params }) {
     }
 
     const purchases = await Purchase.find(query)
-      .select("productName quantity unitPrice total paid createdAt")
+      .select("productName quantity unitPrice total paid createdAt batchId")
       .sort({ createdAt: -1 });
 
     const totals = purchases.reduce(
@@ -53,6 +53,7 @@ export async function GET(req, { params }) {
           total: p.total,
           paid: p.paid,
           createdAt: p.createdAt,
+          batchId: p.batchId || null,
         })),
         totals,
       },

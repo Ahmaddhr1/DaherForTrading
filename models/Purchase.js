@@ -26,6 +26,10 @@ const purchaseSchema = new mongoose.Schema(
     // what's added to Company.debt when the purchase is unpaid.
     total: { type: Number, required: true },
     paid: { type: Boolean, default: false },
+    // Purchases recorded together (one submit of the Add Purchase form)
+    // share this id, so statements can show them as one order. Older
+    // purchases don't have it and are grouped by day instead.
+    batchId: { type: String, index: true },
   },
   { timestamps: true }
 );

@@ -13,7 +13,7 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { PageHeaderSkeleton, TableSkeleton } from "@/components/ui/skeleton-patterns";
-import CompanyStatementDoc, { groupPurchasesByProduct } from "@/components/statements/CompanyStatementDoc";
+import CompanyStatementDoc, { groupPurchasesByProduct, groupPurchasesByOrder } from "@/components/statements/CompanyStatementDoc";
 import { statementApiQuery, statementPeriodLabel, statementPrintQuery } from "@/lib/statementPeriod";
 
 const fetchStatement = async (id, startDate, endDate) => {
@@ -79,18 +79,26 @@ function CompanyStatementPageInner() {
           rows: productRows.map((r) => [r.productName, String(r.quantity), `$${r.total.toFixed(2)}`, `$${r.owed.toFixed(2)}`]),
         }),
         ...(!productRows && {
-        columns: [
-          { header: "Date" },
-          { header: "Product" },
-          { header: "Total", align: "right" },
-          { header: "Status", align: "center" },
-        ],
-        rows: statement.purchases.map((purchase) => [
-          format(new Date(purchase.createdAt), "MMM d, yyyy"),
-          purchase.productName,
-          `$${purchase.total.toFixed(2)}`,
-          purchase.paid ? "Paid" : "Unpaid",
-        ]),
+          columns: [
+            { header: "Date" },
+            { header: "Order / Product" },
+            { header: "Total", align: "right" },
+            { header: "Status", align: "center" },
+          ],
+          rows: groupPurchasesByOrder(statement.purchases).flatMap((order, i, all) => [
+            [
+              format(new Date(order.date), "MMM d, yyyy"),
+              `Order #${all.length - i} (${order.items.length} item${order.items.length === 1 ? "" : "s"})`,
+              `$${order.total.toFixed(2)}`,
+              order.status === "paid" ? "Paid" : order.status === "partial" ? "Partial" : "Unpaid",
+            ],
+            ...order.items.map((p) => [
+              "",
+              `  - ${p.productName} ${p.quantity} x $${Number(p.unitPrice || 0).toFixed(2)}`,
+              `$${p.total.toFixed(2)}`,
+              p.paid ? "Paid" : "Unpaid",
+            ]),
+          ]),
         }),
         totals: [
           { label: "Total Purchased", value: `$${statement.totals.totalPurchased.toFixed(2)}` },

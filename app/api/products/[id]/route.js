@@ -80,6 +80,17 @@ export async function PUT(req, { params }) {
         body.expiryDate = d;
       }
     }
+    if (body.expiryAlertDays !== undefined) {
+      if (body.expiryAlertDays === "" || body.expiryAlertDays === null) {
+        body.expiryAlertDays = null;
+      } else {
+        const n = parseInt(body.expiryAlertDays, 10);
+        if (isNaN(n) || n < 1 || n > 3650) {
+          return NextResponse.json({ error: "Alert days must be between 1 and 3650." }, { status: 400 });
+        }
+        body.expiryAlertDays = n;
+      }
+    }
     if (typeof body.unit === "string" && !body.unit.trim()) {
       body.unit = "pcs";
     }

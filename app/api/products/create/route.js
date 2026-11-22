@@ -23,6 +23,7 @@ export async function POST(req) {
       unit,
       lowStockThreshold,
       expiryDate,
+      expiryAlertDays,
       defaultSupplier,
       priceWholesale,
       priceDistributor,
@@ -135,6 +136,10 @@ export async function POST(req) {
       unit: parsedUnit,
       lowStockThreshold: parsedLowStockThreshold,
       expiryDate: expiryDate ? new Date(expiryDate) : null,
+      expiryAlertDays:
+        expiryAlertDays === "" || expiryAlertDays == null || isNaN(parseInt(expiryAlertDays, 10))
+          ? null
+          : Math.min(3650, Math.max(1, parseInt(expiryAlertDays, 10))),
       defaultSupplier: parsedDefaultSupplier,
       img: Array.isArray(img) ? img.filter((url) => typeof url === "string" && url) : [],
       discount: parsedDiscount,

@@ -1,6 +1,7 @@
 "use client";
 import { t, dateLocale } from "@/lib/i18n";
 import { useT } from "@/lib/i18n/LangProvider";
+import { useSettings } from "@/lib/currency";
 
 import { useParams, useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
@@ -15,7 +16,7 @@ import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { FormSkeleton, PageHeaderSkeleton } from "@/components/ui/skeleton-patterns";
-import { Loader2, Package, DollarSign, Tag, Box, TrendingUp, PackageCheck, Ruler, AlertTriangle, Truck, Layers, ImagePlus, X, Percent, CalendarClock } from "lucide-react";
+import { Loader2, Package, DollarSign, Tag, Box, TrendingUp, PackageCheck, Ruler, AlertTriangle, Truck, Layers, ImagePlus, X, Percent, CalendarClock, BellRing } from "lucide-react";
 import Link from "next/link";
 import ProductHistory from "./ProductHistory";
 import StockAdjustments from "./StockAdjustments";
@@ -40,6 +41,8 @@ const UNIT_SUGGESTIONS = ["pcs", "kg", "g", "box", "carton", "liter", "ml", "met
 
 const EditProductPage = () => {
   const t = useT();
+  const { data: appSettings } = useSettings();
+  const defaultAlertDays = appSettings?.expiryAlertDays || 30;
   const router = useRouter();
   const { id } = useParams();
   const queryClient = useQueryClient();
@@ -74,6 +77,7 @@ const EditProductPage = () => {
     unit: "pcs",
     lowStockThreshold: "5",
     expiryDate: "",
+    expiryAlertDays: "",
     defaultSupplier: "",
     discount: "",
   });
@@ -98,6 +102,7 @@ const EditProductPage = () => {
         unit: product.unit || "pcs",
         lowStockThreshold: product.lowStockThreshold?.toString() ?? "5",
         expiryDate: product.expiryDate ? String(product.expiryDate).slice(0, 10) : "",
+        expiryAlertDays: product.expiryAlertDays ? String(product.expiryAlertDays) : "",
         defaultSupplier: product.defaultSupplier || "",
         discount: product.discount?.toString() ?? "0",
       });
@@ -439,6 +444,27 @@ const EditProductPage = () => {
                           className="focus:border-purple-500 transition-colors"
                         />
                         <p className="text-xs text-gray-500 dark:text-gray-400">{t("Optional - shows on the dashboard when it gets close")}</p>
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor="expiryAlertDays" className="text-sm font-medium flex items-center gap-2">
+                          <BellRing className="h-4 w-4" />
+                          {t("Alert days before expiry")}
+                        </Label>
+                        <Input
+                          id="expiryAlertDays"
+                          type="number"
+                          min="1"
+                          max="3650"
+                          name="expiryAlertDays"
+                          value={form.expiryAlertDays}
+                          onChange={handleChange}
+                          placeholder={String(defaultAlertDays)}
+                          className="focus:border-purple-500 transition-colors"
+                        />
+                        <p className="text-xs text-gray-500 dark:text-gray-400">
+                          {t("Leave empty to use the default ({0} days, set in Settings)", { 0: defaultAlertDays })}
+                        </p>
                       </div>
 
                       <div className="space-y-2">

@@ -30,6 +30,9 @@ const productSchema = new mongoose.Schema(
     // Optional expiry date (perishable stock). Products expiring within
     // AppSettings.expiryAlertDays show up in the dashboard's expiry alert.
     expiryDate: { type: Date, default: null, index: true },
+    // How many days before expiryDate this product should appear in the
+    // expiry alert. Empty = the default from Settings (AppSettings.expiryAlertDays).
+    expiryAlertDays: { type: Number, default: null, min: 1, max: 3650 },
     // Supplier to quick-reorder from (see the "Reorder from supplier" link
     // on the product edit page, which pre-fills a purchase form).
     defaultSupplier: { type: mongoose.Types.ObjectId, ref: "Company", default: null },

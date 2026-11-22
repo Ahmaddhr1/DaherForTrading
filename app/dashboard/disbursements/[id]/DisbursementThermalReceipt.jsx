@@ -25,7 +25,7 @@ export default function DisbursementThermalReceipt({ disbursement }) {
 
   return createPortal(
     <div id="thermal-receipt-root">
-      <div className="thermal-receipt mx-auto w-[80mm] px-[3mm] py-2 font-mono text-[13px] font-semibold leading-snug text-black bg-white">
+      <div className="thermal-receipt mx-auto w-[80mm] px-[3mm] py-2 font-mono text-[13px] font-normal leading-snug text-black bg-white">
         <div className="text-center mb-2">
           <p className="text-lg font-bold">{t("Invento")}</p>
           <p>{t("Disbursement Receipt")}</p>

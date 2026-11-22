@@ -163,3 +163,10 @@ html[dir="rtl"] .rtl-flip {
   direction: ltr;
   unicode-bidi: isolate;
 }
+/* Charts keep their internal LTR geometry in Arabic: Recharts positions SVG
+   text by text-anchor, which flips under RTL and draws axis labels on top of
+   the bars. */
+html[dir="rtl"] .recharts-wrapper,
+html[dir="rtl"] .recharts-wrapper * {
+  direction: ltr;
+}

@@ -1,6 +1,6 @@
 // components/dashboard/RealProfitChart.jsx
 "use client";
-import { t } from "@/lib/i18n";
+import { t, dateLocale } from "@/lib/i18n";
 import { useT } from "@/lib/i18n/LangProvider";
 
 import React, { useState } from "react";
@@ -25,10 +25,10 @@ function formatPeriodLabel(period, granularity) {
   if (granularity === "month") {
     const [year, month] = period.split("-");
     const date = new Date(Number(year), Number(month) - 1, 1);
-    return date.toLocaleDateString("en-US", { month: "short", year: "2-digit" });
+    return date.toLocaleDateString(dateLocale() || "en-US", { month: "short", year: "2-digit" });
   }
   const date = new Date(period);
-  return date.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+  return date.toLocaleDateString(dateLocale() || "en-US", { month: "short", day: "numeric" });
 }
 
 const currencyFormatter = (value) => `$${value.toLocaleString()}`;

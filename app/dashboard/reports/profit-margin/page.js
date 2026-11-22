@@ -1,5 +1,5 @@
 "use client";
-import { t } from "@/lib/i18n";
+import { t, dateLocale } from "@/lib/i18n";
 import { useT } from "@/lib/i18n/LangProvider";
 
 import { useMemo, useState } from "react";
@@ -18,7 +18,7 @@ const TOP_CATEGORY_LIMIT = AvailableChartColors.length;
 
 function formatMonth(monthKey) {
   const [year, month] = monthKey.split("-");
-  return new Date(Number(year), Number(month) - 1, 1).toLocaleDateString("en-US", {
+  return new Date(Number(year), Number(month) - 1, 1).toLocaleDateString(dateLocale() || "en-US", {
     month: "short",
     year: "2-digit",
   });

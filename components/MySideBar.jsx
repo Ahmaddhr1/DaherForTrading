@@ -13,7 +13,6 @@ import { toast } from "@/lib/i18n/toast";
 import { GlobalSearchModal } from "@/components/GlobalSearchModal";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { hasPermission } from "@/lib/permissions";
-import { LanguageSwitch } from "@/components/LanguageSwitch";
 
 // Desktop-only navigation (lg and up). On mobile, navigation is handled by
 // MobileBottomBar instead - see components/MobileBottomBar.jsx.
@@ -202,7 +201,6 @@ export function MySideBar() {
 
         {/* Footer */}
         <div className="border-t border-sidebar-border">
-          <LanguageSwitch collapsed={isCollapsed} />
           <button
             onClick={() => setLogoutConfirmOpen(true)}
             className={`w-full p-4 flex items-center hover:bg-destructive hover:text-white cursor-pointer duration-150 ${

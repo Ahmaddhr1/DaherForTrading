@@ -5,12 +5,18 @@ import { Printer, Loader2, Settings2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/lib/i18n/toast";
 import { useT } from "@/lib/i18n/LangProvider";
-import { isDirectPrintSupported, getSavedPrinter, choosePrinter, printReceiptDirect } from "@/lib/escposPrinter";
+import {
+  isDirectPrintSupported,
+  getSavedPrinter,
+  choosePrinter,
+  printReceiptDirect,
+  onPrinterChange,
+} from "@/lib/escposPrinter";
 
 // One-click thermal printing on computers (Chrome/Edge): the first time it
-// asks which printer to use, then every click prints straight away. Falls
-// back to the normal print dialog (`fallback`) when direct printing isn't
-// available on this device/browser or fails.
+// asks which printer to use, then every click - on any order, purchase or
+// disbursement page - prints straight to that same printer. Falls back to
+// the normal print dialog (`fallback`) when needed.
 export function useDirectPrint() {
   const [supported, setSupported] = useState(false);
   useEffect(() => setSupported(isDirectPrintSupported()), []);
@@ -22,23 +28,20 @@ export default function DirectPrintButton({ fallback, label = "Print Receipt" })
   const [port, setPort] = useState(null);
   const [busy, setBusy] = useState(false);
 
+  // Shared printer state: picking/changing it on one page updates them all.
   useEffect(() => {
     let alive = true;
     getSavedPrinter().then((p) => alive && setPort(p));
-    const refresh = () => getSavedPrinter().then((p) => alive && setPort(p));
-    navigator.serial?.addEventListener?.("connect", refresh);
-    navigator.serial?.addEventListener?.("disconnect", refresh);
+    const off = onPrinterChange((p) => alive && setPort(p));
     return () => {
       alive = false;
-      navigator.serial?.removeEventListener?.("connect", refresh);
-      navigator.serial?.removeEventListener?.("disconnect", refresh);
+      off();
     };
   }, []);
 
   const pick = async () => {
     try {
       const p = await choosePrinter();
-      setPort(p);
       toast.success("Printer connected");
       return p;
     } catch {
@@ -47,9 +50,10 @@ export default function DirectPrintButton({ fallback, label = "Print Receipt" })
   };
 
   const print = async () => {
+    if (busy) return;
     setBusy(true);
     try {
-      const p = port || (await pick());
+      const p = port || (await getSavedPrinter()) || (await pick());
       if (!p) return;
       await printReceiptDirect(p);
       toast.success("Sent to printer");

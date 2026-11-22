@@ -8,7 +8,8 @@ import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { format } from "@/lib/i18n/date";
 import { Printer, MessageCircle, Receipt, Loader2, ClipboardList, Package } from "lucide-react";
 import { toast } from "@/lib/i18n/toast";
-import { generateStatementPdf, sharePdfOrDownload } from "@/lib/thermalPdf";
+import { generateStatementPdf } from "@/lib/thermalPdf";
+import PdfPreviewDialog from "@/components/PdfPreviewDialog";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -31,7 +32,6 @@ function CompanyStatementPageInner() {
   const { id } = useParams();
   const router = useRouter();
   const search = useSearchParams();
-  const [isSharingPdf, setIsSharingPdf] = useState(false);
   const [startDate, setStartDate] = useState(search.get("from") || "");
   const [endDate, setEndDate] = useState(search.get("to") || "");
   // "orders" = every purchase, "products" = totals per product.
@@ -69,16 +69,17 @@ function CompanyStatementPageInner() {
     window.open(waUrl, "_blank", "noopener,noreferrer");
   };
 
-  const handleShareThermalPdf = async () => {
-    setIsSharingPdf(true);
+  // Black-and-white PDF statement: shown in a window with Print (choose a
+  // printer), Share and Download.
+  const [pdf, setPdf] = useState(null);
+  const handleShareThermalPdf = () => {
     try {
-      const blob = generateStatementPdf(receiptData);
-      const result = await sharePdfOrDownload(blob, `statement-${statement.name?.replace(/\s+/g, "-") || id}.pdf`);
-      if (result === "downloaded") toast.success("Statement PDF downloaded");
+      setPdf({
+        blob: generateStatementPdf(receiptData),
+        filename: `statement-${statement.name?.replace(/\s+/g, "-") || id}.pdf`,
+      });
     } catch {
       toast.error("Failed to generate PDF");
-    } finally {
-      setIsSharingPdf(false);
     }
   };
 
@@ -147,9 +148,9 @@ function CompanyStatementPageInner() {
           <MessageCircle className="h-4 w-4" />
           {t("Share via WhatsApp")}
         </Button>
-        <Button variant="outline" onClick={handleShareThermalPdf} disabled={isSharingPdf} className="flex items-center gap-2" aria-label={t("Share as PDF")}>
-          {isSharingPdf ? <Loader2 className="h-4 w-4 animate-spin" /> : <Receipt className="h-4 w-4" />}
-          {t("Share as PDF")}
+        <Button variant="outline" onClick={handleShareThermalPdf} className="flex items-center gap-2" aria-label={t("PDF Statement")}>
+          <Receipt className="h-4 w-4" />
+          {t("PDF Statement")}
         </Button>
       </div>
     </>
@@ -161,6 +162,7 @@ function CompanyStatementPageInner() {
         <CompanyStatementDoc statement={statement} periodLabel={periodLabel} view={view} toolbar={toolbar} />
       </div>
       <StatementPrintDialog open={printOpen} onClose={() => setPrintOpen(false)} src={printUrl} />
+      <PdfPreviewDialog open={!!pdf} onClose={() => setPdf(null)} blob={pdf?.blob} filename={pdf?.filename} title={t("PDF Statement")} />
     </div>
   );
 }

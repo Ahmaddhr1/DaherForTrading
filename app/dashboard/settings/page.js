@@ -359,7 +359,7 @@ export default function SettingsPage() {
                 <div className="space-y-2">
                   <Label htmlFor="expiryAlertDays" className="flex items-center gap-2">
                     <CalendarClock className="h-4 w-4" />
-                    {t("Expiry Alert (days before)")}
+                    {t("Default Expiry Alert (days before)")}
                   </Label>
                   <Input
                     id="expiryAlertDays"
@@ -373,7 +373,7 @@ export default function SettingsPage() {
                     disabled={!canManageSettings}
                   />
                   <p className="text-xs text-gray-500 dark:text-gray-400">
-                    {t("Products expiring within this many days (and already expired ones) are listed on the dashboard.")}
+                    {t("Used for products that don't have their own alert days. Products inside their alert window (and expired ones) are listed on the dashboard.")}
                   </p>
                 </div>
 

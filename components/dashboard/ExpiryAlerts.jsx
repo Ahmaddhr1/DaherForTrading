@@ -23,8 +23,8 @@ function daysLeft(date) {
   return Math.round((d - today) / 86400000);
 }
 
-// Dashboard alert: every product expiring within the owner's chosen window
-// (Settings -> Expiry Alert) or already expired, closest date first.
+// Dashboard alert: every product inside its own alert window (set per
+// product, or the default from Settings) or already expired, closest first.
 // Paginated on the server (/api/products/expiring).
 export default function ExpiryAlerts() {
   const t = useT();
@@ -51,7 +51,7 @@ export default function ExpiryAlerts() {
             <Badge className="bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300">{data.total}</Badge>
           )}
           <span className="text-sm font-normal text-gray-500 dark:text-gray-400">
-            {t("Expiring within {0} days", { 0: days })}
+            {t("Each product's own alert window (default {0} days)", { 0: days })}
           </span>
         </CardTitle>
       </CardHeader>

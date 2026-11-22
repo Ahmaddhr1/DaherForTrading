@@ -1,6 +1,7 @@
 "use client";
 import { t } from "@/lib/i18n";
 import { useT } from "@/lib/i18n/LangProvider";
+import { useSettings } from "@/lib/currency";
 
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -10,7 +11,7 @@ import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import axios from "axios";
-import { Loader2, PackagePlus, DollarSign, Tag, Package, TrendingUp, Box, Ruler, AlertTriangle, Truck, Layers, ImagePlus, X, Percent, CalendarClock } from "lucide-react";
+import { Loader2, PackagePlus, DollarSign, Tag, Package, TrendingUp, Box, Ruler, AlertTriangle, Truck, Layers, ImagePlus, X, Percent, CalendarClock, BellRing } from "lucide-react";
 import React, { useState } from "react";
 import { toast } from "@/lib/i18n/toast";
 import { useRouter } from "next/navigation";
@@ -31,6 +32,8 @@ const UNIT_SUGGESTIONS = ["pcs", "kg", "g", "box", "carton", "liter", "ml", "met
 
 const Page = () => {
   const t = useT();
+  const { data: appSettings } = useSettings();
+  const defaultAlertDays = appSettings?.expiryAlertDays || 30;
   const router = useRouter();
 
   const { data: categories, isLoading: categoriesLoading, isError: categoriesError } = useQuery({
@@ -56,6 +59,7 @@ const Page = () => {
     unit: "pcs",
     lowStockThreshold: "5",
     expiryDate: "",
+    expiryAlertDays: "",
     defaultSupplier: "",
     discount: "",
   });
@@ -102,6 +106,7 @@ const Page = () => {
         unit: form.unit,
         lowStockThreshold: form.lowStockThreshold,
         expiryDate: form.expiryDate || null,
+        expiryAlertDays: form.expiryAlertDays || null,
         defaultSupplier: form.defaultSupplier || null,
         discount: form.discount === "" ? 0 : parseFloat(form.discount),
         img,
@@ -356,6 +361,27 @@ const Page = () => {
                           className="focus:border-purple-500 transition-colors"
                         />
                         <p className="text-xs text-gray-500 dark:text-gray-400">{t("Optional - shows on the dashboard when it gets close")}</p>
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor="expiryAlertDays" className="text-sm font-medium flex items-center gap-2">
+                          <BellRing className="h-4 w-4" />
+                          {t("Alert days before expiry")}
+                        </Label>
+                        <Input
+                          id="expiryAlertDays"
+                          type="number"
+                          min="1"
+                          max="3650"
+                          name="expiryAlertDays"
+                          value={form.expiryAlertDays}
+                          onChange={handleChange}
+                          placeholder={String(defaultAlertDays)}
+                          className="focus:border-purple-500 transition-colors"
+                        />
+                        <p className="text-xs text-gray-500 dark:text-gray-400">
+                          {t("Leave empty to use the default ({0} days, set in Settings)", { 0: defaultAlertDays })}
+                        </p>
                       </div>
 
                       <div className="space-y-2">

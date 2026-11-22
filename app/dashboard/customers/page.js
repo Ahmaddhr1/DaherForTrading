@@ -399,7 +399,7 @@ export default function CustomersPage() {
                                     {customer.phoneNumber}
                                   </span>
                                 )}
-                                <span>{getTierLabel(customer.priceTier)}</span>
+                                <span>{t(getTierLabel(customer.priceTier))}</span>
                               </div>
                             </div>
                           </div>

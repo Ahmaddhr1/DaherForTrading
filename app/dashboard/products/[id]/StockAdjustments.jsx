@@ -138,7 +138,7 @@ export default function StockAdjustments({ productId, currentQuantity, unit }) {
                   <TableRow key={adj._id}>
                     <TableCell>
                       <Badge className={TYPE_BADGE_CLASSES[adj.type] || "bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200"}>
-                        {TYPE_LABELS[adj.type] || adj.type}
+                        {t(TYPE_LABELS[adj.type] || adj.type)}
                       </Badge>
                     </TableCell>
                     <TableCell
@@ -191,7 +191,7 @@ export default function StockAdjustments({ productId, currentQuantity, unit }) {
             >
               {MANUAL_TYPE_OPTIONS.map(([value, label]) => (
                 <option key={value} value={value}>
-                  {label}
+                  {t(label)}
                 </option>
               ))}
             </select>

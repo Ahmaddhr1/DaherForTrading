@@ -191,7 +191,7 @@ export default function OrderDetailsPage() {
                     : "bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300"
                 }`}
               >
-                {order.status}
+                {t(order.status)}
               </span>
             </p>
           </div>

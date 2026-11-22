@@ -52,9 +52,9 @@ export default function SalesTrendsChart() {
   const trends = (data?.trends || []).map((row) => ({
     ...row,
     label: formatPeriodLabel(row.period, granularity),
-    Sales: row.salesTotal,
-    Purchases: row.purchasesTotal,
-    Orders: row.ordersCount,
+    [t("Sales")]: row.salesTotal,
+    [t("Purchases")]: row.purchasesTotal,
+    [t("Orders")]: row.ordersCount,
   }));
 
   return (
@@ -98,7 +98,7 @@ export default function SalesTrendsChart() {
             <BarChart
               data={trends}
               index="label"
-              categories={["Sales", "Purchases"]}
+              categories={[t("Sales"), t("Purchases")]}
               colors={["blue", "amber"]}
               valueFormatter={currencyFormatter}
               className="h-72"
@@ -126,7 +126,7 @@ export default function SalesTrendsChart() {
             <BarChart
               data={trends}
               index="label"
-              categories={["Orders"]}
+              categories={[t("Orders")]}
               colors={["blue"]}
               valueFormatter={countFormatter}
               showLegend={false}

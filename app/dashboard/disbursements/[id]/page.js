@@ -136,7 +136,7 @@ export default function DisbursementDetailsPage() {
             <Separator />
             <div>
               <p className="text-sm font-medium text-gray-500 dark:text-gray-400">{t("Category")}</p>
-              <Badge variant="outline">{disbursement.category}</Badge>
+              <Badge variant="outline">{t(disbursement.category)}</Badge>
             </div>
             <Separator />
             <div className="flex justify-between items-center pt-2">

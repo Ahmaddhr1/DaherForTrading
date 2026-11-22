@@ -67,7 +67,7 @@ const OrdersPage = () => {
                   className="flex flex-col sm:flex-row items-center justify-center gap-1 h-14 sm:h-9 px-1 text-xs sm:text-sm whitespace-normal sm:whitespace-nowrap"
                 >
                   <Package className="h-4 w-4" />
-                  {t("Today's")} {t("Orders")}
+                  {t("Today's Orders")}
                 </TabsTrigger>
                 <TabsTrigger
                   value="pending"

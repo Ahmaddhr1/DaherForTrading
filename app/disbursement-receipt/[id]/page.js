@@ -73,7 +73,7 @@ export default function PublicDisbursementReceiptPage() {
             </div>
             <div>
               <p className="text-sm text-gray-500">{t("Category")}</p>
-              <Badge variant="outline">{disbursement.category}</Badge>
+              <Badge variant="outline">{t(disbursement.category)}</Badge>
             </div>
 
             <Separator />

@@ -1,5 +1,5 @@
 "use client";
-import { t } from "@/lib/i18n";
+import { t, dateLocale } from "@/lib/i18n";
 import { useT } from "@/lib/i18n/LangProvider";
 
 import { useState, useEffect } from "react";
@@ -24,7 +24,8 @@ import { Button } from "@/components/ui/button";
 import { Modal } from "@/components/ui/modal";
 import { DateRangeFilter } from "@/app/dashboard/orders/components/DateRangeFilter";
 import { getTodayDateString, localDayStartISO, localDayEndISO } from "@/lib/dateUtils";
-import { AUDIT_ENTITY_TYPES, describeAction, actionKind } from "@/lib/auditFields";
+import { AUDIT_ENTITY_TYPES, describeAction, actionKind, translateEntityLabel } from "@/lib/auditFields";
+import { useLang } from "@/lib/i18n/LangProvider";
 import { ChangePreview } from "@/components/audit/ChangesTable";
 
 const KIND_DOT = {
@@ -37,6 +38,7 @@ const ENTITY_TYPES = AUDIT_ENTITY_TYPES;
 
 export default function ActivityPage() {
   const t = useT();
+  const { lang } = useLang();
   const [page, setPage] = useState(1);
   const [adminFilter, setAdminFilter] = useState("");
   const [entityTypeFilter, setEntityTypeFilter] = useState("");
@@ -266,7 +268,7 @@ export default function ActivityPage() {
                         className="cursor-pointer align-top"
                       >
                         <TableCell className="text-gray-500 dark:text-gray-400 whitespace-nowrap">
-                          {new Date(entry.createdAt).toLocaleString()}
+                          {new Date(entry.createdAt).toLocaleString(dateLocale())}
                         </TableCell>
                         <TableCell className="font-medium">{entry.adminName}</TableCell>
                         <TableCell>
@@ -280,9 +282,9 @@ export default function ActivityPage() {
                         </TableCell>
                         <TableCell className="whitespace-normal max-w-md">
                           {entry.entityLabel && (
-                            <p className="font-medium text-gray-900 dark:text-gray-100">{entry.entityLabel}</p>
+                            <p className="font-medium text-gray-900 dark:text-gray-100">{translateEntityLabel(entry.entityLabel, t)}</p>
                           )}
-                          <p className="text-gray-700 dark:text-gray-300">{entry.summary}</p>
+                          {lang === "en" && <p className="text-gray-700 dark:text-gray-300">{entry.summary}</p>}
                           <ChangePreview changes={entry.changes} total={entry.changeCount} />
                         </TableCell>
                         <TableCell className="text-end whitespace-nowrap">
@@ -294,7 +296,7 @@ export default function ActivityPage() {
                             {entry.changeCount > 0
                               ? t("View {0} {1}", {
                               0: entry.changeCount,
-                              1: entry.changeCount === 1 ? "change" : "changes"
+                              1: entry.changeCount === 1 ? t("change") : t("changes")
                             })
                               : t("View")}
                           </Link>

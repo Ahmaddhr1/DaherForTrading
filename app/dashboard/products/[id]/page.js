@@ -1,5 +1,5 @@
 "use client";
-import { t } from "@/lib/i18n";
+import { t, dateLocale } from "@/lib/i18n";
 import { useT } from "@/lib/i18n/LangProvider";
 
 import { useParams, useRouter } from "next/navigation";
@@ -655,7 +655,7 @@ const EditProductPage = () => {
                       <div className="flex justify-between items-center pt-2 border-t">
                         <span className="text-sm text-gray-600 dark:text-gray-400">{t("Last Updated")}</span>
                         <Badge variant="outline" className="text-xs">
-                          {new Date(product.updatedAt).toLocaleDateString()}
+                          {new Date(product.updatedAt).toLocaleDateString(dateLocale())}
                         </Badge>
                       </div>
                     )}

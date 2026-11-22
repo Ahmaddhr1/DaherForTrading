@@ -82,7 +82,7 @@ export default function LowStockAlerts() {
                           : "bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-400 shrink-0"
                       }
                     >
-                      {product.quantity} {product.unit || t("pcs")} {t("left")}
+                      {product.quantity} {t(product.unit || "pcs")} {t("left")}
                       {!outOfStock && ` (≤ ${threshold})`}
                     </Badge>
                   </Link>

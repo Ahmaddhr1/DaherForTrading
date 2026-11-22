@@ -58,7 +58,7 @@ export default async function RootLayout({ children }) {
     <html
       lang={lang}
       dir={dirFor(lang)}
-      className={`${geistSans.className} ${geistMono.variable} ${spaceGrotesk.variable} ${plexArabic.variable}`}
+      className={`${geistSans.className} ${geistSans.variable} ${geistMono.variable} ${spaceGrotesk.variable} ${plexArabic.variable}`}
       suppressHydrationWarning
     >
       <body

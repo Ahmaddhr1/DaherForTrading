@@ -102,7 +102,7 @@ export default function ProductStockHistoryPage() {
       return (
         <div>
           <div>
-            {e.quantity} {unit} @ ${e.unitPrice.toFixed(2)}
+            {e.quantity} {t(unit)} @ ${e.unitPrice.toFixed(2)}
           </div>
           <div className="text-xs text-gray-500 dark:text-gray-400">
             {t("Total $")}{e.total.toFixed(2)}
@@ -117,7 +117,7 @@ export default function ProductStockHistoryPage() {
       return (
         <div>
           <div>
-            {e.quantity} {unit} @ ${e.price.toFixed(2)}
+            {e.quantity} {t(unit)} @ ${e.price.toFixed(2)}
             {e.free && (
               <Badge variant="outline" className="ms-1.5 text-[10px] px-1.5 py-0">
                 {t("FREE")}
@@ -132,7 +132,7 @@ export default function ProductStockHistoryPage() {
       <div>
         <div>
           {e.delta > 0 ? "+" : ""}
-          {e.delta} {unit} ({ADJUSTMENT_LABELS[e.adjustmentType] || e.adjustmentType})
+          {e.delta} {t(unit)} ({t(ADJUSTMENT_LABELS[e.adjustmentType] || e.adjustmentType)})
         </div>
         <div className="text-xs text-gray-500 dark:text-gray-400">
           {e.reason ? `${e.reason} · ` : ""}
@@ -194,7 +194,7 @@ export default function ProductStockHistoryPage() {
             )}
             {product && (
               <div className="sm:ms-auto text-sm text-gray-600 dark:text-gray-400">
-                {t("Current stock:")} <span className="font-semibold text-gray-900 dark:text-gray-100">{product.quantity} {product.unit}</span>
+                {t("Current stock:")} <span className="font-semibold text-gray-900 dark:text-gray-100">{product.quantity} {t(product.unit)}</span>
               </div>
             )}
           </CardContent>

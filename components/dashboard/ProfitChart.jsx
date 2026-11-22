@@ -41,9 +41,9 @@ const ProfitChart = ({ range = "all", startDate, endDate }) => {
   // Fixed lookback periods only - the selected-range figure already has its
   // own card in the Profit summary section above, so it isn't repeated here.
   const chartData = [
-    { period: "Today", Profit: profitData?.today?.realProfit || 0 },
-    { period: "Last Week", Profit: profitData?.lastWeek?.realProfit || 0 },
-    { period: "Last Month", Profit: profitData?.lastMonth?.realProfit || 0 },
+    { period: t("Today"), [t("Profit")]: profitData?.today?.realProfit || 0 },
+    { period: t("Last Week"), [t("Profit")]: profitData?.lastWeek?.realProfit || 0 },
+    { period: t("Last Month"), [t("Profit")]: profitData?.lastMonth?.realProfit || 0 },
   ];
 
   return (
@@ -58,7 +58,7 @@ const ProfitChart = ({ range = "all", startDate, endDate }) => {
           <BarChart
             data={chartData}
             index="period"
-            categories={["Profit"]}
+            categories={[t("Profit")]}
             colors={["emerald"]}
             valueFormatter={currencyFormatter}
             showLegend={false}

@@ -317,7 +317,7 @@ export default function AdminsPage() {
                               return count === 0 ? (
                                 <span className="text-gray-400 dark:text-gray-500 italic">{t("None")}</span>
                               ) : (
-                                `${count} of ${PERMISSION_KEYS.length}`
+                                t("{0} of {1}", { 0: count, 1: PERMISSION_KEYS.length })
                               );
                             })()
                           )}

@@ -43,7 +43,7 @@ export default function ProductGridView({ products, onAddToCart }) {
                   ) : (
                     t("{0} {1} in stock", {
                       0: product.quantity,
-                      1: product.unit || "pcs"
+                      1: t(product.unit || "pcs")
                     })
                   )}
                 </p>

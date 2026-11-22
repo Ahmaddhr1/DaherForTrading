@@ -321,7 +321,7 @@ const MakeOrderPage = () => {
           {customer && (
             <p className="flex items-center gap-1.5 text-sm text-gray-500 dark:text-gray-400 mt-1">
               <Layers className="h-3.5 w-3.5" />
-              {t("Pricing for")} {customer.fullName}: <span className="font-medium text-gray-700 dark:text-gray-300">{getTierLabel(priceTier)}</span>
+              {t("Pricing for")} {customer.fullName}: <span className="font-medium text-gray-700 dark:text-gray-300">{t(getTierLabel(priceTier))}</span>
             </p>
           )}
           {!canOverride && (

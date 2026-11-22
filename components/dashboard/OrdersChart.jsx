@@ -43,9 +43,9 @@ const OrdersChart = ({ range = "all", startDate, endDate }) => {
   // own "Total Orders" card in the summary section above, so it isn't
   // repeated here.
   const chartData = [
-    { period: "Today", Orders: orderCounts.today || 0 },
-    { period: "Last Week", Orders: orderCounts.lastWeek || 0 },
-    { period: "All Time", Orders: orderCounts.allTime || 0 },
+    { period: t("Today"), [t("Orders")]: orderCounts.today || 0 },
+    { period: t("Last Week"), [t("Orders")]: orderCounts.lastWeek || 0 },
+    { period: t("All Time"), [t("Orders")]: orderCounts.allTime || 0 },
   ];
 
   return (
@@ -60,7 +60,7 @@ const OrdersChart = ({ range = "all", startDate, endDate }) => {
           <BarChart
             data={chartData}
             index="period"
-            categories={["Orders"]}
+            categories={[t("Orders")]}
             colors={["blue"]}
             valueFormatter={countFormatter}
             showLegend={false}

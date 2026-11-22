@@ -1,5 +1,5 @@
 "use client";
-import { t } from "@/lib/i18n";
+import { t, dateLocale } from "@/lib/i18n";
 import { useT } from "@/lib/i18n/LangProvider";
 
 import { Card, CardContent } from "@/components/ui/card";
@@ -78,7 +78,7 @@ const OrderCard = ({ order, onStatusUpdate, actions }) => {
             <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-0.5 text-xs text-gray-500 dark:text-gray-400">
               <span className="inline-flex items-center gap-1">
                 <Calendar className="h-3 w-3" />
-                {created.toLocaleDateString()} · {created.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                {created.toLocaleDateString(dateLocale())} · {created.toLocaleTimeString(dateLocale() || [], { hour: "2-digit", minute: "2-digit" })}
               </span>
               <span className="inline-flex items-center gap-1">
                 <Package className="h-3 w-3" />

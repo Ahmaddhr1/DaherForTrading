@@ -266,7 +266,7 @@ export default function DisbursementsPage() {
                   >
                     <option value="">{t("All Categories")}</option>
                     {CATEGORY_OPTIONS.map((c) => (
-                      <option key={c} value={c}>{c}</option>
+                      <option key={c} value={c}>{t(c)}</option>
                     ))}
                   </select>
                 </div>
@@ -384,7 +384,7 @@ export default function DisbursementsPage() {
                       </div>
                     </TableCell>
                     <TableCell>
-                      <Badge variant="outline">{item.category}</Badge>
+                      <Badge variant="outline">{t(item.category)}</Badge>
                     </TableCell>
                     <TableCell className="text-center font-semibold text-red-600">
                       -${item.amount.toLocaleString()}
@@ -535,7 +535,7 @@ function AddDisbursementForm({ onSuccess }) {
             className="w-full p-2 border rounded-md focus:border-red-500"
           >
             {CATEGORY_OPTIONS.map((c) => (
-              <option key={c} value={c}>{c}</option>
+              <option key={c} value={c}>{t(c)}</option>
             ))}
           </select>
         </div>

@@ -77,9 +77,9 @@ export default function ProductsPage() {
   });
   const selectedCategoryLabel =
     categoryFilters.length === 0
-      ? "All Categories"
+      ? t("All Categories")
       : categoryFilters.length === 1
-        ? categories.find((c) => c._id === categoryFilters[0])?.name || "All Categories"
+        ? categories.find((c) => c._id === categoryFilters[0])?.name || t("All Categories")
         : `${categoryFilters.length} categories selected`;
 
   const toggleCategory = (id) => {
@@ -575,7 +575,7 @@ export default function ProductsPage() {
                                 : "bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-400"
                           }`}>
                             <Box className="h-3 w-3 me-1" />
-                            {product?.quantity} {product.unit || t("pcs")} {t("in stock")}
+                            {product?.quantity} {t(product.unit || "pcs")} {t("in stock")}
                           </div>
                         </TableCell>
 

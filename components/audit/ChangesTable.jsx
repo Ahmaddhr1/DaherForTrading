@@ -12,8 +12,8 @@ export function ChangesTable({ changes, kind = "change" }) {
   const t = useT();
   if (!changes?.length) return null;
 
-  const beforeHeading = kind === "create" ? "Before (new record)" : "Previous";
-  const afterHeading = kind === "delete" ? "After (deleted)" : "Current";
+  const beforeHeading = kind === "create" ? t("Before (new record)") : t("Previous");
+  const afterHeading = kind === "delete" ? t("After (deleted)") : t("Current");
 
   return (
     <div className="overflow-hidden rounded-lg border border-gray-200 dark:border-gray-800">

@@ -59,7 +59,7 @@ export default function RealProfitChart() {
   const trends = (data?.trends || []).map((row) => ({
     ...row,
     label: formatPeriodLabel(row.period, granularity),
-    "Real Profit": row.realProfit,
+    [t("Real Profit")]: row.realProfit,
   }));
   const totalProfit = trends.reduce((sum, row) => sum + row.realProfit, 0);
 
@@ -141,7 +141,7 @@ export default function RealProfitChart() {
             <LineChart
               data={trends}
               index="label"
-              categories={["Real Profit"]}
+              categories={[t("Real Profit")]}
               colors={["emerald"]}
               valueFormatter={currencyFormatter}
               showLegend={false}

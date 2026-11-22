@@ -1,5 +1,5 @@
 "use client";
-import { t } from "@/lib/i18n";
+import { t, dateLocale } from "@/lib/i18n";
 import { useT } from "@/lib/i18n/LangProvider";
 
 import Link from "next/link";
@@ -11,7 +11,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { TableSkeleton } from "@/components/ui/skeleton-patterns";
 import { ChangesTable } from "@/components/audit/ChangesTable";
-import { describeAction, actionKind, entityHref } from "@/lib/auditFields";
+import { describeAction, actionKind, entityHref, translateEntityLabel } from "@/lib/auditFields";
+import { useLang } from "@/lib/i18n/LangProvider";
 
 const KIND_BADGE = {
   create: "bg-green-100 text-green-800 dark:bg-green-900/40 dark:text-green-300",
@@ -21,6 +22,7 @@ const KIND_BADGE = {
 
 export default function ActivityEntryPage() {
   const t = useT();
+  const { lang } = useLang();
   const { id } = useParams();
 
   const { data, isLoading, error } = useQuery({
@@ -71,7 +73,7 @@ export default function ActivityEntryPage() {
                   <Badge variant="outline">{t(entry.entityType)}</Badge>
                 </div>
                 <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-gray-100 break-words">
-                  {entry.entityLabel || describeAction(entry.action, t)}
+                  {translateEntityLabel(entry.entityLabel, t) || describeAction(entry.action, t)}
                 </h1>
                 <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-gray-600 dark:text-gray-400">
                   <span className="inline-flex items-center gap-1.5">
@@ -80,24 +82,26 @@ export default function ActivityEntryPage() {
                   </span>
                   <span className="inline-flex items-center gap-1.5">
                     <Clock className="h-4 w-4" />
-                    {new Date(entry.createdAt).toLocaleString()}
+                    {new Date(entry.createdAt).toLocaleString(dateLocale())}
                   </span>
                   {href && (
                     <Link href={href} className="inline-flex items-center gap-1.5 text-blue-600 hover:underline">
                       <ExternalLink className="h-4 w-4" />
-                      {t("Open")} {entry.entityType.toLowerCase()}
+                      {t("Open")} {t(entry.entityType)}
                     </Link>
                   )}
                 </div>
               </div>
             </div>
 
+            {lang === "en" && (
             <Card>
               <CardHeader className="pb-3">
                 <CardTitle className="text-base">{t("Summary")}</CardTitle>
               </CardHeader>
               <CardContent className="text-gray-700 dark:text-gray-300">{entry.summary}</CardContent>
             </Card>
+            )}
 
             <Card>
               <CardHeader className="pb-3">
@@ -129,7 +133,7 @@ export default function ActivityEntryPage() {
             {related.length > 0 && (
               <Card>
                 <CardHeader className="pb-3">
-                  <CardTitle className="text-base">{t("Other activity on this")} {entry.entityType.toLowerCase()}</CardTitle>
+                  <CardTitle className="text-base">{t("Other activity on this")} {t(entry.entityType)}</CardTitle>
                 </CardHeader>
                 <CardContent className="p-0">
                   <ul className="divide-y divide-gray-100 dark:divide-gray-800">
@@ -140,7 +144,7 @@ export default function ActivityEntryPage() {
                           className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-4 px-6 py-3 hover:bg-gray-50 dark:hover:bg-gray-900/60"
                         >
                           <span className="text-xs text-gray-500 dark:text-gray-400 whitespace-nowrap sm:w-44">
-                            {new Date(item.createdAt).toLocaleString()}
+                            {new Date(item.createdAt).toLocaleString(dateLocale())}
                           </span>
                           <span className="text-sm font-medium sm:w-28">{item.adminName}</span>
                           <span className="text-sm text-gray-700 dark:text-gray-300 flex-1 min-w-0 truncate">

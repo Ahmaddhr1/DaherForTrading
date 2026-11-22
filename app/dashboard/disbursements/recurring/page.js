@@ -22,6 +22,8 @@ const CATEGORY_OPTIONS = ["Salaries", "Rent", "Utilities", "Maintenance", "Trans
 const EMPTY_FORM = { description: "", amount: "", category: "Other", dayOfMonth: "1" };
 
 function ordinal(n) {
+  // Arabic has no ordinal suffix: "اليوم 5 من الشهر"
+  if (t("of the month") !== "of the month") return t("Day {0}", { 0: n });
   const s = ["th", "st", "nd", "rd"];
   const v = n % 100;
   return `${n}${s[(v - 20) % 10] || s[v] || s[0]}`;
@@ -155,7 +157,7 @@ export default function RecurringDisbursementsPage() {
                   <TableRow key={tpl._id}>
                     <TableCell className="font-medium text-gray-900 dark:text-gray-100">{t(tpl.description)}</TableCell>
                     <TableCell>
-                      <Badge variant="outline">{tpl.category}</Badge>
+                      <Badge variant="outline">{t(tpl.category)}</Badge>
                     </TableCell>
                     <TableCell className="text-center font-semibold text-red-600">
                       -${tpl.amount.toLocaleString()}
@@ -301,7 +303,7 @@ function RecurringForm({ form, setForm }) {
           className="w-full border rounded-md text-sm px-2 py-2 bg-transparent focus:outline-none focus:ring-2 focus:ring-blue-500"
         >
           {CATEGORY_OPTIONS.map((c) => (
-            <option key={c} value={c}>{c}</option>
+            <option key={c} value={c}>{t(c)}</option>
           ))}
         </select>
       </div>

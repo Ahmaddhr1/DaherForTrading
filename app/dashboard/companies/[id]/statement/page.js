@@ -51,7 +51,7 @@ export default function CompanyStatementPage() {
 
   const periodLabel = startDate || endDate
     ? `${startDate ? format(new Date(startDate), "MMM d, yyyy") : "the start"} - ${endDate ? format(new Date(endDate), "MMM d, yyyy") : "today"}`
-    : "All Time";
+    : t("All Time");
 
   const handleShareWhatsApp = () => {
     const phoneDigits = statement?.phoneNumber?.toString().replace(/\D/g, "");

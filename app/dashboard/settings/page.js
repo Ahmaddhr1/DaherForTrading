@@ -1,5 +1,5 @@
 "use client";
-import { t } from "@/lib/i18n";
+import { t, dateLocale } from "@/lib/i18n";
 import { useT } from "@/lib/i18n/LangProvider";
 
 import React, { useEffect, useRef, useState } from "react";
@@ -36,8 +36,8 @@ import { Languages } from "lucide-react";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { useHasPermission } from "@/lib/useHasPermission";
 
-const RESTORE_WARNING =
-  "This will permanently replace all current customers, orders, products, categories, companies, purchases, payments, and disbursements with the contents of this file. This cannot be undone. Continue?";
+const restoreWarning = () =>
+  t("This will permanently replace all current customers, orders, products, categories, companies, purchases, payments, and disbursements with the contents of this file. This cannot be undone. Continue?");
 
 export default function SettingsPage() {
   const t = useT();
@@ -513,7 +513,7 @@ export default function SettingsPage() {
                     >
                       {t("Last backup email")} {settings.lastScheduledBackupStatus === "failed" ? t("failed") : t("sent")}
                       {" - "}
-                      {new Date(settings.lastScheduledBackupAt).toLocaleString()}
+                      {new Date(settings.lastScheduledBackupAt).toLocaleString(dateLocale())}
                     </p>
                     {settings.lastScheduledBackupStatus === "failed" && settings.lastScheduledBackupError && (
                       <p className="text-red-700 mt-1">{settings.lastScheduledBackupError}</p>
@@ -576,7 +576,7 @@ export default function SettingsPage() {
             <CardContent className="space-y-4">
               <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-900/50 rounded-lg p-3 flex items-start gap-2">
                 <AlertTriangle className="h-4 w-4 text-amber-600 shrink-0 mt-0.5" />
-                <p className="text-xs text-amber-800 dark:text-amber-400">{RESTORE_WARNING}</p>
+                <p className="text-xs text-amber-800 dark:text-amber-400">{restoreWarning()}</p>
               </div>
 
               <div className="space-y-2">
@@ -646,7 +646,7 @@ export default function SettingsPage() {
         open={confirmRestoreOpen}
         onClose={() => setConfirmRestoreOpen(false)}
         title={t("Restore backup?")}
-        description={RESTORE_WARNING}
+        description={restoreWarning()}
         confirmLabel={t("Restore")}
         onConfirm={confirmRestore}
         loading={restoreMutation.isPending}

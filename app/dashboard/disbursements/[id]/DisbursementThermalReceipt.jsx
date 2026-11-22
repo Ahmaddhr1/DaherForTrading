@@ -35,7 +35,7 @@ export default function DisbursementThermalReceipt({ disbursement }) {
 
         <p>{t("Disbursement #")}{disbursement._id?.slice(-6).toUpperCase()}</p>
         <p>{format(new Date(disbursement.createdAt), "MMM d, yyyy h:mm a")}</p>
-        <p>{t("Category:")} {disbursement.category}</p>
+        <p>{t("Category:")} {t(disbursement.category)}</p>
 
         <div className="border-t border-dashed border-black my-1" />
 

@@ -42,7 +42,8 @@ export default function ActivityEntryPage() {
       <div className="container mx-auto px-4 max-w-5xl">
         <Link
           href="/dashboard/activity"
-          className="inline-flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 mb-6"
+          title={t("Back to Activity Log")}
+          className="icon-only-mobile inline-flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 mb-6"
         >
           <ArrowLeft className="rtl-flip h-4 w-4" />
           {t("Back to Activity Log")}
@@ -85,7 +86,7 @@ export default function ActivityEntryPage() {
                     {new Date(entry.createdAt).toLocaleString(dateLocale())}
                   </span>
                   {href && (
-                    <Link href={href} className="inline-flex items-center gap-1.5 text-blue-600 hover:underline">
+                    <Link href={href} title={`${t("Open")} ${t(entry.entityType)}`} className="icon-only-mobile inline-flex items-center gap-1.5 text-blue-600 hover:underline">
                       <ExternalLink className="h-4 w-4" />
                       {t("Open")} {t(entry.entityType)}
                     </Link>

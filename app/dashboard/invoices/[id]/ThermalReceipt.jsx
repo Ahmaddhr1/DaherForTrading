@@ -31,7 +31,7 @@ export default function ThermalReceipt({ order }) {
 
   return createPortal(
     <div id="thermal-receipt-root">
-      <div className="thermal-receipt mx-auto w-[80mm] px-[3mm] py-2 font-mono text-[13px] font-normal leading-snug text-black bg-white">
+      <div className="thermal-receipt mx-auto w-[80mm] px-[3mm] pt-2 pb-[6mm] font-mono text-[13px] font-normal leading-snug text-black bg-white">
         <div className="text-center mb-2">
           <p className="text-lg font-bold">{t("Invento")}</p>
         </div>

@@ -99,13 +99,13 @@ export default function SupplierPaymentsView() {
               className="ps-10"
             />
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-2">
             <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{t("From")}</span>
-            <input type="date" value={startDate} onChange={touch(setStartDate)} className="border rounded-md text-sm px-2 py-1.5 bg-transparent" />
+            <input type="date" value={startDate} onChange={touch(setStartDate)} className="w-full sm:w-auto border rounded-md text-sm px-2 py-1.5 bg-transparent focus:outline-none focus:ring-2 focus:ring-blue-500" />
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-2">
             <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{t("To")}</span>
-            <input type="date" value={endDate} onChange={touch(setEndDate)} className="border rounded-md text-sm px-2 py-1.5 bg-transparent" />
+            <input type="date" value={endDate} onChange={touch(setEndDate)} className="w-full sm:w-auto border rounded-md text-sm px-2 py-1.5 bg-transparent focus:outline-none focus:ring-2 focus:ring-blue-500" />
           </div>
           {hasFilters && (
             <Button

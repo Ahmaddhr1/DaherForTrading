@@ -15,7 +15,6 @@ import {
   Folder,
   Plus,
   ArrowRight,
-  FileText,
   Grid3X3,
   Search,
   ChevronLeft,
@@ -163,49 +162,68 @@ const CategoriesPage = () => {
         {/* Categories Grid */}
         {!isLoading && !error && categories.length > 0 && (
           <>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {categories.map((category) => (
-                <Link
-                  key={category._id}
-                  href={`/dashboard/categories/${category._id}`}
-                  className="group block"
-                >
-                  <Card className="hover:shadow-lg transition-all duration-300 hover:border-blue-300 h-full">
-                    <CardContent className="p-6">
-                      {/* Category Icon */}
-                      <div className="flex justify-center mb-4">
-                        <div className="w-16 h-16 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center group-hover:bg-blue-200 transition-colors">
-                          <Folder className="h-8 w-8 text-blue-600" />
+            <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+              {categories.map((category, index) => {
+                const count = category.products?.length || 0;
+                return (
+                  <Link
+                    key={category._id}
+                    href={`/dashboard/categories/${category._id}`}
+                    className="group block"
+                  >
+                    {/* Same card design as customers/companies: coloured
+                        left edge, number on top, count on the right, action
+                        in a footer. */}
+                    <Card className="border-s-4 border-s-blue-500 shadow-sm hover:shadow-md transition-shadow cursor-pointer h-full">
+                      <CardContent className="p-4 flex flex-col h-full">
+                        <div className="flex items-center justify-between gap-2">
+                          <span className="font-mono text-xs font-semibold tracking-wide text-gray-500 dark:text-gray-400">
+                            #{(currentPage - 1) * limit + index + 1}
+                          </span>
+                          <span
+                            className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold ${
+                              count > 0
+                                ? "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300"
+                                : "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400"
+                            }`}
+                          >
+                            {count > 0 ? t("In use") : t("Empty")}
+                          </span>
                         </div>
-                      </div>
 
-                      {/* Category Name */}
-                      <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 text-center mb-2 group-hover:text-blue-600 transition-colors">
-                        {category.name}
-                      </h3>
+                        <div className="mt-2 flex items-start justify-between gap-3">
+                          <div className="flex items-start gap-3 min-w-0">
+                            <div className="w-10 h-10 shrink-0 rounded-full flex items-center justify-center bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300">
+                              <Folder className="h-5 w-5" />
+                            </div>
+                            <div className="min-w-0">
+                              <h3 className="font-semibold text-gray-900 dark:text-gray-100 line-clamp-2 break-words">
+                                {category.name}
+                              </h3>
+                              {category.description && (
+                                <p className="mt-1 text-xs text-gray-500 dark:text-gray-400 line-clamp-2">
+                                  {t(category.description)}
+                                </p>
+                              )}
+                            </div>
+                          </div>
+                          <div className="text-end shrink-0">
+                            <p className="text-lg font-bold text-gray-900 dark:text-gray-100">{count}</p>
+                            <p className="text-[11px] text-gray-500 dark:text-gray-400">{t("products")}</p>
+                          </div>
+                        </div>
 
-                      {/* Category Description */}
-                      {category.description && (
-                        <p className="text-gray-600 dark:text-gray-400 text-sm text-center mb-4 line-clamp-2">
-                          {t(category.description)}
-                        </p>
-                      )}
-
-                      {/* Product Count (if available) */}
-                      <div className="flex items-center justify-center gap-2 text-sm text-gray-500 dark:text-gray-400 mb-4">
-                        <FileText className="h-4 w-4" />
-                        <span>{category.products?.length || 0} {t("products")}</span>
-                      </div>
-
-                      {/* View Button */}
-                      <div className="flex items-center justify-center gap-2 text-blue-600 font-medium group-hover:text-blue-700 transition-colors">
-                        <span>{t("View Category")}</span>
-                        <ArrowRight className="rtl-flip h-4 w-4 transform group-hover:translate-x-1 transition-transform" />
-                      </div>
-                    </CardContent>
-                  </Card>
-                </Link>
-              ))}
+                        <div className="mt-auto pt-3">
+                          <div className="pt-3 border-t border-gray-100 dark:border-gray-800 flex items-center justify-between gap-2 text-sm font-medium text-blue-600 dark:text-blue-400">
+                            <span>{t("View Category")}</span>
+                            <ArrowRight className="rtl-flip h-4 w-4 transition-transform group-hover:translate-x-1" />
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </Link>
+                );
+              })}
             </div>
 
             {/* Pagination */}

@@ -190,13 +190,14 @@ export default function CustomersPage() {
             </div>
 
             {/* Debt Filter Buttons */}
-            <div className="flex flex-col sm:flex-row sm:flex-wrap gap-2">
-              <div className="flex items-center gap-2">
+            <div className="grid grid-cols-2 gap-2 sm:flex sm:flex-row sm:flex-wrap">
+              <div className="col-span-2 flex items-center gap-2">
                 <Filter className="h-4 w-4 text-gray-500 dark:text-gray-400" />
                 <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{t("Filter by Debt:")}</span>
               </div>
 
               <Button
+                data-keep-label
                 variant={debtFilter === "all" ? "default" : "outline"}
                 size="sm"
                 onClick={() => setDebtFilter("all")}
@@ -207,6 +208,7 @@ export default function CustomersPage() {
               </Button>
 
               <Button
+                data-keep-label
                 variant={debtFilter === "hasDebt" ? "default" : "outline"}
                 size="sm"
                 onClick={() => setDebtFilter("hasDebt")}
@@ -217,6 +219,7 @@ export default function CustomersPage() {
               </Button>
 
               <Button
+                data-keep-label
                 variant={debtFilter === "noDebt" ? "default" : "outline"}
                 size="sm"
                 onClick={() => setDebtFilter("noDebt")}
@@ -227,6 +230,7 @@ export default function CustomersPage() {
               </Button>
 
               <Button
+                data-keep-label
                 variant={isTopDebtorsView ? "default" : "outline"}
                 size="sm"
                 onClick={handleShowTopDebtors}

@@ -348,6 +348,7 @@ export default function SettingsPage() {
                 </div>
 
                 <Button
+                  data-keep-label
                   type="submit"
                   disabled={settingsMutation.isPending || !canManageSettings}
                   className="bg-green-600 hover:bg-green-700"
@@ -420,6 +421,7 @@ export default function SettingsPage() {
               </div>
 
               <Button
+                data-keep-label
                 type="submit"
                 disabled={changePasswordMutation.isPending}
               >
@@ -452,6 +454,7 @@ export default function SettingsPage() {
             </CardHeader>
             <CardContent>
               <Button
+                data-keep-label
                 onClick={handleDownloadBackup}
                 disabled={isDownloading}
                 variant="outline"
@@ -532,6 +535,7 @@ export default function SettingsPage() {
               )}
 
               <Button
+                data-keep-label
                 onClick={() => sendTestBackupMutation.mutate()}
                 disabled={sendTestBackupMutation.isPending}
                 variant="outline"
@@ -590,6 +594,7 @@ export default function SettingsPage() {
                 />
                 <div className="flex items-center gap-3 flex-wrap">
                   <Button
+                    data-keep-label
                     type="button"
                     variant="outline"
                     onClick={() => fileInputRef.current?.click()}
@@ -608,6 +613,7 @@ export default function SettingsPage() {
               </div>
 
               <Button
+                data-keep-label
                 onClick={handleRestore}
                 disabled={!restoreFile || restoreMutation.isPending}
                 variant="destructive"

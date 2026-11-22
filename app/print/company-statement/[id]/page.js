@@ -11,14 +11,16 @@ function Inner() {
   const search = useSearchParams();
   const from = search.get("from") || "";
   const to = search.get("to") || "";
+  const view = search.get("view") === "products" ? "products" : "orders";
+  const back = statementPrintQuery(from, to);
   return (
     <ThermalPrintPage
       variant="document"
-      queryKey={["print-company-statement", id, from, to]}
+      queryKey={["print-company-statement", id, from, to, view]}
       fetchUrl={`/api/companies/${id}/statement${statementApiQuery(from, to)}`}
-      backHref={`/dashboard/companies/${id}/statement${statementPrintQuery(from, to)}`}
+      backHref={`/dashboard/companies/${id}/statement${view === "products" ? `${back}${back ? "&" : "?"}view=products` : back}`}
     >
-      {(statement) => <CompanyStatementDoc statement={statement} periodLabel={statementPeriodLabel(from, to)} />}
+      {(statement) => <CompanyStatementDoc statement={statement} periodLabel={statementPeriodLabel(from, to)} view={view} />}
     </ThermalPrintPage>
   );
 }

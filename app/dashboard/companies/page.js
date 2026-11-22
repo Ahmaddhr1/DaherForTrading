@@ -8,10 +8,10 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { toast } from "@/lib/i18n/toast";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { CardGridSkeleton } from "@/components/ui/skeleton-patterns";
 import { FiltersPanel } from "@/components/ui/filters-panel";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
@@ -47,6 +47,7 @@ const PAGE_SIZE_OPTIONS = [10, 20, 50];
 
 export default function CompaniesPage() {
   const t = useT();
+  const router = useRouter();
   const [searchInput, setSearchInput] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
@@ -211,13 +212,14 @@ export default function CompaniesPage() {
               />
             </div>
 
-            <div className="flex flex-col sm:flex-row sm:flex-wrap gap-2">
-              <div className="flex items-center gap-2">
+            <div className="grid grid-cols-2 gap-2 sm:flex sm:flex-row sm:flex-wrap">
+              <div className="col-span-2 flex items-center gap-2">
                 <Filter className="h-4 w-4 text-gray-500 dark:text-gray-400" />
                 <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{t("Filter by Debt We Owe:")}</span>
               </div>
 
               <Button
+                data-keep-label
                 variant={debtFilter === "all" ? "default" : "outline"}
                 size="sm"
                 onClick={() => setDebtFilter("all")}
@@ -228,6 +230,7 @@ export default function CompaniesPage() {
               </Button>
 
               <Button
+                data-keep-label
                 variant={debtFilter === "hasDebt" ? "default" : "outline"}
                 size="sm"
                 onClick={() => setDebtFilter("hasDebt")}
@@ -238,6 +241,7 @@ export default function CompaniesPage() {
               </Button>
 
               <Button
+                data-keep-label
                 variant={debtFilter === "noDebt" ? "default" : "outline"}
                 size="sm"
                 onClick={() => setDebtFilter("noDebt")}
@@ -248,6 +252,7 @@ export default function CompaniesPage() {
               </Button>
 
               <Button
+                data-keep-label
                 variant={isTopDebtView ? "default" : "outline"}
                 size="sm"
                 onClick={handleShowTopDebts}
@@ -395,7 +400,7 @@ export default function CompaniesPage() {
         {/* Companies Grid */}
         {!isLoading && !error && companies.length > 0 && (
           <>
-            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
               {companies.map((company, index) => {
                 const companyNumber = (currentPage - 1) * pageSize + index + 1;
                 const hasDebt = company.debt > 0;
@@ -405,62 +410,93 @@ export default function CompaniesPage() {
                     href={`/dashboard/companies/${company._id}`}
                     key={company._id}
                   >
-                    <Card className="hover:shadow-md transition-shadow cursor-pointer h-full relative">
-                      <CardContent className="p-4">
-                        {sortBy === "debtDesc" && (
-                          <Badge className="absolute top-2 start-2 bg-amber-500 hover:bg-amber-500">
+                    {/* Same card design as customers/orders: status-coloured
+                        left edge, number + status on top, amount on the
+                        right, actions in a footer. */}
+                    <Card
+                      className={`border-s-4 ${
+                        hasDebt ? "border-s-red-500" : "border-s-green-500"
+                      } shadow-sm hover:shadow-md transition-shadow cursor-pointer h-full`}
+                    >
+                      <CardContent className="p-4 flex flex-col h-full">
+                        <div className="flex items-center justify-between gap-2">
+                          <span className="font-mono text-xs font-semibold tracking-wide text-gray-500 dark:text-gray-400">
                             #{companyNumber}
-                          </Badge>
-                        )}
+                          </span>
+                          {hasDebt ? (
+                            <span className="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300">
+                              {t("We Owe Them")}
+                            </span>
+                          ) : (
+                            <span className="inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-semibold bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300">
+                              <CheckCircle className="h-3 w-3" />
+                              {t("Settled")}
+                            </span>
+                          )}
+                        </div>
 
-                        <div className="flex justify-center mb-3">
-                          <div className={`w-16 h-16 rounded-full flex items-center justify-center ${hasDebt ? "bg-red-100 dark:bg-red-900/30" : "bg-green-100 dark:bg-green-900/30"
-                            }`}>
-                            <Building2 className={`h-8 w-8 ${hasDebt ? "text-red-600" : "text-green-600"}`} />
+                        <div className="mt-2 flex items-start justify-between gap-3">
+                          <div className="flex items-start gap-3 min-w-0">
+                            <div
+                              className={`w-10 h-10 shrink-0 rounded-full flex items-center justify-center ${
+                                hasDebt
+                                  ? "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300"
+                                  : "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300"
+                              }`}
+                            >
+                              <Building2 className="h-5 w-5" />
+                            </div>
+                            <div className="min-w-0">
+                              <h3 className="font-semibold text-gray-900 dark:text-gray-100 line-clamp-2 break-words">
+                                {company.name}
+                              </h3>
+                              {company.phoneNumber && (
+                                <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-0.5 text-xs text-gray-500 dark:text-gray-400">
+                                  <span className="inline-flex items-center gap-1">
+                                    <Phone className="h-3 w-3" />
+                                    {company.phoneNumber}
+                                  </span>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                          <div className="text-end shrink-0">
+                            <p className={`text-lg font-bold ${hasDebt ? "text-red-600" : "text-gray-900 dark:text-gray-100"}`}>
+                              ${Number(company.debt || 0).toLocaleString()}
+                            </p>
+                            <p className="text-[11px] text-gray-500 dark:text-gray-400">{t("balance")}</p>
                           </div>
                         </div>
 
-                        <div className="text-center mb-3">
-                          <h3 className="font-semibold text-gray-900 dark:text-gray-100 mb-1">
-                            #{companyNumber} - {company.name}
-                          </h3>
-
-                          {company.phoneNumber && (
-                            <p className="text-sm text-gray-600 dark:text-gray-400 flex items-center justify-center gap-1">
-                              <Phone className="h-3 w-3" />
-                              {company.phoneNumber}
-                            </p>
-                          )}
+                        <div className="mt-auto pt-3">
+                          <div className="pt-3 border-t border-gray-100 dark:border-gray-800 flex items-center justify-between gap-2">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={(e) => {
+                                e.preventDefault();
+                                router.push(`/dashboard/companies/${company._id}/purchases`);
+                              }}
+                            >
+                              {t("View purchases")}
+                            </Button>
+                            {canDelete && (
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                aria-label={t("Delete {0}", { 0: company.name })}
+                                onClick={(e) => {
+                                  e.preventDefault();
+                                  setDeleteTarget(company);
+                                }}
+                                disabled={deleteMutation.isPending}
+                                className="text-red-600 hover:bg-red-50 hover:text-red-700 dark:hover:bg-red-950/40"
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            )}
+                          </div>
                         </div>
-
-                        <div className="text-center mb-4">
-                          {hasDebt ? (
-                            <p className="text-red-600 font-medium">
-                              {t("We Owe: $")}{company.debt}
-                            </p>
-                          ) : (
-                            <div className="text-green-600 font-medium">
-                              <CheckCircle className="h-4 w-4 inline me-1" />
-                              {t("Settled")}
-                            </div>
-                          )}
-                        </div>
-
-                        {canDelete && (
-                          <Button
-                            variant="destructive"
-                            size="sm"
-                            onClick={(e) => {
-                              e.preventDefault();
-                              setDeleteTarget(company);
-                            }}
-                            disabled={deleteMutation.isPending}
-                            className="w-full"
-                          >
-                            <Trash2 className="h-4 w-4 me-1" />
-                            {deleteMutation.isPending ? t("Deleting...") : t("Delete")}
-                          </Button>
-                        )}
                       </CardContent>
                     </Card>
                   </Link>

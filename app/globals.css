@@ -240,3 +240,25 @@ html[dir="rtl"] .recharts-wrapper * {
     flex-wrap: wrap;
   }
 }
+
+/* Date inputs on phones: iOS Safari draws them with its own intrinsic size
+   (overflowing their box, or tiny and blank when empty). Let them follow
+   their width/height classes like any other input. */
+@media (max-width: 639.98px) {
+  input[type="date"],
+  input[type="datetime-local"],
+  input[type="month"] {
+    -webkit-appearance: none;
+    appearance: none;
+    display: block;
+    min-width: 0;
+    max-width: 100%;
+    min-height: 2.25rem;
+    line-height: 1.25rem;
+    background-color: transparent;
+  }
+  input[type="date"]::-webkit-date-and-time-value {
+    text-align: start;
+    min-height: 1.25rem;
+  }
+}

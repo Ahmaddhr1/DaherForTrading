@@ -201,13 +201,14 @@ export default function CustomerOrdersTable() {
         <FiltersPanel activeCount={activeFilterCount}>
           <Card className="shadow-sm border-gray-200 dark:border-gray-800 mb-6">
             <CardContent className="p-4 space-y-4">
-              <div className="flex flex-col sm:flex-row sm:flex-wrap gap-2">
-                <div className="flex items-center gap-2">
+              <div className="grid grid-cols-2 gap-2 sm:flex sm:flex-row sm:flex-wrap">
+                <div className="col-span-2 flex items-center gap-2">
                   <Filter className="h-4 w-4 text-gray-500 dark:text-gray-400" />
                   <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{t("Status:")}</span>
                 </div>
 
                 <Button
+                  data-keep-label
                   variant={statusFilter === "all" ? "default" : "outline"}
                   size="sm"
                   onClick={() => setStatusFilter("all")}
@@ -217,6 +218,7 @@ export default function CustomerOrdersTable() {
                   <Badge variant="secondary" className="ms-1">{totalCount}</Badge>
                 </Button>
                 <Button
+                  data-keep-label
                   variant={statusFilter === "draft" ? "default" : "outline"}
                   size="sm"
                   onClick={() => setStatusFilter("draft")}
@@ -226,6 +228,7 @@ export default function CustomerOrdersTable() {
                   <Badge variant="secondary" className="ms-1">{counts.draft}</Badge>
                 </Button>
                 <Button
+                  data-keep-label
                   variant={statusFilter === "pending" ? "default" : "outline"}
                   size="sm"
                   onClick={() => setStatusFilter("pending")}
@@ -235,6 +238,7 @@ export default function CustomerOrdersTable() {
                   <Badge variant="secondary" className="ms-1">{counts.pending}</Badge>
                 </Button>
                 <Button
+                  data-keep-label
                   variant={statusFilter === "partiallyPaid" ? "default" : "outline"}
                   size="sm"
                   onClick={() => setStatusFilter("partiallyPaid")}
@@ -244,6 +248,7 @@ export default function CustomerOrdersTable() {
                   <Badge variant="secondary" className="ms-1">{counts.partiallyPaid}</Badge>
                 </Button>
                 <Button
+                  data-keep-label
                   variant={statusFilter === "paid" ? "default" : "outline"}
                   size="sm"
                   onClick={() => setStatusFilter("paid")}

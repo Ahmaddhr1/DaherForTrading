@@ -20,6 +20,8 @@ export function FiltersPanel({ children, activeCount = 0 }) {
       <Button
         type="button"
         variant="outline"
+        data-keep-label
+        aria-expanded={open}
         onClick={() => setOpen((prev) => !prev)}
         className="w-full flex items-center justify-between sm:hidden mb-3"
       >

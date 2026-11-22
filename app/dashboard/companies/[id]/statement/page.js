@@ -5,7 +5,7 @@ import { Suspense, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { format } from "@/lib/i18n/date";
-import { Printer, MessageCircle, Receipt, Loader2 } from "lucide-react";
+import { Printer, MessageCircle, Receipt, Loader2, ClipboardList, Package } from "lucide-react";
 import { toast } from "@/lib/i18n/toast";
 import { generateStatementPdf, sharePdfOrDownload } from "@/lib/thermalPdf";
 import { Card, CardContent } from "@/components/ui/card";
@@ -13,7 +13,7 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { PageHeaderSkeleton, TableSkeleton } from "@/components/ui/skeleton-patterns";
-import CompanyStatementDoc from "@/components/statements/CompanyStatementDoc";
+import CompanyStatementDoc, { groupPurchasesByProduct } from "@/components/statements/CompanyStatementDoc";
 import { statementApiQuery, statementPeriodLabel, statementPrintQuery } from "@/lib/statementPeriod";
 
 const fetchStatement = async (id, startDate, endDate) => {
@@ -30,6 +30,9 @@ function CompanyStatementPageInner() {
   const [isSharingPdf, setIsSharingPdf] = useState(false);
   const [startDate, setStartDate] = useState(search.get("from") || "");
   const [endDate, setEndDate] = useState(search.get("to") || "");
+  // "orders" = every purchase, "products" = totals per product.
+  const [view, setView] = useState(search.get("view") === "products" ? "products" : "orders");
+  const viewQuery = (qs) => (view === "products" ? `${qs}${qs ? "&" : "?"}view=products` : qs);
 
   const { data: statement, isLoading, isError } = useQuery({
     queryKey: ["company-statement", id, startDate, endDate],
@@ -42,7 +45,7 @@ function CompanyStatementPageInner() {
   // Printing happens on a dedicated print view (like the thermal receipts):
   // it shows only the statement, in its light design, with its own Print
   // button.
-  const handlePrint = () => router.push(`/print/company-statement/${id}${statementPrintQuery(startDate, endDate)}`);
+  const handlePrint = () => router.push(`/print/company-statement/${id}${viewQuery(statementPrintQuery(startDate, endDate))}`);
 
   const handleShareWhatsApp = () => {
     const phoneDigits = statement?.phoneNumber?.toString().replace(/\D/g, "");
@@ -60,11 +63,22 @@ function CompanyStatementPageInner() {
   const handleShareThermalPdf = async () => {
     setIsSharingPdf(true);
     try {
+      const productRows = view === "products" ? groupPurchasesByProduct(statement.purchases) : null;
       const blob = generateStatementPdf({
-        title: "COMPANY STATEMENT",
+        title: productRows ? "COMPANY STATEMENT - PRODUCTS" : "COMPANY STATEMENT",
         subtitle: statement.name,
         meta: `Generated ${format(new Date(), "MMM d, yyyy h:mm a")}`,
         periodLabel,
+        ...(productRows && {
+          columns: [
+            { header: "Product" },
+            { header: "Qty", align: "right" },
+            { header: "Total", align: "right" },
+            { header: "Owed", align: "right" },
+          ],
+          rows: productRows.map((r) => [r.productName, String(r.quantity), `$${r.total.toFixed(2)}`, `$${r.owed.toFixed(2)}`]),
+        }),
+        ...(!productRows && {
         columns: [
           { header: "Date" },
           { header: "Product" },
@@ -77,6 +91,7 @@ function CompanyStatementPageInner() {
           `$${purchase.total.toFixed(2)}`,
           purchase.paid ? "Paid" : "Unpaid",
         ]),
+        }),
         totals: [
           { label: "Total Purchased", value: `$${statement.totals.totalPurchased.toFixed(2)}` },
           { label: "Total Paid", value: `$${statement.totals.totalPaid.toFixed(2)}` },
@@ -129,6 +144,26 @@ function CompanyStatementPageInner() {
         </div>
         <p className="text-xs text-gray-500 dark:text-gray-400 pb-2">{t("Leave blank for all time.")}</p>
       </div>
+      <div className="inline-flex rounded-lg border border-gray-200 dark:border-gray-800 p-1 mt-4 bg-white dark:bg-gray-900" role="tablist" aria-label={t("Statement view")}>
+        {[
+          ["orders", ClipboardList, t("Orders")],
+          ["products", Package, t("Products")],
+        ].map(([key, Icon, label]) => (
+          <button
+            key={key}
+            type="button"
+            role="tab"
+            aria-selected={view === key}
+            onClick={() => setView(key)}
+            className={`flex items-center gap-2 rounded-md px-3 py-1.5 text-sm font-medium transition-colors ${
+              view === key ? "bg-primary text-white" : "text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
+            }`}
+          >
+            <Icon className="h-4 w-4" />
+            {label}
+          </button>
+        ))}
+      </div>
       <div className="flex flex-wrap gap-2 mt-3">
         <Button variant="outline" onClick={handlePrint} className="flex items-center gap-2" aria-label={t("Print")}>
           <Printer className="h-4 w-4" />
@@ -149,7 +184,7 @@ function CompanyStatementPageInner() {
   return (
     <div className="min-h-screen bg-gray-50/30 dark:bg-transparent py-8">
       <div className="container mx-auto px-4">
-        <CompanyStatementDoc statement={statement} periodLabel={periodLabel} toolbar={toolbar} />
+        <CompanyStatementDoc statement={statement} periodLabel={periodLabel} view={view} toolbar={toolbar} />
       </div>
     </div>
   );

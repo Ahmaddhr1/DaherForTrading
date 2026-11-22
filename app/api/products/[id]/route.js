@@ -68,6 +68,18 @@ export async function PUT(req, { params }) {
       }
       body.lowStockThreshold = parsedThreshold;
     }
+    // Expiry date: "" clears it, otherwise a yyyy-mm-dd / ISO date.
+    if (body.expiryDate !== undefined) {
+      if (body.expiryDate === "" || body.expiryDate === null) {
+        body.expiryDate = null;
+      } else {
+        const d = new Date(body.expiryDate);
+        if (isNaN(d.getTime())) {
+          return NextResponse.json({ error: "Invalid expiry date." }, { status: 400 });
+        }
+        body.expiryDate = d;
+      }
+    }
     if (typeof body.unit === "string" && !body.unit.trim()) {
       body.unit = "pcs";
     }

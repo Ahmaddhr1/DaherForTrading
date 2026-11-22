@@ -27,6 +27,9 @@ const productSchema = new mongoose.Schema(
     // Below this quantity (and above 0), the product shows as low-stock on
     // the Products page and the dashboard's LowStockAlerts widget.
     lowStockThreshold: { type: Number, default: 5, min: 0 },
+    // Optional expiry date (perishable stock). Products expiring within
+    // AppSettings.expiryAlertDays show up in the dashboard's expiry alert.
+    expiryDate: { type: Date, default: null, index: true },
     // Supplier to quick-reorder from (see the "Reorder from supplier" link
     // on the product edit page, which pre-fills a purchase form).
     defaultSupplier: { type: mongoose.Types.ObjectId, ref: "Company", default: null },

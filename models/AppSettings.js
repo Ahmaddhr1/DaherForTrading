@@ -14,6 +14,8 @@ const appSettingsSchema = new mongoose.Schema(
     // purchases but editable per transaction - see Order.taxRate /
     // Purchase.taxRate, which snapshot whatever rate was used at the time.
     taxRate: { type: Number, default: 0, min: 0, max: 100 },
+    // How many days ahead the dashboard warns about expiring products.
+    expiryAlertDays: { type: Number, default: 30, min: 1, max: 365 },
     // Set by app/api/cron/backup/route.js after each successful automated
     // backup email, purely so the Settings page can show "last backup"
     // without needing its own model - not user-editable.

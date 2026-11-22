@@ -2,6 +2,7 @@
 import { t } from "@/lib/i18n";
 import { useT } from "@/lib/i18n/LangProvider";
 import { isTouchDevice } from "@/lib/isTouchDevice";
+import { applyThermalPageSize } from "@/lib/thermalPageSize";
 import { useRouter } from "next/navigation";
 
 import { useEffect } from "react";
@@ -58,6 +59,7 @@ export default function PurchaseDetailsPage() {
       return;
     }
     document.body.classList.add("printing-thermal");
+    applyThermalPageSize();
     window.print();
   };
 

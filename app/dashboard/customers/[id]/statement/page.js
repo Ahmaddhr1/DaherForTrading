@@ -1,5 +1,6 @@
 "use client";
 import { useT } from "@/lib/i18n/LangProvider";
+import { whatsappNumber } from "@/lib/whatsapp";
 
 import { Suspense, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
@@ -13,8 +14,11 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { PageHeaderSkeleton, TableSkeleton } from "@/components/ui/skeleton-patterns";
-import CustomerStatementDoc, { customerStatusConfig } from "@/components/statements/CustomerStatementDoc";
+import CustomerStatementDoc from "@/components/statements/CustomerStatementDoc";
 import { statementApiQuery, statementPeriodLabel, statementPrintQuery } from "@/lib/statementPeriod";
+import { buildCustomerStatementReceipt } from "@/lib/statementReceiptData";
+import { isTouchDevice } from "@/lib/isTouchDevice";
+import StatementPrintDialog from "@/components/StatementPrintDialog";
 
 const fetchStatement = async (id, startDate, endDate) => {
   const res = await fetch(`/api/customers/${id}/statement${statementApiQuery(startDate, endDate)}`);
@@ -38,14 +42,19 @@ function CustomerStatementPageInner() {
   });
 
   const periodLabel = statementPeriodLabel(startDate, endDate);
+  // Content of "Share as PDF".
+  const receiptData = statement ? buildCustomerStatementReceipt(statement, periodLabel) : null;
+
 
   // Printing happens on a dedicated print view (like the thermal receipts):
   // it shows only the statement, in its light design, with its own Print
   // button.
-  const handlePrint = () => router.push(`/print/statement/${id}${statementPrintQuery(startDate, endDate)}`);
+  const printUrl = `/print/statement/${id}${statementPrintQuery(startDate, endDate)}`;
+  const [printOpen, setPrintOpen] = useState(false);
+  const handlePrint = () => (isTouchDevice() ? router.push(printUrl) : setPrintOpen(true));
 
   const handleShareWhatsApp = () => {
-    const phoneDigits = statement?.phoneNumber?.toString().replace(/\D/g, "");
+    const phoneDigits = whatsappNumber(statement?.phoneNumber);
     if (!phoneDigits) {
       toast.error("This customer has no phone number on file");
       return;
@@ -60,32 +69,7 @@ function CustomerStatementPageInner() {
   const handleShareThermalPdf = async () => {
     setIsSharingPdf(true);
     try {
-      const blob = generateStatementPdf({
-        title: "ACCOUNT STATEMENT",
-        subtitle: statement.fullName,
-        meta: `Generated ${format(new Date(), "MMM d, yyyy h:mm a")}`,
-        periodLabel,
-        columns: [
-          { header: "Date" },
-          { header: "Total", align: "right" },
-          { header: "Paid", align: "right" },
-          { header: "Remaining", align: "right" },
-          { header: "Status", align: "center" },
-        ],
-        rows: statement.orders.map((order) => [
-          format(new Date(order.createdAt), "MMM d, yyyy"),
-          `$${order.total.toFixed(2)}`,
-          `$${order.amountpaid.toFixed(2)}`,
-          `$${order.remainingBalance.toFixed(2)}`,
-          (customerStatusConfig[order.status] || customerStatusConfig.pending).label,
-        ]),
-        totals: [
-          { label: "Total Billed", value: `$${statement.totals.totalAmount.toFixed(2)}` },
-          { label: "Total Paid", value: `$${statement.totals.totalPaid.toFixed(2)}` },
-          { label: "Total Owed", value: `$${statement.totals.totalRemaining.toFixed(2)}`, bold: true },
-        ],
-        footer: "Powered by Ahmad Daher",
-      });
+      const blob = generateStatementPdf(receiptData);
       const result = await sharePdfOrDownload(blob, `statement-${statement.fullName?.replace(/\s+/g, "-") || id}.pdf`);
       if (result === "downloaded") toast.success("Statement PDF downloaded");
     } catch {
@@ -153,6 +137,7 @@ function CustomerStatementPageInner() {
       <div className="container mx-auto px-4">
         <CustomerStatementDoc statement={statement} periodLabel={periodLabel} toolbar={toolbar} />
       </div>
+      <StatementPrintDialog open={printOpen} onClose={() => setPrintOpen(false)} src={printUrl} />
     </div>
   );
 }

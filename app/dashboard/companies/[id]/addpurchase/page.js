@@ -101,7 +101,12 @@ const NewPurchasePage = () => {
     mutationFn: async () => {
       // Each row is its own Purchase record - post them one at a time so a
       // failure partway through doesn't leave duplicate stock increments
-      // from a retried Promise.all.
+      // from a retried Promise.all. They share one batch id so statements
+      // show them as a single order.
+      const batchId =
+        typeof crypto !== "undefined" && crypto.randomUUID
+          ? crypto.randomUUID()
+          : `${Date.now()}-${Math.random().toString(36).slice(2)}`;
       for (const row of rows) {
         await axios.post(`/api/companies/${companyId}/purchases`, {
           productId: row.productId,
@@ -110,6 +115,7 @@ const NewPurchasePage = () => {
           discount: parseFloat(row.discount) || 0,
           taxRate: parseFloat(taxRate) || 0,
           paid,
+          batchId,
         });
       }
     },

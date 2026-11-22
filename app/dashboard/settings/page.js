@@ -27,8 +27,7 @@ import {
   CheckCircle2,
   XCircle,
   Send,
-  Moon,
-} from "lucide-react";
+  Moon, CalendarClock } from "lucide-react";
 import { useSettings } from "@/lib/currency";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { LanguageSwitch } from "@/components/LanguageSwitch";
@@ -62,11 +61,13 @@ export default function SettingsPage() {
   const { data: settings, isLoading: settingsLoading } = useSettings();
   const [dollarRate, setDollarRate] = useState("");
   const [taxRate, setTaxRate] = useState("");
+  const [expiryAlertDays, setExpiryAlertDays] = useState("30");
 
   useEffect(() => {
     if (settings) {
       setDollarRate(settings.dollarRate?.toString() ?? "");
       setTaxRate(settings.taxRate?.toString() ?? "");
+      setExpiryAlertDays(settings.expiryAlertDays?.toString() ?? "30");
     }
   }, [settings]);
 
@@ -75,6 +76,7 @@ export default function SettingsPage() {
       const res = await axios.put("/api/settings/business", {
         dollarRate: parseFloat(dollarRate),
         taxRate: parseFloat(taxRate),
+        expiryAlertDays: parseInt(expiryAlertDays, 10),
       });
       return res.data;
     },
@@ -97,6 +99,11 @@ export default function SettingsPage() {
     }
     if (isNaN(tax) || tax < 0 || tax > 100) {
       toast.error("Enter a valid Tax Rate between 0 and 100");
+      return;
+    }
+    const days = parseInt(expiryAlertDays, 10);
+    if (isNaN(days) || days < 1 || days > 365) {
+      toast.error("Enter an expiry alert between 1 and 365 days");
       return;
     }
     settingsMutation.mutate();
@@ -344,6 +351,29 @@ export default function SettingsPage() {
                     {t(
                       "Pre-fills the tax field when creating an order or purchase - it can still be changed per transaction."
                     )}
+                  </p>
+                </div>
+
+                <Separator />
+
+                <div className="space-y-2">
+                  <Label htmlFor="expiryAlertDays" className="flex items-center gap-2">
+                    <CalendarClock className="h-4 w-4" />
+                    {t("Expiry Alert (days before)")}
+                  </Label>
+                  <Input
+                    id="expiryAlertDays"
+                    type="number"
+                    min="1"
+                    max="365"
+                    step="1"
+                    value={expiryAlertDays}
+                    onChange={(e) => setExpiryAlertDays(e.target.value)}
+                    placeholder="30"
+                    disabled={!canManageSettings}
+                  />
+                  <p className="text-xs text-gray-500 dark:text-gray-400">
+                    {t("Products expiring within this many days (and already expired ones) are listed on the dashboard.")}
                   </p>
                 </div>
 

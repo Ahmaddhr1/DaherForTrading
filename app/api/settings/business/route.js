@@ -40,7 +40,7 @@ export async function PUT(req) {
   if (forbidden) return forbidden;
 
   try {
-    const { dollarRate, taxRate } = await req.json();
+    const { dollarRate, taxRate, expiryAlertDays } = await req.json();
 
     if (dollarRate !== undefined && (typeof dollarRate !== "number" || isNaN(dollarRate) || dollarRate < 0)) {
       return NextResponse.json({ error: "Dollar rate must be a non-negative number" }, { status: 400 });
@@ -48,11 +48,18 @@ export async function PUT(req) {
     if (taxRate !== undefined && (typeof taxRate !== "number" || isNaN(taxRate) || taxRate < 0 || taxRate > 100)) {
       return NextResponse.json({ error: "Tax rate must be a number between 0 and 100" }, { status: 400 });
     }
+    if (
+      expiryAlertDays !== undefined &&
+      (!Number.isInteger(expiryAlertDays) || expiryAlertDays < 1 || expiryAlertDays > 365)
+    ) {
+      return NextResponse.json({ error: "Expiry alert must be between 1 and 365 days" }, { status: 400 });
+    }
 
     const settings = await getOrCreateSettings();
-    const before = { dollarRate: settings.dollarRate, taxRate: settings.taxRate };
+    const before = { dollarRate: settings.dollarRate, taxRate: settings.taxRate, expiryAlertDays: settings.expiryAlertDays };
     if (dollarRate !== undefined) settings.dollarRate = dollarRate;
     if (taxRate !== undefined) settings.taxRate = taxRate;
+    if (expiryAlertDays !== undefined) settings.expiryAlertDays = expiryAlertDays;
     await settings.save();
 
     const changes = diffViews("Settings", before, settings.toObject());
@@ -68,7 +75,7 @@ export async function PUT(req) {
       entityType: "Settings",
       entityId: settings._id,
       summary: `Updated business settings: ${describeChanges(changes)}`,
-      metadata: { before, after: { dollarRate: settings.dollarRate, taxRate: settings.taxRate } },
+      metadata: { before, after: { dollarRate: settings.dollarRate, taxRate: settings.taxRate, expiryAlertDays: settings.expiryAlertDays } },
     });
 
     return NextResponse.json(settings, { status: 200 });

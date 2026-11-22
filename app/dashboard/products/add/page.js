@@ -10,7 +10,7 @@ import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import axios from "axios";
-import { Loader2, PackagePlus, DollarSign, Tag, Package, TrendingUp, Box, Ruler, AlertTriangle, Truck, Layers, ImagePlus, X, Percent } from "lucide-react";
+import { Loader2, PackagePlus, DollarSign, Tag, Package, TrendingUp, Box, Ruler, AlertTriangle, Truck, Layers, ImagePlus, X, Percent, CalendarClock } from "lucide-react";
 import React, { useState } from "react";
 import { toast } from "@/lib/i18n/toast";
 import { useRouter } from "next/navigation";
@@ -55,6 +55,7 @@ const Page = () => {
     category: "",
     unit: "pcs",
     lowStockThreshold: "5",
+    expiryDate: "",
     defaultSupplier: "",
     discount: "",
   });
@@ -100,6 +101,7 @@ const Page = () => {
         category: form.category,
         unit: form.unit,
         lowStockThreshold: form.lowStockThreshold,
+        expiryDate: form.expiryDate || null,
         defaultSupplier: form.defaultSupplier || null,
         discount: form.discount === "" ? 0 : parseFloat(form.discount),
         img,
@@ -338,6 +340,22 @@ const Page = () => {
                           className="focus:border-purple-500 transition-colors"
                         />
                         <p className="text-xs text-gray-500 dark:text-gray-400">{t("Alerts you when stock falls to or below this number")}</p>
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor="expiryDate" className="text-sm font-medium flex items-center gap-2">
+                          <CalendarClock className="h-4 w-4" />
+                          {t("Expiry Date")}
+                        </Label>
+                        <Input
+                          id="expiryDate"
+                          type="date"
+                          name="expiryDate"
+                          value={form.expiryDate}
+                          onChange={handleChange}
+                          className="focus:border-purple-500 transition-colors"
+                        />
+                        <p className="text-xs text-gray-500 dark:text-gray-400">{t("Optional - shows on the dashboard when it gets close")}</p>
                       </div>
 
                       <div className="space-y-2">

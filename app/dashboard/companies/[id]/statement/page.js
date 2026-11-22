@@ -1,5 +1,6 @@
 "use client";
 import { useT } from "@/lib/i18n/LangProvider";
+import { whatsappNumber } from "@/lib/whatsapp";
 
 import { Suspense, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
@@ -13,8 +14,11 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { PageHeaderSkeleton, TableSkeleton } from "@/components/ui/skeleton-patterns";
-import CompanyStatementDoc, { groupPurchasesByProduct } from "@/components/statements/CompanyStatementDoc";
+import CompanyStatementDoc from "@/components/statements/CompanyStatementDoc";
 import { statementApiQuery, statementPeriodLabel, statementPrintQuery } from "@/lib/statementPeriod";
+import { buildCompanyStatementReceipt } from "@/lib/statementReceiptData";
+import { isTouchDevice } from "@/lib/isTouchDevice";
+import StatementPrintDialog from "@/components/StatementPrintDialog";
 
 const fetchStatement = async (id, startDate, endDate) => {
   const res = await fetch(`/api/companies/${id}/statement${statementApiQuery(startDate, endDate)}`);
@@ -41,14 +45,19 @@ function CompanyStatementPageInner() {
   });
 
   const periodLabel = statementPeriodLabel(startDate, endDate);
+  // Content of "Share as PDF".
+  const receiptData = statement ? buildCompanyStatementReceipt(statement, periodLabel, view) : null;
+
 
   // Printing happens on a dedicated print view (like the thermal receipts):
   // it shows only the statement, in its light design, with its own Print
   // button.
-  const handlePrint = () => router.push(`/print/company-statement/${id}${viewQuery(statementPrintQuery(startDate, endDate))}`);
+  const printUrl = `/print/company-statement/${id}${statementPrintQuery(startDate, endDate)}` + (view === "products" ? `${statementPrintQuery(startDate, endDate) ? "&" : "?"}view=products` : "");
+  const [printOpen, setPrintOpen] = useState(false);
+  const handlePrint = () => (isTouchDevice() ? router.push(printUrl) : setPrintOpen(true));
 
   const handleShareWhatsApp = () => {
-    const phoneDigits = statement?.phoneNumber?.toString().replace(/\D/g, "");
+    const phoneDigits = whatsappNumber(statement?.phoneNumber);
     if (!phoneDigits) {
       toast.error("This company has no phone number on file");
       return;
@@ -63,42 +72,7 @@ function CompanyStatementPageInner() {
   const handleShareThermalPdf = async () => {
     setIsSharingPdf(true);
     try {
-      const productRows = view === "products" ? groupPurchasesByProduct(statement.purchases) : null;
-      const blob = generateStatementPdf({
-        title: productRows ? "COMPANY STATEMENT - PRODUCTS" : "COMPANY STATEMENT",
-        subtitle: statement.name,
-        meta: `Generated ${format(new Date(), "MMM d, yyyy h:mm a")}`,
-        periodLabel,
-        ...(productRows && {
-          columns: [
-            { header: "Product" },
-            { header: "Qty", align: "right" },
-            { header: "Total", align: "right" },
-            { header: "Owed", align: "right" },
-          ],
-          rows: productRows.map((r) => [r.productName, String(r.quantity), `$${r.total.toFixed(2)}`, `$${r.owed.toFixed(2)}`]),
-        }),
-        ...(!productRows && {
-        columns: [
-          { header: "Date" },
-          { header: "Product" },
-          { header: "Total", align: "right" },
-          { header: "Status", align: "center" },
-        ],
-        rows: statement.purchases.map((purchase) => [
-          format(new Date(purchase.createdAt), "MMM d, yyyy"),
-          purchase.productName,
-          `$${purchase.total.toFixed(2)}`,
-          purchase.paid ? "Paid" : "Unpaid",
-        ]),
-        }),
-        totals: [
-          { label: "Total Purchased", value: `$${statement.totals.totalPurchased.toFixed(2)}` },
-          { label: "Total Paid", value: `$${statement.totals.totalPaid.toFixed(2)}` },
-          { label: "Total Owed", value: `$${statement.totals.totalOwed.toFixed(2)}`, bold: true },
-        ],
-        footer: "Powered by Ahmad Daher",
-      });
+      const blob = generateStatementPdf(receiptData);
       const result = await sharePdfOrDownload(blob, `statement-${statement.name?.replace(/\s+/g, "-") || id}.pdf`);
       if (result === "downloaded") toast.success("Statement PDF downloaded");
     } catch {
@@ -186,6 +160,7 @@ function CompanyStatementPageInner() {
       <div className="container mx-auto px-4">
         <CompanyStatementDoc statement={statement} periodLabel={periodLabel} view={view} toolbar={toolbar} />
       </div>
+      <StatementPrintDialog open={printOpen} onClose={() => setPrintOpen(false)} src={printUrl} />
     </div>
   );
 }

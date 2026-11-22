@@ -82,7 +82,7 @@ export async function POST(req, { params }) {
 
   try {
     const { id } = params;
-    const { productId, unitPrice, quantity, discount, taxRate, paid } = await req.json();
+    const { productId, unitPrice, quantity, discount, taxRate, paid, batchId } = await req.json();
 
     if (!productId || !unitPrice || !quantity) {
       return NextResponse.json(
@@ -131,6 +131,7 @@ export async function POST(req, { params }) {
       taxAmount: numericTaxAmount,
       total,
       paid: isPaid,
+      batchId: typeof batchId === "string" && batchId ? batchId.slice(0, 64) : undefined,
     });
 
     // Restock the product and refresh its cost basis to the new unit price.

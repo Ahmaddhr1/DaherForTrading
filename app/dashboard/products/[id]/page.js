@@ -15,7 +15,7 @@ import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { FormSkeleton, PageHeaderSkeleton } from "@/components/ui/skeleton-patterns";
-import { Loader2, Package, DollarSign, Tag, Box, TrendingUp, PackageCheck, Ruler, AlertTriangle, Truck, Layers, ImagePlus, X, Percent } from "lucide-react";
+import { Loader2, Package, DollarSign, Tag, Box, TrendingUp, PackageCheck, Ruler, AlertTriangle, Truck, Layers, ImagePlus, X, Percent, CalendarClock } from "lucide-react";
 import Link from "next/link";
 import ProductHistory from "./ProductHistory";
 import StockAdjustments from "./StockAdjustments";
@@ -73,6 +73,7 @@ const EditProductPage = () => {
     category: "",
     unit: "pcs",
     lowStockThreshold: "5",
+    expiryDate: "",
     defaultSupplier: "",
     discount: "",
   });
@@ -96,6 +97,7 @@ const EditProductPage = () => {
         category: product.category || "",
         unit: product.unit || "pcs",
         lowStockThreshold: product.lowStockThreshold?.toString() ?? "5",
+        expiryDate: product.expiryDate ? String(product.expiryDate).slice(0, 10) : "",
         defaultSupplier: product.defaultSupplier || "",
         discount: product.discount?.toString() ?? "0",
       });
@@ -421,6 +423,22 @@ const EditProductPage = () => {
                           onChange={handleChange}
                           className="focus:border-purple-500 transition-colors"
                         />
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor="expiryDate" className="text-sm font-medium flex items-center gap-2">
+                          <CalendarClock className="h-4 w-4" />
+                          {t("Expiry Date")}
+                        </Label>
+                        <Input
+                          id="expiryDate"
+                          type="date"
+                          name="expiryDate"
+                          value={form.expiryDate}
+                          onChange={handleChange}
+                          className="focus:border-purple-500 transition-colors"
+                        />
+                        <p className="text-xs text-gray-500 dark:text-gray-400">{t("Optional - shows on the dashboard when it gets close")}</p>
                       </div>
 
                       <div className="space-y-2">

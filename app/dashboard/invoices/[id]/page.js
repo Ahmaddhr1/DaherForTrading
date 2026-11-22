@@ -1,6 +1,7 @@
 "use client";
 import { t } from "@/lib/i18n";
 import { useT } from "@/lib/i18n/LangProvider";
+import { whatsappNumber } from "@/lib/whatsapp";
 import { isTouchDevice } from "@/lib/isTouchDevice";
 import { applyThermalPageSize } from "@/lib/thermalPageSize";
 import DirectPrintButton, { useDirectPrint } from "@/components/DirectPrintButton";
@@ -124,7 +125,7 @@ export default function OrderDetailsPage() {
   const status = statusConfig[order.status] || statusConfig.unpaid;
 
   const handleShareWhatsApp = () => {
-    const phoneDigits = order.customer?.phoneNumber?.toString().replace(/\D/g, "");
+    const phoneDigits = whatsappNumber(order.customer?.phoneNumber);
     if (!phoneDigits) {
       toast.error("This customer has no phone number on file");
       return;

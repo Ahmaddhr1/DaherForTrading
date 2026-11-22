@@ -6,6 +6,7 @@ import { useT } from "@/lib/i18n/LangProvider";
 import React, { useState } from "react";
 import SummaryCards from "@/components/dashboard/SummaryCards";
 import LowStockAlerts from "@/components/dashboard/LowStockAlerts";
+import ExpiryAlerts from "@/components/dashboard/ExpiryAlerts";
 import DebtCard from "@/components/dashboard/DebtCard";
 import OrdersBreakdown from "@/components/dashboard/OrdersBreakdown";
 import ProfitChart from "@/components/dashboard/ProfitChart";
@@ -62,6 +63,9 @@ export default function DashboardPage() {
 
         {/* Low Stock Alerts */}
         <LowStockAlerts />
+
+        {/* Expiring products (owner-chosen window, closest first) */}
+        <ExpiryAlerts />
 
         {/* Debt and Orders */}
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 mb-8">

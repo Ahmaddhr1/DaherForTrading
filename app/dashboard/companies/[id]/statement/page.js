@@ -1,11 +1,11 @@
 "use client";
 import { useT } from "@/lib/i18n/LangProvider";
 
-import { Suspense, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { format } from "@/lib/i18n/date";
-import { Printer, MessageCircle, Receipt, Loader2, ClipboardList, Package } from "lucide-react";
+import { Printer, MessageCircle, Receipt, Loader2, ClipboardList, Package, ReceiptText } from "lucide-react";
 import { toast } from "@/lib/i18n/toast";
 import { generateStatementPdf, sharePdfOrDownload } from "@/lib/thermalPdf";
 import { Card, CardContent } from "@/components/ui/card";
@@ -13,8 +13,12 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { PageHeaderSkeleton, TableSkeleton } from "@/components/ui/skeleton-patterns";
-import CompanyStatementDoc, { groupPurchasesByProduct, groupPurchasesByOrder } from "@/components/statements/CompanyStatementDoc";
+import CompanyStatementDoc from "@/components/statements/CompanyStatementDoc";
 import { statementApiQuery, statementPeriodLabel, statementPrintQuery } from "@/lib/statementPeriod";
+import { buildCompanyStatementReceipt } from "@/lib/statementReceiptData";
+import StatementThermalReceipt from "@/components/StatementThermalReceipt";
+import { isTouchDevice } from "@/lib/isTouchDevice";
+import { applyThermalPageSize } from "@/lib/thermalPageSize";
 
 const fetchStatement = async (id, startDate, endDate) => {
   const res = await fetch(`/api/companies/${id}/statement${statementApiQuery(startDate, endDate)}`);
@@ -41,6 +45,25 @@ function CompanyStatementPageInner() {
   });
 
   const periodLabel = statementPeriodLabel(startDate, endDate);
+  // Same content for "Share as PDF" and "Thermal Print".
+  const receiptData = statement ? buildCompanyStatementReceipt(statement, periodLabel, view) : null;
+
+  // Thermal print like the order receipt: the print dialog (choose any
+  // printer) with only the 80mm receipt; phones use the dedicated print page.
+  const handlePrintThermal = () => {
+    if (isTouchDevice()) {
+      router.push(`/print/company-statement-receipt/${id}${statementPrintQuery(startDate, endDate)}` + (view === "products" ? `${statementPrintQuery(startDate, endDate) ? "&" : "?"}view=products` : ""));
+      return;
+    }
+    document.body.classList.add("printing-thermal");
+    applyThermalPageSize();
+    window.print();
+  };
+  useEffect(() => {
+    const done = () => document.body.classList.remove("printing-thermal");
+    window.addEventListener("afterprint", done);
+    return () => window.removeEventListener("afterprint", done);
+  }, []);
 
   // Printing happens on a dedicated print view (like the thermal receipts):
   // it shows only the statement, in its light design, with its own Print
@@ -63,50 +86,7 @@ function CompanyStatementPageInner() {
   const handleShareThermalPdf = async () => {
     setIsSharingPdf(true);
     try {
-      const productRows = view === "products" ? groupPurchasesByProduct(statement.purchases) : null;
-      const blob = generateStatementPdf({
-        title: productRows ? "COMPANY STATEMENT - PRODUCTS" : "COMPANY STATEMENT",
-        subtitle: statement.name,
-        meta: `Generated ${format(new Date(), "MMM d, yyyy h:mm a")}`,
-        periodLabel,
-        ...(productRows && {
-          columns: [
-            { header: "Product" },
-            { header: "Qty", align: "right" },
-            { header: "Total", align: "right" },
-            { header: "Owed", align: "right" },
-          ],
-          rows: productRows.map((r) => [r.productName, String(r.quantity), `$${r.total.toFixed(2)}`, `$${r.owed.toFixed(2)}`]),
-        }),
-        ...(!productRows && {
-          columns: [
-            { header: "Date" },
-            { header: "Order / Product" },
-            { header: "Total", align: "right" },
-            { header: "Status", align: "center" },
-          ],
-          rows: groupPurchasesByOrder(statement.purchases).flatMap((order, i, all) => [
-            [
-              format(new Date(order.date), "MMM d, yyyy"),
-              `Order #${all.length - i} (${order.items.length} item${order.items.length === 1 ? "" : "s"})`,
-              `$${order.total.toFixed(2)}`,
-              order.status === "paid" ? "Paid" : order.status === "partial" ? "Partial" : "Unpaid",
-            ],
-            ...order.items.map((p) => [
-              "",
-              `  - ${p.productName} ${p.quantity} x $${Number(p.unitPrice || 0).toFixed(2)}`,
-              `$${p.total.toFixed(2)}`,
-              p.paid ? "Paid" : "Unpaid",
-            ]),
-          ]),
-        }),
-        totals: [
-          { label: "Total Purchased", value: `$${statement.totals.totalPurchased.toFixed(2)}` },
-          { label: "Total Paid", value: `$${statement.totals.totalPaid.toFixed(2)}` },
-          { label: "Total Owed", value: `$${statement.totals.totalOwed.toFixed(2)}`, bold: true },
-        ],
-        footer: "Powered by Ahmad Daher",
-      });
+      const blob = generateStatementPdf(receiptData);
       const result = await sharePdfOrDownload(blob, `statement-${statement.name?.replace(/\s+/g, "-") || id}.pdf`);
       if (result === "downloaded") toast.success("Statement PDF downloaded");
     } catch {
@@ -177,6 +157,10 @@ function CompanyStatementPageInner() {
           <Printer className="h-4 w-4" />
           {t("Print")}
         </Button>
+        <Button variant="outline" onClick={handlePrintThermal} className="flex items-center gap-2" aria-label={t("Thermal Print")}>
+          <ReceiptText className="h-4 w-4" />
+          {t("Thermal Print")}
+        </Button>
         <Button onClick={handleShareWhatsApp} className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white" aria-label={t("Share via WhatsApp")}>
           <MessageCircle className="h-4 w-4" />
           {t("Share via WhatsApp")}
@@ -194,6 +178,7 @@ function CompanyStatementPageInner() {
       <div className="container mx-auto px-4">
         <CompanyStatementDoc statement={statement} periodLabel={periodLabel} view={view} toolbar={toolbar} />
       </div>
+      <StatementThermalReceipt data={receiptData} />
     </div>
   );
 }

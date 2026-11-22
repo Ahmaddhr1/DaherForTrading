@@ -31,7 +31,7 @@ export default function ThermalReceipt({ order }) {
 
   return createPortal(
     <div id="thermal-receipt-root">
-      <div className="thermal-receipt mx-auto w-[80mm] px-[3mm] py-2 font-mono text-[13px] font-semibold leading-snug text-black bg-white">
+      <div className="thermal-receipt mx-auto w-[80mm] px-[3mm] pt-2 pb-[6mm] font-mono text-[13px] font-normal leading-snug text-black bg-white">
         <div className="text-center mb-2">
           <p className="text-lg font-bold">{t("Invento")}</p>
         </div>
@@ -74,7 +74,7 @@ export default function ThermalReceipt({ order }) {
                   <td className="text-end py-0.5 ps-1 ltr-text">{item.quantity}</td>
                   <td className="text-end py-0.5 ps-1 ltr-text">{Number(item.price).toFixed(2)}</td>
                   <td className="text-end py-0.5 ps-1 ltr-text">{lineDiscount > 0 ? lineDiscount.toFixed(2) : "-"}</td>
-                  <td className="text-end py-0.5 ps-1 ltr-text font-bold">{lineTotal.toFixed(2)}</td>
+                  <td className="text-end py-0.5 ps-1 ltr-text">{lineTotal.toFixed(2)}</td>
                 </tr>
               );
             })}

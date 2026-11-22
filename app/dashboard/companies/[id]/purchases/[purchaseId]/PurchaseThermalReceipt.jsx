@@ -29,19 +29,19 @@ export default function PurchaseThermalReceipt({ purchase }) {
 
   return createPortal(
     <div id="thermal-receipt-root">
-      <div className="thermal-receipt mx-auto w-[80mm] px-[3mm] pt-2 pb-[6mm] font-mono text-[13px] font-normal leading-snug text-black bg-white">
+      <div className="thermal-receipt mx-auto w-[80mm] px-[3mm] py-2 font-mono text-[13px] font-normal leading-snug text-black bg-white">
         <div className="text-center mb-2">
           <p className="text-lg font-bold">{t("Invento")}</p>
           <p>{t("Purchase Receipt")}</p>
         </div>
 
-        <div className="border-t border-dashed border-black my-1" />
+        <div className="thermal-rule my-1" />
 
         <p>{t("Purchase #")}{purchase._id?.slice(-6).toUpperCase()}</p>
         <p>{format(new Date(purchase.createdAt), "MMM d, yyyy h:mm a")}</p>
         <p>{t("Supplier:")} {purchase.company?.name || t("Unknown")}</p>
 
-        <div className="border-t border-dashed border-black my-1" />
+        <div className="thermal-rule my-1" />
 
         <div className="mb-1">
           <div className="flex justify-between">
@@ -56,7 +56,7 @@ export default function PurchaseThermalReceipt({ purchase }) {
           </div>
         </div>
 
-        <div className="border-t border-dashed border-black my-1" />
+        <div className="thermal-rule my-1" />
 
         <div className="flex justify-between">
           <span>{t("Subtotal")}</span>
@@ -92,7 +92,7 @@ export default function PurchaseThermalReceipt({ purchase }) {
 
         {typeof companyDebt === "number" && (
           <>
-            <div className="border-t border-dashed border-black my-1" />
+            <div className="thermal-rule my-1" />
             <div className="flex justify-between font-bold">
               <span>{t("Supplier Total Debt")}</span>
               <span>${companyDebt.toFixed(2)}</span>
@@ -100,7 +100,7 @@ export default function PurchaseThermalReceipt({ purchase }) {
           </>
         )}
 
-        <div className="border-t border-dashed border-black my-1" />
+        <div className="thermal-rule my-1" />
 
         <p className="text-center mt-2">{t("Thank you for your business!")}</p>
       </div>

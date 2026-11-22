@@ -1,8 +1,10 @@
 "use client";
+import { t } from "@/lib/i18n";
+import { useT } from "@/lib/i18n/LangProvider";
 
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
-import { format } from "date-fns";
+import { format } from "@/lib/i18n/date";
 import { useSettings, formatLL } from "@/lib/currency";
 
 // Narrow, monospace, supermarket-style receipt meant for printing on an
@@ -10,6 +12,7 @@ import { useSettings, formatLL } from "@/lib/currency";
 // sibling of the app root under <body> - see the "printing-thermal" rules
 // in globals.css for how it's swapped in during printing.
 export default function ThermalReceipt({ order }) {
+  const t = useT();
   const [mounted, setMounted] = useState(false);
   const { data: settings } = useSettings();
 
@@ -30,20 +33,20 @@ export default function ThermalReceipt({ order }) {
     <div id="thermal-receipt-root">
       <div className="mx-auto w-[80mm] p-2 font-mono text-[11px] leading-tight text-black bg-white">
         <div className="text-center mb-2">
-          <p className="text-sm font-bold">Invento</p>
+          <p className="text-sm font-bold">{t("Invento")}</p>
         </div>
 
         <div className="border-t border-dashed border-black my-1" />
 
-        <p>Order #{order._id?.slice(-6).toUpperCase()}</p>
+        <p>{t("Order #")}{order._id?.slice(-6).toUpperCase()}</p>
         <p>{format(new Date(order.createdAt), "MMM d, yyyy h:mm a")}</p>
-        <p>Customer: {order.customer?.fullName || "Walk-in"}</p>
+        <p>{t("Customer:")} {order.customer?.fullName || t("Walk-in")}</p>
 
         <div className="border-t border-dashed border-black my-1" />
 
         <div className="flex justify-between font-bold">
-          <span>Item</span>
-          <span>Qty x Price - Disc = Total</span>
+          <span>{t("Item")}</span>
+          <span>{t("Qty x Price - Disc = Total")}</span>
         </div>
         {products.map((item) => {
           const lineSubtotal = item.price * item.quantity;
@@ -56,7 +59,7 @@ export default function ThermalReceipt({ order }) {
               </div>
               <div className="flex justify-between">
                 <span>
-                  {item.quantity} x ${Number(item.price).toFixed(2)}
+                  {item.quantity} {t("x $")}{Number(item.price).toFixed(2)}
                   {lineDiscount > 0 ? ` - $${lineDiscount.toFixed(2)}` : ""}
                 </span>
                 <span>${lineTotal.toFixed(2)}</span>
@@ -68,24 +71,24 @@ export default function ThermalReceipt({ order }) {
         <div className="border-t border-dashed border-black my-1" />
 
         <div className="flex justify-between">
-          <span>Subtotal</span>
+          <span>{t("Subtotal")}</span>
           <span>${subtotal.toFixed(2)}</span>
         </div>
         {discountTotal > 0 && (
           <div className="flex justify-between">
-            <span>Discount</span>
+            <span>{t("Discount")}</span>
             <span>-${discountTotal.toFixed(2)}</span>
           </div>
         )}
         {taxAmount > 0 && (
           <div className="flex justify-between">
-            <span>Tax ({taxRate}%)</span>
+            <span>{t("Tax (")}{taxRate}%)</span>
             <span>+${taxAmount.toFixed(2)}</span>
           </div>
         )}
 
         <div className="flex justify-between font-bold">
-          <span>TOTAL</span>
+          <span>{t("TOTAL")}</span>
           <span>${Number(order.total).toFixed(2)}</span>
         </div>
         {dollarRate > 0 && (
@@ -95,23 +98,23 @@ export default function ThermalReceipt({ order }) {
           </div>
         )}
         <div className="flex justify-between">
-          <span>Paid</span>
+          <span>{t("Paid")}</span>
           <span>${Number(order.amountpaid || 0).toFixed(2)}</span>
         </div>
         <div className="flex justify-between">
-          <span>Remaining</span>
+          <span>{t("Remaining")}</span>
           <span>${Number(order.remainingBalance || 0).toFixed(2)}</span>
         </div>
         <div className="flex justify-between font-bold">
-          <span>Status</span>
-          <span>{isPaidInFull ? "PAID" : "NOT PAID"}</span>
+          <span>{t("Status")}</span>
+          <span>{isPaidInFull ? t("PAID") : t("NOT PAID")}</span>
         </div>
 
         {typeof customerDebt === "number" && (
           <>
             <div className="border-t border-dashed border-black my-1" />
             <div className="flex justify-between font-bold">
-              <span>Customer Total Debt</span>
+              <span>{t("Customer Total Debt")}</span>
               <span>${customerDebt.toFixed(2)}</span>
             </div>
           </>
@@ -119,7 +122,7 @@ export default function ThermalReceipt({ order }) {
 
         <div className="border-t border-dashed border-black my-1" />
 
-        <p className="text-center mt-2">Thank you for your business!</p>
+        <p className="text-center mt-2">{t("Thank you for your business!")}</p>
       </div>
     </div>,
     document.body

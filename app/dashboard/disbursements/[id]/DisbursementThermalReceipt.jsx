@@ -1,8 +1,10 @@
 "use client";
+import { t } from "@/lib/i18n";
+import { useT } from "@/lib/i18n/LangProvider";
 
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
-import { format } from "date-fns";
+import { format } from "@/lib/i18n/date";
 import { useSettings, formatLL } from "@/lib/currency";
 
 // Same narrow 80mm thermal-receipt look as the order/purchase receipts,
@@ -11,6 +13,7 @@ import { useSettings, formatLL } from "@/lib/currency";
 // company debt to show - it's always "Paid" since the money has already
 // gone out by the time the record exists.
 export default function DisbursementThermalReceipt({ disbursement }) {
+  const t = useT();
   const [mounted, setMounted] = useState(false);
   const { data: settings } = useSettings();
 
@@ -24,30 +27,30 @@ export default function DisbursementThermalReceipt({ disbursement }) {
     <div id="thermal-receipt-root">
       <div className="mx-auto w-[80mm] p-2 font-mono text-[11px] leading-tight text-black bg-white">
         <div className="text-center mb-2">
-          <p className="text-sm font-bold">Invento</p>
-          <p>Disbursement Receipt</p>
+          <p className="text-sm font-bold">{t("Invento")}</p>
+          <p>{t("Disbursement Receipt")}</p>
         </div>
 
         <div className="border-t border-dashed border-black my-1" />
 
-        <p>Disbursement #{disbursement._id?.slice(-6).toUpperCase()}</p>
+        <p>{t("Disbursement #")}{disbursement._id?.slice(-6).toUpperCase()}</p>
         <p>{format(new Date(disbursement.createdAt), "MMM d, yyyy h:mm a")}</p>
-        <p>Category: {disbursement.category}</p>
+        <p>{t("Category:")} {t(disbursement.category)}</p>
 
         <div className="border-t border-dashed border-black my-1" />
 
         <div className="flex justify-between">
-          <span>{disbursement.description}</span>
+          <span>{t(disbursement.description)}</span>
         </div>
         <div className="flex justify-between">
-          <span>1 x ${Number(disbursement.amount).toFixed(2)}</span>
+          <span>{t("1 x $")}{Number(disbursement.amount).toFixed(2)}</span>
           <span>${Number(disbursement.amount).toFixed(2)}</span>
         </div>
 
         <div className="border-t border-dashed border-black my-1" />
 
         <div className="flex justify-between font-bold">
-          <span>TOTAL</span>
+          <span>{t("TOTAL")}</span>
           <span>${Number(disbursement.amount).toFixed(2)}</span>
         </div>
         {dollarRate > 0 && (
@@ -57,13 +60,13 @@ export default function DisbursementThermalReceipt({ disbursement }) {
           </div>
         )}
         <div className="flex justify-between font-bold">
-          <span>Status</span>
-          <span>PAID</span>
+          <span>{t("Status")}</span>
+          <span>{t("PAID")}</span>
         </div>
 
         <div className="border-t border-dashed border-black my-1" />
 
-        <p className="text-center mt-2">For internal records</p>
+        <p className="text-center mt-2">{t("For internal records")}</p>
       </div>
     </div>,
     document.body

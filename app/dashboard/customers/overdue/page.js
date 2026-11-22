@@ -1,10 +1,12 @@
 "use client";
+import { t } from "@/lib/i18n";
+import { useT } from "@/lib/i18n/LangProvider";
 
 import { useEffect, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import Link from "next/link";
-import { format } from "date-fns";
+import { format } from "@/lib/i18n/date";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -15,6 +17,7 @@ import { AlertTriangle, ChevronLeft, ChevronRight, CheckCircle2 } from "lucide-r
 const DAY_OPTIONS = [15, 30, 60, 90];
 
 export default function OverdueDebtPage() {
+  const t = useT();
   const [minDays, setMinDays] = useState(30);
   const [page, setPage] = useState(1);
   const limit = 20;
@@ -46,16 +49,18 @@ export default function OverdueDebtPage() {
             <AlertTriangle className="h-6 w-6 text-red-600" />
           </div>
           <div>
-            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-gray-100">Overdue Debt</h1>
+            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-gray-100">{t("Overdue Debt")}</h1>
             <p className="text-gray-600 dark:text-gray-400 text-sm sm:text-base">
-              Customers with outstanding debt who haven&apos;t paid in a while, sorted by amount owed
+              {t(
+                "Customers with outstanding debt who haven't paid in a while, sorted by amount owed"
+              )}
             </p>
           </div>
         </div>
 
         <Card className="mb-6 shadow-sm border-gray-200 dark:border-gray-800">
           <CardContent className="p-4 flex flex-wrap items-center gap-3">
-            <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Hasn&apos;t paid in at least</span>
+            <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{t("Hasn't paid in at least")}</span>
             <div className="flex flex-wrap gap-2">
               {DAY_OPTIONS.map((d) => (
                 <Button
@@ -64,7 +69,7 @@ export default function OverdueDebtPage() {
                   variant={minDays === d ? "default" : "outline"}
                   onClick={() => setMinDays(d)}
                 >
-                  {d} days
+                  {d} {t("days")}
                 </Button>
               ))}
             </div>
@@ -75,34 +80,34 @@ export default function OverdueDebtPage() {
           <ListSkeleton rows={6} rowHeight="h-14" />
         ) : error ? (
           <div className="text-center py-12 text-red-600">
-            Failed to load overdue customers.
+            {t("Failed to load overdue customers.")}
             <Button
               onClick={() => queryClient.refetchQueries(["customers-overdue"])}
               variant="outline"
               className="mt-4 mx-auto block"
             >
-              Try Again
+              {t("Try Again")}
             </Button>
           </div>
         ) : customers.length === 0 ? (
           <div className="text-center py-16 text-gray-500 dark:text-gray-400">
             <CheckCircle2 className="h-12 w-12 mx-auto mb-3 text-green-500" />
-            <p className="text-lg">No customers overdue by {minDays}+ days</p>
+            <p className="text-lg">{t("No customers overdue by")} {minDays}{t("+ days")}</p>
           </div>
         ) : (
           <>
             <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
-              {total} customer{total === 1 ? "" : "s"} overdue by {minDays}+ days
+              {total} {t("customer")}{total === 1 ? "" : t("s")} {t("overdue by")} {minDays}{t("+ days")}
             </p>
             <Card className="shadow-sm border-gray-200 dark:border-gray-800 overflow-hidden">
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Customer</TableHead>
-                    <TableHead>Phone</TableHead>
-                    <TableHead>Debt</TableHead>
-                    <TableHead>Last Payment</TableHead>
-                    <TableHead>Days Overdue</TableHead>
+                    <TableHead>{t("Customer")}</TableHead>
+                    <TableHead>{t("Phone")}</TableHead>
+                    <TableHead>{t("Debt")}</TableHead>
+                    <TableHead>{t("Last Payment")}</TableHead>
+                    <TableHead>{t("Days Overdue")}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -123,10 +128,10 @@ export default function OverdueDebtPage() {
                       <TableCell className="text-gray-600 dark:text-gray-400">
                         {customer.lastPaymentDate
                           ? format(new Date(customer.lastPaymentDate), "MMM d, yyyy")
-                          : "Never paid"}
+                          : t("Never paid")}
                       </TableCell>
                       <TableCell>
-                        <Badge variant="destructive">{customer.daysSincePayment} days</Badge>
+                        <Badge variant="destructive">{customer.daysSincePayment} {t("days")}</Badge>
                       </TableCell>
                     </TableRow>
                   ))}
@@ -143,11 +148,11 @@ export default function OverdueDebtPage() {
                   size="sm"
                   className="flex items-center gap-2"
                 >
-                  <ChevronLeft className="h-4 w-4" />
-                  Previous
+                  <ChevronLeft className="rtl-flip h-4 w-4" />
+                  {t("Previous")}
                 </Button>
                 <span className="text-sm text-gray-600 dark:text-gray-400">
-                  Page {page} of {totalPages}
+                  {t("Page")} {page} {t("of")} {totalPages}
                 </span>
                 <Button
                   onClick={() => setPage((p) => p + 1)}
@@ -156,8 +161,8 @@ export default function OverdueDebtPage() {
                   size="sm"
                   className="flex items-center gap-2"
                 >
-                  Next
-                  <ChevronRight className="h-4 w-4" />
+                  {t("Next")}
+                  <ChevronRight className="rtl-flip h-4 w-4" />
                 </Button>
               </div>
             )}

@@ -1,4 +1,6 @@
 "use client";
+import { t } from "@/lib/i18n";
+import { useT } from "@/lib/i18n/LangProvider";
 
 import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
@@ -9,6 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Search, User, Package, Building2, ShoppingCart, Loader2 } from "lucide-react";
 
 export function GlobalSearchModal({ open, onClose }) {
+  const t = useT();
   const [query, setQuery] = useState("");
   const [debouncedQuery, setDebouncedQuery] = useState("");
   const router = useRouter();
@@ -44,35 +47,35 @@ export function GlobalSearchModal({ open, onClose }) {
   const hasSearched = debouncedQuery.length >= 2;
 
   return (
-    <Modal open={open} onClose={onClose} title="Search" maxWidth="max-w-xl">
+    <Modal open={open} onClose={onClose} title={t("Search")} maxWidth="max-w-xl">
       <div className="space-y-4">
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 h-4 w-4" />
+          <Search className="absolute start-3 top-1/2 -translate-y-1/2 text-gray-400 h-4 w-4" />
           <Input
             type="text"
-            placeholder="Search customers, products, companies, orders..."
+            placeholder={t("Search customers, products, companies, orders...")}
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            className="pl-10"
+            className="ps-10"
             autoFocus
           />
           {isFetching && (
-            <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 h-4 w-4 animate-spin" />
+            <Loader2 className="absolute end-3 top-1/2 -translate-y-1/2 text-gray-400 h-4 w-4 animate-spin" />
           )}
         </div>
 
         {!hasSearched ? (
           <p className="text-sm text-gray-500 dark:text-gray-400 text-center py-6">
-            Type at least 2 characters to search
+            {t("Type at least 2 characters to search")}
           </p>
         ) : !isFetching && !hasAnyResults ? (
           <p className="text-sm text-gray-500 dark:text-gray-400 text-center py-6">
-            No results for &quot;{debouncedQuery}&quot;
+            {t("No results for \"")}{debouncedQuery}"
           </p>
         ) : (
           <div className="space-y-4 max-h-[60vh] overflow-y-auto">
             {customers.length > 0 && (
-              <ResultSection title="Customers" icon={<User className="h-3.5 w-3.5" />}>
+              <ResultSection title={t("Customers")} icon={<User className="h-3.5 w-3.5" />}>
                 {customers.map((c) => (
                   <ResultRow
                     key={c._id}
@@ -87,7 +90,7 @@ export function GlobalSearchModal({ open, onClose }) {
             )}
 
             {products.length > 0 && (
-              <ResultSection title="Products" icon={<Package className="h-3.5 w-3.5" />}>
+              <ResultSection title={t("Products")} icon={<Package className="h-3.5 w-3.5" />}>
                 {products.map((p) => (
                   <ResultRow
                     key={p._id}
@@ -101,7 +104,7 @@ export function GlobalSearchModal({ open, onClose }) {
             )}
 
             {companies.length > 0 && (
-              <ResultSection title="Companies" icon={<Building2 className="h-3.5 w-3.5" />}>
+              <ResultSection title={t("Companies")} icon={<Building2 className="h-3.5 w-3.5" />}>
                 {companies.map((co) => (
                   <ResultRow
                     key={co._id}
@@ -115,7 +118,7 @@ export function GlobalSearchModal({ open, onClose }) {
             )}
 
             {orders.length > 0 && (
-              <ResultSection title="Orders" icon={<ShoppingCart className="h-3.5 w-3.5" />}>
+              <ResultSection title={t("Orders")} icon={<ShoppingCart className="h-3.5 w-3.5" />}>
                 {orders.map((o) => (
                   <ResultRow
                     key={o._id}
@@ -151,7 +154,7 @@ function ResultRow({ onClick, primary, secondary, trailing, trailingClassName = 
     <button
       type="button"
       onClick={onClick}
-      className="w-full flex items-center justify-between gap-3 px-2 py-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 text-left"
+      className="w-full flex items-center justify-between gap-3 px-2 py-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 text-start"
     >
       <div className="min-w-0">
         <div className="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">{primary}</div>

@@ -1,9 +1,11 @@
 "use client";
+import { t } from "@/lib/i18n";
+import { useT } from "@/lib/i18n/LangProvider";
 
 import { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
-import { toast } from "sonner";
+import { toast } from "@/lib/i18n/toast";
 import { Modal } from "@/components/ui/modal";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -28,6 +30,7 @@ const MODE_OPTIONS = [
 ];
 
 export default function BulkPriceUpdateModal({ open, onClose, productIds, onDone }) {
+  const t = useT();
   const [field, setField] = useState("price");
   const [mode, setMode] = useState("increasePercent");
   const [value, setValue] = useState("");
@@ -49,13 +52,24 @@ export default function BulkPriceUpdateModal({ open, onClose, productIds, onDone
       const skippedCount = data.skipped?.length || 0;
       if (skippedCount > 0) {
         toast.warning(
-          `Updated ${data.updated} product${data.updated === 1 ? "" : "s"}, skipped ${skippedCount} (${data.skipped
-            .slice(0, 3)
-            .map((s) => s.name)
-            .join(", ")}${skippedCount > 3 ? "…" : ""})`
+          t("Updated {0} product{1}, skipped {2} ({3}{4})", {
+            0: data.updated,
+            1: data.updated === 1 ? "" : "s",
+            2: skippedCount,
+
+            3: data.skipped
+              .slice(0, 3)
+              .map((s) => s.name)
+              .join(", "),
+
+            4: skippedCount > 3 ? "…" : ""
+          })
         );
       } else {
-        toast.success(`Updated ${data.updated} product${data.updated === 1 ? "" : "s"}`);
+        toast.success(t("Updated {0} product{1}", {
+          0: data.updated,
+          1: data.updated === 1 ? "" : "s"
+        }));
       }
       setValue("");
       onDone?.();
@@ -79,12 +93,15 @@ export default function BulkPriceUpdateModal({ open, onClose, productIds, onDone
     <Modal
       open={open}
       onClose={onClose}
-      title="Bulk Price Update"
-      description={`Applies to ${productIds.length} selected product${productIds.length === 1 ? "" : "s"}`}
+      title={t("Bulk Price Update")}
+      description={t("Applies to {0} selected product{1}", {
+        0: productIds.length,
+        1: productIds.length === 1 ? "" : "s"
+      })}
     >
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="space-y-2">
-          <Label htmlFor="bulk-field">Field</Label>
+          <Label htmlFor="bulk-field">{t("Field")}</Label>
           <select
             id="bulk-field"
             value={field}
@@ -93,14 +110,14 @@ export default function BulkPriceUpdateModal({ open, onClose, productIds, onDone
           >
             {FIELD_OPTIONS.map((opt) => (
               <option key={opt.value} value={opt.value}>
-                {opt.label}
+                {t(opt.label)}
               </option>
             ))}
           </select>
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="bulk-mode">Adjustment</Label>
+          <Label htmlFor="bulk-mode">{t("Adjustment")}</Label>
           <select
             id="bulk-mode"
             value={mode}
@@ -109,14 +126,14 @@ export default function BulkPriceUpdateModal({ open, onClose, productIds, onDone
           >
             {MODE_OPTIONS.map((opt) => (
               <option key={opt.value} value={opt.value}>
-                {opt.label}
+                {t(opt.label)}
               </option>
             ))}
           </select>
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="bulk-value">Value</Label>
+          <Label htmlFor="bulk-value">{t("Value")}</Label>
           <Input
             id="bulk-value"
             type="number"
@@ -124,29 +141,33 @@ export default function BulkPriceUpdateModal({ open, onClose, productIds, onDone
             step="0.01"
             value={value}
             onChange={(e) => setValue(e.target.value)}
-            placeholder={mode.includes("Percent") ? "e.g. 10" : "e.g. 5.00"}
+            placeholder={mode.includes("Percent") ? t("e.g. 10") : t("e.g. 5.00")}
             required
           />
         </div>
 
         <p className="text-xs text-gray-500 dark:text-gray-400">
           {field === "discount"
-            ? "Products where this would push the discount above 100% are skipped automatically and reported after applying."
-            : "Products where this would make the cost price exceed the selling price are skipped automatically and reported after applying."}
+            ? t(
+            "Products where this would push the discount above 100% are skipped automatically and reported after applying."
+          )
+            : t(
+            "Products where this would make the cost price exceed the selling price are skipped automatically and reported after applying."
+          )}
         </p>
 
         <div className="flex justify-end gap-2 pt-2">
           <Button type="button" variant="outline" onClick={onClose} disabled={mutation.isPending}>
-            Cancel
+            {t("Cancel")}
           </Button>
           <Button type="submit" disabled={mutation.isPending}>
             {mutation.isPending ? (
               <span className="flex items-center gap-2">
                 <Loader2 className="h-4 w-4 animate-spin" />
-                Applying...
+                {t("Applying...")}
               </span>
             ) : (
-              "Apply"
+              t("Apply")
             )}
           </Button>
         </div>

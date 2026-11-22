@@ -1,11 +1,13 @@
 "use client";
+import { t } from "@/lib/i18n";
+import { useT } from "@/lib/i18n/LangProvider";
 
 import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useParams } from "next/navigation";
-import { format } from "date-fns";
+import { format } from "@/lib/i18n/date";
 import { User, Package, CreditCard, Calendar, Tag, Printer, MessageCircle, Receipt, RotateCcw } from "lucide-react";
-import { toast } from "sonner";
+import { toast } from "@/lib/i18n/toast";
 import ThermalReceipt from "./ThermalReceipt";
 import ProcessReturnModal from "./ProcessReturnModal";
 import { useHasPermission } from "@/lib/useHasPermission";
@@ -33,6 +35,7 @@ const fetchOrder = async (id) => {
 };
 
 export default function OrderDetailsPage() {
+  const t = useT();
   const { id } = useParams();
 
   const { data: order, isLoading, isError } = useQuery({
@@ -92,8 +95,8 @@ export default function OrderDetailsPage() {
             <div className="text-red-500 bg-red-50 dark:bg-red-900/20 rounded-full p-3 w-12 h-12 mx-auto mb-4 flex items-center justify-center">
               <Tag className="h-6 w-6" />
             </div>
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">Error Loading Order</h3>
-            <p className="text-gray-600 dark:text-gray-400">Unable to load order details. Please try again.</p>
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">{t("Error Loading Order")}</h3>
+            <p className="text-gray-600 dark:text-gray-400">{t("Unable to load order details. Please try again.")}</p>
           </CardContent>
         </Card>
       </div>
@@ -128,34 +131,34 @@ export default function OrderDetailsPage() {
         <div className="mb-8">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-2">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">Order Details</h1>
-              <p className="text-gray-600 dark:text-gray-400 mt-1">Order #{order._id}</p>
+              <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">{t("Order Details")}</h1>
+              <p className="text-gray-600 dark:text-gray-400 mt-1">{t("Order #")}{order._id}</p>
 
             </div>
             <Badge className={`px-3 py-1 text-sm font-medium ${status.color} self-start sm:self-auto`}>
-              {status.label}
+              {t(status.label)}
             </Badge>
 
           </div>
           <div className="flex items-center text-gray-500 dark:text-gray-400 text-sm">
-            <Calendar className="h-4 w-4 mr-1" />
+            <Calendar className="h-4 w-4 me-1" />
             {format(new Date(order.createdAt), "EEEE, MMMM d, yyyy 'at' h:mm a")}
           </div>
           <div className="flex flex-wrap gap-2 mt-2">
             <Button variant="outline" onClick={() => window.print()} className="flex items-center gap-2">
               <Printer className="h-4 w-4" />
-              Print
+              {t("Print")}
             </Button>
             <Button variant="outline" onClick={handlePrintThermal} className="flex items-center gap-2">
               <Receipt className="h-4 w-4" />
-              Thermal Receipt
+              {t("Thermal Receipt")}
             </Button>
             <Button
               onClick={handleShareWhatsApp}
               className="flex items-center gap-2 bg-green-600 hover:bg-green-700"
             >
               <MessageCircle className="h-4 w-4" />
-              Share via WhatsApp
+              {t("Share via WhatsApp")}
             </Button>
             {order.status !== "draft" && canProcessReturns && (
               <Button
@@ -164,7 +167,7 @@ export default function OrderDetailsPage() {
                 className="flex items-center gap-2"
               >
                 <RotateCcw className="h-4 w-4" />
-                Process Return
+                {t("Process Return")}
               </Button>
             )}
           </div>
@@ -179,20 +182,20 @@ export default function OrderDetailsPage() {
             <Card className="shadow-sm border-gray-200 dark:border-gray-800">
               <CardHeader className="pb-4">
                 <CardTitle className="flex items-center text-lg">
-                  <Package className="h-5 w-5 mr-2 text-blue-600" />
-                  Order Items
+                  <Package className="h-5 w-5 me-2 text-blue-600" />
+                  {t("Order Items")}
                 </CardTitle>
-                <CardDescription>Products included in this order</CardDescription>
+                <CardDescription>{t("Products included in this order")}</CardDescription>
               </CardHeader>
               <CardContent className="p-0">
                 <Table>
                   <TableHeader className="bg-gray-50/50 dark:bg-gray-900/40">
                     <TableRow>
-                      <TableHead className="font-semibold text-gray-700 dark:text-gray-300">Product</TableHead>
-                      <TableHead className="text-center font-semibold text-gray-700 dark:text-gray-300">Quantity</TableHead>
-                      <TableHead className="text-center font-semibold text-gray-700 dark:text-gray-300">Unit Price</TableHead>
-                      <TableHead className="text-center font-semibold text-gray-700 dark:text-gray-300">Discount</TableHead>
-                      <TableHead className="text-right font-semibold text-gray-700 dark:text-gray-300">Total</TableHead>
+                      <TableHead className="font-semibold text-gray-700 dark:text-gray-300">{t("Product")}</TableHead>
+                      <TableHead className="text-center font-semibold text-gray-700 dark:text-gray-300">{t("Quantity")}</TableHead>
+                      <TableHead className="text-center font-semibold text-gray-700 dark:text-gray-300">{t("Unit Price")}</TableHead>
+                      <TableHead className="text-center font-semibold text-gray-700 dark:text-gray-300">{t("Discount")}</TableHead>
+                      <TableHead className="text-end font-semibold text-gray-700 dark:text-gray-300">{t("Total")}</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -206,7 +209,7 @@ export default function OrderDetailsPage() {
                         <TableCell className="text-center text-amber-700">
                           {item.discount ? `-$${item.discount.toFixed(2)}` : "—"}
                         </TableCell>
-                        <TableCell className="text-right font-medium text-gray-900 dark:text-gray-100">
+                        <TableCell className="text-end font-medium text-gray-900 dark:text-gray-100">
                           ${(item.price * item.quantity - (item.discount || 0)).toFixed(2)}
                         </TableCell>
                       </TableRow>
@@ -220,10 +223,10 @@ export default function OrderDetailsPage() {
               <Card className="shadow-sm border-gray-200 dark:border-gray-800">
                 <CardHeader className="pb-4">
                   <CardTitle className="flex items-center text-lg">
-                    <RotateCcw className="h-5 w-5 mr-2 text-amber-600" />
-                    Returns
+                    <RotateCcw className="h-5 w-5 me-2 text-amber-600" />
+                    {t("Returns")}
                   </CardTitle>
-                  <CardDescription>Stock this customer has sent back from this order</CardDescription>
+                  <CardDescription>{t("Stock this customer has sent back from this order")}</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-3">
                   {returns.map((ret) => (
@@ -238,7 +241,7 @@ export default function OrderDetailsPage() {
                         <p className="text-xs text-gray-500 dark:text-gray-400">
                           {format(new Date(ret.createdAt), "MMM d, yyyy h:mm a")}
                           {ret.reason ? ` · ${ret.reason}` : ""}
-                          {!ret.restocked ? " · not restocked" : ""}
+                          {!ret.restocked ? t(" · not restocked") : ""}
                         </p>
                       </div>
                       <span className="text-sm font-semibold text-green-600 whitespace-nowrap">
@@ -257,19 +260,19 @@ export default function OrderDetailsPage() {
             <Card className="shadow-sm border-gray-200 dark:border-gray-800">
               <CardHeader className="pb-4">
                 <CardTitle className="flex items-center text-lg">
-                  <User className="h-5 w-5 mr-2 text-blue-600" />
-                  Customer Information
+                  <User className="h-5 w-5 me-2 text-blue-600" />
+                  {t("Customer Information")}
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
                 <div>
-                  <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Full Name</p>
-                  <p className="text-gray-900 dark:text-gray-100">{order.customer?.fullName || "Not provided"}</p>
+                  <p className="text-sm font-medium text-gray-500 dark:text-gray-400">{t("Full Name")}</p>
+                  <p className="text-gray-900 dark:text-gray-100">{order.customer?.fullName || t("Not provided")}</p>
                 </div>
                 <Separator />
                 <div>
-                  <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Phone Number</p>
-                  <p className="text-gray-900 dark:text-gray-100">{order.customer?.phoneNumber || "Not provided"}</p>
+                  <p className="text-sm font-medium text-gray-500 dark:text-gray-400">{t("Phone Number")}</p>
+                  <p className="text-gray-900 dark:text-gray-100">{order.customer?.phoneNumber || t("Not provided")}</p>
                 </div>
               </CardContent>
             </Card>
@@ -278,13 +281,13 @@ export default function OrderDetailsPage() {
             <Card className="shadow-sm border-gray-200 dark:border-gray-800">
               <CardHeader className="pb-4">
                 <CardTitle className="flex items-center text-lg">
-                  <CreditCard className="h-5 w-5 mr-2 text-blue-600" />
-                  Payment Summary
+                  <CreditCard className="h-5 w-5 me-2 text-blue-600" />
+                  {t("Payment Summary")}
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="flex justify-between items-center">
-                  <span className="text-gray-600 dark:text-gray-400">Subtotal</span>
+                  <span className="text-gray-600 dark:text-gray-400">{t("Subtotal")}</span>
                   <span className="font-medium text-gray-900 dark:text-gray-100">
                     ${order.products.reduce((s, i) => s + i.price * i.quantity, 0).toFixed(2)}
                   </span>
@@ -292,20 +295,20 @@ export default function OrderDetailsPage() {
 
                 {order.discountTotal > 0 && (
                   <div className="flex justify-between items-center">
-                    <span className="text-gray-600 dark:text-gray-400">Discount</span>
+                    <span className="text-gray-600 dark:text-gray-400">{t("Discount")}</span>
                     <span className="text-amber-700 font-medium">-${order.discountTotal.toFixed(2)}</span>
                   </div>
                 )}
 
                 {order.taxAmount > 0 && (
                   <div className="flex justify-between items-center">
-                    <span className="text-gray-600 dark:text-gray-400">Tax ({order.taxRate}%)</span>
+                    <span className="text-gray-600 dark:text-gray-400">{t("Tax (")}{order.taxRate}%)</span>
                     <span className="text-gray-900 dark:text-gray-100 font-medium">+${order.taxAmount.toFixed(2)}</span>
                   </div>
                 )}
 
                 <div className="flex justify-between items-center pt-2 border-t">
-                  <span className="text-gray-600 dark:text-gray-400 font-medium">Grand Total</span>
+                  <span className="text-gray-600 dark:text-gray-400 font-medium">{t("Grand Total")}</span>
                   <span className="font-semibold text-gray-900 dark:text-gray-100">${Number(order.total).toFixed(2)}</span>
                 </div>
                 {settings?.dollarRate > 0 && (
@@ -316,14 +319,14 @@ export default function OrderDetailsPage() {
                 )}
 
                 <div className="flex justify-between items-center pt-2 border-t">
-                  <span className="text-gray-600 dark:text-gray-400">Amount Paid</span>
+                  <span className="text-gray-600 dark:text-gray-400">{t("Amount Paid")}</span>
                   <span className="text-green-600 font-medium">
                     ${Number(order.amountpaid || 0).toFixed(2)}
                   </span>
                 </div>
 
                 <div className="flex justify-between items-center pt-2 border-t">
-                  <span className="text-gray-600 dark:text-gray-400">Remaining Balance</span>
+                  <span className="text-gray-600 dark:text-gray-400">{t("Remaining Balance")}</span>
                   <span className={`font-medium ${Number(order.remainingBalance || 0) > 0 ? "text-red-600" : "text-gray-900 dark:text-gray-100"
                     }`}>
                     ${Number(order.remainingBalance || 0).toFixed(2)}
@@ -333,15 +336,15 @@ export default function OrderDetailsPage() {
                 <Separator />
 
                 <div className="flex justify-between items-center pt-2">
-                  <span className="font-semibold text-gray-900 dark:text-gray-100">Status</span>
+                  <span className="font-semibold text-gray-900 dark:text-gray-100">{t("Status")}</span>
                   <Badge variant="outline" className={status.color}>
-                    {status.label}
+                    {t(status.label)}
                   </Badge>
                 </div>
 
                 {typeof order.customer?.debt === "number" && (
                   <div className="flex justify-between items-center pt-2 border-t">
-                    <span className="text-gray-600 dark:text-gray-400">Customer&apos;s Total Debt</span>
+                    <span className="text-gray-600 dark:text-gray-400">{t("Customer's Total Debt")}</span>
                     <span className={`font-semibold ${order.customer.debt > 0 ? "text-red-600" : "text-gray-900 dark:text-gray-100"}`}>
                       ${order.customer.debt.toFixed(2)}
                     </span>
@@ -355,7 +358,7 @@ export default function OrderDetailsPage() {
         {/* Footer */}
         <div className="mt-12 pt-6 border-t border-gray-200 dark:border-gray-800 text-center">
           <p className="text-gray-500 dark:text-gray-400 text-sm">
-            Order management system • Powered by Ahmad Daher
+            {t("Order management system • Powered by Ahmad Daher")}
           </p>
         </div>
       </div>

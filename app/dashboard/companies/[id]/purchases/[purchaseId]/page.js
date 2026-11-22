@@ -1,9 +1,11 @@
 "use client";
+import { t } from "@/lib/i18n";
+import { useT } from "@/lib/i18n/LangProvider";
 
 import { useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useParams } from "next/navigation";
-import { format } from "date-fns";
+import { format } from "@/lib/i18n/date";
 import { Package, Building2, Calendar, Printer, MessageCircle, Receipt } from "lucide-react";
 import PurchaseThermalReceipt from "./PurchaseThermalReceipt";
 
@@ -30,6 +32,7 @@ const fetchPurchase = async (purchaseId) => {
 };
 
 export default function PurchaseDetailsPage() {
+  const t = useT();
   const { id: companyId, purchaseId } = useParams();
 
   const { data: purchase, isLoading, isError } = useQuery({
@@ -90,8 +93,8 @@ export default function PurchaseDetailsPage() {
       <div className="flex justify-center items-center min-h-96">
         <Card className="w-full max-w-md">
           <CardContent className="pt-6 text-center">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">Error Loading Purchase</h3>
-            <p className="text-gray-600 dark:text-gray-400">Unable to load this purchase. Please try again.</p>
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">{t("Error Loading Purchase")}</h3>
+            <p className="text-gray-600 dark:text-gray-400">{t("Unable to load this purchase. Please try again.")}</p>
           </CardContent>
         </Card>
       </div>
@@ -106,32 +109,32 @@ export default function PurchaseDetailsPage() {
         <div className="mb-8">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-2">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">Purchase Receipt</h1>
-              <p className="text-gray-600 dark:text-gray-400 mt-1">Purchase #{purchase._id}</p>
+              <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">{t("Purchase Receipt")}</h1>
+              <p className="text-gray-600 dark:text-gray-400 mt-1">{t("Purchase #")}{purchase._id}</p>
             </div>
             <Badge className={`px-3 py-1 text-sm font-medium self-start sm:self-auto ${purchase.paid ? "bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-400" : "bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-400"}`}>
-              {purchase.paid ? "Paid" : "Unpaid"}
+              {purchase.paid ? t("Paid") : t("Unpaid")}
             </Badge>
           </div>
           <div className="flex items-center text-gray-500 dark:text-gray-400 text-sm">
-            <Calendar className="h-4 w-4 mr-1" />
+            <Calendar className="h-4 w-4 me-1" />
             {format(new Date(purchase.createdAt), "EEEE, MMMM d, yyyy 'at' h:mm a")}
           </div>
           <div className="flex flex-wrap gap-2 mt-2">
             <Button variant="outline" onClick={() => window.print()} className="flex items-center gap-2">
               <Printer className="h-4 w-4" />
-              Print
+              {t("Print")}
             </Button>
             <Button variant="outline" onClick={handlePrintThermal} className="flex items-center gap-2">
               <Receipt className="h-4 w-4" />
-              Thermal Receipt
+              {t("Thermal Receipt")}
             </Button>
             <Button
               onClick={handleShareWhatsApp}
               className="flex items-center gap-2 bg-green-600 hover:bg-green-700"
             >
               <MessageCircle className="h-4 w-4" />
-              Share via WhatsApp
+              {t("Share via WhatsApp")}
             </Button>
           </div>
         </div>
@@ -143,20 +146,20 @@ export default function PurchaseDetailsPage() {
             <Card className="shadow-sm border-gray-200 dark:border-gray-800">
               <CardHeader className="pb-4">
                 <CardTitle className="flex items-center text-lg">
-                  <Package className="h-5 w-5 mr-2 text-blue-600" />
-                  Purchase Item
+                  <Package className="h-5 w-5 me-2 text-blue-600" />
+                  {t("Purchase Item")}
                 </CardTitle>
-                <CardDescription>Product included in this purchase</CardDescription>
+                <CardDescription>{t("Product included in this purchase")}</CardDescription>
               </CardHeader>
               <CardContent className="p-0">
                 <Table>
                   <TableHeader className="bg-gray-50/50 dark:bg-gray-900/40">
                     <TableRow>
-                      <TableHead className="font-semibold text-gray-700 dark:text-gray-300">Product</TableHead>
-                      <TableHead className="text-center font-semibold text-gray-700 dark:text-gray-300">Quantity</TableHead>
-                      <TableHead className="text-center font-semibold text-gray-700 dark:text-gray-300">Unit Price</TableHead>
-                      <TableHead className="text-center font-semibold text-gray-700 dark:text-gray-300">Discount</TableHead>
-                      <TableHead className="text-right font-semibold text-gray-700 dark:text-gray-300">Total</TableHead>
+                      <TableHead className="font-semibold text-gray-700 dark:text-gray-300">{t("Product")}</TableHead>
+                      <TableHead className="text-center font-semibold text-gray-700 dark:text-gray-300">{t("Quantity")}</TableHead>
+                      <TableHead className="text-center font-semibold text-gray-700 dark:text-gray-300">{t("Unit Price")}</TableHead>
+                      <TableHead className="text-center font-semibold text-gray-700 dark:text-gray-300">{t("Discount")}</TableHead>
+                      <TableHead className="text-end font-semibold text-gray-700 dark:text-gray-300">{t("Total")}</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -167,7 +170,7 @@ export default function PurchaseDetailsPage() {
                       <TableCell className="text-center text-amber-700">
                         {purchase.discount ? `-$${purchase.discount.toFixed(2)}` : "—"}
                       </TableCell>
-                      <TableCell className="text-right font-medium text-gray-900 dark:text-gray-100">
+                      <TableCell className="text-end font-medium text-gray-900 dark:text-gray-100">
                         ${(lineSubtotal - (purchase.discount || 0)).toFixed(2)}
                       </TableCell>
                     </TableRow>
@@ -181,46 +184,46 @@ export default function PurchaseDetailsPage() {
             <Card className="shadow-sm border-gray-200 dark:border-gray-800">
               <CardHeader className="pb-4">
                 <CardTitle className="flex items-center text-lg">
-                  <Building2 className="h-5 w-5 mr-2 text-blue-600" />
-                  Supplier
+                  <Building2 className="h-5 w-5 me-2 text-blue-600" />
+                  {t("Supplier")}
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
                 <div>
-                  <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Company</p>
-                  <p className="text-gray-900 dark:text-gray-100">{purchase.company?.name || "Unknown"}</p>
+                  <p className="text-sm font-medium text-gray-500 dark:text-gray-400">{t("Company")}</p>
+                  <p className="text-gray-900 dark:text-gray-100">{purchase.company?.name || t("Unknown")}</p>
                 </div>
                 <Separator />
                 <div>
-                  <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Phone Number</p>
-                  <p className="text-gray-900 dark:text-gray-100">{purchase.company?.phoneNumber || "Not provided"}</p>
+                  <p className="text-sm font-medium text-gray-500 dark:text-gray-400">{t("Phone Number")}</p>
+                  <p className="text-gray-900 dark:text-gray-100">{purchase.company?.phoneNumber || t("Not provided")}</p>
                 </div>
               </CardContent>
             </Card>
 
             <Card className="shadow-sm border-gray-200 dark:border-gray-800">
               <CardHeader className="pb-4">
-                <CardTitle className="text-lg">Payment Summary</CardTitle>
+                <CardTitle className="text-lg">{t("Payment Summary")}</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="flex justify-between items-center">
-                  <span className="text-gray-600 dark:text-gray-400">Subtotal</span>
+                  <span className="text-gray-600 dark:text-gray-400">{t("Subtotal")}</span>
                   <span className="font-medium text-gray-900 dark:text-gray-100">${lineSubtotal.toFixed(2)}</span>
                 </div>
                 {purchase.discount > 0 && (
                   <div className="flex justify-between items-center">
-                    <span className="text-gray-600 dark:text-gray-400">Discount</span>
+                    <span className="text-gray-600 dark:text-gray-400">{t("Discount")}</span>
                     <span className="text-amber-700 font-medium">-${purchase.discount.toFixed(2)}</span>
                   </div>
                 )}
                 {purchase.taxAmount > 0 && (
                   <div className="flex justify-between items-center">
-                    <span className="text-gray-600 dark:text-gray-400">Tax ({purchase.taxRate}%)</span>
+                    <span className="text-gray-600 dark:text-gray-400">{t("Tax (")}{purchase.taxRate}%)</span>
                     <span className="text-gray-900 dark:text-gray-100 font-medium">+${purchase.taxAmount.toFixed(2)}</span>
                   </div>
                 )}
                 <div className="flex justify-between items-center pt-2 border-t">
-                  <span className="text-gray-600 dark:text-gray-400 font-medium">Grand Total</span>
+                  <span className="text-gray-600 dark:text-gray-400 font-medium">{t("Grand Total")}</span>
                   <span className="font-semibold text-gray-900 dark:text-gray-100">${purchase.total.toFixed(2)}</span>
                 </div>
                 {settings?.dollarRate > 0 && (
@@ -231,14 +234,14 @@ export default function PurchaseDetailsPage() {
                 )}
                 <Separator />
                 <div className="flex justify-between items-center pt-2">
-                  <span className="font-semibold text-gray-900 dark:text-gray-100">Status</span>
+                  <span className="font-semibold text-gray-900 dark:text-gray-100">{t("Status")}</span>
                   <Badge variant="outline" className={purchase.paid ? "bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-400" : "bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-400"}>
-                    {purchase.paid ? "Paid" : "Unpaid"}
+                    {purchase.paid ? t("Paid") : t("Unpaid")}
                   </Badge>
                 </div>
                 {typeof purchase.company?.debt === "number" && (
                   <div className="flex justify-between items-center pt-2 border-t">
-                    <span className="text-gray-600 dark:text-gray-400">Supplier&apos;s Total Debt</span>
+                    <span className="text-gray-600 dark:text-gray-400">{t("Supplier's Total Debt")}</span>
                     <span className={`font-semibold ${purchase.company.debt > 0 ? "text-red-600" : "text-gray-900 dark:text-gray-100"}`}>
                       ${purchase.company.debt.toFixed(2)}
                     </span>
@@ -250,7 +253,7 @@ export default function PurchaseDetailsPage() {
         </div>
 
         <div className="mt-12 pt-6 border-t border-gray-200 dark:border-gray-800 text-center">
-          <p className="text-gray-500 dark:text-gray-400 text-sm">Order management system • Powered by Ahmad Daher</p>
+          <p className="text-gray-500 dark:text-gray-400 text-sm">{t("Order management system • Powered by Ahmad Daher")}</p>
         </div>
       </div>
     </div>

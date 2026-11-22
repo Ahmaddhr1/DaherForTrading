@@ -1,10 +1,12 @@
 // app/dashboard/customers/page.jsx
 "use client";
+import { t } from "@/lib/i18n";
+import { useT } from "@/lib/i18n/LangProvider";
 
 import React, { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
-import { toast } from "sonner";
+import { toast } from "@/lib/i18n/toast";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { getTierLabel } from "@/lib/priceTiers";
@@ -53,6 +55,7 @@ const initials = (name = "") =>
     .join("") || "?";
 
 export default function CustomersPage() {
+  const t = useT();
   const router = useRouter();
   // State for search, pagination, sorting and filters
   const [searchInput, setSearchInput] = useState("");
@@ -155,8 +158,8 @@ export default function CustomersPage() {
                 <Users className="h-6 w-6 text-blue-600" />
               </div>
               <div>
-                <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">Customers</h1>
-                <p className="text-gray-600 dark:text-gray-400">Manage your customers</p>
+                <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">{t("Customers")}</h1>
+                <p className="text-gray-600 dark:text-gray-400">{t("Manage your customers")}</p>
               </div>
             </div>
 
@@ -164,7 +167,7 @@ export default function CustomersPage() {
               <Link href="/dashboard/customers/create">
                 <Button className="flex items-center gap-2">
                   <Plus className="h-4 w-4" />
-                  <span className="hidden sm:inline">Add Customer</span>
+                  <span className="hidden sm:inline">{t("Add Customer")}</span>
                 </Button>
               </Link>
             )}
@@ -176,13 +179,13 @@ export default function CustomersPage() {
           <div className="mb-6 space-y-4">
             {/* Search Bar */}
             <div className="relative max-w-md">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 h-4 w-4" />
+              <Search className="absolute start-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 h-4 w-4" />
               <Input
                 type="text"
-                placeholder="Search customers by name..."
+                placeholder={t("Search customers by name...")}
                 value={searchInput}
                 onChange={(e) => setSearchInput(e.target.value)}
-                className="pl-10"
+                className="ps-10"
               />
             </div>
 
@@ -190,7 +193,7 @@ export default function CustomersPage() {
             <div className="flex flex-col sm:flex-row sm:flex-wrap gap-2">
               <div className="flex items-center gap-2">
                 <Filter className="h-4 w-4 text-gray-500 dark:text-gray-400" />
-                <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Filter by Debt:</span>
+                <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{t("Filter by Debt:")}</span>
               </div>
 
               <Button
@@ -200,7 +203,7 @@ export default function CustomersPage() {
                 className="flex items-center justify-center gap-2 w-full sm:w-auto"
               >
                 <Users className="h-4 w-4" />
-                All Customers
+                {t("All Customers")}
               </Button>
 
               <Button
@@ -210,7 +213,7 @@ export default function CustomersPage() {
                 className="flex items-center justify-center gap-2 w-full sm:w-auto"
               >
                 <DollarSign className="h-4 w-4" />
-                Has Debt
+                {t("Has Debt")}
               </Button>
 
               <Button
@@ -220,7 +223,7 @@ export default function CustomersPage() {
                 className="flex items-center justify-center gap-2 w-full sm:w-auto"
               >
                 <CheckCircle className="h-4 w-4" />
-                No Debt
+                {t("No Debt")}
               </Button>
 
               <Button
@@ -230,7 +233,7 @@ export default function CustomersPage() {
                 className="flex items-center justify-center gap-2 w-full sm:w-auto"
               >
                 <Trophy className="h-4 w-4" />
-                Top 10 Debtors
+                {t("Top 10 Debtors")}
               </Button>
             </div>
 
@@ -239,7 +242,7 @@ export default function CustomersPage() {
               <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-2">
                 <span className="flex items-center gap-1.5 text-sm font-medium text-gray-700 dark:text-gray-300">
                   <ArrowUpDown className="h-4 w-4 text-gray-500 dark:text-gray-400" />
-                  Sort by
+                  {t("Sort by")}
                 </span>
                 <select
                   value={sortBy}
@@ -248,14 +251,14 @@ export default function CustomersPage() {
                 >
                   {SORT_OPTIONS.map((option) => (
                     <option key={option.value} value={option.value}>
-                      {option.label}
+                      {t(option.label)}
                     </option>
                   ))}
                 </select>
               </div>
 
               <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-2">
-                <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Per page</span>
+                <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{t("Per page")}</span>
                 <select
                   value={pageSize}
                   onChange={(e) => setPageSize(parseInt(e.target.value))}
@@ -275,14 +278,14 @@ export default function CustomersPage() {
         {/* Results Count */}
         <div className="mb-4">
           <p className="text-gray-600 dark:text-gray-400">
-            Showing {customers.length} of {totalCount} customers
+            {t("Showing")} {customers.length} {t("of")} {totalCount} {t("customers")}
             {debtFilter !== "all" && (
-              <span className="ml-2 text-blue-600">
-                • Filtered by: {debtFilter === "hasDebt" ? "Has Debt" : "No Debt"}
+              <span className="ms-2 text-blue-600">
+                {t("• Filtered by:")} {debtFilter === "hasDebt" ? t("Has Debt") : t("No Debt")}
               </span>
             )}
             {sortBy === "debtDesc" && (
-              <span className="ml-2 text-amber-600">• Sorted by debt: high to low</span>
+              <span className="ms-2 text-amber-600">{t("• Sorted by debt: high to low")}</span>
             )}
           </p>
         </div>
@@ -294,13 +297,13 @@ export default function CustomersPage() {
         {error && !isLoading && (
           <Card>
             <CardContent className="pt-6 text-center">
-              <div className="text-red-500 text-lg mb-2">Error</div>
-              <p className="text-gray-600 dark:text-gray-400">Failed to load customers. Please try again.</p>
+              <div className="text-red-500 text-lg mb-2">{t("Error")}</div>
+              <p className="text-gray-600 dark:text-gray-400">{t("Failed to load customers. Please try again.")}</p>
               <Button
                 onClick={() => queryClient.refetchQueries(["customers"])}
                 className="mt-4"
               >
-                Try Again
+                {t("Try Again")}
               </Button>
             </CardContent>
           </Card>
@@ -311,10 +314,10 @@ export default function CustomersPage() {
           <Card>
             <CardContent className="pt-6 text-center">
               <User className="h-12 w-12 text-gray-400 dark:text-gray-500 mx-auto mb-3" />
-              <p className="text-gray-500 dark:text-gray-400 text-lg mb-2">No customers found</p>
+              <p className="text-gray-500 dark:text-gray-400 text-lg mb-2">{t("No customers found")}</p>
               {searchTerm || debtFilter !== "all" ? (
                 <div>
-                  <p className="text-gray-400 dark:text-gray-500 mb-2">Try adjusting your filters</p>
+                  <p className="text-gray-400 dark:text-gray-500 mb-2">{t("Try adjusting your filters")}</p>
                   <Button
                     variant="outline"
                     onClick={() => {
@@ -324,12 +327,12 @@ export default function CustomersPage() {
                       setSortBy("newest");
                     }}
                   >
-                    Clear Filters
+                    {t("Clear Filters")}
                   </Button>
                 </div>
               ) : canCreateCustomers ? (
                 <Link href="/dashboard/customers/create">
-                  <Button className="mt-2">Add Your First Customer</Button>
+                  <Button className="mt-2">{t("Add Your First Customer")}</Button>
                 </Link>
               ) : null}
             </CardContent>
@@ -353,8 +356,8 @@ export default function CustomersPage() {
                         number + status on top, amount on the right, actions
                         in a footer. */}
                     <Card
-                      className={`border-l-4 ${
-                        hasDebt ? "border-l-red-500" : "border-l-green-500"
+                      className={`border-s-4 ${
+                        hasDebt ? "border-s-red-500" : "border-s-green-500"
                       } shadow-sm hover:shadow-md transition-shadow cursor-pointer h-full`}
                     >
                       <CardContent className="p-4 flex flex-col h-full">
@@ -364,12 +367,12 @@ export default function CustomersPage() {
                           </span>
                           {hasDebt ? (
                             <span className="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300">
-                              Owes money
+                              {t("Owes money")}
                             </span>
                           ) : (
                             <span className="inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-semibold bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300">
                               <CheckCircle className="h-3 w-3" />
-                              No debt
+                              {t("No debt")}
                             </span>
                           )}
                         </div>
@@ -396,15 +399,15 @@ export default function CustomersPage() {
                                     {customer.phoneNumber}
                                   </span>
                                 )}
-                                <span>{getTierLabel(customer.priceTier)}</span>
+                                <span>{t(getTierLabel(customer.priceTier))}</span>
                               </div>
                             </div>
                           </div>
-                          <div className="text-right shrink-0">
+                          <div className="text-end shrink-0">
                             <p className={`text-lg font-bold ${hasDebt ? "text-red-600" : "text-gray-900 dark:text-gray-100"}`}>
                               ${Number(customer.debt || 0).toLocaleString()}
                             </p>
-                            <p className="text-[11px] text-gray-500 dark:text-gray-400">debt</p>
+                            <p className="text-[11px] text-gray-500 dark:text-gray-400">{t("debt")}</p>
                           </div>
                         </div>
 
@@ -418,13 +421,15 @@ export default function CustomersPage() {
                                 router.push(`/dashboard/customers/${customer._id}/orders`);
                               }}
                             >
-                              View orders
+                              {t("View orders")}
                             </Button>
                             {canDelete && (
                               <Button
                                 variant="ghost"
                                 size="sm"
-                                aria-label={`Delete ${customer.fullName}`}
+                                aria-label={t("Delete {0}", {
+                                  0: customer.fullName
+                                })}
                                 onClick={(e) => {
                                   e.preventDefault();
                                   setDeleteTarget(customer);
@@ -453,12 +458,12 @@ export default function CustomersPage() {
                   variant="outline"
                   className="flex items-center gap-2"
                 >
-                  <ChevronLeft className="h-4 w-4" />
-                  Previous
+                  <ChevronLeft className="rtl-flip h-4 w-4" />
+                  {t("Previous")}
                 </Button>
 
                 <span className="text-gray-600 dark:text-gray-400">
-                  Page {currentPage} of {totalPages}
+                  {t("Page")} {currentPage} {t("of")} {totalPages}
                 </span>
 
                 <Button
@@ -467,8 +472,8 @@ export default function CustomersPage() {
                   variant="outline"
                   className="flex items-center gap-2"
                 >
-                  Next
-                  <ChevronRight className="h-4 w-4" />
+                  {t("Next")}
+                  <ChevronRight className="rtl-flip h-4 w-4" />
                 </Button>
               </div>
             )}
@@ -478,8 +483,10 @@ export default function CustomersPage() {
       <ConfirmDialog
         open={!!deleteTarget}
         onClose={() => setDeleteTarget(null)}
-        title="Delete customer?"
-        description={`Are you sure you want to delete ${deleteTarget?.fullName}?`}
+        title={t("Delete customer?")}
+        description={t("Are you sure you want to delete {0}?", {
+          0: deleteTarget?.fullName
+        })}
         onConfirm={confirmDelete}
         loading={deleteMutation.isPending}
       />

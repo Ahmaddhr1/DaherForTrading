@@ -1,5 +1,7 @@
 // components/dashboard/TopProducts.jsx
 "use client";
+import { t } from "@/lib/i18n";
+import { useT } from "@/lib/i18n/LangProvider";
 
 import React, { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
@@ -20,6 +22,7 @@ const fetchTopProducts = async (limit, sort, category) => {
 };
 
 const TopProducts = ({ limit = 10, sort = "orders", category = "" }) => {
+  const t = useT();
   const [page, setPage] = useState(1);
 
   const { data, isLoading, error } = useQuery({
@@ -40,7 +43,7 @@ const TopProducts = ({ limit = 10, sort = "orders", category = "" }) => {
     return (
       <Card>
         <CardContent className="pt-6">
-          <div className="text-red-500">Error loading top products</div>
+          <div className="text-red-500">{t("Error loading top products")}</div>
         </CardContent>
       </Card>
     );
@@ -53,7 +56,7 @@ const TopProducts = ({ limit = 10, sort = "orders", category = "" }) => {
       <CardHeader>
         <CardTitle className="flex items-center gap-2 text-lg font-medium">
           <Package className="h-5 w-5 text-blue-600" />
-          Top {limit} Products ({sort === "profit" ? "Most Profitable" : "Most Ordered"})
+          {t("Top")} {limit} {t("Products (")}{sort === "profit" ? t("Most Profitable") : t("Most Ordered")})
         </CardTitle>
       </CardHeader>
       <CardContent>
@@ -64,7 +67,7 @@ const TopProducts = ({ limit = 10, sort = "orders", category = "" }) => {
             ))}
           </div>
         ) : topProducts.length === 0 ? (
-          <div className="text-center py-8 text-gray-500 dark:text-gray-400">No products found</div>
+          <div className="text-center py-8 text-gray-500 dark:text-gray-400">{t("No products found")}</div>
         ) : (
           <>
             <div className="space-y-4">
@@ -91,11 +94,11 @@ const TopProducts = ({ limit = 10, sort = "orders", category = "" }) => {
                     <div>
                       <p className="font-medium">{product.name}</p>
                       <p className="text-sm text-gray-500 dark:text-gray-400">
-                        {product.nbOfOrders} orders
+                        {product.nbOfOrders} {t("orders")}
                       </p>
                     </div>
                   </div>
-                  <div className="text-right">
+                  <div className="text-end">
                     {sort === "profit" ? (
                       <p className="font-semibold text-green-600">
                         ${(product.totalProfit || 0).toFixed(2)}
@@ -104,7 +107,7 @@ const TopProducts = ({ limit = 10, sort = "orders", category = "" }) => {
                       <p className="font-semibold">${product.price}</p>
                     )}
                     <p className="text-sm text-gray-500 dark:text-gray-400">
-                      {sort === "profit" ? "total profit" : "each"}
+                      {sort === "profit" ? t("total profit") : t("each")}
                     </p>
                   </div>
                 </div>
@@ -120,11 +123,11 @@ const TopProducts = ({ limit = 10, sort = "orders", category = "" }) => {
                   size="sm"
                   className="flex items-center gap-2"
                 >
-                  <ChevronLeft className="h-4 w-4" />
-                  Previous
+                  <ChevronLeft className="rtl-flip h-4 w-4" />
+                  {t("Previous")}
                 </Button>
                 <span className="text-sm text-gray-600 dark:text-gray-400">
-                  Page {page} of {totalPages}
+                  {t("Page")} {page} {t("of")} {totalPages}
                 </span>
                 <Button
                   onClick={() => setPage((p) => p + 1)}
@@ -133,8 +136,8 @@ const TopProducts = ({ limit = 10, sort = "orders", category = "" }) => {
                   size="sm"
                   className="flex items-center gap-2"
                 >
-                  Next
-                  <ChevronRight className="h-4 w-4" />
+                  {t("Next")}
+                  <ChevronRight className="rtl-flip h-4 w-4" />
                 </Button>
               </div>
             )}

@@ -1,10 +1,12 @@
 "use client";
+import { t } from "@/lib/i18n";
+import { useT } from "@/lib/i18n/LangProvider";
 
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import Link from "next/link";
-import { format } from "date-fns";
+import { format } from "@/lib/i18n/date";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -12,6 +14,7 @@ import { ListSkeleton } from "@/components/ui/skeleton-patterns";
 import { RotateCcw, ChevronLeft, ChevronRight } from "lucide-react";
 
 export default function ReturnsPage() {
+  const t = useT();
   const [page, setPage] = useState(1);
   const limit = 20;
 
@@ -31,9 +34,9 @@ export default function ReturnsPage() {
             <RotateCcw className="h-6 w-6 text-amber-600" />
           </div>
           <div>
-            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-gray-100">Returns</h1>
+            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-gray-100">{t("Returns")}</h1>
             <p className="text-gray-600 dark:text-gray-400 text-sm sm:text-base">
-              Stock customers have sent back, across every order
+              {t("Stock customers have sent back, across every order")}
             </p>
           </div>
         </div>
@@ -41,11 +44,11 @@ export default function ReturnsPage() {
         {isLoading ? (
           <ListSkeleton rows={6} rowHeight="h-16" />
         ) : error ? (
-          <div className="text-center py-12 text-red-600">Failed to load returns.</div>
+          <div className="text-center py-12 text-red-600">{t("Failed to load returns.")}</div>
         ) : returns.length === 0 ? (
           <div className="text-center py-16 text-gray-500 dark:text-gray-400">
             <RotateCcw className="h-12 w-12 mx-auto mb-3 text-gray-300 dark:text-gray-700" />
-            <p className="text-lg">No returns processed yet</p>
+            <p className="text-lg">{t("No returns processed yet")}</p>
           </div>
         ) : (
           <>
@@ -53,12 +56,12 @@ export default function ReturnsPage() {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Date</TableHead>
-                    <TableHead>Customer</TableHead>
-                    <TableHead>Items</TableHead>
-                    <TableHead className="text-center">Restocked</TableHead>
-                    <TableHead className="text-right">Refund</TableHead>
-                    <TableHead className="text-right">Order</TableHead>
+                    <TableHead>{t("Date")}</TableHead>
+                    <TableHead>{t("Customer")}</TableHead>
+                    <TableHead>{t("Items")}</TableHead>
+                    <TableHead className="text-center">{t("Restocked")}</TableHead>
+                    <TableHead className="text-end">{t("Refund")}</TableHead>
+                    <TableHead className="text-end">{t("Order")}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -68,20 +71,20 @@ export default function ReturnsPage() {
                         {format(new Date(ret.createdAt), "MMM d, yyyy h:mm a")}
                       </TableCell>
                       <TableCell className="font-medium text-gray-900 dark:text-gray-100">
-                        {ret.customer?.fullName || "Unknown"}
+                        {ret.customer?.fullName || t("Unknown")}
                       </TableCell>
                       <TableCell className="text-gray-600 dark:text-gray-400 max-w-xs truncate">
                         {ret.items.map((i) => `${i.quantity}x ${i.name}`).join(", ")}
                       </TableCell>
                       <TableCell className="text-center">
-                        {ret.restocked ? "Yes" : "No"}
+                        {ret.restocked ? t("Yes") : t("No")}
                       </TableCell>
-                      <TableCell className="text-right font-semibold text-green-600">
+                      <TableCell className="text-end font-semibold text-green-600">
                         -${ret.totalRefundAmount.toFixed(2)}
                       </TableCell>
-                      <TableCell className="text-right">
+                      <TableCell className="text-end">
                         <Link href={`/dashboard/invoices/${ret.order}`}>
-                          <Button variant="outline" size="sm">View Order</Button>
+                          <Button variant="outline" size="sm">{t("View Order")}</Button>
                         </Link>
                       </TableCell>
                     </TableRow>
@@ -99,11 +102,11 @@ export default function ReturnsPage() {
                   size="sm"
                   className="flex items-center gap-2"
                 >
-                  <ChevronLeft className="h-4 w-4" />
-                  Previous
+                  <ChevronLeft className="rtl-flip h-4 w-4" />
+                  {t("Previous")}
                 </Button>
                 <span className="text-sm text-gray-600 dark:text-gray-400">
-                  Page {page} of {totalPages}
+                  {t("Page")} {page} {t("of")} {totalPages}
                 </span>
                 <Button
                   onClick={() => setPage((p) => p + 1)}
@@ -112,8 +115,8 @@ export default function ReturnsPage() {
                   size="sm"
                   className="flex items-center gap-2"
                 >
-                  Next
-                  <ChevronRight className="h-4 w-4" />
+                  {t("Next")}
+                  <ChevronRight className="rtl-flip h-4 w-4" />
                 </Button>
               </div>
             )}

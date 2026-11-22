@@ -1,4 +1,6 @@
 "use client";
+import { t } from "@/lib/i18n";
+import { useT } from "@/lib/i18n/LangProvider";
 
 import { Card, CardContent } from "@/components/ui/card";
 import { Receipt, TrendingUp, Wallet } from "lucide-react";
@@ -13,6 +15,7 @@ import { Receipt, TrendingUp, Wallet } from "lucide-react";
 // amount paid so far for Partially Paid ones). Callers that don't pass it
 // keep the original 2-stat layout.
 export function OrdersTotalsCard({ totalAmount = 0, totalProfit = 0, collectedAmount, label = "Total Sales" }) {
+  const t = useT();
   const showCollected = collectedAmount !== undefined;
   return (
     <Card className="shadow-sm border-gray-200 dark:border-gray-800">
@@ -31,7 +34,7 @@ export function OrdersTotalsCard({ totalAmount = 0, totalProfit = 0, collectedAm
         <div className="flex sm:flex-col items-center sm:items-start justify-between gap-1">
           <span className="flex items-center gap-1.5 text-xs font-medium text-gray-500 dark:text-gray-400">
             <TrendingUp className="h-3.5 w-3.5" />
-            Profit Made
+            {t("Profit Made")}
           </span>
           <span className={`text-lg font-bold ${totalProfit >= 0 ? "text-green-600" : "text-red-600"}`}>
             ${totalProfit.toLocaleString()}
@@ -41,7 +44,7 @@ export function OrdersTotalsCard({ totalAmount = 0, totalProfit = 0, collectedAm
           <div className="flex sm:flex-col items-center sm:items-start justify-between gap-1">
             <span className="flex items-center gap-1.5 text-xs font-medium text-gray-500 dark:text-gray-400">
               <Wallet className="h-3.5 w-3.5" />
-              Paid + Partially Paid
+              {t("Paid + Partially Paid")}
             </span>
             <span className="text-lg font-bold text-blue-600">
               ${collectedAmount.toLocaleString()}

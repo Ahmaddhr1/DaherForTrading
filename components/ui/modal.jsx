@@ -1,9 +1,12 @@
 "use client";
+import { t } from "@/lib/i18n";
+import { useT } from "@/lib/i18n/LangProvider";
 
 import { useEffect } from "react";
 import { X } from "lucide-react";
 
 export function Modal({ open, onClose, title, description, children, maxWidth = "max-w-lg" }) {
+  const t = useT();
   useEffect(() => {
     if (!open) return;
     const handleKeyDown = (e) => {
@@ -29,7 +32,7 @@ export function Modal({ open, onClose, title, description, children, maxWidth = 
           <button
             onClick={onClose}
             className="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-400 rounded-md p-1"
-            aria-label="Close"
+            aria-label={t("Close")}
           >
             <X className="h-5 w-5" />
           </button>

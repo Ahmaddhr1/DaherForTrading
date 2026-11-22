@@ -1,5 +1,7 @@
 // components/dashboard/OrdersBreakdown.jsx
 "use client";
+import { t } from "@/lib/i18n";
+import { useT } from "@/lib/i18n/LangProvider";
 
 import React from "react";
 import { useQuery } from "@tanstack/react-query";
@@ -15,13 +17,14 @@ const fetchOrdersData = async (range, startDate, endDate) => {
 };
 
 const OrdersBreakdown = ({ range = "all", startDate, endDate }) => {
+  const t = useT();
   const { data, isLoading, error } = useQuery({
     queryKey: ["dashboard-orders", range, startDate, endDate],
     queryFn: () => fetchOrdersData(range, startDate, endDate),
   });
 
   if (error) {
-    return <div className="text-red-500">Error loading orders data</div>;
+    return <div className="text-red-500">{t("Error loading orders data")}</div>;
   }
 
   const ordersData = data?.data?.selected || {};
@@ -39,21 +42,21 @@ const OrdersBreakdown = ({ range = "all", startDate, endDate }) => {
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
       <DashboardCard
-        title="Paid Orders"
+        title={t("Paid Orders")}
         value={(ordersData.paidOrdersCount || 0).toLocaleString()}
         description={`$${(ordersData.paidOrdersTotal || 0).toLocaleString()}`}
         color="green"
       />
 
       <DashboardCard
-        title="Pending Orders"
+        title={t("Pending Orders")}
         value={(ordersData.pendingOrdersCount || 0).toLocaleString()}
         description={`$${(ordersData.pendingOrdersTotal || 0).toLocaleString()}`}
         color="yellow"
       />
 
       <DashboardCard
-        title="Partial Orders"
+        title={t("Partial Orders")}
         value={(ordersData.partialOrdersCount || 0).toLocaleString()}
         description={`$${(ordersData.partialOrdersTotal || 0).toLocaleString()}`}
         color="blue"

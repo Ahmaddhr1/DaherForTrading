@@ -142,3 +142,31 @@ body {
     display: block !important;
   }
 }
+
+/* ---------- Arabic / right-to-left ----------
+   dir="rtl" on <html> (set from the language cookie in app/layout.js)
+   mirrors the layout; utilities use logical sides (ms/me, ps/pe,
+   start/end, text-start/end) so they flip with it. */
+html[lang="ar"] {
+  font-family: var(--font-arabic, "IBM Plex Sans Arabic"), var(--font-geist-sans, system-ui), system-ui, sans-serif;
+}
+/* Letter-spacing breaks the joins between Arabic letters. */
+html[lang="ar"] body * {
+  letter-spacing: 0 !important;
+}
+/* Directional icons (chevrons/arrows) point the other way in RTL. */
+html[dir="rtl"] .rtl-flip {
+  transform: scaleX(-1);
+}
+/* Numbers, phone numbers, emails and codes stay left-to-right inside RTL text. */
+.ltr-text {
+  direction: ltr;
+  unicode-bidi: isolate;
+}
+/* Charts keep their internal LTR geometry in Arabic: Recharts positions SVG
+   text by text-anchor, which flips under RTL and draws axis labels on top of
+   the bars. */
+html[dir="rtl"] .recharts-wrapper,
+html[dir="rtl"] .recharts-wrapper * {
+  direction: ltr;
+}

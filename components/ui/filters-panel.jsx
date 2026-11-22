@@ -1,4 +1,6 @@
 "use client";
+import { t } from "@/lib/i18n";
+import { useT } from "@/lib/i18n/LangProvider";
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -10,6 +12,7 @@ import { SlidersHorizontal, ChevronDown, ChevronUp } from "lucide-react";
 // dominated by search/sort/date inputs on first load; from the `sm`
 // breakpoint up, the controls are always shown inline as before.
 export function FiltersPanel({ children, activeCount = 0 }) {
+  const t = useT();
   const [open, setOpen] = useState(false);
 
   return (
@@ -22,9 +25,9 @@ export function FiltersPanel({ children, activeCount = 0 }) {
       >
         <span className="flex items-center gap-2">
           <SlidersHorizontal className="h-4 w-4" />
-          Filters
+          {t("Filters")}
           {activeCount > 0 && (
-            <Badge variant="secondary" className="ml-1">
+            <Badge variant="secondary" className="ms-1">
               {activeCount}
             </Badge>
           )}

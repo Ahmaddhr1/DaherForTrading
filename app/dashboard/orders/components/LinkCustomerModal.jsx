@@ -1,8 +1,10 @@
 "use client";
+import { t } from "@/lib/i18n";
+import { useT } from "@/lib/i18n/LangProvider";
 
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { toast } from "sonner";
+import { toast } from "@/lib/i18n/toast";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Modal } from "@/components/ui/modal";
 import { Input } from "@/components/ui/input";
@@ -14,6 +16,7 @@ import { Search, Loader2, UserPlus, ArrowLeft } from "lucide-react";
 // customerNameText (from the product-grid cart). Linking never finalizes
 // the draft - it's still a separate explicit "Finalize Order" action.
 export default function LinkCustomerModal({ open, onClose, order }) {
+  const t = useT();
   const queryClient = useQueryClient();
   const [mode, setMode] = useState("search"); // "search" | "create"
   const [searchInput, setSearchInput] = useState("");
@@ -93,19 +96,21 @@ export default function LinkCustomerModal({ open, onClose, order }) {
     <Modal
       open={open}
       onClose={handleClose}
-      title="Link a Customer"
-      description={order?.customerNameText ? `Typed in as "${order.customerNameText}"` : undefined}
+      title={t("Link a Customer")}
+      description={order?.customerNameText ? t("Typed in as \"{0}\"", {
+        0: order.customerNameText
+      }) : undefined}
     >
       {mode === "search" ? (
         <div className="space-y-3">
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500 h-4 w-4" />
+            <Search className="absolute start-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500 h-4 w-4" />
             <Input
               type="text"
-              placeholder="Search customers by name..."
+              placeholder={t("Search customers by name...")}
               value={searchInput}
               onChange={(e) => setSearchInput(e.target.value)}
-              className="pl-10"
+              className="ps-10"
               autoFocus
             />
           </div>
@@ -118,7 +123,7 @@ export default function LinkCustomerModal({ open, onClose, order }) {
                 </div>
               )}
               {!searching && !isSearchPending && customers.length === 0 && (
-                <div className="p-4 text-center text-gray-500 dark:text-gray-400 text-sm">No customers found</div>
+                <div className="p-4 text-center text-gray-500 dark:text-gray-400 text-sm">{t("No customers found")}</div>
               )}
               {!searching && !isSearchPending &&
                 customers.map((customer) => (
@@ -127,7 +132,7 @@ export default function LinkCustomerModal({ open, onClose, order }) {
                     type="button"
                     disabled={linking}
                     onClick={() => linkCustomer(customer._id)}
-                    className="w-full flex items-center justify-between p-3 hover:bg-gray-50 dark:hover:bg-gray-800/60 text-left disabled:opacity-50"
+                    className="w-full flex items-center justify-between p-3 hover:bg-gray-50 dark:hover:bg-gray-800/60 text-start disabled:opacity-50"
                   >
                     <div>
                       <p className="font-medium text-gray-900 dark:text-gray-100">{customer.fullName}</p>
@@ -143,17 +148,17 @@ export default function LinkCustomerModal({ open, onClose, order }) {
 
           <Button type="button" variant="outline" className="w-full flex items-center gap-2" onClick={openCreateMode}>
             <UserPlus className="h-4 w-4" />
-            Create New Customer
+            {t("Create New Customer")}
           </Button>
         </div>
       ) : (
         <form onSubmit={handleCreateAndLink} className="space-y-3">
-          <Button type="button" variant="ghost" size="sm" className="flex items-center gap-1 -ml-2" onClick={() => setMode("search")}>
-            <ArrowLeft className="h-3.5 w-3.5" />
-            Back to search
+          <Button type="button" variant="ghost" size="sm" className="flex items-center gap-1 -ms-2" onClick={() => setMode("search")}>
+            <ArrowLeft className="rtl-flip h-3.5 w-3.5" />
+            {t("Back to search")}
           </Button>
           <div className="space-y-2">
-            <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Full Name</label>
+            <label className="text-sm font-medium text-gray-700 dark:text-gray-300">{t("Full Name")}</label>
             <Input
               value={newCustomer.fullName}
               onChange={(e) => setNewCustomer((prev) => ({ ...prev, fullName: e.target.value }))}
@@ -161,7 +166,7 @@ export default function LinkCustomerModal({ open, onClose, order }) {
             />
           </div>
           <div className="space-y-2">
-            <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Phone Number</label>
+            <label className="text-sm font-medium text-gray-700 dark:text-gray-300">{t("Phone Number")}</label>
             <Input
               value={newCustomer.phoneNumber}
               onChange={(e) => setNewCustomer((prev) => ({ ...prev, phoneNumber: e.target.value.replace(/\D/g, "") }))}
@@ -169,7 +174,7 @@ export default function LinkCustomerModal({ open, onClose, order }) {
             />
           </div>
           <div className="space-y-2">
-            <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Starting Debt ($, optional)</label>
+            <label className="text-sm font-medium text-gray-700 dark:text-gray-300">{t("Starting Debt ($, optional)")}</label>
             <Input
               type="number"
               min="0"
@@ -178,7 +183,7 @@ export default function LinkCustomerModal({ open, onClose, order }) {
             />
           </div>
           <Button type="submit" className="w-full" disabled={linking}>
-            {linking ? <Loader2 className="h-4 w-4 animate-spin" /> : "Create & Link"}
+            {linking ? <Loader2 className="h-4 w-4 animate-spin" /> : t("Create & Link")}
           </Button>
         </form>
       )}

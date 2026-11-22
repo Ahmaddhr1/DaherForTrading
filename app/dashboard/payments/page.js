@@ -1,10 +1,12 @@
 // app/dashboard/payments/page.jsx
 "use client";
+import { t } from "@/lib/i18n";
+import { useT } from "@/lib/i18n/LangProvider";
 
 import React, { useEffect, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
-import { toast } from "sonner";
+import { toast } from "@/lib/i18n/toast";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
@@ -38,7 +40,7 @@ import {
   X,
   History,
 } from "lucide-react";
-import { format } from "date-fns";
+import { format } from "@/lib/i18n/date";
 import { useHasPermission } from "@/lib/useHasPermission";
 import Link from "next/link";
 import SupplierPaymentsView from "@/components/payments/SupplierPaymentsView";
@@ -53,6 +55,7 @@ const SORT_OPTIONS = [
 const PAGE_SIZE_OPTIONS = [10, 20, 50];
 
 export default function PaymentsPage() {
+  const t = useT();
   // History filters
   const [searchInput, setSearchInput] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
@@ -165,9 +168,9 @@ export default function PaymentsPage() {
                 <Wallet className="h-6 w-6 text-blue-600" />
               </div>
               <div className="min-w-0">
-                <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-gray-100 truncate">Payments</h1>
+                <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-gray-100 truncate">{t("Payments")}</h1>
                 <p className="text-gray-600 dark:text-gray-400 text-sm sm:text-base truncate">
-                  {view === "suppliers" ? "Payments made to your companies (suppliers)" : "Payment history across all customers"}
+                  {view === "suppliers" ? t("Payments made to your companies (suppliers)") : t("Payment history across all customers")}
                 </p>
               </div>
             </div>
@@ -175,7 +178,7 @@ export default function PaymentsPage() {
             {canManagePayments && view === "customers" && (
               <Button onClick={() => setIsModalOpen(true)} className="flex items-center gap-2 shrink-0">
                 <Plus className="h-4 w-4" />
-                <span className="hidden sm:inline">Make a Payment</span>
+                <span className="hidden sm:inline">{t("Make a Payment")}</span>
               </Button>
             )}
           </div>
@@ -197,7 +200,7 @@ export default function PaymentsPage() {
                   : "text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800"
               }`}
             >
-              {opt.label}
+              {t(opt.label)}
             </button>
           ))}
         </div>
@@ -212,11 +215,11 @@ export default function PaymentsPage() {
             <div className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
               <History className="h-4 w-4 text-gray-500 dark:text-gray-400" />
               <span className="text-sm font-medium">
-                {totalCount} payment{totalCount === 1 ? "" : "s"} matching current filters
+                {totalCount} {t("payment")}{totalCount === 1 ? "" : t("s")} {t("matching current filters")}
               </span>
             </div>
             <div className="text-sm text-gray-600 dark:text-gray-400">
-              Total Collected:{" "}
+              {t("Total Collected:")}{" "}
               <span className="font-bold text-green-600">${totalCollected.toLocaleString()}</span>
             </div>
           </CardContent>
@@ -224,7 +227,7 @@ export default function PaymentsPage() {
 
         {!hasInteracted && (
           <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
-            Showing today&apos;s payments only. Pick a date range below to see more.
+            {t("Showing today's payments only. Pick a date range below to see more.")}
           </p>
         )}
 
@@ -233,13 +236,13 @@ export default function PaymentsPage() {
           <Card className="shadow-sm border-gray-200 dark:border-gray-800 mb-6">
             <CardContent className="p-4 space-y-4">
               <div className="relative max-w-md">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 h-4 w-4" />
+                <Search className="absolute start-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 h-4 w-4" />
                 <Input
                   type="text"
-                  placeholder="Search by customer name..."
+                  placeholder={t("Search by customer name...")}
                   value={searchInput}
                   onChange={(e) => handleSearchInputChange(e.target.value)}
-                  className="pl-10"
+                  className="ps-10"
                 />
               </div>
 
@@ -247,7 +250,7 @@ export default function PaymentsPage() {
                 <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-2">
                   <span className="flex items-center gap-1.5 text-sm font-medium text-gray-700 dark:text-gray-300">
                     <Filter className="h-4 w-4 text-gray-500 dark:text-gray-400" />
-                    From
+                    {t("From")}
                   </span>
                   <input
                     type="date"
@@ -257,7 +260,7 @@ export default function PaymentsPage() {
                   />
                 </div>
                 <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-2">
-                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">To</span>
+                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{t("To")}</span>
                   <input
                     type="date"
                     value={endDate}
@@ -269,7 +272,7 @@ export default function PaymentsPage() {
                 <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-2">
                   <span className="flex items-center gap-1.5 text-sm font-medium text-gray-700 dark:text-gray-300">
                     <ArrowUpDown className="h-4 w-4 text-gray-500 dark:text-gray-400" />
-                    Sort by
+                    {t("Sort by")}
                   </span>
                   <select
                     value={sortBy}
@@ -278,14 +281,14 @@ export default function PaymentsPage() {
                   >
                     {SORT_OPTIONS.map((option) => (
                       <option key={option.value} value={option.value}>
-                        {option.label}
+                        {t(option.label)}
                       </option>
                     ))}
                   </select>
                 </div>
 
                 <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-2">
-                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Per page</span>
+                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{t("Per page")}</span>
                   <select
                     value={pageSize}
                     onChange={(e) => setPageSize(parseInt(e.target.value))}
@@ -307,7 +310,7 @@ export default function PaymentsPage() {
                     className="flex items-center justify-center gap-1 text-gray-500 dark:text-gray-400 w-full sm:w-auto"
                   >
                     <X className="h-3 w-3" />
-                    Clear Filters
+                    {t("Clear Filters")}
                   </Button>
                 )}
               </div>
@@ -321,18 +324,18 @@ export default function PaymentsPage() {
         ) : error ? (
           <Card>
             <CardContent className="pt-6 text-center">
-              <div className="text-red-500 text-lg mb-2">Error</div>
-              <p className="text-gray-600 dark:text-gray-400">Failed to load payment history.</p>
+              <div className="text-red-500 text-lg mb-2">{t("Error")}</div>
+              <p className="text-gray-600 dark:text-gray-400">{t("Failed to load payment history.")}</p>
             </CardContent>
           </Card>
         ) : payments.length === 0 ? (
           <Card>
             <CardContent className="pt-6 text-center">
               <CheckCircle className="h-12 w-12 text-gray-300 dark:text-gray-600 mx-auto mb-3" />
-              <p className="text-gray-500 dark:text-gray-400 text-lg mb-2">No payments found</p>
+              <p className="text-gray-500 dark:text-gray-400 text-lg mb-2">{t("No payments found")}</p>
               {hasActiveFilters && (
                 <Button variant="outline" onClick={handleClearFilters}>
-                  Clear Filters
+                  {t("Clear Filters")}
                 </Button>
               )}
             </CardContent>
@@ -340,16 +343,16 @@ export default function PaymentsPage() {
         ) : (
           <Card className="shadow-sm border-gray-200 dark:border-gray-800">
             <Table>
-              <TableCaption>Payment history</TableCaption>
+              <TableCaption>{t("Payment history")}</TableCaption>
               <TableHeader>
                 <TableRow>
                   <TableHead className="w-12">#</TableHead>
-                  <TableHead>Customer</TableHead>
-                  <TableHead className="text-center">Amount Paid</TableHead>
-                  <TableHead className="text-center">Debt Before</TableHead>
-                  <TableHead className="text-center">Debt After</TableHead>
-                  <TableHead>Source</TableHead>
-                  <TableHead>Date</TableHead>
+                  <TableHead>{t("Customer")}</TableHead>
+                  <TableHead className="text-center">{t("Amount Paid")}</TableHead>
+                  <TableHead className="text-center">{t("Debt Before")}</TableHead>
+                  <TableHead className="text-center">{t("Debt After")}</TableHead>
+                  <TableHead>{t("Source")}</TableHead>
+                  <TableHead>{t("Date")}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -360,7 +363,7 @@ export default function PaymentsPage() {
                     </TableCell>
                     <TableCell>
                       <div className="font-medium text-gray-900 dark:text-gray-100">
-                        {payment.customer?.fullName || "Deleted Customer"}
+                        {payment.customer?.fullName || t("Deleted Customer")}
                       </div>
                       {payment.customer?.phoneNumber && (
                         <div className="text-sm text-gray-500 dark:text-gray-400 flex items-center gap-1">
@@ -386,10 +389,10 @@ export default function PaymentsPage() {
                           href={`/dashboard/orders/${payment.order}`}
                           className="inline-flex items-center rounded-md bg-blue-50 dark:bg-blue-900/30 px-2 py-0.5 text-xs font-medium text-blue-700 dark:text-blue-300 hover:underline"
                         >
-                          Order #{String(payment.order).slice(-6).toUpperCase()}
+                          {t("Order #")}{String(payment.order).slice(-6).toUpperCase()}
                         </Link>
                       ) : (
-                        <span className="text-xs text-gray-500 dark:text-gray-400">Manual payment</span>
+                        <span className="text-xs text-gray-500 dark:text-gray-400">{t("Manual payment")}</span>
                       )}
                     </TableCell>
                     <TableCell className="text-gray-500 dark:text-gray-400 text-sm">
@@ -409,11 +412,11 @@ export default function PaymentsPage() {
                   size="sm"
                   className="flex items-center gap-2"
                 >
-                  <ChevronLeft className="h-4 w-4" />
-                  Previous
+                  <ChevronLeft className="rtl-flip h-4 w-4" />
+                  {t("Previous")}
                 </Button>
                 <span className="text-sm text-gray-600 dark:text-gray-400">
-                  Page {currentPage} of {totalPages}
+                  {t("Page")} {currentPage} {t("of")} {totalPages}
                 </span>
                 <Button
                   onClick={() => setCurrentPage((p) => p + 1)}
@@ -422,8 +425,8 @@ export default function PaymentsPage() {
                   size="sm"
                   className="flex items-center gap-2"
                 >
-                  Next
-                  <ChevronRight className="h-4 w-4" />
+                  {t("Next")}
+                  <ChevronRight className="rtl-flip h-4 w-4" />
                 </Button>
               </div>
             )}
@@ -437,8 +440,8 @@ export default function PaymentsPage() {
       <Modal
         open={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        title="Make a Payment"
-        description="Search for a customer and record a payment against their debt"
+        title={t("Make a Payment")}
+        description={t("Search for a customer and record a payment against their debt")}
         maxWidth="max-w-xl"
       >
         <MakePaymentForm onSuccess={handlePaymentRecorded} />
@@ -448,6 +451,7 @@ export default function PaymentsPage() {
 }
 
 function MakePaymentForm({ onSuccess }) {
+  const t = useT();
   const [searchInput, setSearchInput] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCustomer, setSelectedCustomer] = useState(null);
@@ -557,19 +561,19 @@ function MakePaymentForm({ onSuccess }) {
             </div>
           </div>
           <Button variant="ghost" size="sm" onClick={handleClearCustomer}>
-            <X className="h-4 w-4 mr-1" />
-            Change
+            <X className="h-4 w-4 me-1" />
+            {t("Change")}
           </Button>
         </div>
       ) : (
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 h-4 w-4" />
+          <Search className="absolute start-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 h-4 w-4" />
           <Input
             type="text"
-            placeholder="Search customers by name..."
+            placeholder={t("Search customers by name...")}
             value={searchInput}
             onChange={(e) => setSearchInput(e.target.value)}
-            className="pl-10"
+            className="ps-10"
             autoFocus
           />
 
@@ -581,7 +585,7 @@ function MakePaymentForm({ onSuccess }) {
                 </div>
               )}
               {!searching && !isSearchPending && customers.length === 0 && (
-                <div className="p-4 text-center text-gray-500 dark:text-gray-400 text-sm">No customers found</div>
+                <div className="p-4 text-center text-gray-500 dark:text-gray-400 text-sm">{t("No customers found")}</div>
               )}
               {!searching && !isSearchPending &&
                 customers.map((customer) => (
@@ -589,7 +593,7 @@ function MakePaymentForm({ onSuccess }) {
                     key={customer._id}
                     type="button"
                     onClick={() => handleSelectCustomer(customer)}
-                    className="w-full flex items-center justify-between p-3 hover:bg-gray-50 dark:hover:bg-gray-800/60 text-left"
+                    className="w-full flex items-center justify-between p-3 hover:bg-gray-50 dark:hover:bg-gray-800/60 text-start"
                   >
                     <div>
                       <p className="font-medium text-gray-900 dark:text-gray-100">{customer.fullName}</p>
@@ -608,18 +612,18 @@ function MakePaymentForm({ onSuccess }) {
       {selectedCustomer && (
         <div className="space-y-4">
           <p className="text-sm text-gray-600 dark:text-gray-400">
-            Current debt: <span className="font-semibold text-red-600">${currentDebt.toLocaleString()}</span>
+            {t("Current debt:")} <span className="font-semibold text-red-600">${currentDebt.toLocaleString()}</span>
           </p>
 
           {currentDebt <= 0 ? (
             <div className="text-center py-6 text-green-600 flex flex-col items-center gap-2">
               <CheckCircle className="h-8 w-8" />
-              <p className="font-medium">This customer has no outstanding debt.</p>
+              <p className="font-medium">{t("This customer has no outstanding debt.")}</p>
             </div>
           ) : (
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
-                <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Payment Amount ($)</label>
+                <label className="text-sm font-medium text-gray-700 dark:text-gray-300">{t("Payment Amount ($)")}</label>
                 <Input
                   type="number"
                   min="0"
@@ -629,12 +633,14 @@ function MakePaymentForm({ onSuccess }) {
                   onChange={(e) => setAmount(e.target.value)}
                 />
                 <p className="text-xs text-gray-500 dark:text-gray-400">
-                  Defaults to the full outstanding debt. Enter a smaller amount for a partial payment.
+                  {t(
+                    "Defaults to the full outstanding debt. Enter a smaller amount for a partial payment."
+                  )}
                 </p>
               </div>
 
               <div className="bg-gray-50 dark:bg-gray-950 rounded-lg p-4 flex items-center justify-between">
-                <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Remaining After Payment</span>
+                <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{t("Remaining After Payment")}</span>
                 <span className={`font-bold ${remaining > 0 ? "text-red-600" : "text-green-600"}`}>
                   ${remaining.toLocaleString()}
                 </span>
@@ -648,10 +654,10 @@ function MakePaymentForm({ onSuccess }) {
                 {paymentMutation.isPending ? (
                   <span className="flex items-center gap-2">
                     <Loader2 className="h-4 w-4 animate-spin" />
-                    Recording Payment...
+                    {t("Recording Payment...")}
                   </span>
                 ) : (
-                  "Record Payment"
+                  t("Record Payment")
                 )}
               </Button>
             </form>
@@ -661,9 +667,12 @@ function MakePaymentForm({ onSuccess }) {
       <ConfirmDialog
         open={confirmOpen}
         onClose={() => setConfirmOpen(false)}
-        title="Record payment?"
-        description={`Record a payment of $${paymentAmount.toFixed(2)} for ${selectedCustomer?.fullName}?`}
-        confirmLabel="Record Payment"
+        title={t("Record payment?")}
+        description={t("Record a payment of ${0} for {1}?", {
+          0: paymentAmount.toFixed(2),
+          1: selectedCustomer?.fullName
+        })}
+        confirmLabel={t("Record Payment")}
         variant="default"
         onConfirm={confirmSubmit}
         loading={paymentMutation.isPending}

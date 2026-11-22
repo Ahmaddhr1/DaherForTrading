@@ -1,5 +1,7 @@
 // components/dashboard/TopCustomers.jsx
 "use client";
+import { t } from "@/lib/i18n";
+import { useT } from "@/lib/i18n/LangProvider";
 
 import React, { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
@@ -21,6 +23,7 @@ const fetchTopCustomers = async (limit, minDebt) => {
 };
 
 const TopCustomers = ({ limit = 10, minDebt = 0 }) => {
+  const t = useT();
   const [page, setPage] = useState(1);
 
   const { data, isLoading, error } = useQuery({
@@ -39,7 +42,7 @@ const TopCustomers = ({ limit = 10, minDebt = 0 }) => {
     return (
       <Card>
         <CardContent className="pt-6">
-          <div className="text-red-500">Error loading top debtors</div>
+          <div className="text-red-500">{t("Error loading top debtors")}</div>
         </CardContent>
       </Card>
     );
@@ -52,7 +55,7 @@ const TopCustomers = ({ limit = 10, minDebt = 0 }) => {
       <CardHeader>
         <CardTitle className="flex items-center gap-2 text-lg font-medium">
           <Trophy className="h-5 w-5 text-amber-600" />
-          Top {limit} Debtors (High to Low)
+          {t("Top")} {limit} {t("Debtors (High to Low)")}
         </CardTitle>
       </CardHeader>
       <CardContent>
@@ -64,7 +67,7 @@ const TopCustomers = ({ limit = 10, minDebt = 0 }) => {
           </div>
         ) : topCustomers.length === 0 ? (
           <div className="text-center py-8 text-gray-500 dark:text-gray-400">
-            No customers with outstanding debt
+            {t("No customers with outstanding debt")}
           </div>
         ) : (
           <>
@@ -84,7 +87,7 @@ const TopCustomers = ({ limit = 10, minDebt = 0 }) => {
                         <p className="text-sm text-gray-500 dark:text-gray-400">{customer.phoneNumber}</p>
                       </div>
                     </div>
-                    <div className="text-right font-semibold text-red-600">
+                    <div className="text-end font-semibold text-red-600">
                       ${customer.debt.toLocaleString()}
                     </div>
                   </div>
@@ -101,11 +104,11 @@ const TopCustomers = ({ limit = 10, minDebt = 0 }) => {
                   size="sm"
                   className="flex items-center gap-2"
                 >
-                  <ChevronLeft className="h-4 w-4" />
-                  Previous
+                  <ChevronLeft className="rtl-flip h-4 w-4" />
+                  {t("Previous")}
                 </Button>
                 <span className="text-sm text-gray-600 dark:text-gray-400">
-                  Page {page} of {totalPages}
+                  {t("Page")} {page} {t("of")} {totalPages}
                 </span>
                 <Button
                   onClick={() => setPage((p) => p + 1)}
@@ -114,8 +117,8 @@ const TopCustomers = ({ limit = 10, minDebt = 0 }) => {
                   size="sm"
                   className="flex items-center gap-2"
                 >
-                  Next
-                  <ChevronRight className="h-4 w-4" />
+                  {t("Next")}
+                  <ChevronRight className="rtl-flip h-4 w-4" />
                 </Button>
               </div>
             )}

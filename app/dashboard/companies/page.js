@@ -1,10 +1,12 @@
 // app/dashboard/companies/page.jsx
 "use client";
+import { t } from "@/lib/i18n";
+import { useT } from "@/lib/i18n/LangProvider";
 
 import React, { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
-import { toast } from "sonner";
+import { toast } from "@/lib/i18n/toast";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -44,6 +46,7 @@ const SORT_OPTIONS = [
 const PAGE_SIZE_OPTIONS = [10, 20, 50];
 
 export default function CompaniesPage() {
+  const t = useT();
   const [searchInput, setSearchInput] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
@@ -141,8 +144,8 @@ export default function CompaniesPage() {
                 <Building2 className="h-6 w-6 text-blue-600" />
               </div>
               <div className="min-w-0">
-                <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-gray-100 truncate">Companies</h1>
-                <p className="text-gray-600 dark:text-gray-400 text-sm sm:text-base truncate">Manage your suppliers and purchase history</p>
+                <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-gray-100 truncate">{t("Companies")}</h1>
+                <p className="text-gray-600 dark:text-gray-400 text-sm sm:text-base truncate">{t("Manage your suppliers and purchase history")}</p>
               </div>
             </div>
 
@@ -150,7 +153,7 @@ export default function CompaniesPage() {
               <Link href="/dashboard/companies/create">
                 <Button className="flex items-center gap-2 shrink-0">
                   <Plus className="h-4 w-4" />
-                  <span className="hidden sm:inline">Add Company</span>
+                  <span className="hidden sm:inline">{t("Add Company")}</span>
                 </Button>
               </Link>
             )}
@@ -163,7 +166,7 @@ export default function CompaniesPage() {
             <CardContent className="p-4 flex flex-col gap-1">
               <span className="flex items-center gap-1.5 text-xs font-medium text-gray-500 dark:text-gray-400">
                 <DollarSign className="h-3.5 w-3.5" />
-                Total We Owe (All Companies)
+                {t("Total We Owe (All Companies)")}
               </span>
               <span className="text-lg font-bold text-amber-700">
                 ${summary.totalDebt.toLocaleString()}
@@ -174,7 +177,7 @@ export default function CompaniesPage() {
             <CardContent className="p-4 flex flex-col gap-1">
               <span className="flex items-center gap-1.5 text-xs font-medium text-gray-500 dark:text-gray-400">
                 <Wallet className="h-3.5 w-3.5" />
-                Total Spent (Purchases)
+                {t("Total Spent (Purchases)")}
               </span>
               <span className="text-lg font-bold text-gray-900 dark:text-gray-100">
                 ${summary.totalSpent.toLocaleString()}
@@ -185,7 +188,7 @@ export default function CompaniesPage() {
             <CardContent className="p-4 flex flex-col gap-1">
               <span className="flex items-center gap-1.5 text-xs font-medium text-gray-500 dark:text-gray-400">
                 <TrendingUp className="h-3.5 w-3.5" />
-                Expected Profit From Stock
+                {t("Expected Profit From Stock")}
               </span>
               <span className={`text-lg font-bold ${summary.expectedProfit >= 0 ? "text-green-600" : "text-red-600"}`}>
                 ${summary.expectedProfit.toLocaleString()}
@@ -198,20 +201,20 @@ export default function CompaniesPage() {
         <FiltersPanel activeCount={activeFilterCount}>
           <div className="mb-6 space-y-4">
             <div className="relative max-w-md">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 h-4 w-4" />
+              <Search className="absolute start-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 h-4 w-4" />
               <Input
                 type="text"
-                placeholder="Search companies by name..."
+                placeholder={t("Search companies by name...")}
                 value={searchInput}
                 onChange={(e) => setSearchInput(e.target.value)}
-                className="pl-10"
+                className="ps-10"
               />
             </div>
 
             <div className="flex flex-col sm:flex-row sm:flex-wrap gap-2">
               <div className="flex items-center gap-2">
                 <Filter className="h-4 w-4 text-gray-500 dark:text-gray-400" />
-                <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Filter by Debt We Owe:</span>
+                <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{t("Filter by Debt We Owe:")}</span>
               </div>
 
               <Button
@@ -221,7 +224,7 @@ export default function CompaniesPage() {
                 className="flex items-center justify-center gap-2 w-full sm:w-auto"
               >
                 <Building2 className="h-4 w-4" />
-                All Companies
+                {t("All Companies")}
               </Button>
 
               <Button
@@ -231,7 +234,7 @@ export default function CompaniesPage() {
                 className="flex items-center justify-center gap-2 w-full sm:w-auto"
               >
                 <DollarSign className="h-4 w-4" />
-                We Owe Them
+                {t("We Owe Them")}
               </Button>
 
               <Button
@@ -241,7 +244,7 @@ export default function CompaniesPage() {
                 className="flex items-center justify-center gap-2 w-full sm:w-auto"
               >
                 <CheckCircle className="h-4 w-4" />
-                Settled
+                {t("Settled")}
               </Button>
 
               <Button
@@ -251,13 +254,13 @@ export default function CompaniesPage() {
                 className="flex items-center justify-center gap-2 w-full sm:w-auto"
               >
                 <Trophy className="h-4 w-4" />
-                Top 10 We Owe
+                {t("Top 10 We Owe")}
               </Button>
             </div>
 
             <div className="flex flex-col sm:flex-row sm:flex-wrap sm:items-center gap-3 sm:gap-4">
               <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-2">
-                <span className="text-sm font-medium text-gray-700 dark:text-gray-300">From</span>
+                <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{t("From")}</span>
                 <input
                   type="date"
                   value={startDate}
@@ -266,7 +269,7 @@ export default function CompaniesPage() {
                 />
               </div>
               <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-2">
-                <span className="text-sm font-medium text-gray-700 dark:text-gray-300">To</span>
+                <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{t("To")}</span>
                 <input
                   type="date"
                   value={endDate}
@@ -278,7 +281,7 @@ export default function CompaniesPage() {
               <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-2">
                 <span className="flex items-center gap-1.5 text-sm font-medium text-gray-700 dark:text-gray-300">
                   <ArrowUpDown className="h-4 w-4 text-gray-500 dark:text-gray-400" />
-                  Sort by
+                  {t("Sort by")}
                 </span>
                 <select
                   value={sortBy}
@@ -287,14 +290,14 @@ export default function CompaniesPage() {
                 >
                   {SORT_OPTIONS.map((option) => (
                     <option key={option.value} value={option.value}>
-                      {option.label}
+                      {t(option.label)}
                     </option>
                   ))}
                 </select>
               </div>
 
               <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-2">
-                <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Per page</span>
+                <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{t("Per page")}</span>
                 <select
                   value={pageSize}
                   onChange={(e) => setPageSize(parseInt(e.target.value))}
@@ -317,7 +320,7 @@ export default function CompaniesPage() {
                     }}
                     className="w-full sm:w-auto justify-center text-gray-500 dark:text-gray-400"
                   >
-                    Clear Dates
+                    {t("Clear Dates")}
                   </Button>
                 )}
               </div>
@@ -328,14 +331,14 @@ export default function CompaniesPage() {
         {/* Results Count */}
         <div className="mb-4">
           <p className="text-gray-600 dark:text-gray-400">
-            Showing {companies.length} of {totalCount} companies
+            {t("Showing")} {companies.length} {t("of")} {totalCount} {t("companies")}
             {debtFilter !== "all" && (
-              <span className="ml-2 text-blue-600">
-                • Filtered by: {debtFilter === "hasDebt" ? "We Owe Them" : "Settled"}
+              <span className="ms-2 text-blue-600">
+                {t("• Filtered by:")} {debtFilter === "hasDebt" ? t("We Owe Them") : t("Settled")}
               </span>
             )}
             {sortBy === "debtDesc" && (
-              <span className="ml-2 text-amber-600">• Sorted by debt: high to low</span>
+              <span className="ms-2 text-amber-600">{t("• Sorted by debt: high to low")}</span>
             )}
           </p>
         </div>
@@ -347,13 +350,13 @@ export default function CompaniesPage() {
         {error && !isLoading && (
           <Card>
             <CardContent className="pt-6 text-center">
-              <div className="text-red-500 text-lg mb-2">Error</div>
-              <p className="text-gray-600 dark:text-gray-400">Failed to load companies. Please try again.</p>
+              <div className="text-red-500 text-lg mb-2">{t("Error")}</div>
+              <p className="text-gray-600 dark:text-gray-400">{t("Failed to load companies. Please try again.")}</p>
               <Button
                 onClick={() => queryClient.refetchQueries(["companies"])}
                 className="mt-4"
               >
-                Try Again
+                {t("Try Again")}
               </Button>
             </CardContent>
           </Card>
@@ -364,10 +367,10 @@ export default function CompaniesPage() {
           <Card>
             <CardContent className="pt-6 text-center">
               <Building2 className="h-12 w-12 text-gray-400 dark:text-gray-500 mx-auto mb-3" />
-              <p className="text-gray-500 dark:text-gray-400 text-lg mb-2">No companies found</p>
+              <p className="text-gray-500 dark:text-gray-400 text-lg mb-2">{t("No companies found")}</p>
               {searchTerm || debtFilter !== "all" ? (
                 <div>
-                  <p className="text-gray-400 dark:text-gray-500 mb-2">Try adjusting your filters</p>
+                  <p className="text-gray-400 dark:text-gray-500 mb-2">{t("Try adjusting your filters")}</p>
                   <Button
                     variant="outline"
                     onClick={() => {
@@ -377,12 +380,12 @@ export default function CompaniesPage() {
                       setSortBy("newest");
                     }}
                   >
-                    Clear Filters
+                    {t("Clear Filters")}
                   </Button>
                 </div>
               ) : canCreateCompanies ? (
                 <Link href="/dashboard/companies/create">
-                  <Button className="mt-2">Add Your First Company</Button>
+                  <Button className="mt-2">{t("Add Your First Company")}</Button>
                 </Link>
               ) : null}
             </CardContent>
@@ -405,7 +408,7 @@ export default function CompaniesPage() {
                     <Card className="hover:shadow-md transition-shadow cursor-pointer h-full relative">
                       <CardContent className="p-4">
                         {sortBy === "debtDesc" && (
-                          <Badge className="absolute top-2 left-2 bg-amber-500 hover:bg-amber-500">
+                          <Badge className="absolute top-2 start-2 bg-amber-500 hover:bg-amber-500">
                             #{companyNumber}
                           </Badge>
                         )}
@@ -433,12 +436,12 @@ export default function CompaniesPage() {
                         <div className="text-center mb-4">
                           {hasDebt ? (
                             <p className="text-red-600 font-medium">
-                              We Owe: ${company.debt}
+                              {t("We Owe: $")}{company.debt}
                             </p>
                           ) : (
                             <div className="text-green-600 font-medium">
-                              <CheckCircle className="h-4 w-4 inline mr-1" />
-                              Settled
+                              <CheckCircle className="h-4 w-4 inline me-1" />
+                              {t("Settled")}
                             </div>
                           )}
                         </div>
@@ -454,8 +457,8 @@ export default function CompaniesPage() {
                             disabled={deleteMutation.isPending}
                             className="w-full"
                           >
-                            <Trash2 className="h-4 w-4 mr-1" />
-                            {deleteMutation.isPending ? "Deleting..." : "Delete"}
+                            <Trash2 className="h-4 w-4 me-1" />
+                            {deleteMutation.isPending ? t("Deleting...") : t("Delete")}
                           </Button>
                         )}
                       </CardContent>
@@ -473,12 +476,12 @@ export default function CompaniesPage() {
                   variant="outline"
                   className="flex items-center gap-2"
                 >
-                  <ChevronLeft className="h-4 w-4" />
-                  Previous
+                  <ChevronLeft className="rtl-flip h-4 w-4" />
+                  {t("Previous")}
                 </Button>
 
                 <span className="text-gray-600 dark:text-gray-400">
-                  Page {currentPage} of {totalPages}
+                  {t("Page")} {currentPage} {t("of")} {totalPages}
                 </span>
 
                 <Button
@@ -487,8 +490,8 @@ export default function CompaniesPage() {
                   variant="outline"
                   className="flex items-center gap-2"
                 >
-                  Next
-                  <ChevronRight className="h-4 w-4" />
+                  {t("Next")}
+                  <ChevronRight className="rtl-flip h-4 w-4" />
                 </Button>
               </div>
             )}
@@ -498,8 +501,10 @@ export default function CompaniesPage() {
       <ConfirmDialog
         open={!!deleteTarget}
         onClose={() => setDeleteTarget(null)}
-        title="Delete company?"
-        description={`Are you sure you want to delete ${deleteTarget?.name}?`}
+        title={t("Delete company?")}
+        description={t("Are you sure you want to delete {0}?", {
+          0: deleteTarget?.name
+        })}
         onConfirm={confirmDelete}
         loading={deleteMutation.isPending}
       />

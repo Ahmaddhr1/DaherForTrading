@@ -1,4 +1,6 @@
-import { Geist, Geist_Mono, Space_Grotesk } from "next/font/google";
+import { Geist, Geist_Mono, Space_Grotesk, IBM_Plex_Sans_Arabic } from "next/font/google";
+import { cookies } from "next/headers";
+import { LANG_COOKIE, isLang, dirFor } from "@/lib/i18n";
 import "./globals.css";
 import Providers from "@/lib/providers";
 import { Toaster } from "@/components/ui/sonner";
@@ -22,6 +24,15 @@ const spaceGrotesk = Space_Grotesk({
   weight: ["600", "700"],
 });
 
+// Arabic UI font - only used when the language is Arabic (see
+// html[lang="ar"] in globals.css), so it isn't preloaded otherwise.
+const plexArabic = IBM_Plex_Sans_Arabic({
+  variable: "--font-arabic",
+  subsets: ["arabic"],
+  weight: ["400", "500", "600", "700"],
+  preload: false,
+});
+
 export const metadata = {
   title: "Invento",
   description: "Trade and inventory management",
@@ -37,19 +48,25 @@ export const metadata = {
 };
 
 export default async function RootLayout({ children }) {
+  // The user's language choice (English/Arabic), stored in a cookie by the
+  // language switch - read here so the very first render already has the
+  // right language and text direction.
+  const cookieLang = (await cookies()).get(LANG_COOKIE)?.value;
+  const lang = isLang(cookieLang) ? cookieLang : "en";
 
   return (
     <html
-      lang="en"
-      className={`${geistSans.className} ${geistMono.variable} ${spaceGrotesk.variable}`}
+      lang={lang}
+      dir={dirFor(lang)}
+      className={`${geistSans.className} ${geistSans.variable} ${geistMono.variable} ${spaceGrotesk.variable} ${plexArabic.variable}`}
       suppressHydrationWarning
     >
       <body
         className="antialiased"
       >
-        <Providers>
+        <Providers lang={lang}>
           <SplashScreen />
-          <Toaster />
+          <Toaster dir={dirFor(lang)} position={lang === "ar" ? "top-left" : undefined} />
           {children}
         </Providers>
       </body>

@@ -1,5 +1,7 @@
 // components/dashboard/OrdersChart.jsx
 "use client";
+import { t } from "@/lib/i18n";
+import { useT } from "@/lib/i18n/LangProvider";
 
 import React from "react";
 import { useQuery } from "@tanstack/react-query";
@@ -18,6 +20,7 @@ const fetchOrdersChartData = async (range, startDate, endDate) => {
 const countFormatter = (value) => value.toLocaleString();
 
 const OrdersChart = ({ range = "all", startDate, endDate }) => {
+  const t = useT();
   const { data, isLoading, error } = useQuery({
     queryKey: ["dashboard-orders-chart", range, startDate, endDate],
     queryFn: () => fetchOrdersChartData(range, startDate, endDate),
@@ -27,7 +30,7 @@ const OrdersChart = ({ range = "all", startDate, endDate }) => {
     return (
       <Card>
         <CardContent className="pt-6">
-          <div className="text-red-500">Error loading orders chart</div>
+          <div className="text-red-500">{t("Error loading orders chart")}</div>
         </CardContent>
       </Card>
     );
@@ -40,15 +43,15 @@ const OrdersChart = ({ range = "all", startDate, endDate }) => {
   // own "Total Orders" card in the summary section above, so it isn't
   // repeated here.
   const chartData = [
-    { period: "Today", Orders: orderCounts.today || 0 },
-    { period: "Last Week", Orders: orderCounts.lastWeek || 0 },
-    { period: "All Time", Orders: orderCounts.allTime || 0 },
+    { period: t("Today"), [t("Orders")]: orderCounts.today || 0 },
+    { period: t("Last Week"), [t("Orders")]: orderCounts.lastWeek || 0 },
+    { period: t("All Time"), [t("Orders")]: orderCounts.allTime || 0 },
   ];
 
   return (
     <Card className="shadow-sm border-gray-200 dark:border-gray-800">
       <CardHeader>
-        <CardTitle className="text-lg font-medium">Order Activity</CardTitle>
+        <CardTitle className="text-lg font-medium">{t("Order Activity")}</CardTitle>
       </CardHeader>
       <CardContent>
         {isLoading ? (
@@ -57,7 +60,7 @@ const OrdersChart = ({ range = "all", startDate, endDate }) => {
           <BarChart
             data={chartData}
             index="period"
-            categories={["Orders"]}
+            categories={[t("Orders")]}
             colors={["blue"]}
             valueFormatter={countFormatter}
             showLegend={false}

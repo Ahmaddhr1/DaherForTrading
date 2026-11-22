@@ -1,9 +1,11 @@
 "use client";
+import { t } from "@/lib/i18n";
+import { useT } from "@/lib/i18n/LangProvider";
 
 import React, { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
-import { toast } from "sonner";
+import { toast } from "@/lib/i18n/toast";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -22,6 +24,7 @@ import {
 import { useHasPermission } from "@/lib/useHasPermission";
 
 const CategoriesPage = () => {
+  const t = useT();
   const [searchInput, setSearchInput] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
@@ -72,8 +75,8 @@ const CategoriesPage = () => {
                 <Grid3X3 className="h-6 w-6 text-blue-600" />
               </div>
               <div className="min-w-0">
-                <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-gray-100 truncate">Categories</h1>
-                <p className="text-gray-600 dark:text-gray-400 text-sm sm:text-base truncate">Organize your products by categories</p>
+                <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-gray-100 truncate">{t("Categories")}</h1>
+                <p className="text-gray-600 dark:text-gray-400 text-sm sm:text-base truncate">{t("Organize your products by categories")}</p>
               </div>
             </div>
 
@@ -81,7 +84,7 @@ const CategoriesPage = () => {
               <Link href="/dashboard/categories/add">
                 <Button className="flex items-center gap-2 shrink-0">
                   <Plus className="h-4 w-4" />
-                  <span className="hidden sm:inline">Add Category</span>
+                  <span className="hidden sm:inline">{t("Add Category")}</span>
                 </Button>
               </Link>
             )}
@@ -91,13 +94,13 @@ const CategoriesPage = () => {
         {/* Search Bar */}
         <div className="mb-6">
           <div className="relative max-w-md">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 h-4 w-4" />
+            <Search className="absolute start-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 h-4 w-4" />
             <Input
               type="text"
-              placeholder="Search categories by name..."
+              placeholder={t("Search categories by name...")}
               value={searchInput}
               onChange={(e) => setSearchInput(e.target.value)}
-              className="pl-10"
+              className="ps-10"
             />
           </div>
         </div>
@@ -106,7 +109,7 @@ const CategoriesPage = () => {
         {!isLoading && !error && (
           <div className="mb-4">
             <p className="text-gray-600 dark:text-gray-400">
-              Showing {categories.length} of {totalCount} categories
+              {t("Showing")} {categories.length} {t("of")} {totalCount} {t("categories")}
             </p>
           </div>
         )}
@@ -118,13 +121,13 @@ const CategoriesPage = () => {
         {error && !isLoading && (
           <Card>
             <CardContent className="pt-6 text-center">
-              <div className="text-red-500 text-lg mb-2">Error Loading Categories</div>
-              <p className="text-gray-600 dark:text-gray-400 mb-4">Unable to load categories. Please try again.</p>
+              <div className="text-red-500 text-lg mb-2">{t("Error Loading Categories")}</div>
+              <p className="text-gray-600 dark:text-gray-400 mb-4">{t("Unable to load categories. Please try again.")}</p>
               <Button
                 onClick={() => window.location.reload()}
                 variant="outline"
               >
-                Retry
+                {t("Retry")}
               </Button>
             </CardContent>
           </Card>
@@ -136,18 +139,20 @@ const CategoriesPage = () => {
             <CardContent className="pt-6 text-center">
               <Folder className="h-16 w-16 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
               <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">
-                {searchTerm ? "No Categories Found" : "No Categories Yet"}
+                {searchTerm ? t("No Categories Found") : t("No Categories Yet")}
               </h3>
               <p className="text-gray-600 dark:text-gray-400 mb-4">
                 {searchTerm
-                  ? "Try adjusting your search."
-                  : "Categories help you organize your products. Create your first category to get started."}
+                  ? t("Try adjusting your search.")
+                  : t(
+                  "Categories help you organize your products. Create your first category to get started."
+                )}
               </p>
               {!searchTerm && canCreateCategories && (
                 <Link href="/dashboard/categories/add">
                   <Button>
-                    <Plus className="h-4 w-4 mr-2" />
-                    Create First Category
+                    <Plus className="h-4 w-4 me-2" />
+                    {t("Create First Category")}
                   </Button>
                 </Link>
               )}
@@ -182,20 +187,20 @@ const CategoriesPage = () => {
                       {/* Category Description */}
                       {category.description && (
                         <p className="text-gray-600 dark:text-gray-400 text-sm text-center mb-4 line-clamp-2">
-                          {category.description}
+                          {t(category.description)}
                         </p>
                       )}
 
                       {/* Product Count (if available) */}
                       <div className="flex items-center justify-center gap-2 text-sm text-gray-500 dark:text-gray-400 mb-4">
                         <FileText className="h-4 w-4" />
-                        <span>{category.products?.length || 0} products</span>
+                        <span>{category.products?.length || 0} {t("products")}</span>
                       </div>
 
                       {/* View Button */}
                       <div className="flex items-center justify-center gap-2 text-blue-600 font-medium group-hover:text-blue-700 transition-colors">
-                        <span>View Category</span>
-                        <ArrowRight className="h-4 w-4 transform group-hover:translate-x-1 transition-transform" />
+                        <span>{t("View Category")}</span>
+                        <ArrowRight className="rtl-flip h-4 w-4 transform group-hover:translate-x-1 transition-transform" />
                       </div>
                     </CardContent>
                   </Card>
@@ -212,12 +217,12 @@ const CategoriesPage = () => {
                   variant="outline"
                   className="flex items-center gap-2"
                 >
-                  <ChevronLeft className="h-4 w-4" />
-                  Previous
+                  <ChevronLeft className="rtl-flip h-4 w-4" />
+                  {t("Previous")}
                 </Button>
 
                 <span className="text-gray-600 dark:text-gray-400">
-                  Page {currentPage} of {totalPages}
+                  {t("Page")} {currentPage} {t("of")} {totalPages}
                 </span>
 
                 <Button
@@ -226,8 +231,8 @@ const CategoriesPage = () => {
                   variant="outline"
                   className="flex items-center gap-2"
                 >
-                  Next
-                  <ChevronRight className="h-4 w-4" />
+                  {t("Next")}
+                  <ChevronRight className="rtl-flip h-4 w-4" />
                 </Button>
               </div>
             )}

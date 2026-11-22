@@ -1,10 +1,12 @@
 "use client";
+import { t } from "@/lib/i18n";
+import { useT } from "@/lib/i18n/LangProvider";
 
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
-import { format } from "date-fns";
+import { format } from "@/lib/i18n/date";
 import { Search, Building2, History, ChevronLeft, ChevronRight, X, CheckCircle } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -17,6 +19,7 @@ import { getTodayDateString, localDayStartISO, localDayEndISO } from "@/lib/date
 // "Supplier payments" view of the Payments tab: money paid to companies,
 // created when an unpaid purchase is marked as paid.
 export default function SupplierPaymentsView() {
+  const t = useT();
   const [searchInput, setSearchInput] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const [startDate, setStartDate] = useState("");
@@ -26,8 +29,8 @@ export default function SupplierPaymentsView() {
   const limit = 10;
 
   useEffect(() => {
-    const t = setTimeout(() => setSearchTerm(searchInput.trim()), 400);
-    return () => clearTimeout(t);
+    const timer = setTimeout(() => setSearchTerm(searchInput.trim()), 400);
+    return () => clearTimeout(timer);
   }, [searchInput]);
 
   useEffect(() => setPage(1), [searchTerm, startDate, endDate]);
@@ -67,11 +70,11 @@ export default function SupplierPaymentsView() {
           <div className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
             <History className="h-4 w-4 text-gray-500 dark:text-gray-400" />
             <span className="text-sm font-medium">
-              {data?.total || 0} supplier payment{data?.total === 1 ? "" : "s"} matching current filters
+              {data?.total || 0} {t("supplier payment")}{data?.total === 1 ? "" : t("s")} {t("matching current filters")}
             </span>
           </div>
           <div className="text-sm text-gray-600 dark:text-gray-400">
-            Total Paid Out:{" "}
+            {t("Total Paid Out:")}{" "}
             <span className="font-bold text-violet-600">${(data?.totalPaid || 0).toLocaleString()}</span>
           </div>
         </CardContent>
@@ -79,27 +82,29 @@ export default function SupplierPaymentsView() {
 
       {!hasInteracted && (
         <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
-          Showing today&apos;s supplier payments only. Pick a date range below to see more.
+          {t(
+            "Showing today's supplier payments only. Pick a date range below to see more."
+          )}
         </p>
       )}
 
       <Card className="shadow-sm border-gray-200 dark:border-gray-800 mb-6">
         <CardContent className="p-4 flex flex-col sm:flex-row sm:flex-wrap sm:items-center gap-3">
           <div className="relative w-full sm:max-w-sm">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 h-4 w-4" />
+            <Search className="absolute start-3 top-1/2 -translate-y-1/2 text-gray-400 h-4 w-4" />
             <Input
-              placeholder="Search by company name..."
+              placeholder={t("Search by company name...")}
               value={searchInput}
               onChange={touch(setSearchInput)}
-              className="pl-10"
+              className="ps-10"
             />
           </div>
           <div className="flex items-center gap-2">
-            <span className="text-sm font-medium text-gray-700 dark:text-gray-300">From</span>
+            <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{t("From")}</span>
             <input type="date" value={startDate} onChange={touch(setStartDate)} className="border rounded-md text-sm px-2 py-1.5 bg-transparent" />
           </div>
           <div className="flex items-center gap-2">
-            <span className="text-sm font-medium text-gray-700 dark:text-gray-300">To</span>
+            <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{t("To")}</span>
             <input type="date" value={endDate} onChange={touch(setEndDate)} className="border rounded-md text-sm px-2 py-1.5 bg-transparent" />
           </div>
           {hasFilters && (
@@ -115,7 +120,7 @@ export default function SupplierPaymentsView() {
               className="flex items-center gap-1 text-gray-500"
             >
               <X className="h-3 w-3" />
-              Clear Filters
+              {t("Clear Filters")}
             </Button>
           )}
         </CardContent>
@@ -125,31 +130,33 @@ export default function SupplierPaymentsView() {
         <TableSkeleton rows={limit} cols={6} />
       ) : error ? (
         <Card>
-          <CardContent className="pt-6 text-center text-red-500">Failed to load supplier payments.</CardContent>
+          <CardContent className="pt-6 text-center text-red-500">{t("Failed to load supplier payments.")}</CardContent>
         </Card>
       ) : payments.length === 0 ? (
         <Card>
           <CardContent className="pt-6 text-center">
             <CheckCircle className="h-12 w-12 text-gray-300 dark:text-gray-600 mx-auto mb-3" />
-            <p className="text-gray-500 dark:text-gray-400 text-lg mb-1">No supplier payments found</p>
+            <p className="text-gray-500 dark:text-gray-400 text-lg mb-1">{t("No supplier payments found")}</p>
             <p className="text-sm text-gray-500 dark:text-gray-400">
-              Mark an unpaid purchase as paid from a company&apos;s purchase history to record one.
+              {t(
+                "Mark an unpaid purchase as paid from a company's purchase history to record one."
+              )}
             </p>
           </CardContent>
         </Card>
       ) : (
         <Card className="shadow-sm border-gray-200 dark:border-gray-800">
           <Table>
-            <TableCaption>Supplier payment history</TableCaption>
+            <TableCaption>{t("Supplier payment history")}</TableCaption>
             <TableHeader>
               <TableRow>
                 <TableHead className="w-12">#</TableHead>
-                <TableHead>Company</TableHead>
-                <TableHead>For</TableHead>
-                <TableHead className="text-center">Amount Paid</TableHead>
-                <TableHead className="text-center">Owed Before</TableHead>
-                <TableHead className="text-center">Owed After</TableHead>
-                <TableHead>Date</TableHead>
+                <TableHead>{t("Company")}</TableHead>
+                <TableHead>{t("For")}</TableHead>
+                <TableHead className="text-center">{t("Amount Paid")}</TableHead>
+                <TableHead className="text-center">{t("Owed Before")}</TableHead>
+                <TableHead className="text-center">{t("Owed After")}</TableHead>
+                <TableHead>{t("Date")}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -164,12 +171,15 @@ export default function SupplierPaymentsView() {
                           {p.company.name}
                         </Link>
                       ) : (
-                        "Deleted Company"
+                        t("Deleted Company")
                       )}
                     </div>
                   </TableCell>
                   <TableCell className="text-sm text-gray-600 dark:text-gray-400">
-                    {p.purchase ? `${p.purchase.quantity} x ${p.purchase.productName}` : "—"}
+                    {p.purchase ? t("{0} x {1}", {
+                      0: p.purchase.quantity,
+                      1: p.purchase.productName
+                    }) : "—"}
                   </TableCell>
                   <TableCell className="text-center font-semibold text-violet-600">
                     -${p.amount.toLocaleString()}
@@ -195,15 +205,15 @@ export default function SupplierPaymentsView() {
           {totalPages > 1 && (
             <div className="flex items-center justify-center gap-4 p-4 border-t">
               <Button onClick={() => setPage((x) => x - 1)} disabled={page === 1} variant="outline" size="sm">
-                <ChevronLeft className="h-4 w-4" />
-                Previous
+                <ChevronLeft className="rtl-flip h-4 w-4" />
+                {t("Previous")}
               </Button>
               <span className="text-sm text-gray-600 dark:text-gray-400">
-                Page {page} of {totalPages}
+                {t("Page")} {page} {t("of")} {totalPages}
               </span>
               <Button onClick={() => setPage((x) => x + 1)} disabled={page === totalPages} variant="outline" size="sm">
-                Next
-                <ChevronRight className="h-4 w-4" />
+                {t("Next")}
+                <ChevronRight className="rtl-flip h-4 w-4" />
               </Button>
             </div>
           )}

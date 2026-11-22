@@ -1,4 +1,6 @@
 "use client";
+import { t } from "@/lib/i18n";
+import { useT } from "@/lib/i18n/LangProvider";
 
 import React, { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -10,6 +12,7 @@ import PendingOrders from "./components/PendingOrders";
 import PartiallyPaidOrders from "./components/PartiallyPaidOrders";
 
 const OrdersPage = () => {
+  const t = useT();
   const [activeTab, setActiveTab] = useState("all");
 
   const renderActiveComponent = () => {
@@ -36,17 +39,17 @@ const OrdersPage = () => {
               <Package className="h-6 w-6 text-blue-600" />
             </div>
             <div>
-              <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">Orders Management</h1>
-              <p className="text-gray-600 dark:text-gray-400">View and manage all customer orders</p>
+              <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">{t("Orders Management")}</h1>
+              <p className="text-gray-600 dark:text-gray-400">{t("View and manage all customer orders")}</p>
             </div>
           </div>
         </div>
 
         <Card className="shadow-sm border-gray-200 dark:border-gray-800">
           <CardHeader>
-            <CardTitle className="text-xl">Order Overview</CardTitle>
+            <CardTitle className="text-xl">{t("Order Overview")}</CardTitle>
             <CardDescription>
-              Browse all orders, or narrow down by payment status and timeline
+              {t("Browse all orders, or narrow down by payment status and timeline")}
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -57,28 +60,28 @@ const OrdersPage = () => {
                   className="flex flex-col sm:flex-row items-center justify-center gap-1 h-14 sm:h-9 px-1 text-xs sm:text-sm whitespace-normal sm:whitespace-nowrap"
                 >
                   <ListOrdered className="h-4 w-4" />
-                  All Orders
+                  {t("All Orders")}
                 </TabsTrigger>
                 <TabsTrigger
                   value="today"
                   className="flex flex-col sm:flex-row items-center justify-center gap-1 h-14 sm:h-9 px-1 text-xs sm:text-sm whitespace-normal sm:whitespace-nowrap"
                 >
                   <Package className="h-4 w-4" />
-                  {"Today's"} Orders
+                  {t("Today's Orders")}
                 </TabsTrigger>
                 <TabsTrigger
                   value="pending"
                   className="flex flex-col sm:flex-row items-center justify-center gap-1 h-14 sm:h-9 px-1 text-xs sm:text-sm whitespace-normal sm:whitespace-nowrap"
                 >
                   <Clock className="h-4 w-4" />
-                  Pending
+                  {t("Pending")}
                 </TabsTrigger>
                 <TabsTrigger
                   value="partially-paid"
                   className="flex flex-col sm:flex-row items-center justify-center gap-1 h-14 sm:h-9 px-1 text-xs sm:text-sm whitespace-normal sm:whitespace-nowrap"
                 >
                   <DollarSign className="h-4 w-4" />
-                  Partially Paid
+                  {t("Partially Paid")}
                 </TabsTrigger>
               </TabsList>
             </Tabs>

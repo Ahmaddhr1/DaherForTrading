@@ -1,5 +1,7 @@
 // components/dashboard/DashboardFilters.jsx
 "use client";
+import { t } from "@/lib/i18n";
+import { useT } from "@/lib/i18n/LangProvider";
 
 import React from "react";
 import { useQuery } from "@tanstack/react-query";
@@ -26,6 +28,7 @@ const PRODUCT_SORT_OPTIONS = [
 const LIMIT_OPTIONS = [5, 10, 20];
 
 export default function DashboardFilters({ filters, setFilters }) {
+  const t = useT();
   const { data: categories = [] } = useQuery({
     queryKey: ["categories"],
     queryFn: async () => {
@@ -50,7 +53,7 @@ export default function DashboardFilters({ filters, setFilters }) {
           <div className="flex flex-col sm:flex-row sm:flex-wrap sm:items-center gap-3">
             <div className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300">
               <CalendarRange className="h-4 w-4 text-blue-600" />
-              Date Range
+              {t("Date Range")}
             </div>
             <select
               value={filters.range}
@@ -70,7 +73,7 @@ export default function DashboardFilters({ filters, setFilters }) {
             >
               {RANGE_OPTIONS.map((option) => (
                 <option key={option.value} value={option.value}>
-                  {option.label}
+                  {t(option.label)}
                 </option>
               ))}
             </select>
@@ -83,7 +86,7 @@ export default function DashboardFilters({ filters, setFilters }) {
                   onChange={(e) => update({ startDate: e.target.value })}
                   className="w-full sm:w-auto border rounded-md text-sm px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
-                <span className="hidden sm:inline text-gray-400 dark:text-gray-500">to</span>
+                <span className="hidden sm:inline text-gray-400 dark:text-gray-500">{t("to")}</span>
                 <input
                   type="date"
                   value={filters.endDate}
@@ -99,7 +102,7 @@ export default function DashboardFilters({ filters, setFilters }) {
             <div className="flex flex-col sm:flex-row sm:flex-wrap sm:items-center gap-2 sm:gap-3">
               <div className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300">
                 <Package className="h-4 w-4 text-purple-600" />
-                Top Products
+                {t("Top Products")}
               </div>
               <select
                 value={filters.topProductsSort}
@@ -108,7 +111,7 @@ export default function DashboardFilters({ filters, setFilters }) {
               >
                 {PRODUCT_SORT_OPTIONS.map((option) => (
                   <option key={option.value} value={option.value}>
-                    {option.label}
+                    {t(option.label)}
                   </option>
                 ))}
               </select>
@@ -117,7 +120,7 @@ export default function DashboardFilters({ filters, setFilters }) {
                 onChange={(e) => update({ topProductsCategory: e.target.value })}
                 className="w-full sm:w-auto border rounded-md text-sm px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
-                <option value="">All Categories</option>
+                <option value="">{t("All Categories")}</option>
                 {categories.map((cat) => (
                   <option key={cat._id} value={cat._id}>
                     {cat.name}
@@ -131,7 +134,7 @@ export default function DashboardFilters({ filters, setFilters }) {
               >
                 {LIMIT_OPTIONS.map((n) => (
                   <option key={n} value={n}>
-                    Top {n}
+                    {t("Top")} {n}
                   </option>
                 ))}
               </select>
@@ -141,7 +144,7 @@ export default function DashboardFilters({ filters, setFilters }) {
             <div className="flex flex-col sm:flex-row sm:flex-wrap sm:items-center gap-2 sm:gap-3">
               <div className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300">
                 <Trophy className="h-4 w-4 text-amber-600" />
-                Top Debtors
+                {t("Top Debtors")}
               </div>
               <select
                 value={filters.topCustomersLimit}
@@ -150,13 +153,13 @@ export default function DashboardFilters({ filters, setFilters }) {
               >
                 {LIMIT_OPTIONS.map((n) => (
                   <option key={n} value={n}>
-                    Top {n}
+                    {t("Top")} {n}
                   </option>
                 ))}
               </select>
               <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
                 <ListFilter className="h-3 w-3" />
-                Min debt ($)
+                {t("Min debt ($)")}
                 <input
                   type="number"
                   min="0"

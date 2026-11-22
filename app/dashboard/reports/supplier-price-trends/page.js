@@ -1,9 +1,11 @@
 "use client";
+import { t } from "@/lib/i18n";
+import { useT } from "@/lib/i18n/LangProvider";
 
 import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
-import { format } from "date-fns";
+import { format } from "@/lib/i18n/date";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Combobox } from "@/components/ui/combobox";
 import { Badge } from "@/components/ui/badge";
@@ -16,6 +18,7 @@ import { TrendingUp, ArrowUp, ArrowDown, Minus, Package } from "lucide-react";
 const currencyFormatter = (value) => `$${value.toFixed(2)}`;
 
 export default function SupplierPriceTrendsPage() {
+  const t = useT();
   const [productId, setProductId] = useState("");
 
   const { data: productsData, isLoading: productsLoading } = useQuery({
@@ -57,10 +60,12 @@ export default function SupplierPriceTrendsPage() {
           </div>
           <div>
             <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-gray-100">
-              Supplier Price Trends
+              {t("Supplier Price Trends")}
             </h1>
             <p className="text-gray-600 dark:text-gray-400 text-sm sm:text-base">
-              Compare how much each supplier charges you for the same product, over time
+              {t(
+                "Compare how much each supplier charges you for the same product, over time"
+              )}
             </p>
           </div>
         </div>
@@ -71,7 +76,7 @@ export default function SupplierPriceTrendsPage() {
               options={products}
               value={productId}
               onChange={setProductId}
-              placeholder="Search for a product..."
+              placeholder={t("Search for a product...")}
               disabled={productsLoading}
               renderOption={(product) => (
                 <span className="flex items-center gap-2">
@@ -89,19 +94,19 @@ export default function SupplierPriceTrendsPage() {
         {!productId ? (
           <div className="text-center py-16 text-gray-500 dark:text-gray-400">
             <Package className="h-12 w-12 mx-auto mb-3 text-gray-300 dark:text-gray-700" />
-            <p className="text-lg">Pick a product to compare supplier prices</p>
+            <p className="text-lg">{t("Pick a product to compare supplier prices")}</p>
           </div>
         ) : trendLoading ? (
           <Skeleton className="h-72 rounded-lg" />
         ) : companies.length === 0 ? (
           <div className="text-center py-16 text-gray-500 dark:text-gray-400">
-            <p className="text-lg">No purchase history for this product yet</p>
+            <p className="text-lg">{t("No purchase history for this product yet")}</p>
           </div>
         ) : (
           <>
             <Card className="mb-6 shadow-sm border-gray-200 dark:border-gray-800">
               <CardHeader>
-                <CardTitle className="text-lg font-medium">Unit Price Over Time</CardTitle>
+                <CardTitle className="text-lg font-medium">{t("Unit Price Over Time")}</CardTitle>
               </CardHeader>
               <CardContent>
                 <LineChart
@@ -120,12 +125,12 @@ export default function SupplierPriceTrendsPage() {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Supplier</TableHead>
-                    <TableHead className="text-center">Purchases</TableHead>
-                    <TableHead className="text-right">First Price</TableHead>
-                    <TableHead className="text-right">Latest Price</TableHead>
-                    <TableHead className="text-right">Avg Price</TableHead>
-                    <TableHead className="text-right">Change</TableHead>
+                    <TableHead>{t("Supplier")}</TableHead>
+                    <TableHead className="text-center">{t("Purchases")}</TableHead>
+                    <TableHead className="text-end">{t("First Price")}</TableHead>
+                    <TableHead className="text-end">{t("Latest Price")}</TableHead>
+                    <TableHead className="text-end">{t("Avg Price")}</TableHead>
+                    <TableHead className="text-end">{t("Change")}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -135,12 +140,12 @@ export default function SupplierPriceTrendsPage() {
                         {c.companyName}
                       </TableCell>
                       <TableCell className="text-center">{c.purchaseCount}</TableCell>
-                      <TableCell className="text-right">{currencyFormatter(c.firstPrice)}</TableCell>
-                      <TableCell className="text-right">{currencyFormatter(c.latestPrice)}</TableCell>
-                      <TableCell className="text-right text-gray-600 dark:text-gray-400">
+                      <TableCell className="text-end">{currencyFormatter(c.firstPrice)}</TableCell>
+                      <TableCell className="text-end">{currencyFormatter(c.latestPrice)}</TableCell>
+                      <TableCell className="text-end text-gray-600 dark:text-gray-400">
                         {currencyFormatter(c.avgPrice)}
                       </TableCell>
-                      <TableCell className="text-right">
+                      <TableCell className="text-end">
                         <Badge
                           variant="outline"
                           className={

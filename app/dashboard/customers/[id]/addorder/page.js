@@ -1,5 +1,7 @@
 // app/dashboard/customers/[id]/addorder/page.jsx
 "use client";
+import { t } from "@/lib/i18n";
+import { useT } from "@/lib/i18n/LangProvider";
 
 import React, { useEffect, useState } from "react";
 import axios from "axios";
@@ -10,7 +12,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { ListSkeleton, PageHeaderSkeleton } from "@/components/ui/skeleton-patterns";
-import { toast } from "sonner";
+import { toast } from "@/lib/i18n/toast";
 import { Loader2, Plus, Trash2, ShoppingCart, Save, Layers, Gift, PackagePlus } from "lucide-react";
 import Link from "next/link";
 import { useSettings, formatLL } from "@/lib/currency";
@@ -44,6 +46,7 @@ const makeCustomRow = (forceFree) => ({
 });
 
 const MakeOrderPage = () => {
+  const t = useT();
   const { id: customerId } = useParams();
   const router = useRouter();
 
@@ -311,27 +314,29 @@ const MakeOrderPage = () => {
               <ShoppingCart className="h-6 w-6 text-blue-600" />
             </div>
             <div>
-              <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">Create New Order</h1>
-              <p className="text-gray-600 dark:text-gray-400">Add products to create an order</p>
+              <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">{t("Create New Order")}</h1>
+              <p className="text-gray-600 dark:text-gray-400">{t("Add products to create an order")}</p>
             </div>
           </div>
           {customer && (
             <p className="flex items-center gap-1.5 text-sm text-gray-500 dark:text-gray-400 mt-1">
               <Layers className="h-3.5 w-3.5" />
-              Pricing for {customer.fullName}: <span className="font-medium text-gray-700 dark:text-gray-300">{getTierLabel(priceTier)}</span>
+              {t("Pricing for")} {customer.fullName}: <span className="font-medium text-gray-700 dark:text-gray-300">{t(getTierLabel(priceTier))}</span>
             </p>
           )}
           {!canOverride && (
             <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-              Prices are set automatically for your account. Ask an owner for the &quot;Override order pricing&quot; permission to set a price or price a custom item.
+              {t(
+                "Prices are set automatically for your account. Ask an owner for the \"Override order pricing\" permission to set a price or price a custom item."
+              )}
             </p>
           )}
         </div>
 
         <Card className="shadow-sm border-gray-200 dark:border-gray-800">
           <CardHeader>
-            <CardTitle className="text-xl">Order Details</CardTitle>
-            <CardDescription>Select products and quantities for this order</CardDescription>
+            <CardTitle className="text-xl">{t("Order Details")}</CardTitle>
+            <CardDescription>{t("Select products and quantities for this order")}</CardDescription>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-6">
@@ -342,7 +347,7 @@ const MakeOrderPage = () => {
                   <div key={row.id} className="p-4 border rounded-lg bg-gray-50 dark:bg-gray-950 space-y-4">
                     <div className="flex items-center justify-between">
                       <Label className="text-sm font-medium">
-                        {row.isCustom ? "Custom Item" : "Product"} {index + 1}
+                        {row.isCustom ? t("Custom Item") : t("Product")} {index + 1}
                       </Label>
                       <Button
                         type="button"
@@ -362,7 +367,7 @@ const MakeOrderPage = () => {
                         type="text"
                         value={row.customName}
                         onChange={(e) => handleRowChange(row.id, "customName", e.target.value)}
-                        placeholder="Item name (not in inventory)"
+                        placeholder={t("Item name (not in inventory)")}
                         required
                       />
                     ) : (
@@ -371,12 +376,11 @@ const MakeOrderPage = () => {
                         options={products}
                         value={row.productId}
                         onChange={(value) => handleRowChange(row.id, "productId", value)}
-                        placeholder="Select a product"
+                        placeholder={t("Select a product")}
                         renderOption={(product) => (
                           <span>
                             {product.name}{" "}
-                            <span className="text-gray-400 dark:text-gray-500">
-                              (${getTierPrice(product, priceTier).toFixed(2)} · stock: {product.quantity})
+                            <span className="text-gray-400 dark:text-gray-500">(${getTierPrice(product, priceTier).toFixed(2)} {t("· stock:")} {product.quantity})
                             </span>
                           </span>
                         )}
@@ -387,14 +391,14 @@ const MakeOrderPage = () => {
                       {/* Price */}
                       <div className="space-y-2">
                         <Label htmlFor={`price-${row.id}`} className="text-sm font-medium">
-                          Price ($)
+                          {t("Price ($)")}
                         </Label>
                         <Input
                           id={`price-${row.id}`}
                           type="text"
                           value={row.free ? "0" : row.price}
                           onChange={(e) => handleRowChange(row.id, "price", e.target.value)}
-                          placeholder={row.isCustom ? "0.00" : "Select a product"}
+                          placeholder={row.isCustom ? "0.00" : t("Select a product")}
                           disabled={row.free || !canOverride}
                           className={row.free || !canOverride ? "bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400" : ""}
                           required
@@ -404,7 +408,7 @@ const MakeOrderPage = () => {
                       {/* Quantity */}
                       <div className="space-y-2">
                         <Label htmlFor={`quantity-${row.id}`} className="text-sm font-medium">
-                          Quantity
+                          {t("Quantity")}
                         </Label>
                         <Input
                           id={`quantity-${row.id}`}
@@ -419,7 +423,7 @@ const MakeOrderPage = () => {
                       {/* Discount */}
                       <div className="space-y-2">
                         <Label htmlFor={`discount-${row.id}`} className="text-sm font-medium">
-                          Discount ($)
+                          {t("Discount ($)")}
                         </Label>
                         <Input
                           id={`discount-${row.id}`}
@@ -441,7 +445,7 @@ const MakeOrderPage = () => {
                         className="h-4 w-4 rounded border-gray-300 dark:border-gray-700 text-green-600 focus:ring-green-500"
                       />
                       <Gift className="h-3.5 w-3.5 text-green-600" />
-                      Free (offer)
+                      {t("Free (offer)")}
                     </label>
                   </div>
                 ))}
@@ -456,7 +460,7 @@ const MakeOrderPage = () => {
                   className="flex items-center gap-2"
                 >
                   <Plus className="h-4 w-4" />
-                  Add Another Product
+                  {t("Add Another Product")}
                 </Button>
                 <Button
                   type="button"
@@ -465,14 +469,14 @@ const MakeOrderPage = () => {
                   className="flex items-center gap-2"
                 >
                   <PackagePlus className="h-4 w-4" />
-                  Add Custom Item
+                  {t("Add Custom Item")}
                 </Button>
               </div>
 
               {/* Tax Rate */}
               <div className="space-y-2 max-w-xs">
                 <Label htmlFor="tax-rate" className="text-sm font-medium">
-                  Tax Rate (%)
+                  {t("Tax Rate (%)")}
                 </Label>
                 <Input
                   id="tax-rate"
@@ -489,23 +493,23 @@ const MakeOrderPage = () => {
               {/* Total Amount */}
               <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4 border border-blue-200 dark:border-blue-900/50 space-y-2">
                 <div className="flex justify-between items-center text-sm text-blue-900/80">
-                  <span>Subtotal</span>
+                  <span>{t("Subtotal")}</span>
                   <span>${calculateSubtotal().toFixed(2)}</span>
                 </div>
                 {calculateDiscountTotal() > 0 && (
                   <div className="flex justify-between items-center text-sm text-amber-700">
-                    <span>Discount</span>
+                    <span>{t("Discount")}</span>
                     <span>-${calculateDiscountTotal().toFixed(2)}</span>
                   </div>
                 )}
                 {calculateTaxAmount() > 0 && (
                   <div className="flex justify-between items-center text-sm text-blue-900/80">
-                    <span>Tax ({parseFloat(taxRate) || 0}%)</span>
+                    <span>{t("Tax (")}{parseFloat(taxRate) || 0}%)</span>
                     <span>+${calculateTaxAmount().toFixed(2)}</span>
                   </div>
                 )}
                 <div className="flex justify-between items-center pt-2 border-t border-blue-200 dark:border-blue-900/50">
-                  <span className="text-lg font-semibold text-blue-900 dark:text-blue-300">Total Amount:</span>
+                  <span className="text-lg font-semibold text-blue-900 dark:text-blue-300">{t("Total Amount:")}</span>
                   <span className="text-2xl font-bold text-blue-900 dark:text-blue-300">
                     ${calculateTotal().toFixed(2)}
                   </span>
@@ -522,7 +526,7 @@ const MakeOrderPage = () => {
               <div className="flex flex-col sm:flex-row gap-3 pt-4">
                 <Link href={`/dashboard/customers/${customerId}`} className="sm:flex-1">
                   <Button type="button" variant="outline" className="w-full">
-                    Cancel
+                    {t("Cancel")}
                   </Button>
                 </Link>
                 <Button
@@ -535,12 +539,12 @@ const MakeOrderPage = () => {
                   {isSavingDraft ? (
                     <span className="flex items-center gap-2">
                       <Loader2 className="animate-spin h-4 w-4" />
-                      Saving Draft...
+                      {t("Saving Draft...")}
                     </span>
                   ) : (
                     <span className="flex items-center gap-2">
                       <Save className="h-4 w-4" />
-                      Save as Draft
+                      {t("Save as Draft")}
                     </span>
                   )}
                 </Button>
@@ -552,12 +556,12 @@ const MakeOrderPage = () => {
                   {isSubmitting ? (
                     <span className="flex items-center gap-2">
                       <Loader2 className="animate-spin h-4 w-4" />
-                      Creating Order...
+                      {t("Creating Order...")}
                     </span>
                   ) : (
                     <span className="flex items-center gap-2">
                       <ShoppingCart className="h-4 w-4" />
-                      Create Order
+                      {t("Create Order")}
                     </span>
                   )}
                 </Button>
@@ -569,9 +573,14 @@ const MakeOrderPage = () => {
       <ConfirmDialog
         open={confirmOpen}
         onClose={() => setConfirmOpen(false)}
-        title="Create order?"
-        description={`Create this order for $${calculateTotal().toFixed(2)}? This will deduct stock and add to the customer's debt.`}
-        confirmLabel="Create Order"
+        title={t("Create order?")}
+        description={t(
+          "Create this order for ${0}? This will deduct stock and add to the customer's debt.",
+          {
+            0: calculateTotal().toFixed(2)
+          }
+        )}
+        confirmLabel={t("Create Order")}
         variant="default"
         onConfirm={confirmSubmit}
         loading={isSubmitting}

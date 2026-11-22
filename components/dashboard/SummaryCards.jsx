@@ -1,5 +1,7 @@
 // components/dashboard/SummaryCards.jsx
 "use client";
+import { t } from "@/lib/i18n";
+import { useT } from "@/lib/i18n/LangProvider";
 
 import React from "react";
 import { useQuery } from "@tanstack/react-query";
@@ -31,13 +33,14 @@ const SectionHeading = ({ children }) => (
 );
 
 const SummaryCards = ({ range = "all", startDate, endDate }) => {
+  const t = useT();
   const { data, isLoading, error } = useQuery({
     queryKey: ["dashboard-summary", range, startDate, endDate],
     queryFn: () => fetchSummaryData(range, startDate, endDate),
   });
 
   if (error) {
-    return <div className="text-red-500 mb-8">Error loading summary</div>;
+    return <div className="text-red-500 mb-8">{t("Error loading summary")}</div>;
   }
 
   const profitData = data?.data?.selected || {};
@@ -69,27 +72,27 @@ const SummaryCards = ({ range = "all", startDate, endDate }) => {
     <div className="space-y-6 mb-8">
       {/* Sales & Orders */}
       <div>
-        <SectionHeading>Sales &amp; Orders</SectionHeading>
+        <SectionHeading>{t("Sales & Orders")}</SectionHeading>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           <DashboardCard
             icon={Package}
-            title="Total Orders"
+            title={t("Total Orders")}
             value={(profitData.totalAllOrders || 0).toLocaleString()}
-            description="Orders in selected range"
+            description={t("Orders in selected range")}
             color="purple"
           />
           <DashboardCard
             icon={ShoppingCart}
-            title="Total Revenue"
+            title={t("Total Revenue")}
             value={`$${(profitData.totalAllOrdersValue || 0).toLocaleString()}`}
-            description="Sales amount in selected range"
+            description={t("Sales amount in selected range")}
             color="orange"
           />
           <DashboardCard
             icon={Receipt}
-            title="Total Purchases"
+            title={t("Total Purchases")}
             value={`$${(profitData.purchasesTotal || 0).toLocaleString()}`}
-            description="Spent restocking from companies"
+            description={t("Spent restocking from companies")}
             color="orange"
           />
         </div>
@@ -97,27 +100,27 @@ const SummaryCards = ({ range = "all", startDate, endDate }) => {
 
       {/* Profit */}
       <div>
-        <SectionHeading>Profit</SectionHeading>
+        <SectionHeading>{t("Profit")}</SectionHeading>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           <DashboardCard
             icon={TrendingUp}
-            title="Real Profit"
+            title={t("Real Profit")}
             value={`$${(profitData.realProfit || 0).toLocaleString()}`}
-            description="Profit earned in selected range"
+            description={t("Profit earned in selected range")}
             color="green"
           />
           <DashboardCard
             icon={TrendingUp}
-            title="Expected Profit"
+            title={t("Expected Profit")}
             value={`$${(profitData.expectedProfit || 0).toLocaleString()}`}
-            description="Projected profit in selected range"
+            description={t("Projected profit in selected range")}
             color="blue"
           />
           <DashboardCard
             icon={Scale}
-            title="Profit (Sales − Payments)"
+            title={t("Profit (Sales − Payments)")}
             value={signed(salesMinusPayments)}
-            description="Total sales minus payments actually collected"
+            description={t("Total sales minus payments actually collected")}
             color={salesMinusPayments < 0 ? "red" : "yellow"}
           />
         </div>
@@ -125,27 +128,27 @@ const SummaryCards = ({ range = "all", startDate, endDate }) => {
 
       {/* Cash Flow */}
       <div>
-        <SectionHeading>Cash Flow</SectionHeading>
+        <SectionHeading>{t("Cash Flow")}</SectionHeading>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           <DashboardCard
             icon={netRevenue < 0 ? TrendingDown : TrendingUp}
-            title="Net Revenue"
+            title={t("Net Revenue")}
             value={signed(netRevenue)}
-            description="Revenue minus purchases (can be negative)"
+            description={t("Revenue minus purchases (can be negative)")}
             color={netRevenue < 0 ? "red" : "green"}
           />
           <DashboardCard
             icon={PiggyBank}
-            title="Revenue in Hand"
+            title={t("Revenue in Hand")}
             value={signed(revenueInHand)}
-            description="Net revenue minus disbursements (can be negative)"
+            description={t("Net revenue minus disbursements (can be negative)")}
             color={revenueInHand < 0 ? "red" : "green"}
           />
           <DashboardCard
             icon={Wallet}
-            title="Payments Collected"
+            title={t("Payments Collected")}
             value={`$${(profitData.paymentsCollected || 0).toLocaleString()}`}
-            description="Cash actually received from customers"
+            description={t("Cash actually received from customers")}
             color="blue"
           />
         </div>

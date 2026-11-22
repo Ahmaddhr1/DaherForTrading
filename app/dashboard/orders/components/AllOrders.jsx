@@ -1,4 +1,6 @@
 "use client";
+import { t } from "@/lib/i18n";
+import { useT } from "@/lib/i18n/LangProvider";
 
 import React, { useEffect, useState } from "react";
 import {
@@ -31,10 +33,10 @@ import {
   ArrowUpDown,
   Package,
 } from "lucide-react";
-import { format } from "date-fns";
+import { format } from "@/lib/i18n/date";
 import { useRouter } from "next/navigation";
 import axios from "axios";
-import { toast } from "sonner";
+import { toast } from "@/lib/i18n/toast";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { localDayStartISO, localDayEndISO } from "@/lib/dateUtils";
 import { DateRangeFilter } from "./DateRangeFilter";
@@ -55,6 +57,7 @@ const SORT_OPTIONS = [
 const PAGE_SIZE_OPTIONS = [10, 20, 50];
 
 export default function AllOrders() {
+  const t = useT();
   const router = useRouter();
   const queryClient = useQueryClient();
   const { isOwner } = useIsOwner();
@@ -171,33 +174,33 @@ export default function AllOrders() {
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="outline" size="icon" disabled={actionLoading}>
-          <span className="sr-only">Open menu</span>⋯
+          <span className="sr-only">{t("Open menu")}</span>⋯
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
         <DropdownMenuItem onClick={() => handleAction("view", order._id)}>
-          View Invoice
+          {t("View Invoice")}
         </DropdownMenuItem>
         {order.status === "pending" && canEditOrders && (
           <DropdownMenuItem onClick={() => router.push(`/dashboard/orders/${order._id}/edit`)}>
-            Update Order
+            {t("Update Order")}
           </DropdownMenuItem>
         )}
         {order.status !== "paid" && (
           <>
             {canFinalizeOrders && (
               <DropdownMenuItem onClick={() => handleAction("pay", order._id)}>
-                Make Payment
+                {t("Make Payment")}
               </DropdownMenuItem>
             )}
             {canFinalizeOrders && (
               <DropdownMenuItem onClick={() => handleAction("markPaid", order._id)}>
-                Mark as Paid
+                {t("Mark as Paid")}
               </DropdownMenuItem>
             )}
             {canDelete && (
               <DropdownMenuItem onClick={() => handleAction("delete", order._id)}>
-                Undo Order
+                {t("Undo Order")}
               </DropdownMenuItem>
             )}
           </>
@@ -215,7 +218,7 @@ export default function AllOrders() {
           totalAmount={totals.totalAmount}
           totalProfit={totals.totalProfit}
           collectedAmount={totals.collectedAmount}
-          label="Total of All Orders"
+          label={t("Total of All Orders")}
         />
       )}
 
@@ -224,20 +227,20 @@ export default function AllOrders() {
         <Card className="shadow-sm border-gray-200 dark:border-gray-800">
           <CardContent className="p-4 space-y-4">
             <div className="relative max-w-md">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 h-4 w-4" />
+              <Search className="absolute start-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 h-4 w-4" />
               <Input
                 type="text"
-                placeholder="Search by customer name or order # (e.g. 4F2A91)"
+                placeholder={t("Search by customer name or order # (e.g. 4F2A91)")}
                 value={searchInput}
                 onChange={(e) => setSearchInput(e.target.value)}
-                className="pl-10"
+                className="ps-10"
               />
             </div>
 
             <div className="flex flex-col sm:flex-row sm:flex-wrap gap-2">
               <div className="flex items-center gap-2">
                 <Filter className="h-4 w-4 text-gray-500 dark:text-gray-400" />
-                <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Status:</span>
+                <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{t("Status:")}</span>
               </div>
               <Button
                 variant={statusFilter === "all" ? "default" : "outline"}
@@ -245,8 +248,8 @@ export default function AllOrders() {
                 onClick={() => setStatusFilter("all")}
                 className="w-full sm:w-auto justify-center"
               >
-                All
-                <Badge variant="secondary" className="ml-1">{totalCount}</Badge>
+                {t("All")}
+                <Badge variant="secondary" className="ms-1">{totalCount}</Badge>
               </Button>
               <Button
                 variant={statusFilter === "pending" ? "default" : "outline"}
@@ -254,8 +257,8 @@ export default function AllOrders() {
                 onClick={() => setStatusFilter("pending")}
                 className="w-full sm:w-auto justify-center"
               >
-                Pending
-                <Badge variant="secondary" className="ml-1">{counts.pending}</Badge>
+                {t("Pending")}
+                <Badge variant="secondary" className="ms-1">{counts.pending}</Badge>
               </Button>
               <Button
                 variant={statusFilter === "partiallyPaid" ? "default" : "outline"}
@@ -263,8 +266,8 @@ export default function AllOrders() {
                 onClick={() => setStatusFilter("partiallyPaid")}
                 className="w-full sm:w-auto justify-center"
               >
-                Partially Paid
-                <Badge variant="secondary" className="ml-1">{counts.partiallyPaid}</Badge>
+                {t("Partially Paid")}
+                <Badge variant="secondary" className="ms-1">{counts.partiallyPaid}</Badge>
               </Button>
               <Button
                 variant={statusFilter === "paid" ? "default" : "outline"}
@@ -272,8 +275,8 @@ export default function AllOrders() {
                 onClick={() => setStatusFilter("paid")}
                 className="w-full sm:w-auto justify-center"
               >
-                Paid
-                <Badge variant="secondary" className="ml-1">{counts.paid}</Badge>
+                {t("Paid")}
+                <Badge variant="secondary" className="ms-1">{counts.paid}</Badge>
               </Button>
             </div>
 
@@ -287,7 +290,7 @@ export default function AllOrders() {
               <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-2">
                 <span className="flex items-center gap-1.5 text-sm font-medium text-gray-700 dark:text-gray-300">
                   <ArrowUpDown className="h-4 w-4 text-gray-500 dark:text-gray-400" />
-                  Sort by
+                  {t("Sort by")}
                 </span>
                 <select
                   value={sortBy}
@@ -295,12 +298,12 @@ export default function AllOrders() {
                   className="w-full sm:w-auto border rounded-md text-sm px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
                   {SORT_OPTIONS.map((option) => (
-                    <option key={option.value} value={option.value}>{option.label}</option>
+                    <option key={option.value} value={option.value}>{t(option.label)}</option>
                   ))}
                 </select>
               </div>
               <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-2">
-                <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Per page</span>
+                <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{t("Per page")}</span>
                 <select
                   value={pageSize}
                   onChange={(e) => setPageSize(parseInt(e.target.value))}
@@ -319,11 +322,11 @@ export default function AllOrders() {
       {isLoading ? (
         <TableSkeleton rows={pageSize} cols={6} />
       ) : isError ? (
-        <div className="text-center py-12 text-red-600">Failed to load orders.</div>
+        <div className="text-center py-12 text-red-600">{t("Failed to load orders.")}</div>
       ) : orders.length === 0 ? (
         <div className="text-center py-12 text-gray-500 dark:text-gray-400">
           <Package className="h-12 w-12 mx-auto mb-3" />
-          <p>No orders found</p>
+          <p>{t("No orders found")}</p>
         </div>
       ) : (
         <>
@@ -336,7 +339,7 @@ export default function AllOrders() {
                 actions={
                   <div className="flex items-center justify-between gap-2">
                     <Button variant="outline" size="sm" onClick={() => handleAction("view", order._id)}>
-                      View Invoice
+                      {t("View Invoice")}
                     </Button>
                     {actionsMenu(order)}
                   </div>
@@ -348,15 +351,15 @@ export default function AllOrders() {
           {/* Desktop: table */}
           <Card className="shadow-sm border-gray-200 dark:border-gray-800 hidden sm:block">
             <Table>
-              <TableCaption>All orders across all customers</TableCaption>
+              <TableCaption>{t("All orders across all customers")}</TableCaption>
               <TableHeader>
                 <TableRow>
-                  <TableHead className="w-28">Order #</TableHead>
-                  <TableHead>Customer</TableHead>
-                  <TableHead className="text-center">Total</TableHead>
-                  <TableHead className="text-center">Status</TableHead>
-                  <TableHead>Date</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
+                  <TableHead className="w-28">{t("Order #")}</TableHead>
+                  <TableHead>{t("Customer")}</TableHead>
+                  <TableHead className="text-center">{t("Total")}</TableHead>
+                  <TableHead className="text-center">{t("Status")}</TableHead>
+                  <TableHead>{t("Date")}</TableHead>
+                  <TableHead className="text-end">{t("Actions")}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -373,7 +376,7 @@ export default function AllOrders() {
                     <TableCell className="text-gray-500 dark:text-gray-400 text-sm">
                       {format(new Date(order.createdAt), "MMM d, yyyy HH:mm")}
                     </TableCell>
-                    <TableCell className="text-right">{actionsMenu(order)}</TableCell>
+                    <TableCell className="text-end">{actionsMenu(order)}</TableCell>
                   </TableRow>
                 ))}
               </TableBody>
@@ -384,13 +387,13 @@ export default function AllOrders() {
             <Card className="shadow-sm border-gray-200 dark:border-gray-800">
               <div className="flex items-center justify-center gap-4 p-4">
                 <Button onClick={() => setPage((p) => p - 1)} disabled={page === 1} variant="outline" size="sm" className="flex items-center gap-2">
-                  <ChevronLeft className="h-4 w-4" />
-                  Previous
+                  <ChevronLeft className="rtl-flip h-4 w-4" />
+                  {t("Previous")}
                 </Button>
-                <span className="text-sm text-gray-600 dark:text-gray-400">Page {page} of {totalPages}</span>
+                <span className="text-sm text-gray-600 dark:text-gray-400">{t("Page")} {page} {t("of")} {totalPages}</span>
                 <Button onClick={() => setPage((p) => p + 1)} disabled={page === totalPages} variant="outline" size="sm" className="flex items-center gap-2">
-                  Next
-                  <ChevronRight className="h-4 w-4" />
+                  {t("Next")}
+                  <ChevronRight className="rtl-flip h-4 w-4" />
                 </Button>
               </div>
             </Card>
@@ -400,18 +403,18 @@ export default function AllOrders() {
       <ConfirmDialog
         open={!!deleteOrderId}
         onClose={() => setDeleteOrderId(null)}
-        title="Undo order?"
-        description="Undo this order? Stock will be restored and the customer's debt reduced."
-        confirmLabel="Undo Order"
+        title={t("Undo order?")}
+        description={t("Undo this order? Stock will be restored and the customer's debt reduced.")}
+        confirmLabel={t("Undo Order")}
         onConfirm={confirmDeleteOrder}
         loading={actionLoading}
       />
       <ConfirmDialog
         open={!!markPaidOrderId}
         onClose={() => setMarkPaidOrderId(null)}
-        title="Mark as paid?"
-        description="Mark this order as fully paid?"
-        confirmLabel="Mark as Paid"
+        title={t("Mark as paid?")}
+        description={t("Mark this order as fully paid?")}
+        confirmLabel={t("Mark as Paid")}
         variant="default"
         onConfirm={confirmMarkPaid}
         loading={actionLoading}

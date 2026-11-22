@@ -1,4 +1,6 @@
 "use client";
+import { t, dateLocale } from "@/lib/i18n";
+import { useT } from "@/lib/i18n/LangProvider";
 
 import Link from "next/link";
 import { useParams } from "next/navigation";
@@ -9,7 +11,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { TableSkeleton } from "@/components/ui/skeleton-patterns";
 import { ChangesTable } from "@/components/audit/ChangesTable";
-import { describeAction, actionKind, entityHref } from "@/lib/auditFields";
+import { describeAction, actionKind, entityHref, translateEntityLabel } from "@/lib/auditFields";
+import { useLang } from "@/lib/i18n/LangProvider";
 
 const KIND_BADGE = {
   create: "bg-green-100 text-green-800 dark:bg-green-900/40 dark:text-green-300",
@@ -18,6 +21,8 @@ const KIND_BADGE = {
 };
 
 export default function ActivityEntryPage() {
+  const t = useT();
+  const { lang } = useLang();
   const { id } = useParams();
 
   const { data, isLoading, error } = useQuery({
@@ -39,8 +44,8 @@ export default function ActivityEntryPage() {
           href="/dashboard/activity"
           className="inline-flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 mb-6"
         >
-          <ArrowLeft className="h-4 w-4" />
-          Back to Activity Log
+          <ArrowLeft className="rtl-flip h-4 w-4" />
+          {t("Back to Activity Log")}
         </Link>
 
         {isLoading && <TableSkeleton rows={6} cols={3} />}
@@ -49,7 +54,7 @@ export default function ActivityEntryPage() {
           <Card>
             <CardContent className="pt-6 text-center text-red-600 flex flex-col items-center gap-2">
               <AlertCircle className="h-8 w-8" />
-              {error.response?.status === 404 ? "This activity entry no longer exists." : "Failed to load this activity entry."}
+              {error.response?.status === 404 ? t("This activity entry no longer exists.") : t("Failed to load this activity entry.")}
             </CardContent>
           </Card>
         )}
@@ -63,12 +68,12 @@ export default function ActivityEntryPage() {
               <div className="min-w-0">
                 <div className="flex flex-wrap items-center gap-2 mb-1">
                   <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${KIND_BADGE[kind]}`}>
-                    {describeAction(entry.action)}
+                    {describeAction(entry.action, t)}
                   </span>
-                  <Badge variant="outline">{entry.entityType}</Badge>
+                  <Badge variant="outline">{t(entry.entityType)}</Badge>
                 </div>
                 <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-gray-100 break-words">
-                  {entry.entityLabel || describeAction(entry.action)}
+                  {translateEntityLabel(entry.entityLabel, t) || describeAction(entry.action, t)}
                 </h1>
                 <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-gray-600 dark:text-gray-400">
                   <span className="inline-flex items-center gap-1.5">
@@ -77,32 +82,34 @@ export default function ActivityEntryPage() {
                   </span>
                   <span className="inline-flex items-center gap-1.5">
                     <Clock className="h-4 w-4" />
-                    {new Date(entry.createdAt).toLocaleString()}
+                    {new Date(entry.createdAt).toLocaleString(dateLocale())}
                   </span>
                   {href && (
                     <Link href={href} className="inline-flex items-center gap-1.5 text-blue-600 hover:underline">
                       <ExternalLink className="h-4 w-4" />
-                      Open {entry.entityType.toLowerCase()}
+                      {t("Open")} {t(entry.entityType)}
                     </Link>
                   )}
                 </div>
               </div>
             </div>
 
+            {lang === "en" && (
             <Card>
               <CardHeader className="pb-3">
-                <CardTitle className="text-base">Summary</CardTitle>
+                <CardTitle className="text-base">{t("Summary")}</CardTitle>
               </CardHeader>
               <CardContent className="text-gray-700 dark:text-gray-300">{entry.summary}</CardContent>
             </Card>
+            )}
 
             <Card>
               <CardHeader className="pb-3">
                 <CardTitle className="text-base">
-                  {kind === "create" ? "Values set" : kind === "delete" ? "Values removed" : "What changed"}
+                  {kind === "create" ? t("Values set") : kind === "delete" ? t("Values removed") : t("What changed")}
                   {changes.length > 0 && (
-                    <span className="ml-2 text-sm font-normal text-gray-500">
-                      {changes.length} {changes.length === 1 ? "field" : "fields"}
+                    <span className="ms-2 text-sm font-normal text-gray-500">
+                      {changes.length} {changes.length === 1 ? t("field") : t("fields")}
                     </span>
                   )}
                 </CardTitle>
@@ -114,8 +121,9 @@ export default function ActivityEntryPage() {
                   <div className="flex items-start gap-3 rounded-lg bg-gray-50 dark:bg-gray-900/60 p-4 text-sm text-gray-600 dark:text-gray-400">
                     <Info className="h-5 w-5 shrink-0 mt-0.5" />
                     <p>
-                      No field-level details for this entry - it was recorded before detailed change tracking was
-                      added, so only the summary above is available.
+                      {t(
+                        "No field-level details for this entry - it was recorded before detailed change tracking was added, so only the summary above is available."
+                      )}
                     </p>
                   </div>
                 )}
@@ -125,7 +133,7 @@ export default function ActivityEntryPage() {
             {related.length > 0 && (
               <Card>
                 <CardHeader className="pb-3">
-                  <CardTitle className="text-base">Other activity on this {entry.entityType.toLowerCase()}</CardTitle>
+                  <CardTitle className="text-base">{t("Other activity on this")} {t(entry.entityType)}</CardTitle>
                 </CardHeader>
                 <CardContent className="p-0">
                   <ul className="divide-y divide-gray-100 dark:divide-gray-800">
@@ -136,7 +144,7 @@ export default function ActivityEntryPage() {
                           className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-4 px-6 py-3 hover:bg-gray-50 dark:hover:bg-gray-900/60"
                         >
                           <span className="text-xs text-gray-500 dark:text-gray-400 whitespace-nowrap sm:w-44">
-                            {new Date(item.createdAt).toLocaleString()}
+                            {new Date(item.createdAt).toLocaleString(dateLocale())}
                           </span>
                           <span className="text-sm font-medium sm:w-28">{item.adminName}</span>
                           <span className="text-sm text-gray-700 dark:text-gray-300 flex-1 min-w-0 truncate">
@@ -144,7 +152,7 @@ export default function ActivityEntryPage() {
                           </span>
                           {item.changeCount > 0 && (
                             <span className="text-xs text-blue-600 whitespace-nowrap">
-                              {item.changeCount} {item.changeCount === 1 ? "change" : "changes"}
+                              {item.changeCount} {item.changeCount === 1 ? t("change") : t("changes")}
                             </span>
                           )}
                         </Link>

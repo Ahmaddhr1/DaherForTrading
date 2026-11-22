@@ -1,9 +1,11 @@
 "use client";
+import { t } from "@/lib/i18n";
+import { useT } from "@/lib/i18n/LangProvider";
 
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
-import { toast } from "sonner";
+import { toast } from "@/lib/i18n/toast";
 import Link from "next/link";
 import {
   Users,
@@ -71,6 +73,7 @@ function PermissionCheckboxes({ permissions, onChange }) {
 }
 
 export default function AdminsPage() {
+  const t = useT();
   const queryClient = useQueryClient();
   const [createOpen, setCreateOpen] = useState(false);
   const [createForm, setCreateForm] = useState(EMPTY_CREATE_FORM);
@@ -231,9 +234,9 @@ export default function AdminsPage() {
               <Users className="h-6 w-6 text-blue-600" />
             </div>
             <div className="min-w-0">
-              <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-gray-100 truncate">Admins</h1>
+              <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-gray-100 truncate">{t("Admins")}</h1>
               <p className="text-gray-600 dark:text-gray-400 text-sm sm:text-base truncate">
-                Manage who can log in and what they can do
+                {t("Manage who can log in and what they can do")}
               </p>
             </div>
           </div>
@@ -241,7 +244,7 @@ export default function AdminsPage() {
             <Link href="/dashboard/admins/performance">
               <Button variant="outline" className="flex items-center gap-2">
                 <BarChart3 className="h-4 w-4" />
-                <span className="hidden sm:inline">Performance</span>
+                <span className="hidden sm:inline">{t("Performance")}</span>
               </Button>
             </Link>
             <Button
@@ -249,7 +252,7 @@ export default function AdminsPage() {
               className="flex items-center gap-2"
             >
               <Plus className="h-4 w-4" />
-              <span className="hidden sm:inline">Add Admin</span>
+              <span className="hidden sm:inline">{t("Add Admin")}</span>
             </Button>
           </div>
         </div>
@@ -259,7 +262,7 @@ export default function AdminsPage() {
         {error && !isLoading && (
           <Card>
             <CardContent className="pt-6 text-center text-red-600">
-              Failed to load admins.
+              {t("Failed to load admins.")}
             </CardContent>
           </Card>
         )}
@@ -271,11 +274,11 @@ export default function AdminsPage() {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Username</TableHead>
-                    <TableHead>Email / Login Code</TableHead>
-                    <TableHead>Role</TableHead>
-                    <TableHead>Permissions</TableHead>
-                    <TableHead>Status</TableHead>
+                    <TableHead>{t("Username")}</TableHead>
+                    <TableHead>{t("Email / Login Code")}</TableHead>
+                    <TableHead>{t("Role")}</TableHead>
+                    <TableHead>{t("Permissions")}</TableHead>
+                    <TableHead>{t("Status")}</TableHead>
                     <TableHead className="w-10" />
                   </TableRow>
                 </TableHeader>
@@ -286,13 +289,13 @@ export default function AdminsPage() {
                       <TableRow key={admin._id}>
                         <TableCell className="font-medium">
                           {admin.adminname}
-                          {isSelf && <span className="text-gray-400 dark:text-gray-500 text-xs ml-2">(you)</span>}
+                          {isSelf && <span className="text-gray-400 dark:text-gray-500 text-xs ms-2">{t("(you)")}</span>}
                         </TableCell>
                         <TableCell>
                           {admin.email ? (
                             <span className="text-sm text-gray-700 dark:text-gray-300">{admin.email}</span>
                           ) : (
-                            <span className="text-sm text-gray-400 dark:text-gray-500 italic">No code (direct login)</span>
+                            <span className="text-sm text-gray-400 dark:text-gray-500 italic">{t("No code (direct login)")}</span>
                           )}
                         </TableCell>
                         <TableCell>
@@ -302,19 +305,19 @@ export default function AdminsPage() {
                             ) : (
                               <UserRound className="h-3 w-3 text-gray-500 dark:text-gray-400" />
                             )}
-                            {admin.role === "owner" ? "Owner" : "Employee"}
+                            {admin.role === "owner" ? t("Owner") : t("Employee")}
                           </Badge>
                         </TableCell>
                         <TableCell className="text-sm text-gray-600 dark:text-gray-400">
                           {admin.role === "owner" ? (
-                            "Full access"
+                            t("Full access")
                           ) : (
                             (() => {
                               const count = PERMISSION_KEYS.filter((key) => admin.permissions?.[key]).length;
                               return count === 0 ? (
-                                <span className="text-gray-400 dark:text-gray-500 italic">None</span>
+                                <span className="text-gray-400 dark:text-gray-500 italic">{t("None")}</span>
                               ) : (
-                                `${count} of ${PERMISSION_KEYS.length}`
+                                t("{0} of {1}", { 0: count, 1: PERMISSION_KEYS.length })
                               );
                             })()
                           )}
@@ -328,7 +331,7 @@ export default function AdminsPage() {
                                 : "text-gray-500 dark:text-gray-400 border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-950"
                             }
                           >
-                            {admin.active ? "Active" : "Deactivated"}
+                            {admin.active ? t("Active") : t("Deactivated")}
                           </Badge>
                         </TableCell>
                         <TableCell>
@@ -343,11 +346,11 @@ export default function AdminsPage() {
                                 <DropdownMenuItem onClick={() => handleToggleRole(admin)}>
                                   {admin.role === "owner" ? (
                                     <>
-                                      <UserRound className="h-4 w-4" /> Make Employee
+                                      <UserRound className="h-4 w-4" /> {t("Make Employee")}
                                     </>
                                   ) : (
                                     <>
-                                      <Crown className="h-4 w-4" /> Make Owner
+                                      <Crown className="h-4 w-4" /> {t("Make Owner")}
                                     </>
                                   )}
                                 </DropdownMenuItem>
@@ -357,7 +360,7 @@ export default function AdminsPage() {
                                     setResetPassword("");
                                   }}
                                 >
-                                  <KeyRound className="h-4 w-4" /> Reset Password
+                                  <KeyRound className="h-4 w-4" /> {t("Reset Password")}
                                 </DropdownMenuItem>
                                 <DropdownMenuItem
                                   onClick={() => {
@@ -365,7 +368,7 @@ export default function AdminsPage() {
                                     setEmailValue(admin.email || "");
                                   }}
                                 >
-                                  <Mail className="h-4 w-4" /> Edit Email
+                                  <Mail className="h-4 w-4" /> {t("Edit Email")}
                                 </DropdownMenuItem>
                                 {admin.role !== "owner" && (
                                   <DropdownMenuItem
@@ -374,17 +377,17 @@ export default function AdminsPage() {
                                       setPermissionsValue({ ...emptyPermissions(), ...admin.permissions });
                                     }}
                                   >
-                                    <Lock className="h-4 w-4" /> Edit Permissions
+                                    <Lock className="h-4 w-4" /> {t("Edit Permissions")}
                                   </DropdownMenuItem>
                                 )}
                                 <DropdownMenuItem onClick={() => handleToggleActive(admin)}>
                                   {admin.active ? (
                                     <>
-                                      <ShieldOff className="h-4 w-4" /> Deactivate
+                                      <ShieldOff className="h-4 w-4" /> {t("Deactivate")}
                                     </>
                                   ) : (
                                     <>
-                                      <ShieldCheck className="h-4 w-4" /> Activate
+                                      <ShieldCheck className="h-4 w-4" /> {t("Activate")}
                                     </>
                                   )}
                                 </DropdownMenuItem>
@@ -392,7 +395,7 @@ export default function AdminsPage() {
                                   variant="destructive"
                                   onClick={() => handleDelete(admin)}
                                 >
-                                  <Trash2 className="h-4 w-4" /> Delete
+                                  <Trash2 className="h-4 w-4" /> {t("Delete")}
                                 </DropdownMenuItem>
                               </DropdownMenuContent>
                             </DropdownMenu>
@@ -413,12 +416,12 @@ export default function AdminsPage() {
       <Modal
         open={createOpen}
         onClose={() => setCreateOpen(false)}
-        title="Add Admin"
-        description="Create a new login for this dashboard"
+        title={t("Add Admin")}
+        description={t("Create a new login for this dashboard")}
       >
         <form onSubmit={handleCreate} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="new-adminname">Username</Label>
+            <Label htmlFor="new-adminname">{t("Username")}</Label>
             <Input
               id="new-adminname"
               value={createForm.adminname}
@@ -428,7 +431,7 @@ export default function AdminsPage() {
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="new-email">Email</Label>
+            <Label htmlFor="new-email">{t("Email")}</Label>
             <Input
               id="new-email"
               type="email"
@@ -437,10 +440,10 @@ export default function AdminsPage() {
               autoComplete="off"
               required
             />
-            <p className="text-xs text-gray-500 dark:text-gray-400">A login code is sent here every time they sign in</p>
+            <p className="text-xs text-gray-500 dark:text-gray-400">{t("A login code is sent here every time they sign in")}</p>
           </div>
           <div className="space-y-2">
-            <Label htmlFor="new-password">Password</Label>
+            <Label htmlFor="new-password">{t("Password")}</Label>
             <Input
               id="new-password"
               type="password"
@@ -449,23 +452,23 @@ export default function AdminsPage() {
               autoComplete="new-password"
               required
             />
-            <p className="text-xs text-gray-500 dark:text-gray-400">At least 8 characters</p>
+            <p className="text-xs text-gray-500 dark:text-gray-400">{t("At least 8 characters")}</p>
           </div>
           <div className="space-y-2">
-            <Label htmlFor="new-role">Role</Label>
+            <Label htmlFor="new-role">{t("Role")}</Label>
             <select
               id="new-role"
               value={createForm.role}
               onChange={(e) => setCreateForm((f) => ({ ...f, role: e.target.value }))}
               className="border-input flex h-9 w-full rounded-md border bg-transparent px-3 py-1 text-sm shadow-xs"
             >
-              <option value="employee">Employee - day-to-day access only</option>
-              <option value="owner">Owner - full access</option>
+              <option value="employee">{t("Employee - day-to-day access only")}</option>
+              <option value="owner">{t("Owner - full access")}</option>
             </select>
           </div>
           {createForm.role === "employee" && (
             <div className="space-y-2">
-              <Label>Extra Permissions</Label>
+              <Label>{t("Extra Permissions")}</Label>
               <PermissionCheckboxes
                 permissions={createForm.permissions}
                 onChange={(permissions) => setCreateForm((f) => ({ ...f, permissions }))}
@@ -479,10 +482,10 @@ export default function AdminsPage() {
           >
             {createMutation.isPending ? (
               <span className="flex items-center gap-2">
-                <Loader2 className="h-4 w-4 animate-spin" /> Creating...
+                <Loader2 className="h-4 w-4 animate-spin" /> {t("Creating...")}
               </span>
             ) : (
-              "Create Admin"
+              t("Create Admin")
             )}
           </Button>
         </form>
@@ -492,12 +495,14 @@ export default function AdminsPage() {
       <Modal
         open={!!resetTarget}
         onClose={() => setResetTarget(null)}
-        title="Reset Password"
-        description={resetTarget ? `Set a new password for ${resetTarget.adminname}` : ""}
+        title={t("Reset Password")}
+        description={resetTarget ? t("Set a new password for {0}", {
+          0: resetTarget.adminname
+        }) : ""}
       >
         <form onSubmit={handleResetPassword} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="reset-password">New Password</Label>
+            <Label htmlFor="reset-password">{t("New Password")}</Label>
             <Input
               id="reset-password"
               type="password"
@@ -506,7 +511,7 @@ export default function AdminsPage() {
               autoComplete="new-password"
               required
             />
-            <p className="text-xs text-gray-500 dark:text-gray-400">At least 8 characters</p>
+            <p className="text-xs text-gray-500 dark:text-gray-400">{t("At least 8 characters")}</p>
           </div>
           <Button
             type="submit"
@@ -515,10 +520,10 @@ export default function AdminsPage() {
           >
             {patchMutation.isPending ? (
               <span className="flex items-center gap-2">
-                <Loader2 className="h-4 w-4 animate-spin" /> Saving...
+                <Loader2 className="h-4 w-4 animate-spin" /> {t("Saving...")}
               </span>
             ) : (
-              "Set New Password"
+              t("Set New Password")
             )}
           </Button>
         </form>
@@ -528,31 +533,33 @@ export default function AdminsPage() {
       <Modal
         open={!!emailTarget}
         onClose={() => setEmailTarget(null)}
-        title="Edit Email"
-        description={emailTarget ? `Login code address for ${emailTarget.adminname}` : ""}
+        title={t("Edit Email")}
+        description={emailTarget ? t("Login code address for {0}", {
+          0: emailTarget.adminname
+        }) : ""}
       >
         <form onSubmit={handleEditEmail} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="edit-email">Email</Label>
+            <Label htmlFor="edit-email">{t("Email")}</Label>
             <Input
               id="edit-email"
               type="email"
               value={emailValue}
               onChange={(e) => setEmailValue(e.target.value)}
               autoComplete="off"
-              placeholder="Leave blank to disable the login code"
+              placeholder={t("Leave blank to disable the login code")}
             />
             <p className="text-xs text-gray-500 dark:text-gray-400">
-              Leaving this blank lets {emailTarget?.adminname} log in with just a password again.
+              {t("Leaving this blank lets")} {emailTarget?.adminname} {t("log in with just a password again.")}
             </p>
           </div>
           <Button type="submit" disabled={patchMutation.isPending} className="w-full">
             {patchMutation.isPending ? (
               <span className="flex items-center gap-2">
-                <Loader2 className="h-4 w-4 animate-spin" /> Saving...
+                <Loader2 className="h-4 w-4 animate-spin" /> {t("Saving...")}
               </span>
             ) : (
-              "Save Email"
+              t("Save Email")
             )}
           </Button>
         </form>
@@ -562,18 +569,20 @@ export default function AdminsPage() {
       <Modal
         open={!!permissionsTarget}
         onClose={() => setPermissionsTarget(null)}
-        title="Edit Permissions"
-        description={permissionsTarget ? `What ${permissionsTarget.adminname} can do beyond day-to-day access` : ""}
+        title={t("Edit Permissions")}
+        description={permissionsTarget ? t("What {0} can do beyond day-to-day access", {
+          0: permissionsTarget.adminname
+        }) : ""}
       >
         <form onSubmit={handleEditPermissions} className="space-y-4">
           <PermissionCheckboxes permissions={permissionsValue} onChange={setPermissionsValue} />
           <Button type="submit" disabled={patchMutation.isPending} className="w-full">
             {patchMutation.isPending ? (
               <span className="flex items-center gap-2">
-                <Loader2 className="h-4 w-4 animate-spin" /> Saving...
+                <Loader2 className="h-4 w-4 animate-spin" /> {t("Saving...")}
               </span>
             ) : (
-              "Save Permissions"
+              t("Save Permissions")
             )}
           </Button>
         </form>
@@ -581,21 +590,29 @@ export default function AdminsPage() {
       <ConfirmDialog
         open={!!deleteTarget}
         onClose={() => setDeleteTarget(null)}
-        title="Delete admin?"
-        description={`Permanently delete ${deleteTarget?.adminname}? This can't be undone.`}
+        title={t("Delete admin?")}
+        description={t("Permanently delete {0}? This can't be undone.", {
+          0: deleteTarget?.adminname
+        })}
         onConfirm={confirmDelete}
         loading={deleteMutation.isPending}
       />
       <ConfirmDialog
         open={!!roleChangeTarget}
         onClose={() => setRoleChangeTarget(null)}
-        title="Change role?"
+        title={t("Change role?")}
         description={
           roleChangeTarget
-            ? `Change ${roleChangeTarget.adminname}'s role to "${roleChangeTarget.role === "owner" ? "employee" : "owner"}"? This takes effect the next time they log in.`
+            ? t(
+            "Change {0}'s role to \"{1}\"? This takes effect the next time they log in.",
+            {
+              0: roleChangeTarget.adminname,
+              1: roleChangeTarget.role === "owner" ? "employee" : "owner"
+            }
+          )
             : ""
         }
-        confirmLabel="Change Role"
+        confirmLabel={t("Change Role")}
         variant="default"
         onConfirm={confirmToggleRole}
         loading={patchMutation.isPending}
@@ -603,13 +620,18 @@ export default function AdminsPage() {
       <ConfirmDialog
         open={!!deactivateTarget}
         onClose={() => setDeactivateTarget(null)}
-        title="Deactivate admin?"
+        title={t("Deactivate admin?")}
         description={
           deactivateTarget
-            ? `Deactivate ${deactivateTarget.adminname}? They won't be able to log in anymore (an existing session stays valid until it expires).`
+            ? t(
+            "Deactivate {0}? They won't be able to log in anymore (an existing session stays valid until it expires).",
+            {
+              0: deactivateTarget.adminname
+            }
+          )
             : ""
         }
-        confirmLabel="Deactivate"
+        confirmLabel={t("Deactivate")}
         onConfirm={confirmDeactivate}
         loading={patchMutation.isPending}
       />

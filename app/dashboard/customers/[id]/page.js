@@ -1,4 +1,6 @@
 "use client";
+import { t } from "@/lib/i18n";
+import { useT } from "@/lib/i18n/LangProvider";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -9,18 +11,19 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { FormSkeleton, PageHeaderSkeleton } from "@/components/ui/skeleton-patterns";
 import { Eye, Loader2, User, Phone, DollarSign, UserCog, Package, PhoneCall, Lock, FileText, Layers, AlertTriangle } from "lucide-react";
-import { format } from "date-fns";
+import { format } from "@/lib/i18n/date";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
-import { toast } from "sonner";
+import { toast } from "@/lib/i18n/toast";
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import { PRICE_TIERS } from "@/lib/priceTiers";
 import { useHasPermission } from "@/lib/useHasPermission";
 
 const EditCustomerPage = () => {
+  const t = useT();
   const router = useRouter();
   const { id } = useParams();
   const queryClient = useQueryClient();
@@ -155,8 +158,8 @@ const EditCustomerPage = () => {
                 <UserCog className="h-6 w-6 text-blue-600" />
               </div>
               <div className="min-w-0">
-                <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-gray-100 truncate">Edit Customer</h1>
-                <p className="text-gray-600 dark:text-gray-400 text-sm sm:text-base truncate">Update customer profile and debt information</p>
+                <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-gray-100 truncate">{t("Edit Customer")}</h1>
+                <p className="text-gray-600 dark:text-gray-400 text-sm sm:text-base truncate">{t("Update customer profile and debt information")}</p>
               </div>
             </div>
 
@@ -165,7 +168,7 @@ const EditCustomerPage = () => {
                 <Link href={`/dashboard/customers/${id}/addorder`} className="flex-1 sm:flex-none">
                   <Button className="flex items-center gap-2 w-full sm:w-auto justify-center">
                     <Package className="h-4 w-4" />
-                    Create Order
+                    {t("Create Order")}
                   </Button>
                 </Link>
               </div>
@@ -181,7 +184,7 @@ const EditCustomerPage = () => {
             >
               <Button variant="outline" className="flex items-center justify-center gap-2 w-full sm:w-auto">
                 <PhoneCall className="h-4 w-4" />
-                Contact via WhatsApp
+                {t("Contact via WhatsApp")}
               </Button>
             </a>
 
@@ -189,7 +192,7 @@ const EditCustomerPage = () => {
               <Link href={`/dashboard/customers/${id}/orders`}>
                 <Button variant="outline" className="flex items-center justify-center gap-2 w-full sm:w-auto">
                   <Eye className="h-4 w-4" />
-                  View Orders ({ordersCount})
+                  {t("View Orders (")}{ordersCount})
                 </Button>
               </Link>
             )}
@@ -197,7 +200,7 @@ const EditCustomerPage = () => {
             <Link href={`/dashboard/customers/${id}/statement`}>
               <Button variant="outline" className="flex items-center justify-center gap-2 w-full sm:w-auto">
                 <FileText className="h-4 w-4" />
-                Statement
+                {t("Statement")}
               </Button>
             </Link>
           </div>
@@ -206,10 +209,12 @@ const EditCustomerPage = () => {
             <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-900/50 rounded-lg p-4">
               <div className="flex items-center gap-2 text-amber-800 dark:text-amber-400">
                 <Package className="h-4 w-4" />
-                <span className="font-medium">No Orders Yet</span>
+                <span className="font-medium">{t("No Orders Yet")}</span>
               </div>
               <p className="text-amber-700 text-sm mt-1">
-                This customer doesn&apos;t have any orders. Create their first order to get started.
+                {t(
+                  "This customer doesn't have any orders. Create their first order to get started."
+                )}
               </p>
             </div>
           )}
@@ -222,10 +227,10 @@ const EditCustomerPage = () => {
               <CardHeader className="pb-4">
                 <CardTitle className="text-xl flex items-center gap-2">
                   <User className="h-5 w-5" />
-                  Customer Information
+                  {t("Customer Information")}
                 </CardTitle>
                 <CardDescription>
-                  Update customer details and debt information
+                  {t("Update customer details and debt information")}
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -234,19 +239,19 @@ const EditCustomerPage = () => {
                   <div className="space-y-4">
                     <div className="flex items-center gap-2 text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">
                       <div className="w-1 h-4 bg-blue-600 rounded"></div>
-                      Personal Details
+                      {t("Personal Details")}
                     </div>
                     
                     <div className="grid gap-4">
                       <div className="space-y-2">
                         <Label htmlFor="fullName" className="text-sm font-medium flex items-center gap-2">
                           <User className="h-4 w-4" />
-                          Full Name *
+                          {t("Full Name *")}
                         </Label>
                         <Input
                           id="fullName"
                           type="text"
-                          placeholder="Enter full name"
+                          placeholder={t("Enter full name")}
                           name="fullName"
                           value={form.fullName}
                           onChange={handleChange}
@@ -259,13 +264,13 @@ const EditCustomerPage = () => {
                       <div className="space-y-2">
                         <Label htmlFor="phoneNumber" className="text-sm font-medium flex items-center gap-2">
                           <Phone className="h-4 w-4" />
-                          Phone Number *
+                          {t("Phone Number *")}
                         </Label>
                         <Input
                           id="phoneNumber"
                           type="text"
                           inputMode="numeric"
-                          placeholder="Enter phone number"
+                          placeholder={t("Enter phone number")}
                           name="phoneNumber"
                           value={form.phoneNumber}
                           onChange={handleChange}
@@ -283,13 +288,13 @@ const EditCustomerPage = () => {
                   <div className="space-y-4">
                     <div className="flex items-center gap-2 text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">
                       <div className="w-1 h-4 bg-teal-600 rounded"></div>
-                      Pricing
+                      {t("Pricing")}
                     </div>
 
                     <div className="space-y-2 max-w-xs">
                       <Label htmlFor="priceTier" className="text-sm font-medium flex items-center gap-2">
                         <Layers className="h-4 w-4" />
-                        Price Tier
+                        {t("Price Tier")}
                       </Label>
                       <select
                         id="priceTier"
@@ -301,12 +306,12 @@ const EditCustomerPage = () => {
                       >
                         {PRICE_TIERS.map((tier) => (
                           <option key={tier.value} value={tier.value}>
-                            {tier.label}
+                            {t(tier.label)}
                           </option>
                         ))}
                       </select>
                       <p className="text-xs text-gray-500 dark:text-gray-400">
-                        Which product price this customer is charged when creating an order
+                        {t("Which product price this customer is charged when creating an order")}
                       </p>
                     </div>
                   </div>
@@ -317,12 +322,12 @@ const EditCustomerPage = () => {
                   <div className="space-y-6">
                     <div className="flex items-center gap-2 text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">
                       <div className="w-1 h-4 bg-amber-600 rounded"></div>
-                      Debt Information
+                      {t("Debt Information")}
                     </div>
 
                     <div className="space-y-2">
                       <Label htmlFor="debt" className="text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center gap-2">
-                        Amount Owed ($)
+                        {t("Amount Owed ($)")}
                         <Lock className="h-3 w-3 text-gray-400 dark:text-gray-500" />
                       </Label>
                       <Input
@@ -335,7 +340,9 @@ const EditCustomerPage = () => {
                         className="max-w-xs bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400 cursor-not-allowed"
                       />
                       <p className="text-xs text-gray-500 dark:text-gray-400">
-                        Debt is managed automatically through orders and payments and can no longer be edited directly here.
+                        {t(
+                          "Debt is managed automatically through orders and payments and can no longer be edited directly here."
+                        )}
                       </p>
                     </div>
                   </div>
@@ -350,7 +357,7 @@ const EditCustomerPage = () => {
                       onClick={() => router.back()}
                       className="flex-1"
                     >
-                      Cancel
+                      {t("Cancel")}
                     </Button>
                     <Button
                       type="submit"
@@ -360,12 +367,12 @@ const EditCustomerPage = () => {
                       {mutation.isPending ? (
                         <span className="flex items-center gap-2">
                           <Loader2 className="animate-spin h-4 w-4" />
-                          Updating Customer...
+                          {t("Updating Customer...")}
                         </span>
                       ) : (
                         <span className="flex items-center gap-2">
                           <UserCog className="h-4 w-4" />
-                          Update Customer
+                          {t("Update Customer")}
                         </span>
                       )}
                     </Button>
@@ -379,33 +386,33 @@ const EditCustomerPage = () => {
           <div className="lg:col-span-1">
             <Card className="shadow-sm border-gray-200 dark:border-gray-800 sticky top-6">
               <CardHeader className="pb-4">
-                <CardTitle className="text-lg">Customer Summary</CardTitle>
-                <CardDescription>Current customer overview</CardDescription>
+                <CardTitle className="text-lg">{t("Customer Summary")}</CardTitle>
+                <CardDescription>{t("Current customer overview")}</CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
                 {/* Customer Info */}
                 <div className="space-y-3">
                   <h4 className="font-medium text-gray-900 dark:text-gray-100 flex items-center gap-2">
                     <User className="h-4 w-4" />
-                    Customer Details
+                    {t("Customer Details")}
                   </h4>
                   <div className="space-y-2">
                     <div className="flex justify-between items-center">
-                      <span className="text-sm text-gray-600 dark:text-gray-400">Name</span>
-                      <span className="font-medium text-gray-900 dark:text-gray-100 truncate max-w-[120px] text-right">
-                        {form.fullName || "Not provided"}
+                      <span className="text-sm text-gray-600 dark:text-gray-400">{t("Name")}</span>
+                      <span className="font-medium text-gray-900 dark:text-gray-100 truncate max-w-[120px] text-end">
+                        {form.fullName || t("Not provided")}
                       </span>
                     </div>
                     
                     <div className="flex justify-between items-center">
-                      <span className="text-sm text-gray-600 dark:text-gray-400">Phone</span>
+                      <span className="text-sm text-gray-600 dark:text-gray-400">{t("Phone")}</span>
                       <span className="font-medium text-gray-900 dark:text-gray-100">
-                        {form.phoneNumber || "Not provided"}
+                        {form.phoneNumber || t("Not provided")}
                       </span>
                     </div>
 
                     <div className="flex justify-between items-center pt-2 border-t">
-                      <span className="text-sm text-gray-600 dark:text-gray-400">Total Orders</span>
+                      <span className="text-sm text-gray-600 dark:text-gray-400">{t("Total Orders")}</span>
                       <Badge variant="outline">{ordersCount}</Badge>
                     </div>
                   </div>
@@ -417,19 +424,19 @@ const EditCustomerPage = () => {
                 <div className="space-y-3">
                   <h4 className="font-medium text-gray-900 dark:text-gray-100 flex items-center gap-2">
                     <DollarSign className="h-4 w-4" />
-                    Money Debt
+                    {t("Money Debt")}
                   </h4>
                   <div className="flex justify-between items-center p-3 rounded-lg bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-900/50">
-                    <span className="text-sm font-medium text-amber-800 dark:text-amber-400">Amount Owed</span>
-                    <div className="text-right">
+                    <span className="text-sm font-medium text-amber-800 dark:text-amber-400">{t("Amount Owed")}</span>
+                    <div className="text-end">
                       <span className="text-lg font-bold text-amber-900 dark:text-amber-300">
                         ${(parseInt(form.debt) || 0).toLocaleString()}
                       </span>
                       <Badge
                         variant={hasAnyDebt ? "default" : "outline"}
-                        className={`ml-2 ${hasAnyDebt ? 'bg-amber-100 dark:bg-amber-900/30 text-amber-800 dark:text-amber-400' : ''}`}
+                        className={`ms-2 ${hasAnyDebt ? 'bg-amber-100 dark:bg-amber-900/30 text-amber-800 dark:text-amber-400' : ''}`}
                       >
-                        {hasAnyDebt ? "Owes Money" : "No Money Debt"}
+                        {hasAnyDebt ? t("Owes Money") : t("No Money Debt")}
                       </Badge>
                     </div>
                   </div>
@@ -437,10 +444,12 @@ const EditCustomerPage = () => {
                     <div className="flex items-center gap-2 p-3 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-900/50 text-red-800 dark:text-red-400 text-sm">
                       <AlertTriangle className="h-4 w-4 flex-shrink-0" />
                       <span>
-                        Overdue - hasn&apos;t paid in {data.daysSincePayment} days
+                        {t("Overdue - hasn't paid in")} {data.daysSincePayment} {t("days")}
                         {data.lastPaymentDate
-                          ? ` (last payment ${format(new Date(data.lastPaymentDate), "MMM d, yyyy")})`
-                          : " (never made a payment)"}
+                          ? t(" (last payment {0})", {
+                          0: format(new Date(data.lastPaymentDate), "MMM d, yyyy")
+                        })
+                          : t(" (never made a payment)")}
                       </span>
                     </div>
                   )}
@@ -452,19 +461,19 @@ const EditCustomerPage = () => {
                 <div className="bg-gray-50 dark:bg-gray-950 rounded-lg p-4">
                   <h4 className="font-medium text-gray-900 dark:text-gray-100 flex items-center gap-2 mb-2">
                     <UserCog className="h-4 w-4" />
-                    Overall Status
+                    {t("Overall Status")}
                   </h4>
                   <div className="text-center">
                     <Badge 
                       variant={hasAnyDebt ? "destructive" : "default"} 
                       className="text-sm px-3 py-1 mb-2"
                     >
-                      {hasAnyDebt ? "Customer Has Debt" : "Debt-Free Customer"}
+                      {hasAnyDebt ? t("Customer Has Debt") : t("Debt-Free Customer")}
                     </Badge>
                     <p className="text-xs text-gray-600 dark:text-gray-400">
                       {hasAnyDebt
-                        ? "This customer has an outstanding balance"
-                        : "No current debt"
+                        ? t("This customer has an outstanding balance")
+                        : t("No current debt")
                       }
                     </p>
                   </div>

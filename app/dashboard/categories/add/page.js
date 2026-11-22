@@ -1,10 +1,12 @@
 
 "use client";
+import { t } from "@/lib/i18n";
+import { useT } from "@/lib/i18n/LangProvider";
 
 import React, { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import axios from "axios";
-import { toast } from "sonner";
+import { toast } from "@/lib/i18n/toast";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -14,6 +16,7 @@ import { Label } from "@/components/ui/label";
 import { FolderPlus, Loader2, Tag } from "lucide-react";
 
 export default function AddCategoryPage() {
+  const t = useT();
   const router = useRouter();
   const [formData, setFormData] = useState({
     name: "",
@@ -71,8 +74,8 @@ export default function AddCategoryPage() {
               <FolderPlus className="h-6 w-6 text-blue-600" />
             </div>
             <div>
-              <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">Add New Category</h1>
-              <p className="text-gray-600 dark:text-gray-400">Create a new category to organize your products</p>
+              <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">{t("Add New Category")}</h1>
+              <p className="text-gray-600 dark:text-gray-400">{t("Create a new category to organize your products")}</p>
             </div>
           </div>
         </div>
@@ -84,10 +87,10 @@ export default function AddCategoryPage() {
               <CardHeader className="pb-4">
                 <CardTitle className="text-xl flex items-center gap-2">
                   <Tag className="h-5 w-5" />
-                  Category Information
+                  {t("Category Information")}
                 </CardTitle>
                 <CardDescription>
-                  Enter the details for your new category
+                  {t("Enter the details for your new category")}
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -97,12 +100,12 @@ export default function AddCategoryPage() {
                   <div className="space-y-2">
                     <Label htmlFor="name" className="text-sm font-medium flex items-center gap-2">
                       <Tag className="h-4 w-4" />
-                      Category Name *
+                      {t("Category Name *")}
                     </Label>
                     <Input
                       id="name"
                       name="name"
-                      placeholder="e.g., Electronics, Clothing, Food"
+                      placeholder={t("e.g., Electronics, Clothing, Food")}
                       value={formData.name}
                       onChange={handleInputChange}
                       className="focus:border-blue-500 transition-colors"
@@ -114,7 +117,7 @@ export default function AddCategoryPage() {
                   <div className="flex gap-3 pt-4">
                     <Link href="/dashboard/categories" className="flex-1">
                       <Button type="button" variant="outline" className="w-full">
-                        Cancel
+                        {t("Cancel")}
                       </Button>
                     </Link>
                     <Button
@@ -125,12 +128,12 @@ export default function AddCategoryPage() {
                       {mutation.isPending ? (
                         <span className="flex items-center gap-2">
                           <Loader2 className="animate-spin h-4 w-4" />
-                          Creating Category...
+                          {t("Creating Category...")}
                         </span>
                       ) : (
                         <span className="flex items-center gap-2">
                           <FolderPlus className="h-4 w-4" />
-                          Create Category
+                          {t("Create Category")}
                         </span>
                       )}
                     </Button>
@@ -144,9 +147,9 @@ export default function AddCategoryPage() {
         {/* Quick Actions */}
         <div className="mt-8 text-center">
           <p className="text-sm text-gray-500 dark:text-gray-400">
-            Need to manage existing categories?{" "}
+            {t("Need to manage existing categories?")}{" "}
             <Link href="/dashboard/categories" className="text-blue-600 hover:text-blue-700 underline">
-              View all categories
+              {t("View all categories")}
             </Link>
           </p>
         </div>

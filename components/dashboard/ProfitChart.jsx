@@ -1,5 +1,7 @@
 // components/dashboard/ProfitChart.jsx
 "use client";
+import { t } from "@/lib/i18n";
+import { useT } from "@/lib/i18n/LangProvider";
 
 import React from "react";
 import { useQuery } from "@tanstack/react-query";
@@ -18,6 +20,7 @@ const fetchProfitChartData = async (range, startDate, endDate) => {
 const currencyFormatter = (value) => `$${value.toLocaleString()}`;
 
 const ProfitChart = ({ range = "all", startDate, endDate }) => {
+  const t = useT();
   const { data, isLoading, error } = useQuery({
     queryKey: ["dashboard-profit-chart", range, startDate, endDate],
     queryFn: () => fetchProfitChartData(range, startDate, endDate),
@@ -27,7 +30,7 @@ const ProfitChart = ({ range = "all", startDate, endDate }) => {
     return (
       <Card>
         <CardContent className="pt-6">
-          <div className="text-red-500">Error loading profit chart</div>
+          <div className="text-red-500">{t("Error loading profit chart")}</div>
         </CardContent>
       </Card>
     );
@@ -38,15 +41,15 @@ const ProfitChart = ({ range = "all", startDate, endDate }) => {
   // Fixed lookback periods only - the selected-range figure already has its
   // own card in the Profit summary section above, so it isn't repeated here.
   const chartData = [
-    { period: "Today", Profit: profitData?.today?.realProfit || 0 },
-    { period: "Last Week", Profit: profitData?.lastWeek?.realProfit || 0 },
-    { period: "Last Month", Profit: profitData?.lastMonth?.realProfit || 0 },
+    { period: t("Today"), [t("Profit")]: profitData?.today?.realProfit || 0 },
+    { period: t("Last Week"), [t("Profit")]: profitData?.lastWeek?.realProfit || 0 },
+    { period: t("Last Month"), [t("Profit")]: profitData?.lastMonth?.realProfit || 0 },
   ];
 
   return (
     <Card className="shadow-sm border-gray-200 dark:border-gray-800">
       <CardHeader>
-        <CardTitle className="text-lg font-medium">Profit Trends</CardTitle>
+        <CardTitle className="text-lg font-medium">{t("Profit Trends")}</CardTitle>
       </CardHeader>
       <CardContent>
         {isLoading ? (
@@ -55,7 +58,7 @@ const ProfitChart = ({ range = "all", startDate, endDate }) => {
           <BarChart
             data={chartData}
             index="period"
-            categories={["Profit"]}
+            categories={[t("Profit")]}
             colors={["emerald"]}
             valueFormatter={currencyFormatter}
             showLegend={false}

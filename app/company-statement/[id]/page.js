@@ -1,8 +1,10 @@
 "use client";
+import { t } from "@/lib/i18n";
+import { useT } from "@/lib/i18n/LangProvider";
 
 import { useQuery } from "@tanstack/react-query";
 import { useParams } from "next/navigation";
-import { format } from "date-fns";
+import { format } from "@/lib/i18n/date";
 import { FileText, Calendar, Loader2 } from "lucide-react";
 import {
   Table,
@@ -26,6 +28,7 @@ const fetchPublicStatement = async (id) => {
 // sharing (e.g. via a WhatsApp link). No sidebar, no links elsewhere in the
 // app - intentionally a dead end.
 export default function PublicCompanyStatementPage() {
+  const t = useT();
   const { id } = useParams();
 
   const { data: statement, isLoading, isError } = useQuery({
@@ -47,7 +50,7 @@ export default function PublicCompanyStatementPage() {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
         <Card className="w-full max-w-md">
           <CardContent className="pt-6 text-center">
-            <p className="text-gray-600">This statement link is invalid or no longer available.</p>
+            <p className="text-gray-600">{t("This statement link is invalid or no longer available.")}</p>
           </CardContent>
         </Card>
       </div>
@@ -64,35 +67,35 @@ export default function PublicCompanyStatementPage() {
             <div className="flex items-center justify-between">
               <CardTitle className="flex items-center gap-2 text-xl">
                 <FileText className="h-5 w-5 text-blue-600" />
-                Company Statement
+                {t("Company Statement")}
               </CardTitle>
             </div>
             <p className="text-sm text-gray-500 flex items-center gap-1 mt-1">
               <Calendar className="h-3.5 w-3.5" />
-              Generated {format(new Date(), "MMMM d, yyyy")}
+              {t("Generated")} {format(new Date(), "MMMM d, yyyy")}
             </p>
           </CardHeader>
           <CardContent className="space-y-4">
             <div>
-              <p className="text-sm text-gray-500">Company</p>
+              <p className="text-sm text-gray-500">{t("Company")}</p>
               <p className="font-medium text-gray-900">{name}</p>
             </div>
 
             <Separator />
 
             <div>
-              <p className="text-sm font-medium text-gray-700 mb-2">Purchases</p>
+              <p className="text-sm font-medium text-gray-700 mb-2">{t("Purchases")}</p>
               {purchases.length === 0 ? (
-                <p className="text-sm text-gray-500 text-center py-4">No purchases on file.</p>
+                <p className="text-sm text-gray-500 text-center py-4">{t("No purchases on file.")}</p>
               ) : (
                 <div className="overflow-x-auto">
                   <Table>
                     <TableHeader>
                       <TableRow>
-                        <TableHead>Date</TableHead>
-                        <TableHead>Product</TableHead>
-                        <TableHead className="text-right">Total</TableHead>
-                        <TableHead className="text-center">Status</TableHead>
+                        <TableHead>{t("Date")}</TableHead>
+                        <TableHead>{t("Product")}</TableHead>
+                        <TableHead className="text-end">{t("Total")}</TableHead>
+                        <TableHead className="text-center">{t("Status")}</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -102,10 +105,10 @@ export default function PublicCompanyStatementPage() {
                             {format(new Date(purchase.createdAt), "MMM d, yyyy")}
                           </TableCell>
                           <TableCell className="whitespace-nowrap">{purchase.productName}</TableCell>
-                          <TableCell className="text-right whitespace-nowrap">${purchase.total.toFixed(2)}</TableCell>
+                          <TableCell className="text-end whitespace-nowrap">${purchase.total.toFixed(2)}</TableCell>
                           <TableCell className="text-center whitespace-nowrap">
                             <Badge className={purchase.paid ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"}>
-                              {purchase.paid ? "Paid" : "Unpaid"}
+                              {purchase.paid ? t("Paid") : t("Unpaid")}
                             </Badge>
                           </TableCell>
                         </TableRow>
@@ -120,15 +123,15 @@ export default function PublicCompanyStatementPage() {
 
             <div className="space-y-2">
               <div className="flex justify-between">
-                <span className="text-gray-600">Total Purchased</span>
+                <span className="text-gray-600">{t("Total Purchased")}</span>
                 <span className="font-semibold text-gray-900">${totals.totalPurchased.toFixed(2)}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-gray-600">Total Paid</span>
+                <span className="text-gray-600">{t("Total Paid")}</span>
                 <span className="text-green-600 font-medium">${totals.totalPaid.toFixed(2)}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-gray-600 font-medium">Total Owed</span>
+                <span className="text-gray-600 font-medium">{t("Total Owed")}</span>
                 <span className={`font-semibold ${totals.totalOwed > 0 ? "text-red-600" : "text-gray-900"}`}>
                   ${totals.totalOwed.toFixed(2)}
                 </span>

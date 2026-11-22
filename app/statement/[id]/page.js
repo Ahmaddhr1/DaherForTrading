@@ -1,8 +1,10 @@
 "use client";
+import { t } from "@/lib/i18n";
+import { useT } from "@/lib/i18n/LangProvider";
 
 import { useQuery } from "@tanstack/react-query";
 import { useParams } from "next/navigation";
-import { format } from "date-fns";
+import { format } from "@/lib/i18n/date";
 import { FileText, Calendar, Loader2 } from "lucide-react";
 import {
   Table,
@@ -32,6 +34,7 @@ const statusConfig = {
 // via a WhatsApp link). No sidebar, no links elsewhere in the app -
 // intentionally a dead end.
 export default function PublicStatementPage() {
+  const t = useT();
   const { id } = useParams();
 
   const { data: statement, isLoading, isError } = useQuery({
@@ -53,7 +56,7 @@ export default function PublicStatementPage() {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
         <Card className="w-full max-w-md">
           <CardContent className="pt-6 text-center">
-            <p className="text-gray-600">This statement link is invalid or no longer available.</p>
+            <p className="text-gray-600">{t("This statement link is invalid or no longer available.")}</p>
           </CardContent>
         </Card>
       </div>
@@ -70,36 +73,36 @@ export default function PublicStatementPage() {
             <div className="flex items-center justify-between">
               <CardTitle className="flex items-center gap-2 text-xl">
                 <FileText className="h-5 w-5 text-blue-600" />
-                Account Statement
+                {t("Account Statement")}
               </CardTitle>
             </div>
             <p className="text-sm text-gray-500 flex items-center gap-1 mt-1">
               <Calendar className="h-3.5 w-3.5" />
-              Generated {format(new Date(), "MMMM d, yyyy")}
+              {t("Generated")} {format(new Date(), "MMMM d, yyyy")}
             </p>
           </CardHeader>
           <CardContent className="space-y-4">
             <div>
-              <p className="text-sm text-gray-500">Customer</p>
+              <p className="text-sm text-gray-500">{t("Customer")}</p>
               <p className="font-medium text-gray-900">{fullName}</p>
             </div>
 
             <Separator />
 
             <div>
-              <p className="text-sm font-medium text-gray-700 mb-2">Orders</p>
+              <p className="text-sm font-medium text-gray-700 mb-2">{t("Orders")}</p>
               {orders.length === 0 ? (
-                <p className="text-sm text-gray-500 text-center py-4">No orders on file.</p>
+                <p className="text-sm text-gray-500 text-center py-4">{t("No orders on file.")}</p>
               ) : (
                 <div className="overflow-x-auto">
                   <Table>
                     <TableHeader>
                       <TableRow>
-                        <TableHead>Date</TableHead>
-                        <TableHead className="text-right">Total</TableHead>
-                        <TableHead className="text-right">Paid</TableHead>
-                        <TableHead className="text-right">Remaining</TableHead>
-                        <TableHead className="text-center">Status</TableHead>
+                        <TableHead>{t("Date")}</TableHead>
+                        <TableHead className="text-end">{t("Total")}</TableHead>
+                        <TableHead className="text-end">{t("Paid")}</TableHead>
+                        <TableHead className="text-end">{t("Remaining")}</TableHead>
+                        <TableHead className="text-center">{t("Status")}</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -110,13 +113,13 @@ export default function PublicStatementPage() {
                             <TableCell className="text-gray-600 text-sm whitespace-nowrap">
                               {format(new Date(order.createdAt), "MMM d, yyyy")}
                             </TableCell>
-                            <TableCell className="text-right whitespace-nowrap">${order.total.toFixed(2)}</TableCell>
-                            <TableCell className="text-right text-green-600 whitespace-nowrap">${order.amountpaid.toFixed(2)}</TableCell>
-                            <TableCell className={`text-right whitespace-nowrap ${order.remainingBalance > 0 ? "text-red-600" : ""}`}>
+                            <TableCell className="text-end whitespace-nowrap">${order.total.toFixed(2)}</TableCell>
+                            <TableCell className="text-end text-green-600 whitespace-nowrap">${order.amountpaid.toFixed(2)}</TableCell>
+                            <TableCell className={`text-end whitespace-nowrap ${order.remainingBalance > 0 ? "text-red-600" : ""}`}>
                               ${order.remainingBalance.toFixed(2)}
                             </TableCell>
                             <TableCell className="text-center whitespace-nowrap">
-                              <Badge className={status.color}>{status.label}</Badge>
+                              <Badge className={status.color}>{t(status.label)}</Badge>
                             </TableCell>
                           </TableRow>
                         );
@@ -131,15 +134,15 @@ export default function PublicStatementPage() {
 
             <div className="space-y-2">
               <div className="flex justify-between">
-                <span className="text-gray-600">Total Billed</span>
+                <span className="text-gray-600">{t("Total Billed")}</span>
                 <span className="font-semibold text-gray-900">${totals.totalAmount.toFixed(2)}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-gray-600">Total Paid</span>
+                <span className="text-gray-600">{t("Total Paid")}</span>
                 <span className="text-green-600 font-medium">${totals.totalPaid.toFixed(2)}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-gray-600 font-medium">Total Remaining (Debt)</span>
+                <span className="text-gray-600 font-medium">{t("Total Remaining (Debt)")}</span>
                 <span className={`font-semibold ${totals.totalRemaining > 0 ? "text-red-600" : "text-gray-900"}`}>
                   ${totals.totalRemaining.toFixed(2)}
                 </span>

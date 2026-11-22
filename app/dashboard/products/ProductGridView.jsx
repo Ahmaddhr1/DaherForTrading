@@ -1,15 +1,18 @@
 "use client";
+import { t } from "@/lib/i18n";
+import { useT } from "@/lib/i18n/LangProvider";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Package, ShoppingCart } from "lucide-react";
 
 export default function ProductGridView({ products, onAddToCart }) {
+  const t = useT();
   if (products.length === 0) {
     return (
       <div className="text-center py-12 text-gray-500 dark:text-gray-400">
         <Package className="h-12 w-12 mx-auto mb-2 text-gray-300 dark:text-gray-600" />
-        <p>No products found</p>
+        <p>{t("No products found")}</p>
       </div>
     );
   }
@@ -36,9 +39,12 @@ export default function ProductGridView({ products, onAddToCart }) {
                 <p className="font-medium text-gray-900 dark:text-gray-100 truncate">{product.name}</p>
                 <p className="text-sm text-gray-500 dark:text-gray-400">
                   {outOfStock ? (
-                    <span className="text-red-600">Out of stock</span>
+                    <span className="text-red-600">{t("Out of stock")}</span>
                   ) : (
-                    `${product.quantity} ${product.unit || "pcs"} in stock`
+                    t("{0} {1} in stock", {
+                      0: product.quantity,
+                      1: t(product.unit || "pcs")
+                    })
                   )}
                 </p>
               </div>
@@ -51,7 +57,7 @@ export default function ProductGridView({ products, onAddToCart }) {
                 className="w-full flex items-center justify-center gap-1.5"
               >
                 <ShoppingCart className="h-4 w-4" />
-                Add to Cart
+                {t("Add to Cart")}
               </Button>
             </CardContent>
           </Card>

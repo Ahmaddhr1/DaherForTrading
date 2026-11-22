@@ -35,6 +35,15 @@ const buttonVariants = cva(
   }
 )
 
+// Plain text inside a button's children (for its tooltip).
+function textOf(node) {
+  if (node == null || typeof node === "boolean") return ""
+  if (typeof node === "string" || typeof node === "number") return String(node)
+  if (Array.isArray(node)) return node.map(textOf).join(" ").replace(/\s+/g, " ").trim()
+  if (React.isValidElement(node)) return textOf(node.props.children)
+  return ""
+}
+
 function Button({
   className,
   variant,
@@ -44,9 +53,15 @@ function Button({
 }) {
   const Comp = asChild ? Slot : "button"
 
+  // On phones, buttons that have an icon show only the icon (see
+  // "Icon-only buttons on phones" in globals.css); the label stays as a
+  // tooltip and for screen readers.
+  const label = props.title ?? textOf(props.children)
+
   return (
     (<Comp
       data-slot="button"
+      title={label || undefined}
       className={cn(buttonVariants({ variant, size, className }))}
       {...props} />)
   );

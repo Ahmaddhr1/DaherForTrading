@@ -143,6 +143,10 @@ body.thermal-page #thermal-receipt-root {
 body.thermal-page {
   background: #fff;
 }
+/* Print view of a full-page document (statements). */
+body.print-doc-page {
+  background: #fff;
+}
 
 @media print {
   body.printing-thermal > *:not(#thermal-receipt-root) {
@@ -190,4 +194,49 @@ html[dir="rtl"] .recharts-wrapper * {
 /* Dashboard statements sit on the app background, which is dark in dark mode. */
 .force-light-surface {
   background-color: var(--background);
+}
+
+/* Icon-only buttons on phones: a button that has an icon shows just the
+   icon below the sm breakpoint. The label is kept (shrunk to nothing /
+   visually hidden) so screen readers still announce it, and Button sets it
+   as the tooltip. Buttons in dialogs keep their labels, and any button can
+   opt out with data-keep-label. */
+@media (max-width: 639.98px) {
+  .icon-only-mobile,
+  .icon-only-mobile :is(span, div):has(> svg),
+  [data-slot="button"]:has(svg):not([data-keep-label]):not([role="dialog"] *):not([role="alertdialog"] *),
+  [data-slot="button"]:has(svg):not([data-keep-label]):not([role="dialog"] *):not([role="alertdialog"] *) :is(span, div):has(> svg) {
+    font-size: 0 !important;
+    gap: 0 !important;
+  }
+  .icon-only-mobile > :not(svg):not(:has(svg)):not([data-keep]):not([data-slot="badge"]),
+  [data-slot="button"]:has(svg):not([data-keep-label]):not([role="dialog"] *):not([role="alertdialog"] *) > :not(svg):not(:has(svg)):not([data-keep]):not([data-slot="badge"]),
+  [data-slot="button"]:has(svg):not([data-keep-label]):not([role="dialog"] *):not([role="alertdialog"] *) :is(span, div):has(> svg) > :not(svg):not([data-keep]):not([data-slot="badge"]) {
+    position: absolute !important;
+    width: 1px !important;
+    height: 1px !important;
+    overflow: hidden !important;
+    clip: rect(0 0 0 0) !important;
+    white-space: nowrap !important;
+  }
+}
+
+/* ...and those icon buttons are compact: they size to the icon instead of
+   stretching across the screen, and a stack made only of buttons becomes a
+   row of icons. (No :has() inside :has() - browsers drop such rules.) */
+@media (max-width: 639.98px) {
+  [data-slot="button"]:has(svg):not([data-keep-label]):not([role="dialog"] *):not([role="alertdialog"] *) {
+    width: auto !important;
+    min-width: 2.25rem;
+    flex: 0 0 auto !important;
+  }
+  a:has(> [data-slot="button"] > svg),
+  a:has(> [data-slot="button"] > span > svg) {
+    width: auto !important;
+    flex: 0 0 auto !important;
+  }
+  .flex-col:has(> [data-slot="button"] > svg, > a > [data-slot="button"] > svg, > a > [data-slot="button"] > span > svg):not(:has(> :not([data-slot="button"]):not(a))):not([role="dialog"] *) {
+    flex-direction: row !important;
+    flex-wrap: wrap;
+  }
 }

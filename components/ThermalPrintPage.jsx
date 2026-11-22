@@ -13,7 +13,12 @@ import { useT } from "@/lib/i18n/LangProvider";
 // in-page approach (toggle a body class, print, remove the class) ends up
 // printing the whole page. Here the receipt-only state is permanent, so
 // whenever the print dialog captures the page it gets the receipt.
-export default function ThermalPrintPage({ queryKey, fetchUrl, backHref, children }) {
+//
+// variant="document" is the same idea for full-page documents (account and
+// company statements): the page shows only the document, always in its light
+// design, with Back / Print on top (not printed). Used on every device.
+export default function ThermalPrintPage({ queryKey, fetchUrl, backHref, children, variant = "thermal" }) {
+  const isDocument = variant === "document";
   const t = useT();
   const router = useRouter();
   const printedRef = useRef(false);
@@ -29,9 +34,10 @@ export default function ThermalPrintPage({ queryKey, fetchUrl, backHref, childre
 
   // Receipt-only mode for as long as this page is open.
   useEffect(() => {
-    document.body.classList.add("printing-thermal", "thermal-page");
-    return () => document.body.classList.remove("printing-thermal", "thermal-page");
-  }, []);
+    const classes = isDocument ? ["print-doc-page"] : ["printing-thermal", "thermal-page"];
+    document.body.classList.add(...classes);
+    return () => document.body.classList.remove(...classes);
+  }, [isDocument]);
 
   // Open the print dialog once, after the receipt has rendered.
   useEffect(() => {
@@ -48,7 +54,7 @@ export default function ThermalPrintPage({ queryKey, fetchUrl, backHref, childre
 
   return (
     <>
-      <div className="thermal-toolbar force-light flex items-center justify-between gap-2 p-3 border-b bg-white text-gray-900">
+      <div className="thermal-toolbar force-light print:hidden sticky top-0 z-10 flex items-center justify-between gap-2 p-3 border-b bg-white text-gray-900">
         <Button variant="outline" size="sm" onClick={() => router.push(backHref)} className="flex items-center gap-1">
           <ArrowLeft className="rtl-flip h-4 w-4" />
           {t("Back")}
@@ -64,7 +70,14 @@ export default function ThermalPrintPage({ queryKey, fetchUrl, backHref, childre
         </div>
       )}
       {isError && <p className="p-6 text-center text-red-600">{t("Failed to load")}</p>}
-      {data && children(data)}
+      {data &&
+        (isDocument ? (
+          <div className="force-light min-h-screen bg-white">
+            <div className="container mx-auto px-4 py-8">{children(data)}</div>
+          </div>
+        ) : (
+          children(data)
+        ))}
     </>
   );
 }

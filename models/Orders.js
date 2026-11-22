@@ -84,6 +84,13 @@ const orderSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
+    // Free-text notes for this order (shown on the invoice and thermal receipt).
+    notes: {
+      type: String,
+      trim: true,
+      maxlength: 1000,
+      default: "",
+    },
     taxAmount: {
       type: Number,
       default: 0,

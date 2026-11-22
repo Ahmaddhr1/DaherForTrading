@@ -13,7 +13,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Label } from "@/components/ui/label";
 import { ListSkeleton, PageHeaderSkeleton } from "@/components/ui/skeleton-patterns";
 import { toast } from "@/lib/i18n/toast";
-import { Loader2, Plus, Trash2, ShoppingCart, Save, Layers, Gift, PackagePlus } from "lucide-react";
+import { Loader2, Plus, Trash2, ShoppingCart, Save, Layers, Gift, PackagePlus, StickyNote } from "lucide-react";
 import Link from "next/link";
 import { useSettings, formatLL } from "@/lib/currency";
 import { Combobox } from "@/components/ui/combobox";
@@ -76,6 +76,7 @@ const MakeOrderPage = () => {
   const [orderRows, setOrderRows] = useState([makeProductRow()]);
   const [taxRate, setTaxRate] = useState("");
   const [taxRateTouched, setTaxRateTouched] = useState(false);
+  const [notes, setNotes] = useState("");
   const [isLoadingProducts, setIsLoadingProducts] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSavingDraft, setIsSavingDraft] = useState(false);
@@ -241,6 +242,7 @@ const MakeOrderPage = () => {
       free: row.free,
     })),
     taxRate: parseFloat(taxRate) || 0,
+    notes,
     ...extra,
   });
 
@@ -322,6 +324,12 @@ const MakeOrderPage = () => {
             <p className="flex items-center gap-1.5 text-sm text-gray-500 dark:text-gray-400 mt-1">
               <Layers className="h-3.5 w-3.5" />
               {t("Pricing for")} {customer.fullName}: <span className="font-medium text-gray-700 dark:text-gray-300">{t(getTierLabel(priceTier))}</span>
+            </p>
+          )}
+          {customer?.notes && (
+            <p className="flex items-start gap-1.5 text-sm text-amber-800 dark:text-amber-200 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-900/50 rounded-md px-3 py-2 mt-2 whitespace-pre-line">
+              <StickyNote className="h-3.5 w-3.5 mt-0.5 shrink-0" />
+              <span><span className="font-medium">{t("Customer notes:")}</span> {customer.notes}</span>
             </p>
           )}
           {!canOverride && (
@@ -487,6 +495,23 @@ const MakeOrderPage = () => {
                     setTaxRate(e.target.value.replace(/[^0-9.]/g, ""));
                   }}
                   placeholder="0"
+                />
+              </div>
+
+              {/* Notes */}
+              <div className="space-y-2">
+                <Label htmlFor="order-notes" className="text-sm font-medium flex items-center gap-2">
+                  <StickyNote className="h-4 w-4" />
+                  {t("Notes")}
+                </Label>
+                <textarea
+                  id="order-notes"
+                  rows={3}
+                  maxLength={1000}
+                  value={notes}
+                  onChange={(e) => setNotes(e.target.value)}
+                  placeholder={t("Optional note for this order")}
+                  className="w-full p-2 border border-gray-300 dark:border-gray-700 rounded-md bg-transparent text-sm focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
                 />
               </div>
 

@@ -8,7 +8,7 @@ import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useParams } from "next/navigation";
 import { format } from "@/lib/i18n/date";
-import { User, Package, CreditCard, Calendar, Tag, Printer, MessageCircle, Receipt, RotateCcw } from "lucide-react";
+import { User, Package, CreditCard, Calendar, Tag, Printer, MessageCircle, Receipt, RotateCcw, StickyNote } from "lucide-react";
 import { toast } from "@/lib/i18n/toast";
 import ThermalReceipt from "./ThermalReceipt";
 import ProcessReturnModal from "./ProcessReturnModal";
@@ -185,6 +185,15 @@ export default function OrderDetailsPage() {
         <div className="grid gap-6 lg:grid-cols-3">
           {/* Left Column */}
           <div className="lg:col-span-2 space-y-6">
+            {order.notes && (
+              <div className="flex items-start gap-2 rounded-lg border border-amber-200 dark:border-amber-900/50 bg-amber-50 dark:bg-amber-900/20 px-4 py-3 text-sm text-amber-900 dark:text-amber-100">
+                <StickyNote className="h-4 w-4 mt-0.5 shrink-0" />
+                <div>
+                  <p className="font-medium">{t("Notes")}</p>
+                  <p dir="auto" className="whitespace-pre-line">{order.notes}</p>
+                </div>
+              </div>
+            )}
             {/* Products Table */}
             <Card className="shadow-sm border-gray-200 dark:border-gray-800">
               <CardHeader className="pb-4">

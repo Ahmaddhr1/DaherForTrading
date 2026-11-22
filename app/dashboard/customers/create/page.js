@@ -11,7 +11,7 @@ import { Badge } from "@/components/ui/badge";
 import React, { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import axios from "axios";
-import { Loader2, UserPlus, DollarSign, Phone, User, Scale, Layers } from "lucide-react";
+import { Loader2, UserPlus, DollarSign, Phone, User, Scale, Layers, StickyNote } from "lucide-react";
 import { toast } from "@/lib/i18n/toast";
 import { useRouter } from "next/navigation";
 import { PRICE_TIERS } from "@/lib/priceTiers";
@@ -24,6 +24,7 @@ const AddCustomerPage = () => {
     phoneNumber: "",
     debt: "",
     priceTier: "1",
+    notes: "",
   });
 
   const handleChange = (e) => {
@@ -185,6 +186,26 @@ const AddCustomerPage = () => {
                         {t("Which product price this customer is charged when creating an order")}
                       </p>
                     </div>
+                  </div>
+
+                  <Separator />
+
+                  {/* Notes Section */}
+                  <div className="space-y-2">
+                    <Label htmlFor="notes" className="text-sm font-medium flex items-center gap-2">
+                      <StickyNote className="h-4 w-4" />
+                      {t("Notes")}
+                    </Label>
+                    <textarea
+                      id="notes"
+                      name="notes"
+                      rows={3}
+                      maxLength={1000}
+                      value={form.notes}
+                      onChange={handleChange}
+                      placeholder={t("Anything worth remembering about this customer")}
+                      className="w-full p-2 border border-gray-300 dark:border-gray-700 rounded-md bg-transparent text-sm focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+                    />
                   </div>
 
                   <Separator />

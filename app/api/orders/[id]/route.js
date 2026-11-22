@@ -137,7 +137,7 @@ export async function PUT(req, { params }) {
 
   try {
     const { id } = await params;
-    const { products, taxRate } = await req.json();
+    const { products, taxRate, notes } = await req.json();
 
     if (!products?.length) {
       return NextResponse.json(
@@ -162,6 +162,7 @@ export async function PUT(req, { params }) {
     const beforeLines = order.products.map((p) => p.toObject());
 
     const effectiveTaxRate = taxRate !== undefined ? taxRate : order.taxRate;
+    if (typeof notes === "string") order.notes = notes.trim().slice(0, 1000);
 
     // Needed to re-derive the correct price for a submitted line item
     // without override permission - see priceOrderItems.
@@ -334,7 +335,7 @@ export async function POST(req, { params }) {
 
   try {
     const customerId = params.id;
-    const { products, taxRate, asDraft } = await req.json();
+    const { products, taxRate, asDraft, notes } = await req.json();
 
     if (!products?.length) {
       return NextResponse.json(
@@ -390,6 +391,7 @@ export async function POST(req, { params }) {
       discountTotal: priced.discountTotal,
       taxRate: priced.taxRate,
       taxAmount: priced.taxAmount,
+      notes: typeof notes === "string" ? notes.trim().slice(0, 1000) : "",
       status: asDraft ? "draft" : "pending",
       remainingBalance: asDraft ? undefined : priced.total,
       profit: priced.profit,

@@ -12,7 +12,7 @@ export async function POST(req) {
   if (forbidden) return forbidden;
 
   try {
-    const { fullName, phoneNumber, debt, priceTier } = await req.json();
+    const { fullName, phoneNumber, debt, priceTier, notes } = await req.json();
 
     if (!fullName || !phoneNumber) {
       return NextResponse.json(
@@ -39,6 +39,7 @@ export async function POST(req) {
       phoneNumber,
       debt,
       priceTier: parsedPriceTier,
+      notes: typeof notes === "string" ? notes.trim().slice(0, 1000) : "",
     });
     await newCustomer.save();
 

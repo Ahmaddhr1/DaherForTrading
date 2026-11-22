@@ -161,14 +161,14 @@ export default function OrderDetailsPage() {
               <Printer className="h-4 w-4" />
               {t("Print")}
             </Button>
-            {directPrint ? (
-              <DirectPrintButton fallback={handlePrintThermal} />
-            ) : (
-              <Button variant="outline" onClick={handlePrintThermal} className="flex items-center gap-2">
-                <Receipt className="h-4 w-4" />
-                {t("Thermal Receipt")}
-              </Button>
-            )}
+            {/* Direct (one-click) printing on computers, plus the normal
+                thermal print through the print dialog - e.g. for a wired
+                printer installed in Windows. */}
+            {directPrint && <DirectPrintButton />}
+            <Button variant="outline" onClick={handlePrintThermal} className="flex items-center gap-2">
+              <Receipt className="h-4 w-4" />
+              {t("Thermal Receipt")}
+            </Button>
             <Button
               onClick={handleShareWhatsApp}
               className="flex items-center gap-2 bg-green-600 hover:bg-green-700"

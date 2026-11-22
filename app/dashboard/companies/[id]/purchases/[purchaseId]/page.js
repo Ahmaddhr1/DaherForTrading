@@ -134,10 +134,6 @@ export default function PurchaseDetailsPage() {
             {format(new Date(purchase.createdAt), "EEEE, MMMM d, yyyy 'at' h:mm a")}
           </div>
           <div className="flex flex-wrap gap-2 mt-2">
-            <Button variant="outline" onClick={() => window.print()} className="flex items-center gap-2">
-              <Printer className="h-4 w-4" />
-              {t("Print")}
-            </Button>
             {/* Direct (one-click) printing on computers, plus the normal
                 thermal print through the print dialog - e.g. for a wired
                 printer installed in Windows. */}

@@ -4,7 +4,7 @@ import { whatsappNumber } from "@/lib/whatsapp";
 
 import { Suspense, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { useParams, useRouter, useSearchParams } from "next/navigation";
+import { useParams, useSearchParams } from "next/navigation";
 import { format } from "@/lib/i18n/date";
 import { Printer, MessageCircle, Receipt, Loader2 } from "lucide-react";
 import { toast } from "@/lib/i18n/toast";
@@ -16,10 +16,8 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { PageHeaderSkeleton, TableSkeleton } from "@/components/ui/skeleton-patterns";
 import CustomerStatementDoc from "@/components/statements/CustomerStatementDoc";
-import { statementApiQuery, statementPeriodLabel, statementPrintQuery } from "@/lib/statementPeriod";
+import { statementApiQuery, statementPeriodLabel } from "@/lib/statementPeriod";
 import { buildCustomerStatementReceipt } from "@/lib/statementReceiptData";
-import { isTouchDevice } from "@/lib/isTouchDevice";
-import StatementPrintDialog from "@/components/StatementPrintDialog";
 
 const fetchStatement = async (id, startDate, endDate) => {
   const res = await fetch(`/api/customers/${id}/statement${statementApiQuery(startDate, endDate)}`);
@@ -30,7 +28,6 @@ const fetchStatement = async (id, startDate, endDate) => {
 function CustomerStatementPageInner() {
   const t = useT();
   const { id } = useParams();
-  const router = useRouter();
   const search = useSearchParams();
   const [startDate, setStartDate] = useState(search.get("from") || "");
   const [endDate, setEndDate] = useState(search.get("to") || "");
@@ -49,9 +46,6 @@ function CustomerStatementPageInner() {
   // Printing happens on a dedicated print view (like the thermal receipts):
   // it shows only the statement, in its light design, with its own Print
   // button.
-  const printUrl = `/print/statement/${id}${statementPrintQuery(startDate, endDate)}`;
-  const [printOpen, setPrintOpen] = useState(false);
-  const handlePrint = () => (isTouchDevice() ? router.push(printUrl) : setPrintOpen(true));
 
   const handleShareWhatsApp = () => {
     const phoneDigits = whatsappNumber(statement?.phoneNumber);
@@ -117,17 +111,13 @@ function CustomerStatementPageInner() {
         <p className="text-xs text-gray-500 dark:text-gray-400 pb-2">{t("Leave blank for all time.")}</p>
       </div>
       <div className="flex flex-wrap gap-2 mt-3">
-        <Button variant="outline" onClick={handlePrint} className="flex items-center gap-2" aria-label={t("Print")}>
+        <Button onClick={handleShareThermalPdf} className="flex items-center gap-2" aria-label={t("Print Statement")}>
           <Printer className="h-4 w-4" />
-          {t("Print")}
+          {t("Print Statement")}
         </Button>
         <Button onClick={handleShareWhatsApp} className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white" aria-label={t("Share via WhatsApp")}>
           <MessageCircle className="h-4 w-4" />
           {t("Share via WhatsApp")}
-        </Button>
-        <Button variant="outline" onClick={handleShareThermalPdf} className="flex items-center gap-2" aria-label={t("PDF Statement")}>
-          <Receipt className="h-4 w-4" />
-          {t("PDF Statement")}
         </Button>
       </div>
     </>
@@ -138,8 +128,7 @@ function CustomerStatementPageInner() {
       <div className="container mx-auto px-4">
         <CustomerStatementDoc statement={statement} periodLabel={periodLabel} toolbar={toolbar} />
       </div>
-      <StatementPrintDialog open={printOpen} onClose={() => setPrintOpen(false)} src={printUrl} />
-      <PdfPreviewDialog open={!!pdf} onClose={() => setPdf(null)} blob={pdf?.blob} filename={pdf?.filename} title={t("PDF Statement")} />
+      <PdfPreviewDialog open={!!pdf} onClose={() => setPdf(null)} blob={pdf?.blob} filename={pdf?.filename} title={t("Print Statement")} />
     </div>
   );
 }

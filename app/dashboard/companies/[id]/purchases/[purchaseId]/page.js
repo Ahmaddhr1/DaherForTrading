@@ -1,6 +1,7 @@
 "use client";
 import { t } from "@/lib/i18n";
 import { useT } from "@/lib/i18n/LangProvider";
+import { whatsappNumber } from "@/lib/whatsapp";
 import { isTouchDevice } from "@/lib/isTouchDevice";
 import { applyThermalPageSize } from "@/lib/thermalPageSize";
 import DirectPrintButton, { useDirectPrint } from "@/components/DirectPrintButton";
@@ -67,7 +68,7 @@ export default function PurchaseDetailsPage() {
   };
 
   const handleShareWhatsApp = () => {
-    const phoneDigits = purchase.company?.phoneNumber?.toString().replace(/\D/g, "");
+    const phoneDigits = whatsappNumber(purchase.company?.phoneNumber);
     const shareUrl = `${window.location.origin}/purchase-receipt/${purchase._id}`;
     const message = `Purchase receipt from ${purchase.company?.name || "us"}: ${shareUrl}`;
 

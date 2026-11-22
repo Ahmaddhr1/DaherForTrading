@@ -4,6 +4,7 @@ import { useT } from "@/lib/i18n/LangProvider";
 
 import { useEffect, useState } from "react";
 import { useIsFetching } from "@tanstack/react-query";
+import { usePathname } from "next/navigation";
 
 // Brand splash shown on a hard page load (mounted once in the root layout,
 // which persists across client-side navigation in the App Router, so this
@@ -20,6 +21,9 @@ export function SplashScreen() {
   const [fading, setFading] = useState(false);
   const [visible, setVisible] = useState(true);
   const isFetching = useIsFetching();
+  // Print pages (receipts, statements, and the statement print preview)
+  // show only the document - no splash over it.
+  const isPrintPage = usePathname()?.startsWith("/print/");
 
   useEffect(() => {
     const timer = setTimeout(() => setMinTimeElapsed(true), 3000);
@@ -37,11 +41,11 @@ export function SplashScreen() {
     return () => clearTimeout(hideTimer);
   }, [fading]);
 
-  if (!visible) return null;
+  if (!visible || isPrintPage) return null;
 
   return (
     <div
-      className={`fixed inset-0 z-[100] flex items-center justify-center bg-[#0B0B35] transition-opacity duration-300 ${
+      className={`print:hidden fixed inset-0 z-[100] flex items-center justify-center bg-[#0B0B35] transition-opacity duration-300 ${
         fading ? "opacity-0" : "opacity-100"
       }`}
       aria-hidden="true"

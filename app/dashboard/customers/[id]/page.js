@@ -1,6 +1,7 @@
 "use client";
 import { t } from "@/lib/i18n";
 import { useT } from "@/lib/i18n/LangProvider";
+import { whatsappUrl } from "@/lib/whatsapp";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -180,7 +181,7 @@ const EditCustomerPage = () => {
           {/* Customer Quick Actions */}
           <div className="flex flex-col sm:flex-row sm:flex-wrap gap-3 sm:gap-4 mb-4">
             <a
-              href={`https://wa.me/${form.phoneNumber}`}
+              href={whatsappUrl(form.phoneNumber)}
               target="_blank"
               rel="noopener noreferrer"
             >

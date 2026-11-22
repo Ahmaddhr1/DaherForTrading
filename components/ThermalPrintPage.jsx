@@ -18,7 +18,9 @@ import { applyThermalPageSize, clearThermalPageSize } from "@/lib/thermalPageSiz
 // variant="document" is the same idea for full-page documents (account and
 // company statements): the page shows only the document, always in its light
 // design, with Back / Print on top (not printed). Used on every device.
-export default function ThermalPrintPage({ queryKey, fetchUrl, backHref, children, variant = "thermal" }) {
+// embed: shown inside the statement print preview (no toolbar, no auto
+// print; tells the parent window when the document is ready).
+export default function ThermalPrintPage({ queryKey, fetchUrl, backHref, children, variant = "thermal", embed = false }) {
   const isDocument = variant === "document";
   const t = useT();
   const router = useRouter();
@@ -47,6 +49,15 @@ export default function ThermalPrintPage({ queryKey, fetchUrl, backHref, childre
   useEffect(() => {
     if (!data || printedRef.current) return;
     printedRef.current = true;
+    if (embed) {
+      const ready = setTimeout(async () => {
+        try {
+          await document.fonts?.ready;
+        } catch {}
+        window.parent?.postMessage({ type: "print-doc-ready" }, window.location.origin);
+      }, 300);
+      return () => clearTimeout(ready);
+    }
     const timer = setTimeout(async () => {
       try {
         await document.fonts?.ready;
@@ -59,7 +70,7 @@ export default function ThermalPrintPage({ queryKey, fetchUrl, backHref, childre
 
   return (
     <>
-      <div className="thermal-toolbar force-light print:hidden sticky top-0 z-10 flex items-center justify-between gap-2 p-3 border-b bg-white text-gray-900">
+      <div data-embed={embed} className="thermal-toolbar force-light print:hidden sticky top-0 z-10 flex items-center data-[embed=true]:hidden justify-between gap-2 p-3 border-b bg-white text-gray-900">
         <Button variant="outline" size="sm" onClick={() => router.push(backHref)} className="flex items-center gap-1">
           <ArrowLeft className="rtl-flip h-4 w-4" />
           {t("Back")}

@@ -14,6 +14,7 @@ function Inner() {
   return (
     <ThermalPrintPage
       variant="document"
+      embed={search.get("embed") === "1"}
       queryKey={["print-customer-statement", id, from, to]}
       fetchUrl={`/api/customers/${id}/statement${statementApiQuery(from, to)}`}
       backHref={`/dashboard/customers/${id}/statement${statementPrintQuery(from, to)}`}

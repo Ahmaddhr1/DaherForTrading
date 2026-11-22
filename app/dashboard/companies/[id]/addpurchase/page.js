@@ -314,7 +314,7 @@ const NewPurchasePage = () => {
               )}
 
               <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4 border border-blue-200 dark:border-blue-900/50 space-y-2">
-                <div className="flex justify-between items-center text-sm text-blue-900/80">
+                <div className="flex justify-between items-center text-sm text-blue-900/80 dark:text-blue-200/80">
                   <span>{t("Subtotal")}</span>
                   <span>${subtotal.toFixed(2)}</span>
                 </div>
@@ -325,7 +325,7 @@ const NewPurchasePage = () => {
                   </div>
                 )}
                 {taxAmountTotal > 0 && (
-                  <div className="flex justify-between items-center text-sm text-blue-900/80">
+                  <div className="flex justify-between items-center text-sm text-blue-900/80 dark:text-blue-200/80">
                     <span>{t("Tax (")}{parseFloat(taxRate) || 0}%)</span>
                     <span>+${taxAmountTotal.toFixed(2)}</span>
                   </div>
@@ -335,7 +335,7 @@ const NewPurchasePage = () => {
                   <span className="text-2xl font-bold text-blue-900 dark:text-blue-300">${total.toFixed(2)}</span>
                 </div>
                 {settings?.dollarRate > 0 && (
-                  <div className="flex justify-between items-center text-sm text-blue-900/70">
+                  <div className="flex justify-between items-center text-sm text-blue-900/70 dark:text-blue-200/70">
                     <span>≈</span>
                     <span>{formatLL(total, settings.dollarRate)}</span>
                   </div>

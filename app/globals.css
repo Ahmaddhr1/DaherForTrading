@@ -1,7 +1,9 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
-@custom-variant dark (&:is(.dark *));
+/* .force-light opts a subtree out of dark mode (statements, shared
+   receipts/invoices are documents designed in light colours). */
+@custom-variant dark (&:is(.dark *):not(.force-light, .force-light *));
 
 @theme inline {
   --color-background: var(--background);
@@ -43,7 +45,8 @@
   --radius-xl: calc(var(--radius) + 4px);
 }
 
-:root {
+:root,
+.force-light {
   --radius: 0.625rem;
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
@@ -133,6 +136,13 @@ body {
 #thermal-receipt-root {
   display: none;
 }
+/* The dedicated mobile print page (/print/...) shows the receipt on screen too. */
+body.thermal-page #thermal-receipt-root {
+  display: block;
+}
+body.thermal-page {
+  background: #fff;
+}
 
 @media print {
   body.printing-thermal > *:not(#thermal-receipt-root) {
@@ -169,4 +179,15 @@ html[dir="rtl"] .rtl-flip {
 html[dir="rtl"] .recharts-wrapper,
 html[dir="rtl"] .recharts-wrapper * {
   direction: ltr;
+}
+
+/* Documents always render in their light design, even on a device in dark
+   mode (see the dark variant above). */
+.force-light {
+  color-scheme: light;
+  color: var(--foreground);
+}
+/* Dashboard statements sit on the app background, which is dark in dark mode. */
+.force-light-surface {
+  background-color: var(--background);
 }

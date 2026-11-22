@@ -129,7 +129,7 @@ export async function middleware(request) {
     return NextResponse.redirect(new URL(landingPathFor(user), request.url))
   }
 
-  if (!user && pathname.startsWith('/dashboard')) {
+  if (!user && (pathname.startsWith('/dashboard') || pathname.startsWith('/print/'))) {
     return NextResponse.redirect(new URL('/', request.url))
   }
 

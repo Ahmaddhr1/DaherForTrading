@@ -45,7 +45,7 @@ export default function PublicStatementPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="force-light min-h-screen bg-gray-50 flex items-center justify-center">
         <Loader2 className="h-8 w-8 animate-spin text-gray-400" />
       </div>
     );
@@ -53,7 +53,7 @@ export default function PublicStatementPage() {
 
   if (isError || !statement) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
+      <div className="force-light min-h-screen bg-gray-50 flex items-center justify-center px-4">
         <Card className="w-full max-w-md">
           <CardContent className="pt-6 text-center">
             <p className="text-gray-600">{t("This statement link is invalid or no longer available.")}</p>
@@ -66,7 +66,7 @@ export default function PublicStatementPage() {
   const { fullName, orders, totals } = statement;
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8 px-4">
+    <div className="force-light min-h-screen bg-gray-50 py-8 px-4">
       <div className="max-w-2xl mx-auto">
         <Card className="shadow-sm border-gray-200">
           <CardHeader>

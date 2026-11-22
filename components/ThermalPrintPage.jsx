@@ -6,6 +6,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Printer, ArrowLeft, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useT } from "@/lib/i18n/LangProvider";
+import { applyThermalPageSize, clearThermalPageSize } from "@/lib/thermalPageSize";
 
 // Dedicated page that shows ONLY a thermal receipt and prints it. Used on
 // phones/tablets: there, window.print() returns immediately and the
@@ -36,7 +37,10 @@ export default function ThermalPrintPage({ queryKey, fetchUrl, backHref, childre
   useEffect(() => {
     const classes = isDocument ? ["print-doc-page"] : ["printing-thermal", "thermal-page"];
     document.body.classList.add(...classes);
-    return () => document.body.classList.remove(...classes);
+    return () => {
+      document.body.classList.remove(...classes);
+      if (!isDocument) clearThermalPageSize();
+    };
   }, [isDocument]);
 
   // Open the print dialog once, after the receipt has rendered.
@@ -47,6 +51,7 @@ export default function ThermalPrintPage({ queryKey, fetchUrl, backHref, childre
       try {
         await document.fonts?.ready;
       } catch {}
+      if (!isDocument) applyThermalPageSize({ keep: true });
       window.print();
     }, 600);
     return () => clearTimeout(timer);
@@ -59,7 +64,7 @@ export default function ThermalPrintPage({ queryKey, fetchUrl, backHref, childre
           <ArrowLeft className="rtl-flip h-4 w-4" />
           {t("Back")}
         </Button>
-        <Button size="sm" onClick={() => window.print()} disabled={!data} className="flex items-center gap-1">
+        <Button size="sm" onClick={() => { if (!isDocument) applyThermalPageSize({ keep: true }); window.print(); }} disabled={!data} className="flex items-center gap-1">
           <Printer className="h-4 w-4" />
           {t("Print")}
         </Button>

@@ -155,6 +155,15 @@ body.print-doc-page {
   body.printing-thermal #thermal-receipt-root {
     display: block !important;
   }
+  /* The receipt fills the 80mm page edge to edge (see lib/thermalPageSize.js). */
+  body.printing-thermal {
+    margin: 0 !important;
+    padding: 0 !important;
+    background: #fff !important;
+  }
+  body.printing-thermal #thermal-receipt-root .thermal-receipt {
+    margin: 0 !important;
+  }
 }
 
 /* ---------- Arabic / right-to-left ----------

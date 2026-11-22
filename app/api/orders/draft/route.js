@@ -17,7 +17,7 @@ export async function POST(req) {
   if (forbidden) return forbidden;
 
   try {
-    const { products, taxRate, customerNameText } = await req.json();
+    const { products, taxRate, customerNameText, notes } = await req.json();
 
     if (!products?.length) {
       return NextResponse.json({ message: "No products provided" }, { status: 400 });
@@ -51,6 +51,7 @@ export async function POST(req) {
       discountTotal: priced.discountTotal,
       taxRate: priced.taxRate,
       taxAmount: priced.taxAmount,
+      notes: typeof notes === "string" ? notes.trim().slice(0, 1000) : "",
       status: "draft",
       profit: priced.profit,
     });

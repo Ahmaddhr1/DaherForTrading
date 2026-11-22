@@ -59,6 +59,7 @@ export async function PUT(req, { params }) {
     // Debt is no longer editable directly here; it will be managed by
     // dedicated debt/purchase endpoints.
     delete body.debt;
+    if (body.notes !== undefined) body.notes = String(body.notes ?? "").trim().slice(0, 1000);
 
     if (body.priceTier !== undefined) {
       const parsedPriceTier = parseInt(body.priceTier, 10);

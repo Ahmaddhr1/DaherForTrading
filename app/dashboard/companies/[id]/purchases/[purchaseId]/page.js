@@ -1,6 +1,8 @@
 "use client";
 import { t } from "@/lib/i18n";
 import { useT } from "@/lib/i18n/LangProvider";
+import { isTouchDevice } from "@/lib/isTouchDevice";
+import { useRouter } from "next/navigation";
 
 import { useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
@@ -33,6 +35,7 @@ const fetchPurchase = async (purchaseId) => {
 
 export default function PurchaseDetailsPage() {
   const t = useT();
+  const router = useRouter();
   const { id: companyId, purchaseId } = useParams();
 
   const { data: purchase, isLoading, isError } = useQuery({
@@ -50,6 +53,10 @@ export default function PurchaseDetailsPage() {
   }, []);
 
   const handlePrintThermal = () => {
+    if (isTouchDevice()) {
+      router.push(`/print/purchase/${purchaseId}?company=${companyId}`);
+      return;
+    }
     document.body.classList.add("printing-thermal");
     window.print();
   };

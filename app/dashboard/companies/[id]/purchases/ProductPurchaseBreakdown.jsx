@@ -63,7 +63,7 @@ export default function ProductPurchaseBreakdown({ companyId }) {
         {/* Filters */}
         <div className="flex flex-col sm:flex-row sm:flex-wrap sm:items-center gap-3 sm:gap-4">
           <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-2">
-            <span className="text-sm font-medium text-gray-700">{t("From")}</span>
+            <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{t("From")}</span>
             <input
               type="date"
               value={startDate}
@@ -72,7 +72,7 @@ export default function ProductPurchaseBreakdown({ companyId }) {
             />
           </div>
           <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-2">
-            <span className="text-sm font-medium text-gray-700">{t("To")}</span>
+            <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{t("To")}</span>
             <input
               type="date"
               value={endDate}
@@ -81,7 +81,7 @@ export default function ProductPurchaseBreakdown({ companyId }) {
             />
           </div>
           <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-2">
-            <span className="text-sm font-medium text-gray-700">{t("Product")}</span>
+            <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{t("Product")}</span>
             <select
               value={productId}
               onChange={(e) => setProductId(e.target.value)}
@@ -123,7 +123,7 @@ export default function ProductPurchaseBreakdown({ companyId }) {
             <div className="space-y-2 sm:hidden">
               {items.map((item) => (
                 <div key={item.productId || item.name} className="border rounded-lg p-3">
-                  <p className="font-medium text-gray-900 mb-2">{item.name}</p>
+                  <p className="font-medium text-gray-900 mb-2 dark:text-gray-100">{item.name}</p>
                   <div className="grid grid-cols-3 gap-2 text-sm">
                     <div>
                       <p className="text-xs text-gray-500">{t("Quantity")}</p>
@@ -159,7 +159,7 @@ export default function ProductPurchaseBreakdown({ companyId }) {
                 <TableBody>
                   {items.map((item) => (
                     <TableRow key={item.productId || item.name}>
-                      <TableCell className="font-medium text-gray-900">{item.name}</TableCell>
+                      <TableCell className="font-medium text-gray-900 dark:text-gray-100">{item.name}</TableCell>
                       <TableCell className="text-center">{item.quantity}</TableCell>
                       <TableCell className="text-center font-medium">${item.totalSpent.toFixed(2)}</TableCell>
                       <TableCell className={`text-center font-medium ${item.expectedProfit >= 0 ? "text-green-600" : "text-red-600"}`}>
@@ -181,14 +181,14 @@ export default function ProductPurchaseBreakdown({ companyId }) {
                 <Package className="h-3.5 w-3.5" />
                 {t("Units Purchased")}
               </span>
-              <span className="text-lg font-bold text-gray-900">{totals.totalQuantity}</span>
+              <span className="text-lg font-bold text-gray-900 dark:text-gray-100">{totals.totalQuantity}</span>
             </div>
             <div className="flex flex-col items-center gap-1">
               <span className="flex items-center gap-1.5 text-xs font-medium text-gray-500">
                 <Wallet className="h-3.5 w-3.5" />
                 {t("Total Spent")}
               </span>
-              <span className="text-lg font-bold text-gray-900">${totals.totalSpent.toFixed(2)}</span>
+              <span className="text-lg font-bold text-gray-900 dark:text-gray-100">${totals.totalSpent.toFixed(2)}</span>
             </div>
             <div className="flex flex-col items-center gap-1">
               <span className="flex items-center gap-1.5 text-xs font-medium text-gray-500">

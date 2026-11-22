@@ -44,29 +44,42 @@ export default function ThermalReceipt({ order }) {
 
         <div className="border-t border-dashed border-black my-1" />
 
-        <div className="flex justify-between font-bold">
-          <span>{t("Item")}</span>
-          <span>{t("Qty x Price - Disc = Total")}</span>
-        </div>
-        {products.map((item) => {
-          const lineSubtotal = item.price * item.quantity;
-          const lineDiscount = item.discount || 0;
-          const lineTotal = lineSubtotal - lineDiscount;
-          return (
-            <div key={item._id || item.productId} className="mb-1">
-              <div className="flex justify-between">
-                <span>{item.name}</span>
-              </div>
-              <div className="flex justify-between">
-                <span>
-                  {item.quantity} {t("x $")}{Number(item.price).toFixed(2)}
-                  {lineDiscount > 0 ? ` - $${lineDiscount.toFixed(2)}` : ""}
-                </span>
-                <span>${lineTotal.toFixed(2)}</span>
-              </div>
-            </div>
-          );
-        })}
+        {/* One column per value (product, qty, price, discount, total); long
+            product names wrap inside their own column. Amounts are in $. */}
+        <table className="w-full table-fixed border-collapse text-[10px] leading-tight">
+          <colgroup>
+            <col />
+            <col className="w-[9%]" />
+            <col className="w-[18%]" />
+            <col className="w-[15%]" />
+            <col className="w-[19%]" />
+          </colgroup>
+          <thead>
+            <tr className="font-bold border-b border-dashed border-black">
+              <th className="text-start font-bold pb-0.5">{t("Product")}</th>
+              <th className="text-end font-bold pb-0.5">{t("Qty")}</th>
+              <th className="text-end font-bold pb-0.5">{t("Price")}</th>
+              <th className="text-end font-bold pb-0.5">{t("Disc")}</th>
+              <th className="text-end font-bold pb-0.5">{t("Total")}</th>
+            </tr>
+          </thead>
+          <tbody>
+            {products.map((item) => {
+              const lineSubtotal = item.price * item.quantity;
+              const lineDiscount = item.discount || 0;
+              const lineTotal = lineSubtotal - lineDiscount;
+              return (
+                <tr key={item._id || item.productId || item.name} className="align-top">
+                  <td className="text-start pe-1 py-0.5 break-words">{item.name}</td>
+                  <td className="text-end py-0.5 ltr-text">{item.quantity}</td>
+                  <td className="text-end py-0.5 ltr-text">{Number(item.price).toFixed(2)}</td>
+                  <td className="text-end py-0.5 ltr-text">{lineDiscount > 0 ? lineDiscount.toFixed(2) : "-"}</td>
+                  <td className="text-end py-0.5 ltr-text font-bold">{lineTotal.toFixed(2)}</td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
 
         <div className="border-t border-dashed border-black my-1" />
 
@@ -117,6 +130,14 @@ export default function ThermalReceipt({ order }) {
               <span>{t("Customer Total Debt")}</span>
               <span>${customerDebt.toFixed(2)}</span>
             </div>
+          </>
+        )}
+
+        {order.notes && (
+          <>
+            <div className="border-t border-dashed border-black my-1" />
+            <p className="font-bold">{t("Notes")}</p>
+            <p dir="auto" className="whitespace-pre-line break-words">{order.notes}</p>
           </>
         )}
 

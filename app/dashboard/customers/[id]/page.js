@@ -10,7 +10,7 @@ import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { FormSkeleton, PageHeaderSkeleton } from "@/components/ui/skeleton-patterns";
-import { Eye, Loader2, User, Phone, DollarSign, UserCog, Package, PhoneCall, Lock, FileText, Layers, AlertTriangle } from "lucide-react";
+import { Eye, Loader2, User, Phone, DollarSign, UserCog, Package, PhoneCall, Lock, FileText, Layers, AlertTriangle, StickyNote } from "lucide-react";
 import { format } from "@/lib/i18n/date";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -35,6 +35,7 @@ const EditCustomerPage = () => {
     phoneNumber: "",
     debt: "",
     priceTier: "1",
+    notes: "",
     orders: [],
   });
 
@@ -55,6 +56,7 @@ const EditCustomerPage = () => {
         phoneNumber: data.phoneNumber || "",
         debt: data.debt?.toString() || "",
         priceTier: data.priceTier?.toString() || "1",
+        notes: data.notes || "",
         orders: data?.orders || [],
       });
     }
@@ -314,6 +316,27 @@ const EditCustomerPage = () => {
                         {t("Which product price this customer is charged when creating an order")}
                       </p>
                     </div>
+                  </div>
+
+                  <Separator />
+
+                  {/* Notes Section */}
+                  <div className="space-y-2">
+                    <Label htmlFor="notes" className="text-sm font-medium flex items-center gap-2">
+                      <StickyNote className="h-4 w-4" />
+                      {t("Notes")}
+                    </Label>
+                    <textarea
+                      id="notes"
+                      name="notes"
+                      rows={3}
+                      maxLength={1000}
+                      value={form.notes}
+                      onChange={handleChange}
+                      disabled={!canEditCustomers}
+                      placeholder={t("Anything worth remembering about this customer")}
+                      className="w-full p-2 border border-gray-300 dark:border-gray-700 rounded-md bg-transparent text-sm focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+                    />
                   </div>
 
                   <Separator />

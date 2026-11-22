@@ -59,6 +59,10 @@ export function MobileBottomBar() {
   // sub-pages (Profit Margins, Supplier Trends - see Dashboard's
   // `children` in SideBarTabs.js), the same pattern Sales/Stock already
   // use for their own tabs.
+  // Overdue Debt is a Dashboard sub-tab, so it sits in the Home sheet for
+  // anyone who has one; otherwise it stays in Sales / More as before. Listed
+  // in exactly one place either way.
+  const hasHome = isOwner || canViewStats;
   const SECTIONS = [
     // The stats/charts overview page needs canViewStats (see middleware.js) -
     // an admin without it gets no "Home" slot at all rather than a dead link.
@@ -115,7 +119,7 @@ export function MobileBottomBar() {
           key: "sales",
           label: "Sales",
           icon: <Wallet size={20} />,
-          items: ["Customers", "Overdue Debt", "Payments", "Disbursements"].map(findTab).filter(Boolean),
+          items: ["Customers", ...(hasHome ? [] : ["Overdue Debt"]), "Payments", "Disbursements"].map(findTab).filter(Boolean),
         }
       : {
           key: "customers",
@@ -134,7 +138,7 @@ export function MobileBottomBar() {
       label: "More",
       icon: <MoreHorizontal size={20} />,
       items: [
-        ...(isOwner ? [] : ["Overdue Debt", "Disbursements"]),
+        ...(isOwner ? [] : [...(hasHome ? [] : ["Overdue Debt"]), "Disbursements"]),
         "Settings",
         ...(isOwner ? ["Admins", "Activity Log"] : []),
       ].map(findTab).filter(Boolean),

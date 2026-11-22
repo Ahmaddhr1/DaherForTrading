@@ -12,7 +12,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Label } from "@/components/ui/label";
 import { PageHeaderSkeleton, ListSkeleton } from "@/components/ui/skeleton-patterns";
 import { toast } from "@/lib/i18n/toast";
-import { Loader2, Plus, Trash2, PencilLine, CheckCircle, Layers, Gift, PackagePlus } from "lucide-react";
+import { Loader2, Plus, Trash2, PencilLine, CheckCircle, Layers, Gift, PackagePlus, StickyNote } from "lucide-react";
 import Link from "next/link";
 import { useSettings, formatLL } from "@/lib/currency";
 import { Combobox } from "@/components/ui/combobox";
@@ -48,6 +48,7 @@ export default function EditOrderPage() {
   const [products, setProducts] = useState([]);
   const [orderRows, setOrderRows] = useState([]);
   const [taxRate, setTaxRate] = useState("0");
+  const [notes, setNotes] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isFinalizing, setIsFinalizing] = useState(false);
 
@@ -89,6 +90,7 @@ export default function EditOrderPage() {
         }))
       );
       setTaxRate(order.taxRate?.toString() || "0");
+      setNotes(order.notes || "");
     }
   }, [order]);
 
@@ -211,6 +213,7 @@ export default function EditOrderPage() {
       await axios.put(`/api/orders/${orderId}`, {
         products: buildProductsPayload(),
         taxRate: parseFloat(taxRate) || 0,
+        notes,
       });
 
       toast.success(isDraft ? "Draft saved!" : "Order updated successfully!");
@@ -246,6 +249,7 @@ export default function EditOrderPage() {
       await axios.put(`/api/orders/${orderId}`, {
         products: buildProductsPayload(),
         taxRate: parseFloat(taxRate) || 0,
+        notes,
       });
       await axios.put(`/api/orders/${orderId}/finalize`);
 
@@ -476,8 +480,25 @@ export default function EditOrderPage() {
                 />
               </div>
 
+{/* Notes */}
+              <div className="space-y-2">
+                <Label htmlFor="order-notes" className="text-sm font-medium flex items-center gap-2">
+                  <StickyNote className="h-4 w-4" />
+                  {t("Notes")}
+                </Label>
+                <textarea
+                  id="order-notes"
+                  rows={3}
+                  maxLength={1000}
+                  value={notes}
+                  onChange={(e) => setNotes(e.target.value)}
+                  placeholder={t("Optional note for this order")}
+                  className="w-full p-2 border border-gray-300 dark:border-gray-700 rounded-md bg-transparent text-sm focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+                />
+              </div>
+
               <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4 border border-blue-200 dark:border-blue-900/50 space-y-2">
-                <div className="flex justify-between items-center text-sm text-blue-900/80">
+                <div className="flex justify-between items-center text-sm text-blue-900/80 dark:text-blue-200/80">
                   <span>{t("Subtotal")}</span>
                   <span>${calculateSubtotal().toFixed(2)}</span>
                 </div>
@@ -488,7 +509,7 @@ export default function EditOrderPage() {
                   </div>
                 )}
                 {calculateTaxAmount() > 0 && (
-                  <div className="flex justify-between items-center text-sm text-blue-900/80">
+                  <div className="flex justify-between items-center text-sm text-blue-900/80 dark:text-blue-200/80">
                     <span>{t("Tax (")}{parseFloat(taxRate) || 0}%)</span>
                     <span>+${calculateTaxAmount().toFixed(2)}</span>
                   </div>
@@ -498,7 +519,7 @@ export default function EditOrderPage() {
                   <span className="text-2xl font-bold text-blue-900 dark:text-blue-300">${calculateTotal().toFixed(2)}</span>
                 </div>
                 {settings?.dollarRate > 0 && (
-                  <div className="flex justify-between items-center text-sm text-blue-900/70">
+                  <div className="flex justify-between items-center text-sm text-blue-900/70 dark:text-blue-200/70">
                     <span>≈</span>
                     <span>{formatLL(calculateTotal(), settings.dollarRate)}</span>
                   </div>

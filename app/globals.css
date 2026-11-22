@@ -271,3 +271,13 @@ html[dir="rtl"] .recharts-wrapper * {
     min-height: 1.25rem;
   }
 }
+
+/* Dashed separator on thermal receipts. Drawn as a background pattern
+   (not a dashed border) so it also survives the receipt being turned into
+   an image for direct printing (lib/escposPrinter.js). */
+.thermal-rule {
+  height: 2px;
+  background-image: repeating-linear-gradient(to right, #000 0 5px, transparent 5px 9px);
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}

@@ -31,18 +31,18 @@ export default function ThermalReceipt({ order }) {
 
   return createPortal(
     <div id="thermal-receipt-root">
-      <div className="thermal-receipt mx-auto w-[80mm] px-[3mm] pt-2 pb-[6mm] font-mono text-[13px] font-normal leading-snug text-black bg-white">
+      <div className="thermal-receipt mx-auto w-[80mm] px-[3mm] py-2 font-mono text-[13px] font-normal leading-snug text-black bg-white">
         <div className="text-center mb-2">
           <p className="text-lg font-bold">{t("Invento")}</p>
         </div>
 
-        <div className="border-t border-dashed border-black my-1" />
+        <div className="thermal-rule my-1" />
 
         <p>{t("Order #")}{order._id?.slice(-6).toUpperCase()}</p>
         <p>{format(new Date(order.createdAt), "MMM d, yyyy h:mm a")}</p>
         <p>{t("Customer:")} {order.customer?.fullName || t("Walk-in")}</p>
 
-        <div className="border-t border-dashed border-black my-1" />
+        <div className="thermal-rule my-1" />
 
         {/* One column per value (product, qty, price, discount, total); long
             product names wrap inside their own column. Amounts are in $. */}
@@ -55,12 +55,17 @@ export default function ThermalReceipt({ order }) {
             <col className="w-[21%]" />
           </colgroup>
           <thead>
-            <tr className="font-bold border-b border-dashed border-black">
+            <tr className="font-bold">
               <th className="text-start font-bold pb-0.5">{t("Product")}</th>
               <th className="text-end font-bold pb-0.5 ps-1">{t("Qty")}</th>
               <th className="text-end font-bold pb-0.5 ps-1">{t("Price")}</th>
               <th className="text-end font-bold pb-0.5 ps-1">{t("Disc")}</th>
               <th className="text-end font-bold pb-0.5 ps-1">{t("Total")}</th>
+            </tr>
+            <tr>
+              <td colSpan={5} className="pb-0.5">
+                <div className="thermal-rule" />
+              </td>
             </tr>
           </thead>
           <tbody>
@@ -81,7 +86,7 @@ export default function ThermalReceipt({ order }) {
           </tbody>
         </table>
 
-        <div className="border-t border-dashed border-black my-1" />
+        <div className="thermal-rule my-1" />
 
         <div className="flex justify-between">
           <span>{t("Subtotal")}</span>
@@ -125,7 +130,7 @@ export default function ThermalReceipt({ order }) {
 
         {typeof customerDebt === "number" && (
           <>
-            <div className="border-t border-dashed border-black my-1" />
+            <div className="thermal-rule my-1" />
             <div className="flex justify-between font-bold">
               <span>{t("Customer Total Debt")}</span>
               <span>${customerDebt.toFixed(2)}</span>
@@ -135,13 +140,13 @@ export default function ThermalReceipt({ order }) {
 
         {order.notes && (
           <>
-            <div className="border-t border-dashed border-black my-1" />
+            <div className="thermal-rule my-1" />
             <p className="font-bold">{t("Notes")}</p>
             <p dir="auto" className="whitespace-pre-line break-words">{order.notes}</p>
           </>
         )}
 
-        <div className="border-t border-dashed border-black my-1" />
+        <div className="thermal-rule my-1" />
 
         <p className="text-center mt-2">{t("Thank you for your business!")}</p>
       </div>

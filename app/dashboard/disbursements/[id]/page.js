@@ -3,6 +3,7 @@ import { t } from "@/lib/i18n";
 import { useT } from "@/lib/i18n/LangProvider";
 import { isTouchDevice } from "@/lib/isTouchDevice";
 import { applyThermalPageSize } from "@/lib/thermalPageSize";
+import DirectPrintButton, { useDirectPrint } from "@/components/DirectPrintButton";
 import { useRouter } from "next/navigation";
 
 import { useEffect } from "react";
@@ -28,6 +29,8 @@ const fetchDisbursement = async (id) => {
 
 export default function DisbursementDetailsPage() {
   const t = useT();
+  // Computers with Chrome/Edge print straight to the thermal printer.
+  const directPrint = useDirectPrint();
   const router = useRouter();
   const { id } = useParams();
 
@@ -109,10 +112,14 @@ export default function DisbursementDetailsPage() {
               <Printer className="h-4 w-4" />
               {t("Print")}
             </Button>
-            <Button variant="outline" onClick={handlePrintThermal} className="flex items-center gap-2">
-              <Receipt className="h-4 w-4" />
-              {t("Thermal Receipt")}
-            </Button>
+            {directPrint ? (
+              <DirectPrintButton fallback={handlePrintThermal} />
+            ) : (
+              <Button variant="outline" onClick={handlePrintThermal} className="flex items-center gap-2">
+                <Receipt className="h-4 w-4" />
+                {t("Thermal Receipt")}
+              </Button>
+            )}
             <Button
               onClick={handleShareWhatsApp}
               className="flex items-center gap-2 bg-green-600 hover:bg-green-700"

@@ -1,38 +1,56 @@
 "use client";
 
+import { useEffect } from "react";
 import { useT } from "@/lib/i18n/LangProvider";
 
-// The black-and-white statement (same content as the PDF - see
-// lib/statementReceiptData.js) as a printable page: plain black text on
-// white, monospace, full page width. Used by the statement print pages.
+// The black-and-white statement as a printable A4 page - the same layout
+// as the PDF from "PDF" (lib/thermalPdf.js generateStatementPdf): Courier,
+// centred header, a grid table with alternate grey rows, dashed rules,
+// totals and footer. Used by the statement print pages (/print/statement,
+// /print/company-statement).
 export default function StatementPrintDoc({ data }) {
   const t = useT();
+
+  // Always print on A4 (portrait), never the thermal roll size.
+  useEffect(() => {
+    const style = document.createElement("style");
+    style.id = "statement-a4-page";
+    style.textContent = "@page { size: A4 portrait; margin: 16mm; }";
+    document.head.appendChild(style);
+    return () => style.remove();
+  }, []);
+
   if (!data) return null;
   const { title, subtitle, meta, periodLabel, columns, rows, totals, footer } = data;
-  const align = (c) => (c?.align === "right" ? "text-end" : c?.align === "center" ? "text-center" : "text-start");
-  const isSub = (row) => row[0] === "" && typeof row[1] === "string" && row[1].startsWith("  - ");
-  const isOrderRow = (row) => columns[1]?.header === "Order / Product" && !isSub(row);
+  const align = (c) => (c?.align === "right" ? "right" : c?.align === "center" ? "center" : "left");
+  const rule = "-".repeat(70);
 
   return (
-    <div className="statement-print mx-auto max-w-3xl bg-white font-mono text-[13px] leading-relaxed text-black">
-      <div className="text-center">
-        <p className="text-2xl font-bold">Invento</p>
-        <div className="my-2 border-t border-dashed border-black" />
-        <p className="text-lg font-bold">{t(title)}</p>
-        {subtitle && <p className="text-base">{subtitle}</p>}
-        {meta && <p className="text-xs">{t("Generated")} {meta.replace(/^Generated\s*/, "")}</p>}
+    <div
+      className="statement-a4 mx-auto bg-white text-black"
+      style={{ fontFamily: '"Courier New", Courier, monospace', width: "100%", maxWidth: "178mm" }}
+    >
+      <div style={{ textAlign: "center" }}>
+        <p style={{ fontSize: 18, fontWeight: 700, margin: "0 0 6px" }}>Invento</p>
+        <p style={{ fontSize: 9, margin: "0 0 10px", overflow: "hidden", whiteSpace: "nowrap" }}>{rule}</p>
+        <p style={{ fontSize: 13, fontWeight: 700, margin: "0 0 4px" }}>{t(title)}</p>
+        {subtitle && <p style={{ fontSize: 11, margin: "0 0 4px" }}>{subtitle}</p>}
+        {meta && <p style={{ fontSize: 9, margin: "0 0 3px" }}>{t("Generated")} {meta.replace(/^Generated\s*/, "")}</p>}
         {periodLabel && (
-          <p className="text-xs">
+          <p style={{ fontSize: 9, margin: "0 0 10px" }}>
             {t("Period:")} {periodLabel}
           </p>
         )}
       </div>
 
-      <table className="mt-4 w-full border-collapse">
+      <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 10 }}>
         <thead>
-          <tr className="border-y border-black">
+          <tr>
             {columns.map((c) => (
-              <th key={c.header} className={`${align(c)} px-1.5 py-1.5 font-bold`}>
+              <th
+                key={c.header}
+                style={{ border: "0.3mm solid #000", padding: "2.5mm", textAlign: align(c), fontWeight: 700, background: "#fff" }}
+              >
                 {t(c.header)}
               </th>
             ))}
@@ -40,17 +58,17 @@ export default function StatementPrintDoc({ data }) {
         </thead>
         <tbody>
           {rows.map((row, i) => (
-            <tr key={i} className={`align-top ${isOrderRow(row) && i > 0 ? "border-t border-dashed border-black" : ""}`}>
+            <tr key={i} style={{ background: i % 2 === 0 ? "#f5f5f5" : "#fff" }}>
               {row.map((cell, j) => (
-                <td key={j} className={`${align(columns[j])} px-1.5 py-1 ${j === 0 || columns[j]?.align === "right" ? "whitespace-nowrap" : ""} ${isOrderRow(row) ? "font-bold" : ""}`}>
-                  {isSub(row) && j === 1 ? <span className="ps-4">{cell.replace(/^\s+-\s/, "• ")}</span> : t(cell)}
+                <td key={j} style={{ border: "0.3mm solid #000", padding: "2.5mm", textAlign: align(columns[j]), verticalAlign: "top", whiteSpace: j === 0 ? "nowrap" : "pre-wrap" }}>
+                  {typeof cell === "string" && /^\s+-\s/.test(cell) ? cell : t(cell)}
                 </td>
               ))}
             </tr>
           ))}
           {rows.length === 0 && (
             <tr>
-              <td colSpan={columns.length} className="py-3 text-center">
+              <td colSpan={columns.length} style={{ border: "0.3mm solid #000", padding: "2.5mm", textAlign: "center" }}>
                 {t("No records for this period.")}
               </td>
             </tr>
@@ -58,16 +76,14 @@ export default function StatementPrintDoc({ data }) {
         </tbody>
       </table>
 
-      <div className="mt-2 border-t border-black pt-2">
-        {totals.map((row) => (
-          <div key={row.label} className={`flex justify-between py-0.5 ${row.bold ? "font-bold" : ""}`}>
-            <span>{t(row.label)}</span>
-            <span>{row.value}</span>
-          </div>
-        ))}
-      </div>
-
-      {footer && <p className="mt-6 border-t border-dashed border-black pt-2 text-center text-xs">{footer}</p>}
+      <p style={{ fontSize: 9, textAlign: "center", margin: "10mm 0 4mm", overflow: "hidden", whiteSpace: "nowrap" }}>{rule}</p>
+      {totals.map((row) => (
+        <div key={row.label} style={{ display: "flex", justifyContent: "space-between", fontSize: row.bold ? 12 : 10, fontWeight: row.bold ? 700 : 400, margin: "0 0 3mm" }}>
+          <span>{t(row.label)}</span>
+          <span>{row.value}</span>
+        </div>
+      ))}
+      {footer && <p style={{ fontSize: 8, textAlign: "center", marginTop: "5mm" }}>{footer}</p>}
     </div>
   );
 }

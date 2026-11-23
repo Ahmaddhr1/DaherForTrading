@@ -281,3 +281,10 @@ html[dir="rtl"] .recharts-wrapper * {
   -webkit-print-color-adjust: exact;
   print-color-adjust: exact;
 }
+
+/* A4 statement print page: keep the grey row shading when printing. */
+.statement-a4,
+.statement-a4 * {
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}

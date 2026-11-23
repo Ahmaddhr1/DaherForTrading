@@ -72,7 +72,7 @@ export function MobileBottomBar() {
             key: "dashboard",
             label: "Home",
             icon: <Home size={20} />,
-            items: ["Dashboard", "Profit Margins", "Supplier Trends", "Overdue Debt"].map(findTab).filter(Boolean),
+            items: ["Dashboard", "Daily Closing", "Profit Margins", "Supplier Trends", "Overdue Debt"].map(findTab).filter(Boolean),
           },
         ]
       : []),

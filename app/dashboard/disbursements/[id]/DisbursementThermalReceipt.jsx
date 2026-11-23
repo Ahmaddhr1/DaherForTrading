@@ -1,6 +1,7 @@
 "use client";
 import { t } from "@/lib/i18n";
 import { useT } from "@/lib/i18n/LangProvider";
+import BusinessHeading from "@/components/BusinessHeading";
 
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
@@ -27,7 +28,7 @@ export default function DisbursementThermalReceipt({ disbursement }) {
     <div id="thermal-receipt-root">
       <div className="thermal-receipt mx-auto w-[80mm] px-[3mm] py-2 font-mono text-[13px] font-normal leading-snug text-black bg-white">
         <div className="text-center mb-2">
-          <p className="text-lg font-bold">{t("Invento")}</p>
+          <BusinessHeading />
           <p>{t("Disbursement Receipt")}</p>
         </div>
 

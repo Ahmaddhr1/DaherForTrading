@@ -1,6 +1,7 @@
 "use client";
 import { t } from "@/lib/i18n";
 import { useT } from "@/lib/i18n/LangProvider";
+import { useBusiness } from "@/lib/business";
 
 import { useState } from "react";
 import axios from "axios";
@@ -15,6 +16,7 @@ const DEFAULT_SELECTION = Object.fromEntries(CATALOG_FIELDS.map((f) => [f.key, t
 
 export default function GeneratePdfModal({ open, onClose }) {
   const t = useT();
+  const business = useBusiness();
   const [selectedFields, setSelectedFields] = useState(DEFAULT_SELECTION);
   const [generating, setGenerating] = useState(false);
 
@@ -37,7 +39,7 @@ export default function GeneratePdfModal({ open, onClose }) {
         toast.error("No products to include in the catalog");
         return;
       }
-      const blob = generateProductsCatalogPdf({ products, selectedFields });
+      const blob = generateProductsCatalogPdf({ products, selectedFields, businessName: business.name });
       await sharePdfOrDownload(blob, `product-catalog-${new Date().toISOString().slice(0, 10)}.pdf`);
       onClose();
     } catch (err) {

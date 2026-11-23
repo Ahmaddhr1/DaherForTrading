@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 import { useT } from "@/lib/i18n/LangProvider";
+import { useBusiness } from "@/lib/business";
 
 // The black-and-white statement as a printable A4 page - the same layout
 // as the PDF from "PDF" (lib/thermalPdf.js generateStatementPdf): Courier,
@@ -10,6 +11,7 @@ import { useT } from "@/lib/i18n/LangProvider";
 // /print/company-statement).
 export default function StatementPrintDoc({ data }) {
   const t = useT();
+  const business = useBusiness();
 
   // Always print on A4 (portrait), never the thermal roll size.
   useEffect(() => {
@@ -31,7 +33,8 @@ export default function StatementPrintDoc({ data }) {
       style={{ fontFamily: '"Courier New", Courier, monospace', width: "100%", maxWidth: "178mm" }}
     >
       <div style={{ textAlign: "center" }}>
-        <p style={{ fontSize: 18, fontWeight: 700, margin: "0 0 6px" }}>Invento</p>
+        <p style={{ fontSize: 18, fontWeight: 700, margin: "0 0 2px" }}>{business.name}</p>
+        {business.phone && <p style={{ fontSize: 10, margin: "0 0 6px" }} className="ltr-text">{business.phone}</p>}
         <p style={{ fontSize: 9, margin: "0 0 10px", overflow: "hidden", whiteSpace: "nowrap" }}>{rule}</p>
         <p style={{ fontSize: 13, fontWeight: 700, margin: "0 0 4px" }}>{t(title)}</p>
         {subtitle && <p style={{ fontSize: 11, margin: "0 0 4px" }}>{subtitle}</p>}

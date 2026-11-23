@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useT } from "@/lib/i18n/LangProvider";
+import { useBusiness } from "@/lib/business";
 import { format } from "@/lib/i18n/date";
 import { getTodayDateString, localDayStartISO, localDayEndISO } from "@/lib/dateUtils";
 import ClosingDoc from "@/components/closing/ClosingDoc";
@@ -21,6 +22,7 @@ export const fetchClosing = async (day) =>
 // print (A4) and WhatsApp share.
 function ClosingPage() {
   const t = useT();
+  const business = useBusiness();
   const router = useRouter();
   const search = useSearchParams();
   const [day, setDay] = useState(search.get("date") || getTodayDateString());
@@ -60,7 +62,7 @@ function ClosingPage() {
     if (!data) return;
     const m = (n) => `$${Number(n || 0).toFixed(2)}`;
     const lines = [
-      `Invento - ${t("Daily Closing")} ${format(dayDate, "MMM d, yyyy")}`,
+      `${business.name} - ${t("Daily Closing")} ${format(dayDate, "MMM d, yyyy")}`,
       `${t("Orders today")}: ${data.sales.count} (${m(data.sales.total)})`,
       `${t("Collected from customers")}: ${m(data.collected)}`,
       `${t("Paid to suppliers")}: ${m(data.paidToSuppliers)}`,

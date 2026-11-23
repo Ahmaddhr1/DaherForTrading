@@ -3,6 +3,7 @@
 import { format } from "@/lib/i18n/date";
 import { formatLL } from "@/lib/currency";
 import { useT } from "@/lib/i18n/LangProvider";
+import { useBusiness } from "@/lib/business";
 
 const money = (n) => {
   const v = Number(n || 0);
@@ -14,6 +15,7 @@ const money = (n) => {
 // from /print/closing.
 export default function ClosingDoc({ data, day, opening = 0, counted = null, printable = false }) {
   const t = useT();
+  const business = useBusiness();
   if (!data) return null;
   const rate = data.dollarRate;
   const ll = (n) => (rate > 0 ? formatLL(n, rate) : "");
@@ -60,7 +62,8 @@ export default function ClosingDoc({ data, day, opening = 0, counted = null, pri
     <div className={printable ? "mx-auto max-w-[178mm] bg-white text-black text-[13px]" : "space-y-4"}>
       {printable && (
         <div className="mb-4 text-center">
-          <p className="text-xl font-bold">Invento</p>
+          <p className="text-xl font-bold">{business.name}</p>
+          {business.phone && <p className="text-xs ltr-text">{business.phone}</p>}
           <p className="text-lg font-semibold">{t("Daily Closing")}</p>
           <p className="text-sm">{format(day, "EEEE, MMMM d, yyyy")}</p>
           {rate > 0 && <p className="text-xs">{t("Rate:")} {Number(rate).toLocaleString()} LL / $</p>}

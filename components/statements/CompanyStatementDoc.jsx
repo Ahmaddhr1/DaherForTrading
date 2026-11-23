@@ -217,7 +217,7 @@ export default function CompanyStatementDoc({ statement, periodLabel, view = "or
       </Card>
 
       <div className="mt-12 pt-6 border-t border-gray-200 dark:border-gray-800 text-center">
-        <p className="text-gray-500 dark:text-gray-400 text-sm">{t("Order management system • Powered by Ahmad Daher")}</p>
+        <p className="text-gray-500 dark:text-gray-400 text-sm">{t("Powered by Invento")}</p>
       </div>
     </>
   );

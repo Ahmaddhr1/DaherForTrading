@@ -400,16 +400,34 @@ const EditProductPage = () => {
                           <ScanBarcode className="h-4 w-4" />
                           {t("Barcode")}
                         </Label>
-                        <Input
-                          id="barcode"
-                          name="barcode"
-                          value={form.barcode}
-                          onChange={handleChange}
-                          placeholder={t("Scan or type the barcode")}
-                          className="focus:border-purple-500 transition-colors"
-                          autoComplete="off"
-                          onKeyDown={(e) => e.key === "Enter" && e.preventDefault()}
-                        />
+                        <div className="flex gap-2">
+                          <Input
+                            id="barcode"
+                            name="barcode"
+                            value={form.barcode}
+                            onChange={handleChange}
+                            placeholder={t("Scan or type the barcode")}
+                            className="focus:border-purple-500 transition-colors"
+                            autoComplete="off"
+                            onKeyDown={(e) => e.key === "Enter" && e.preventDefault()}
+                          />
+                          <Button
+                            type="button"
+                            variant="outline"
+                            data-keep-label
+                            className="shrink-0"
+                            onClick={async () => {
+                              try {
+                                const { data } = await axios.get("/api/products/barcodes");
+                                setForm((f) => ({ ...f, barcode: data.barcode }));
+                              } catch {
+                                toast.error("Couldn't generate a barcode");
+                              }
+                            }}
+                          >
+                            {t("Generate")}
+                          </Button>
+                        </div>
                         <p className="text-xs text-gray-500 dark:text-gray-400">
                           {t("Optional - lets a scanner add this product to orders")}
                           {product?.barcode && (

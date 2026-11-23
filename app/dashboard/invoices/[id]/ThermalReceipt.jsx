@@ -42,6 +42,7 @@ export default function ThermalReceipt({ order }) {
         <p>{t("Order #")}{order._id?.slice(-6).toUpperCase()}</p>
         <p>{format(new Date(order.createdAt), "MMM d, yyyy h:mm a")}</p>
         <p>{t("Customer:")} {order.customer?.fullName || t("Walk-in")}</p>
+        {order.deliveryPerson && <p>{t("Delivery:")} {order.deliveryPerson}</p>}
 
         <div className="thermal-rule my-1" />
 

@@ -31,8 +31,7 @@ import {
   Search,
   Filter,
   ArrowUpDown,
-  Package,
-} from "lucide-react";
+  Package, Truck } from "lucide-react";
 import { format } from "@/lib/i18n/date";
 import { useRouter } from "next/navigation";
 import axios from "axios";
@@ -43,6 +42,7 @@ import { DateRangeFilter } from "./DateRangeFilter";
 import { OrdersTotalsCard } from "./OrdersTotalsCard";
 import OrderCustomerName from "./OrderCustomerName";
 import OrderCard, { OrderStatusBadge } from "./OrderCard";
+import { DELIVERY_STATUSES } from "@/lib/delivery";
 import { orderNumber } from "@/lib/orderNumber";
 import { useIsOwner } from "@/lib/useIsOwner";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
@@ -68,6 +68,7 @@ export default function AllOrders() {
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [statusFilter, setStatusFilter] = useState("all");
+  const [deliveryFilter, setDeliveryFilter] = useState("");
   const [searchInput, setSearchInput] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const [sortBy, setSortBy] = useState("newest");
@@ -76,13 +77,14 @@ export default function AllOrders() {
   const [actionLoading, setActionLoading] = useState(false);
 
   const { data, isLoading, isError } = useQuery({
-    queryKey: ["orders", "all", page, pageSize, statusFilter, searchTerm, sortBy, startDate, endDate],
+    queryKey: ["orders", "all", page, pageSize, statusFilter, deliveryFilter, searchTerm, sortBy, startDate, endDate],
     queryFn: async () => {
       const res = await axios.get("/api/orders", {
         params: {
           page,
           limit: pageSize,
           status: statusFilter !== "all" ? statusFilter : undefined,
+          delivery: deliveryFilter || undefined,
           search: searchTerm || undefined,
           sort: sortBy,
           startDate: localDayStartISO(startDate),
@@ -101,7 +103,7 @@ export default function AllOrders() {
 
   useEffect(() => {
     setPage(1);
-  }, [statusFilter, searchTerm, sortBy, pageSize, startDate, endDate]);
+  }, [statusFilter, deliveryFilter, searchTerm, sortBy, pageSize, startDate, endDate]);
 
   const [deleteOrderId, setDeleteOrderId] = useState(null);
   const [markPaidOrderId, setMarkPaidOrderId] = useState(null);
@@ -293,6 +295,24 @@ export default function AllOrders() {
               />
               <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-2">
                 <span className="flex items-center gap-1.5 text-sm font-medium text-gray-700 dark:text-gray-300">
+                  <Truck className="h-4 w-4 text-gray-500 dark:text-gray-400" />
+                  {t("Delivery")}
+                </span>
+                <select
+                  value={deliveryFilter}
+                  onChange={(e) => setDeliveryFilter(e.target.value)}
+                  className="w-full sm:w-auto border rounded-md text-sm px-2 py-1.5 bg-transparent focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-900"
+                >
+                  <option value="">{t("All")}</option>
+                  <option value="any">{t("With delivery")}</option>
+                  {DELIVERY_STATUSES.map((s) => (
+                    <option key={s.value} value={s.value}>{t(s.label)}</option>
+                  ))}
+                  <option value="none">{t("No delivery")}</option>
+                </select>
+              </div>
+              <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-2">
+                <span className="flex items-center gap-1.5 text-sm font-medium text-gray-700 dark:text-gray-300">
                   <ArrowUpDown className="h-4 w-4 text-gray-500 dark:text-gray-400" />
                   {t("Sort by")}
                 </span>
@@ -376,7 +396,16 @@ export default function AllOrders() {
                       <OrderCustomerName order={order} />
                     </TableCell>
                     <TableCell className="text-center font-medium">${Number(order.total).toFixed(2)}</TableCell>
-                    <TableCell className="text-center"><OrderStatusBadge status={order.status} /></TableCell>
+                    <TableCell className="text-center">
+                      <OrderStatusBadge status={order.status} />
+                      {order.deliveryStatus && (
+                        <div className="mt-1 flex items-center justify-center gap-1 text-[11px] text-gray-600 dark:text-gray-400">
+                          <Truck className="h-3 w-3" />
+                          {t(DELIVERY_STATUSES.find((d) => d.value === order.deliveryStatus)?.label || "")}
+                          {order.deliveryPerson ? ` · ${order.deliveryPerson}` : ""}
+                        </div>
+                      )}
+                    </TableCell>
                     <TableCell className="text-gray-500 dark:text-gray-400 text-sm">
                       {format(new Date(order.createdAt), "MMM d, yyyy HH:mm")}
                     </TableCell>

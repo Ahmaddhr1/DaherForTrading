@@ -91,6 +91,16 @@ const orderSchema = new mongoose.Schema(
       maxlength: 1000,
       default: "",
     },
+    // Optional delivery, separate from the payment status (see lib/delivery.js):
+    // null = not delivered/tracked.
+    deliveryStatus: {
+      type: String,
+      enum: [null, "preparing", "out_for_delivery", "delivered", "failed"],
+      default: null,
+      index: true,
+    },
+    deliveryPerson: { type: String, trim: true, maxlength: 60, default: "" },
+    deliveredAt: { type: Date, default: null },
     taxAmount: {
       type: Number,
       default: 0,

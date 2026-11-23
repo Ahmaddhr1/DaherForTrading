@@ -23,6 +23,8 @@ export async function GET(req) {
     const startDateParam = searchParams.get("startDate");
     const endDateParam = searchParams.get("endDate");
     const sort = searchParams.get("sort") || "newest";
+    // Optional delivery filter: any | none | preparing | out_for_delivery | delivered | failed
+    const delivery = searchParams.get("delivery");
     const skip = (page - 1) * limit;
 
     const query = {};
@@ -37,6 +39,9 @@ export async function GET(req) {
       // (app/dashboard/drafts) that explicitly requests status=draft.
       query.status = { $ne: "draft" };
     }
+    if (delivery === "none") query.deliveryStatus = null;
+    else if (delivery === "any") query.deliveryStatus = { $ne: null };
+    else if (["preparing", "out_for_delivery", "delivered", "failed"].includes(delivery)) query.deliveryStatus = delivery;
 
     if (search) {
       const searchPattern = new RegExp(search.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "i");

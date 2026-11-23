@@ -1,9 +1,10 @@
 "use client";
+import { deliveryInfo } from "@/lib/delivery";
 import { t, dateLocale } from "@/lib/i18n";
 import { useT } from "@/lib/i18n/LangProvider";
 
 import { Card, CardContent } from "@/components/ui/card";
-import { Calendar, Package } from "lucide-react";
+import { Calendar, Package, Truck } from "lucide-react";
 import OrderActions from "./OrderActions";
 import OrderCustomerName from "./OrderCustomerName";
 import { orderNumber } from "@/lib/orderNumber";
@@ -88,6 +89,17 @@ const OrderCard = ({ order, onStatusUpdate, actions }) => {
           </div>
           <p className="text-lg font-bold text-gray-900 dark:text-gray-100 whitespace-nowrap">{money(order.total)}</p>
         </div>
+
+        {/* Optional delivery */}
+        {deliveryInfo(order.deliveryStatus) && (
+          <div className="mt-2 flex flex-wrap items-center gap-2 text-xs">
+            <span className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 font-semibold ${deliveryInfo(order.deliveryStatus).style}`}>
+              <Truck className="h-3 w-3" />
+              {t(deliveryInfo(order.deliveryStatus).label)}
+            </span>
+            {order.deliveryPerson && <span className="text-gray-600 dark:text-gray-400">{order.deliveryPerson}</span>}
+          </div>
+        )}
 
         {/* Payment progress for partially paid orders */}
         {order.status === "partiallyPaid" && (

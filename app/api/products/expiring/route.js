@@ -1,12 +1,18 @@
 import { connectToDB } from "@/lib/connectDb";
 import Product from "@/models/Products";
+import Purchase from "@/models/Purchase";
 import AppSettings from "@/models/AppSettings";
 import { NextResponse } from "next/server";
+import { batchesInStock } from "@/lib/batches";
 
-// Powers the dashboard's expiry alert: every product that is inside its own
-// alert window - expiryDate minus the product's expiryAlertDays (or the
-// default from Settings, AppSettings.expiryAlertDays) is today or earlier -
-// including already expired ones. Closest expiry first, paginated.
+// Powers the dashboard's expiry alert. Two sources:
+// - batches: purchases with an expiry date that are still in stock (see
+//   lib/batches.js - earliest expiry is assumed to sell first);
+// - products whose stock has no dated batches but have the product-level
+//   expiry date set.
+// An entry shows once today is inside the product's alert window
+// (expiry minus the product's expiryAlertDays, or the default from
+// Settings) or it has expired. Closest expiry first, paginated.
 // GET /api/products/expiring?page=1&limit=5
 const DAY_MS = 86400000;
 
@@ -22,32 +28,68 @@ export async function GET(req) {
     const endOfToday = new Date();
     endOfToday.setHours(23, 59, 59, 999);
 
-    const [result] = await Product.aggregate([
-      { $match: { expiryDate: { $ne: null } } },
-      { $addFields: { alertDays: { $ifNull: ["$expiryAlertDays", defaultDays] } } },
-      {
-        $match: {
-          $expr: { $lte: [{ $subtract: ["$expiryDate", { $multiply: ["$alertDays", DAY_MS] }] }, endOfToday] },
-        },
-      },
-      { $sort: { expiryDate: 1, _id: 1 } },
-      {
-        $facet: {
-          total: [{ $count: "n" }],
-          products: [
-            { $skip: (page - 1) * limit },
-            { $limit: limit },
-            { $lookup: { from: "categories", localField: "category", foreignField: "_id", as: "category" } },
-            { $unwind: { path: "$category", preserveNullAndEmptyArrays: true } },
-            { $project: { name: 1, quantity: 1, unit: 1, expiryDate: 1, alertDays: 1, "category.name": 1 } },
-          ],
-        },
-      },
-    ]);
+    const datedBatches = await Purchase.find({ expiryDate: { $ne: null } })
+      .select("product quantity expiryDate createdAt")
+      .lean();
+    const byProduct = new Map();
+    for (const b of datedBatches) {
+      const k = String(b.product);
+      if (!byProduct.has(k)) byProduct.set(k, []);
+      byProduct.get(k).push(b);
+    }
 
-    const total = result?.total?.[0]?.n || 0;
+    const products = await Product.find({
+      $or: [{ _id: { $in: [...byProduct.keys()] } }, { expiryDate: { $ne: null } }],
+    })
+      .select("name quantity unit expiryDate expiryAlertDays category")
+      .populate({ path: "category", select: "name" })
+      .lean();
+
+    const entries = [];
+    for (const p of products) {
+      const alertDays = p.expiryAlertDays || defaultDays;
+      const due = (expiry) => new Date(expiry).getTime() - alertDays * DAY_MS <= endOfToday.getTime();
+      const batches = byProduct.get(String(p._id));
+      if (batches?.length) {
+        for (const b of batchesInStock(p.quantity, batches)) {
+          if (!due(b.expiryDate)) continue;
+          entries.push({
+            _id: b._id,
+            productId: p._id,
+            name: p.name,
+            unit: p.unit,
+            category: p.category,
+            expiryDate: b.expiryDate,
+            quantity: b.remaining,
+            batchDate: b.createdAt,
+            alertDays,
+          });
+        }
+      } else if (p.expiryDate && p.quantity > 0 && due(p.expiryDate)) {
+        entries.push({
+          _id: p._id,
+          productId: p._id,
+          name: p.name,
+          unit: p.unit,
+          category: p.category,
+          expiryDate: p.expiryDate,
+          quantity: p.quantity,
+          batchDate: null,
+          alertDays,
+        });
+      }
+    }
+
+    entries.sort((a, b) => new Date(a.expiryDate) - new Date(b.expiryDate));
+    const total = entries.length;
     return NextResponse.json(
-      { products: result?.products || [], total, page, totalPages: Math.max(1, Math.ceil(total / limit)), days: defaultDays },
+      {
+        products: entries.slice((page - 1) * limit, page * limit),
+        total,
+        page,
+        totalPages: Math.max(1, Math.ceil(total / limit)),
+        days: defaultDays,
+      },
       { status: 200 }
     );
   } catch (error) {

@@ -1,6 +1,7 @@
 "use client";
 import { t, dateLocale } from "@/lib/i18n";
 import { useT } from "@/lib/i18n/LangProvider";
+import ProductBatches from "@/components/ProductBatches";
 import { useSettings } from "@/lib/currency";
 
 import { useParams, useRouter } from "next/navigation";
@@ -470,7 +471,7 @@ const EditProductPage = () => {
                           onChange={handleChange}
                           className="focus:border-purple-500 transition-colors"
                         />
-                        <p className="text-xs text-gray-500 dark:text-gray-400">{t("Optional - shows on the dashboard when it gets close")}</p>
+                        <p className="text-xs text-gray-500 dark:text-gray-400">{t("Used when purchases have no expiry date - set it per delivery on Add Purchase")}</p>
                       </div>
 
                       <div className="space-y-2">
@@ -492,6 +493,10 @@ const EditProductPage = () => {
                         <p className="text-xs text-gray-500 dark:text-gray-400">
                           {t("Leave empty to use the default ({0} days, set in Settings)", { 0: defaultAlertDays })}
                         </p>
+                      </div>
+
+                      <div className="sm:col-span-2">
+                        <ProductBatches productId={id} />
                       </div>
 
                       <div className="space-y-2">

@@ -82,7 +82,7 @@ export async function POST(req, { params }) {
 
   try {
     const { id } = params;
-    const { productId, unitPrice, quantity, discount, taxRate, paid, batchId } = await req.json();
+    const { productId, unitPrice, quantity, discount, taxRate, paid, batchId, expiryDate } = await req.json();
 
     if (!productId || !unitPrice || !quantity) {
       return NextResponse.json(
@@ -132,6 +132,7 @@ export async function POST(req, { params }) {
       total,
       paid: isPaid,
       batchId: typeof batchId === "string" && batchId ? batchId.slice(0, 64) : undefined,
+      expiryDate: expiryDate && !isNaN(new Date(expiryDate)) ? new Date(expiryDate) : null,
     });
 
     // Restock the product and refresh its cost basis to the new unit price.

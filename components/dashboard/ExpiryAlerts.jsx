@@ -90,7 +90,7 @@ export default function ExpiryAlerts() {
                 return (
                   <Link
                     key={product._id}
-                    href={`/dashboard/products/${product._id}`}
+                    href={`/dashboard/products/${product.productId || product._id}`}
                     className="flex items-center justify-between gap-3 py-2.5 hover:bg-gray-50 dark:hover:bg-gray-800/60 -mx-2 px-2 rounded-md transition-colors"
                   >
                     <div className="flex items-center gap-2 min-w-0">
@@ -99,6 +99,7 @@ export default function ExpiryAlerts() {
                         <div className="font-medium text-gray-900 dark:text-gray-100 truncate">{product.name}</div>
                         <div className="text-xs text-gray-500 dark:text-gray-400 truncate">
                           {format(new Date(product.expiryDate), "MMM d, yyyy")} · {product.quantity} {t(product.unit || "pcs")}
+                          {product.batchDate ? ` · ${t("batch of {0}", { 0: format(new Date(product.batchDate), "MMM d") })}` : ""}
                           {product.category?.name ? ` · ${product.category.name}` : ""}
                         </div>
                       </div>

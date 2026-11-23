@@ -20,7 +20,7 @@ import { Combobox } from "@/components/ui/combobox";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 
 let nextRowId = 1;
-const emptyRow = () => ({ id: nextRowId++, productId: "", unitPrice: "", quantity: "1", discount: "" });
+const emptyRow = () => ({ id: nextRowId++, productId: "", unitPrice: "", quantity: "1", discount: "", expiryDate: "" });
 
 const NewPurchasePage = () => {
   const t = useT();
@@ -69,7 +69,7 @@ const NewPurchasePage = () => {
     if (prefilled || !preselectedProductId || products.length === 0) return;
     const product = products.find((p) => p._id === preselectedProductId);
     if (product) {
-      setRows([{ id: nextRowId++, productId: product._id, unitPrice: product.initialPrice?.toString() || "", quantity: "1", discount: "" }]);
+      setRows([{ id: nextRowId++, productId: product._id, unitPrice: product.initialPrice?.toString() || "", quantity: "1", discount: "", expiryDate: "" }]);
     }
     setPrefilled(true);
   }, [preselectedProductId, products, prefilled]);
@@ -113,6 +113,7 @@ const NewPurchasePage = () => {
           unitPrice: parseFloat(row.unitPrice),
           quantity: parseInt(row.quantity, 10),
           discount: parseFloat(row.discount) || 0,
+          expiryDate: row.expiryDate || null,
           taxRate: parseFloat(taxRate) || 0,
           paid,
           batchId,
@@ -264,6 +265,16 @@ const NewPurchasePage = () => {
                             value={row.discount}
                             onChange={(e) => updateRow(row.id, "discount", e.target.value.replace(/[^0-9.]/g, ""))}
                           />
+                        </div>
+
+                        <div className="space-y-2">
+                          <Label className="text-sm font-medium">{t("Expiry Date")}</Label>
+                          <Input
+                            type="date"
+                            value={row.expiryDate}
+                            onChange={(e) => updateRow(row.id, "expiryDate", e.target.value)}
+                          />
+                          <p className="text-xs text-gray-500 dark:text-gray-400">{t("Optional - this delivery's expiry")}</p>
                         </div>
                       </div>
                     </div>

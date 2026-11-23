@@ -380,7 +380,7 @@ const Page = () => {
                           onChange={handleChange}
                           className="focus:border-purple-500 transition-colors"
                         />
-                        <p className="text-xs text-gray-500 dark:text-gray-400">{t("Optional - shows on the dashboard when it gets close")}</p>
+                        <p className="text-xs text-gray-500 dark:text-gray-400">{t("Used when purchases have no expiry date - set it per delivery on Add Purchase")}</p>
                       </div>
 
                       <div className="space-y-2">

@@ -88,6 +88,7 @@ const PERMISSION_GATED_PATHS = [
   // Customer / company edit forms (their read-only pages stay open to all).
   { test: (p) => /^\/dashboard\/customers\/[^/]+\/edit$/.test(p), permission: 'canEditCustomers' },
   { test: (p) => /^\/dashboard\/companies\/[^/]+\/edit$/.test(p), permission: 'canEditCompanies' },
+  { test: (p) => /^\/dashboard\/products\/[^/]+\/edit$/.test(p), permission: 'canEditProducts' },
 ]
 
 function permissionGateFor(pathname) {
@@ -156,7 +157,7 @@ export async function middleware(request) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
     }
     // An edit page without the permission: show the record read-only instead.
-    const viewPath = pathname.match(/^(\/dashboard\/(?:customers|companies)\/[^/]+)\/edit$/)?.[1]
+    const viewPath = pathname.match(/^(\/dashboard\/(?:customers|companies|products)\/[^/]+)\/edit$/)?.[1]
     return NextResponse.redirect(new URL(viewPath || landingPathFor(user), request.url))
   }
 

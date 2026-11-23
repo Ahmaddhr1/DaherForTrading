@@ -3,6 +3,7 @@
 import { Modal } from "@/components/ui/modal";
 import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
+import { useT } from "@/lib/i18n/LangProvider";
 
 // A custom in-app confirmation popup, used in place of the browser's
 // native window.confirm() for destructive actions (deleting a record).
@@ -12,14 +13,19 @@ import { Loader2 } from "lucide-react";
 export function ConfirmDialog({
   open,
   onClose,
-  title = "Are you sure?",
+  title,
   description,
-  confirmLabel = "Delete",
-  cancelLabel = "Cancel",
+  confirmLabel,
+  cancelLabel,
   onConfirm,
   loading = false,
   variant = "destructive",
 }) {
+  const t = useT();
+  // Defaults are translated here; labels passed in are already translated by the caller.
+  title = title ?? t("Are you sure?");
+  confirmLabel = confirmLabel ?? t("Delete");
+  cancelLabel = cancelLabel ?? t("Cancel");
   return (
     <Modal open={open} onClose={onClose} title={title} maxWidth="max-w-md">
       {description && <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">{description}</p>}

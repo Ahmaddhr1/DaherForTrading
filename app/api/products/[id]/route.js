@@ -127,6 +127,21 @@ export async function PUT(req, { params }) {
       }
     }
 
+    // Barcode: blank removes it; otherwise it must not belong to another product.
+    if (body.barcode !== undefined) {
+      const code = typeof body.barcode === "string" ? body.barcode.trim() : "";
+      if (!code) {
+        delete body.barcode;
+        body.$unset = { ...(body.$unset || {}), barcode: 1 };
+      } else {
+        const taken = await Product.findOne({ barcode: code, _id: { $ne: id } }).select("name");
+        if (taken) {
+          return NextResponse.json({ error: `This barcode is already used by "${taken.name}".` }, { status: 400 });
+        }
+        body.barcode = code;
+      }
+    }
+
     const updatedProduct = await Product.findByIdAndUpdate(id, body, {
       new: true,
     });

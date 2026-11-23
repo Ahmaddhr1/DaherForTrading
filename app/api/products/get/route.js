@@ -18,7 +18,10 @@ export async function GET(req) {
 
   try {
     const query = {};
-    if (search) query.name = { $regex: new RegExp(search, "i") };
+    if (search) {
+      const rx = new RegExp(search.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "i");
+      query.$or = [{ name: { $regex: rx } }, { barcode: search.trim() }];
+    }
     if (category) {
       const categoryIds = category.split(",").filter(Boolean);
       if (categoryIds.length > 0) query.category = { $in: categoryIds };

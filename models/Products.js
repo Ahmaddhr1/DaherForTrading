@@ -3,6 +3,9 @@ import mongoose from "mongoose";
 const productSchema = new mongoose.Schema(
   {
     name: { type: String, required: true },
+    // Barcode (EAN/UPC/Code128...) for scanning products into orders and
+    // printing labels. Unique when set; left unset (not "") when empty.
+    barcode: { type: String, trim: true, index: { unique: true, sparse: true } },
     quantity: { type: Number, default: 0 },
     // Four price tiers, one per customer tier (see models/Customers.js's
     // priceTier and lib/priceTiers.js for the shared mapping). `price` is

@@ -386,7 +386,7 @@ export default function PaymentsPage() {
                     <TableCell className="text-sm">
                       {payment.order ? (
                         <Link
-                          href={`/dashboard/orders/${payment.order}`}
+                          href={`/dashboard/invoices/${payment.order}`}
                           className="inline-flex items-center rounded-md bg-blue-50 dark:bg-blue-900/30 px-2 py-0.5 text-xs font-medium text-blue-700 dark:text-blue-300 hover:underline"
                         >
                           {t("Order #")}{String(payment.order).slice(-6).toUpperCase()}

@@ -85,6 +85,7 @@ const EditCustomerPage = () => {
         description: `${form.fullName}'s information has been updated.`
       });
       queryClient.invalidateQueries(["customer", id]);
+      router.push(`/dashboard/customers/${id}`);
     },
     onError: (error) => {
       const message = error.response?.data?.error || "Failed to update customer.";

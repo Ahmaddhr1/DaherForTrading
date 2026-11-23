@@ -81,6 +81,7 @@ const EditCompanyPage = () => {
     onSuccess: () => {
       toast.success("Company Updated Successfully!");
       queryClient.invalidateQueries(["company", id]);
+      router.push(`/dashboard/companies/${id}`);
     },
     onError: (error) => {
       toast.error("Update Failed", {

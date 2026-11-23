@@ -17,7 +17,7 @@ import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { FormSkeleton, PageHeaderSkeleton } from "@/components/ui/skeleton-patterns";
-import { Loader2, Package, DollarSign, Tag, Box, TrendingUp, PackageCheck, Ruler, AlertTriangle, Truck, Layers, ImagePlus, X, Percent, CalendarClock, BellRing, ScanBarcode } from "lucide-react";
+import { Loader2, Package, DollarSign, Tag, Box, TrendingUp, PackageCheck, Ruler, AlertTriangle, Truck, Layers, ImagePlus, X, Percent, CalendarClock, BellRing, ScanBarcode, Printer } from "lucide-react";
 import Link from "next/link";
 import ProductHistory from "./ProductHistory";
 import StockAdjustments from "./StockAdjustments";
@@ -428,14 +428,22 @@ const EditProductPage = () => {
                             {t("Generate")}
                           </Button>
                         </div>
-                        <p className="text-xs text-gray-500 dark:text-gray-400">
-                          {t("Optional - lets a scanner add this product to orders")}
-                          {product?.barcode && (
-                            <a href={`/print/labels?ids=${id}`} className="ms-2 font-medium text-purple-600 hover:underline">
-                              {t("Print label")}
-                            </a>
-                          )}
-                        </p>
+                        <p className="text-xs text-gray-500 dark:text-gray-400">{t("Optional - lets a scanner add this product to orders")}</p>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          data-keep-label
+                          className="flex items-center gap-2"
+                          disabled={!product?.barcode || product.barcode !== form.barcode}
+                          onClick={() => window.open(`/print/labels?ids=${id}`, "_blank")}
+                        >
+                          <Printer className="h-4 w-4" />
+                          {t("Print Label")}
+                        </Button>
+                        {form.barcode && product?.barcode !== form.barcode && (
+                          <p className="text-xs text-amber-700 dark:text-amber-400">{t("Save the product first, then print its label.")}</p>
+                        )}
                       </div>
 
                       <div className="space-y-2">

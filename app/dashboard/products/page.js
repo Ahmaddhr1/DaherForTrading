@@ -235,6 +235,12 @@ export default function ProductsPage() {
             </div>
 
             <div className="flex items-center gap-2 shrink-0">
+              <Link href="/dashboard/products/labels">
+                <Button variant="outline" className="flex items-center gap-2" title={t("Barcode Labels")}>
+                  <ScanBarcode className="h-4 w-4" />
+                  <span className="hidden sm:inline">{t("Barcode Labels")}</span>
+                </Button>
+              </Link>
               <Button
                 variant="outline"
                 onClick={() => setPdfModalOpen(true)}

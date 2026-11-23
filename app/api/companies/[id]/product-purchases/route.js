@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
-import { connectToDB } from "@/lib/connectDb";
-import Company from "@/models/Company";
-import Purchase from "@/models/Purchase";
+import { connectToDB } from "@/core/platform/connectDb";
+import Company from "@/core/suppliers/models/Company";
+import Purchase from "@/core/suppliers/models/Purchase";
 import { NextResponse } from "next/server";
 
 // Per-product breakdown of what's been purchased from this company:
@@ -27,7 +27,7 @@ export async function GET(req, { params }) {
     const match = { company: company._id };
     if (startDateParam || endDateParam) {
       // The client resolves these to precise instants before sending them
-      // (see lib/dateUtils.js localDayStartISO/localDayEndISO).
+      // (see core/shared/dateUtils.js localDayStartISO/localDayEndISO).
       match.createdAt = {};
       if (startDateParam) match.createdAt.$gte = new Date(startDateParam);
       if (endDateParam) match.createdAt.$lte = new Date(endDateParam);

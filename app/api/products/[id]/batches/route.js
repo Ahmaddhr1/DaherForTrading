@@ -1,8 +1,8 @@
-import { connectToDB } from "@/lib/connectDb";
-import Product from "@/models/Products";
-import Purchase from "@/models/Purchase";
+import { connectToDB } from "@/core/platform/connectDb";
+import Product from "@/core/products/models/Products";
+import Purchase from "@/core/suppliers/models/Purchase";
 import { NextResponse } from "next/server";
-import { batchesInStock } from "@/lib/batches";
+import { batchesInStock } from "@/core/products/batches";
 
 // Dated batches of one product that are still in stock (earliest expiry
 // first) - shown on the product's page.

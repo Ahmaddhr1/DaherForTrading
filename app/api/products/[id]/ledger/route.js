@@ -1,8 +1,8 @@
-import { connectToDB } from "@/lib/connectDb";
-import Order from "@/models/Orders";
-import Purchase from "@/models/Purchase";
-import Product from "@/models/Products";
-import StockAdjustment from "@/models/StockAdjustment";
+import { connectToDB } from "@/core/platform/connectDb";
+import Order from "@/core/orders/models/Orders";
+import Purchase from "@/core/suppliers/models/Purchase";
+import Product from "@/core/products/models/Products";
+import StockAdjustment from "@/core/products/models/StockAdjustment";
 import { NextResponse } from "next/server";
 
 // Full chronological stock ledger for one product: every purchase, sale,

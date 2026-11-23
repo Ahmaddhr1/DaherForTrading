@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
-import { uploadImage } from "@/lib/uploadthing";
-import { getUserFromCookie } from "@/lib/auth";
-import { requireAnyPermission } from "@/lib/permissions";
+import { uploadImage } from "@/core/platform/uploadthing";
+import { getUserFromCookie } from "@/core/platform/auth";
+import { requireAnyPermission } from "@/core/platform/permissions";
 
 const MAX_SIZE_BYTES = 8 * 1024 * 1024; // 8MB
 

@@ -1,6 +1,6 @@
 "use client";
-import { t } from "@/lib/i18n";
-import { useT } from "@/lib/i18n/LangProvider";
+import { t } from "@/core/shared/i18n";
+import { useT } from "@/core/shared/i18n/LangProvider";
 
 import { useEffect, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
@@ -8,11 +8,11 @@ import Link from "next/link";
 import { LogOut, ListCollapse, Search, ChevronDown } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
-import tabs from "@/lib/SideBarTabs";
-import { toast } from "@/lib/i18n/toast";
+import tabs from "@/core/shared/SideBarTabs";
+import { toast } from "@/core/shared/i18n/toast";
 import { GlobalSearchModal } from "@/components/GlobalSearchModal";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
-import { hasPermission } from "@/lib/permissions";
+import { hasPermission } from "@/core/platform/permissions";
 
 // Desktop-only navigation (lg and up). On mobile, navigation is handled by
 // MobileBottomBar instead - see components/MobileBottomBar.jsx.

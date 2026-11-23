@@ -1,9 +1,9 @@
 "use client";
 
-import { format } from "@/lib/i18n/date";
-import { formatLL } from "@/lib/currency";
-import { useT } from "@/lib/i18n/LangProvider";
-import { useBusiness } from "@/lib/business";
+import { format } from "@/core/shared/i18n/date";
+import { formatLL } from "@/core/shared/currency";
+import { useT } from "@/core/shared/i18n/LangProvider";
+import { useBusiness } from "@/core/shared/business";
 
 const money = (n) => {
   const v = Number(n || 0);

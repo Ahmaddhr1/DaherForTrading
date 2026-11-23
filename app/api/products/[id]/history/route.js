@@ -1,7 +1,7 @@
-import { connectToDB } from "@/lib/connectDb";
-import Order from "@/models/Orders";
-import Purchase from "@/models/Purchase";
-import Product from "@/models/Products";
+import { connectToDB } from "@/core/platform/connectDb";
+import Order from "@/core/orders/models/Orders";
+import Purchase from "@/core/suppliers/models/Purchase";
+import Product from "@/core/products/models/Products";
 import { NextResponse } from "next/server";
 
 // Sales vs purchases history for one product, optionally filtered by date.

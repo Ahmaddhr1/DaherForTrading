@@ -1,13 +1,13 @@
 "use client";
-import { deliveryInfo } from "@/lib/delivery";
-import { t, dateLocale } from "@/lib/i18n";
-import { useT } from "@/lib/i18n/LangProvider";
+import { deliveryInfo } from "@/core/orders/delivery";
+import { t, dateLocale } from "@/core/shared/i18n";
+import { useT } from "@/core/shared/i18n/LangProvider";
 
 import { Card, CardContent } from "@/components/ui/card";
 import { Calendar, Package, Truck } from "lucide-react";
 import OrderActions from "./OrderActions";
 import OrderCustomerName from "./OrderCustomerName";
-import { orderNumber } from "@/lib/orderNumber";
+import { orderNumber } from "@/core/orders/orderNumber";
 
 // One card design for orders everywhere in the Orders tab (All Orders on
 // mobile, Today's, Pending, Partially Paid). Status drives the left accent

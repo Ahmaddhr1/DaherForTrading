@@ -1,6 +1,6 @@
 "use client";
-import { t } from "@/lib/i18n";
-import { useT } from "@/lib/i18n/LangProvider";
+import { t } from "@/core/shared/i18n";
+import { useT } from "@/core/shared/i18n/LangProvider";
 
 import { useMemo, useState } from "react";
 import { Modal } from "@/components/ui/modal";

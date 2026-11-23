@@ -1,5 +1,5 @@
-import { connectToDB } from "@/lib/connectDb";
-import { getEmployeePerformance } from "@/lib/employeePerformance";
+import { connectToDB } from "@/core/platform/connectDb";
+import { getEmployeePerformance } from "@/core/reports/employeePerformance";
 import { NextResponse } from "next/server";
 
 // Owner-only (enforced in middleware.js, under the /api/activity prefix).

@@ -1,16 +1,16 @@
 "use client";
-import { t } from "@/lib/i18n";
-import { useT } from "@/lib/i18n/LangProvider";
-import { useBusiness } from "@/lib/business";
+import { t } from "@/core/shared/i18n";
+import { useT } from "@/core/shared/i18n/LangProvider";
+import { useBusiness } from "@/core/shared/business";
 
 import { useState } from "react";
 import axios from "axios";
-import { toast } from "@/lib/i18n/toast";
+import { toast } from "@/core/shared/i18n/toast";
 import { Modal } from "@/components/ui/modal";
 import { Button } from "@/components/ui/button";
 import { Loader2, FileDown } from "lucide-react";
-import { CATALOG_FIELDS, generateProductsCatalogPdf } from "@/lib/productsCatalogPdf";
-import { sharePdfOrDownload } from "@/lib/thermalPdf";
+import { CATALOG_FIELDS, generateProductsCatalogPdf } from "@/core/printing/productsCatalogPdf";
+import { sharePdfOrDownload } from "@/core/printing/thermalPdf";
 
 const DEFAULT_SELECTION = Object.fromEntries(CATALOG_FIELDS.map((f) => [f.key, true]));
 

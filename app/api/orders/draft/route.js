@@ -1,11 +1,11 @@
-import { connectToDB } from "@/lib/connectDb";
-import Order from "@/models/Orders";
+import { connectToDB } from "@/core/platform/connectDb";
+import Order from "@/core/orders/models/Orders";
 import { NextResponse } from "next/server";
-import { getUserFromCookie } from "@/lib/auth";
-import { logActivity } from "@/lib/activityLog";
-import { auditView, diffViews, snapshotChanges, diffOrderLines, extraChange, describeChanges, orderLabel } from "@/lib/audit";
-import { priceOrderItems, PricingError } from "@/lib/orderPricing";
-import { requirePermission, hasPermission } from "@/lib/permissions";
+import { getUserFromCookie } from "@/core/platform/auth";
+import { logActivity } from "@/core/audit/activityLog";
+import { auditView, diffViews, snapshotChanges, diffOrderLines, extraChange, describeChanges, orderLabel } from "@/core/audit/audit";
+import { priceOrderItems, PricingError } from "@/core/orders/orderPricing";
+import { requirePermission, hasPermission } from "@/core/platform/permissions";
 
 // Creates a draft order with no real customer yet - just a hand-typed name,
 // for the product-grid cart's "type a name" checkout path. The customer

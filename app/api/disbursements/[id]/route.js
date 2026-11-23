@@ -1,10 +1,10 @@
-import { connectToDB } from "@/lib/connectDb";
-import Disbursement from "@/models/Disbursement";
+import { connectToDB } from "@/core/platform/connectDb";
+import Disbursement from "@/core/expenses/models/Disbursement";
 import { NextResponse } from "next/server";
-import { getUserFromCookie } from "@/lib/auth";
-import { logActivity } from "@/lib/activityLog";
-import { diffViews, snapshotChanges, extraChange, describeChanges } from "@/lib/audit";
-import { requirePermission } from "@/lib/permissions";
+import { getUserFromCookie } from "@/core/platform/auth";
+import { logActivity } from "@/core/audit/activityLog";
+import { diffViews, snapshotChanges, extraChange, describeChanges } from "@/core/audit/audit";
+import { requirePermission } from "@/core/platform/permissions";
 
 // GET one disbursement - used by the disbursement receipt page.
 export async function GET(_, { params }) {

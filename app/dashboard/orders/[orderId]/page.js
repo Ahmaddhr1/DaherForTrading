@@ -1,12 +1,12 @@
 "use client";
-import { t } from "@/lib/i18n";
-import { useT } from "@/lib/i18n/LangProvider";
+import { t } from "@/core/shared/i18n";
+import { useT } from "@/core/shared/i18n/LangProvider";
 
 import { useParams, useRouter } from "next/navigation";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { useEffect, useState } from "react";
-import { toast } from "@/lib/i18n/toast";
+import { toast } from "@/core/shared/i18n/toast";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -16,7 +16,7 @@ import { Loader2, CheckCircle, PencilLine, Trash2 } from "lucide-react";
 import Link from "next/link";
 import OrderCustomerName from "../components/OrderCustomerName";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
-import { useHasPermission } from "@/lib/useHasPermission";
+import { useHasPermission } from "@/core/platform/useHasPermission";
 
 export default function OrderDetailsPage() {
   const t = useT();

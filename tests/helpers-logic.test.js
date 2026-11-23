@@ -1,9 +1,9 @@
 // Pure business rules that don't need the database.
 import { describe, it, expect } from "vitest";
-import { getTierPrice } from "@/lib/priceTiers";
-import { batchesInStock } from "@/lib/batches";
-import { ean13CheckDigit } from "@/lib/barcodeGen";
-import { whatsappNumber } from "@/lib/whatsapp";
+import { getTierPrice } from "@/core/products/priceTiers";
+import { batchesInStock } from "@/core/products/batches";
+import { ean13CheckDigit } from "@/core/products/barcodeGen";
+import { whatsappNumber } from "@/core/shared/whatsapp";
 
 describe("price tiers", () => {
   const product = { price: 10, priceWholesale: 9, priceDistributor: 8, priceVip: 7 };

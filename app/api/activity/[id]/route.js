@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
-import { connectToDB } from "@/lib/connectDb";
-import ActivityLog from "@/models/ActivityLog";
+import { connectToDB } from "@/core/platform/connectDb";
+import ActivityLog from "@/core/audit/models/ActivityLog";
 import { NextResponse } from "next/server";
 
 // Owner-only (enforced in middleware.js under the /api/activity prefix).

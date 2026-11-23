@@ -1,6 +1,6 @@
-import { connectToDB } from "@/lib/connectDb";
-import Order from "@/models/Orders";
-import AppSettings from "@/models/AppSettings";
+import { connectToDB } from "@/core/platform/connectDb";
+import Order from "@/core/orders/models/Orders";
+import AppSettings from "@/core/settings/models/AppSettings";
 import { NextResponse } from "next/server";
 
 // Public, unauthenticated, read-only view of a single order for sharing

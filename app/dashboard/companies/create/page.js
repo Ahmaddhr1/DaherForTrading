@@ -1,6 +1,6 @@
 "use client";
-import { t } from "@/lib/i18n";
-import { useT } from "@/lib/i18n/LangProvider";
+import { t } from "@/core/shared/i18n";
+import { useT } from "@/core/shared/i18n/LangProvider";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -10,7 +10,7 @@ import React, { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import axios from "axios";
 import { Loader2, Building2, Phone, MapPin } from "lucide-react";
-import { toast } from "@/lib/i18n/toast";
+import { toast } from "@/core/shared/i18n/toast";
 import { useRouter } from "next/navigation";
 
 const AddCompanyPage = () => {

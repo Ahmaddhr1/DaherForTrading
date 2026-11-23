@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import { jwtVerify } from 'jose'
-import { hasPermission } from '@/lib/permissions'
+import { hasPermission } from '@/core/platform/permissions'
 
 // API paths that must remain reachable without a logged-in session.
 // Keep this list short and explicit - everything else under /api is
@@ -64,7 +64,7 @@ function isOwnerOnlyPath(pathname) {
 }
 
 // Routes an employee can reach only with the matching permission granted
-// (see lib/permissions.js) - an owner always passes these too. Checked
+// (see core/platform/permissions.js) - an owner always passes these too. Checked
 // after the strict owner-only list above, so e.g. '/api/activity/performance'
 // being carved out there is what lets it reach this list at all.
 const PERMISSION_GATED_PATHS = [

@@ -1,11 +1,11 @@
-import { connectToDB } from '@/lib/connectDb'
-import Admin from '@/models/Admin'
+import { connectToDB } from '@/core/platform/connectDb'
+import Admin from '@/core/platform/models/Admin'
 import bcrypt from 'bcryptjs'
 import { NextResponse } from 'next/server'
-import { checkLoginRateLimit, recordFailedLogin, clearLoginAttempts } from '@/lib/rateLimit'
-import { generateOtpCode, hashOtpCode, OTP_TTL_MS } from '@/lib/otp'
-import { sendOtpEmail } from '@/lib/mailer'
-import { issueSession } from '@/lib/session'
+import { checkLoginRateLimit, recordFailedLogin, clearLoginAttempts } from '@/core/platform/rateLimit'
+import { generateOtpCode, hashOtpCode, OTP_TTL_MS } from '@/core/platform/otp'
+import { sendOtpEmail } from '@/core/platform/mailer'
+import { issueSession } from '@/core/platform/session'
 
 export async function POST(req) {
   await connectToDB();

@@ -1,12 +1,12 @@
 "use client";
-import { t } from "@/lib/i18n";
-import { useT } from "@/lib/i18n/LangProvider";
+import { t } from "@/core/shared/i18n";
+import { useT } from "@/core/shared/i18n/LangProvider";
 import BusinessHeading from "@/components/BusinessHeading";
 
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
-import { format } from "@/lib/i18n/date";
-import { useSettings, formatLL } from "@/lib/currency";
+import { format } from "@/core/shared/i18n/date";
+import { useSettings, formatLL } from "@/core/shared/currency";
 
 // Same narrow 80mm thermal-receipt look as the order receipt (see
 // app/dashboard/invoices/[id]/ThermalReceipt.jsx) but for a single

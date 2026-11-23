@@ -1,8 +1,8 @@
-import { connectToDB } from "@/lib/connectDb";
-import Customer from "@/models/Customers";
-import Order from "@/models/Orders";
+import { connectToDB } from "@/core/platform/connectDb";
+import Customer from "@/core/customers/models/Customers";
+import Order from "@/core/orders/models/Orders";
 import { NextResponse } from "next/server";
-import { orderNumberSearchTerm } from "@/lib/orderNumber";
+import { orderNumberSearchTerm } from "@/core/orders/orderNumber";
 
 const SORT_MAP = {
   newest: { createdAt: -1 },
@@ -68,7 +68,7 @@ export async function GET(req) {
 
     if (startDateParam || endDateParam) {
       // The client resolves these to precise instants (see
-      // lib/dateUtils.js localDayStartISO/localDayEndISO) before sending
+      // core/shared/dateUtils.js localDayStartISO/localDayEndISO) before sending
       // them, so they're parsed directly here rather than re-derived
       // from a bare calendar date.
       query.createdAt = {};

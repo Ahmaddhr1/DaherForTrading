@@ -3,7 +3,7 @@
 import { Modal } from "@/components/ui/modal";
 import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
-import { useT } from "@/lib/i18n/LangProvider";
+import { useT } from "@/core/shared/i18n/LangProvider";
 
 // A custom in-app confirmation popup, used in place of the browser's
 // native window.confirm() for destructive actions (deleting a record).

@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
-import { connectToDB } from "@/lib/connectDb";
-import SupplierPayment from "@/models/SupplierPayment";
-import Company from "@/models/Company";
-import "@/models/Purchase";
+import { connectToDB } from "@/core/platform/connectDb";
+import SupplierPayment from "@/core/payments/models/SupplierPayment";
+import Company from "@/core/suppliers/models/Company";
+import "@/core/suppliers/models/Purchase";
 
 // Paginated, filterable list of payments made to companies (suppliers) -
 // same shape as GET /api/payments so the Payments tab can share its UI.

@@ -8,10 +8,10 @@ import { Calculator, Printer, MessageCircle, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useT } from "@/lib/i18n/LangProvider";
-import { useBusiness } from "@/lib/business";
-import { format } from "@/lib/i18n/date";
-import { getTodayDateString, localDayStartISO, localDayEndISO } from "@/lib/dateUtils";
+import { useT } from "@/core/shared/i18n/LangProvider";
+import { useBusiness } from "@/core/shared/business";
+import { format } from "@/core/shared/i18n/date";
+import { getTodayDateString, localDayStartISO, localDayEndISO } from "@/core/shared/dateUtils";
 import ClosingDoc from "@/components/closing/ClosingDoc";
 
 export const fetchClosing = async (day) =>

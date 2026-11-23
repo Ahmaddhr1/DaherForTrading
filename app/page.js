@@ -1,6 +1,6 @@
 "use client";
-import { t } from "@/lib/i18n";
-import { useT } from "@/lib/i18n/LangProvider";
+import { t } from "@/core/shared/i18n";
+import { useT } from "@/core/shared/i18n/LangProvider";
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -10,7 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Loader2, Lock, User, Mail, ArrowLeft } from "lucide-react";
-import { toast } from "@/lib/i18n/toast";
+import { toast } from "@/core/shared/i18n/toast";
 
 const OTP_RESEND_COOLDOWN_SECONDS = 30;
 

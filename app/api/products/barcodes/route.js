@@ -1,10 +1,10 @@
-import { connectToDB } from "@/lib/connectDb";
-import Product from "@/models/Products";
+import { connectToDB } from "@/core/platform/connectDb";
+import Product from "@/core/products/models/Products";
 import { NextResponse } from "next/server";
-import { getUserFromCookie } from "@/lib/auth";
-import { requirePermission } from "@/lib/permissions";
-import { logActivity } from "@/lib/activityLog";
-import { generateUniqueBarcodes } from "@/lib/barcodeGen";
+import { getUserFromCookie } from "@/core/platform/auth";
+import { requirePermission } from "@/core/platform/permissions";
+import { logActivity } from "@/core/audit/activityLog";
+import { generateUniqueBarcodes } from "@/core/products/barcodeGen";
 
 // GET  /api/products/barcodes            -> { barcode } one new unique code
 //      (for the product form's "Generate" button; saved with the product).

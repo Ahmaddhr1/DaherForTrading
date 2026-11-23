@@ -1,6 +1,6 @@
 "use client";
-import { t } from "@/lib/i18n";
-import { useT } from "@/lib/i18n/LangProvider";
+import { t } from "@/core/shared/i18n";
+import { useT } from "@/core/shared/i18n/LangProvider";
 
 import React, { useState } from "react";
 import {
@@ -17,16 +17,16 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { FiltersPanel } from "@/components/ui/filters-panel";
 import { ChevronLeft, ChevronRight, Plus, History, DollarSign, Package, Eye, CheckCircle } from "lucide-react";
-import { toast } from "@/lib/i18n/toast";
+import { toast } from "@/core/shared/i18n/toast";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
-import { useHasPermission } from "@/lib/useHasPermission";
+import { useHasPermission } from "@/core/platform/useHasPermission";
 import { TableSkeleton } from "@/components/ui/skeleton-patterns";
-import { format } from "@/lib/i18n/date";
+import { format } from "@/core/shared/i18n/date";
 import { useParams } from "next/navigation";
 import axios from "axios";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import Link from "next/link";
-import { localDayStartISO, localDayEndISO } from "@/lib/dateUtils";
+import { localDayStartISO, localDayEndISO } from "@/core/shared/dateUtils";
 import ProductPurchaseBreakdown from "./ProductPurchaseBreakdown";
 
 export default function CompanyPurchasesPage() {

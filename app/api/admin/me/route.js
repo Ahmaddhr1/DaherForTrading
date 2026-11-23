@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getUserFromCookie } from "@/lib/auth";
+import { getUserFromCookie } from "@/core/platform/auth";
 
 // Returns the currently logged-in admin's identity and role. The session
 // cookie is httpOnly, so client components can't decode the JWT themselves -

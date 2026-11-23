@@ -1,5 +1,5 @@
-import { connectToDB } from "@/lib/connectDb";
-import Return from "@/models/Return";
+import { connectToDB } from "@/core/platform/connectDb";
+import Return from "@/core/orders/models/Return";
 import { NextResponse } from "next/server";
 
 export async function GET(req) {

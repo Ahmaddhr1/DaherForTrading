@@ -1,13 +1,13 @@
 import mongoose from "mongoose";
-import { connectToDB } from "@/lib/connectDb";
-import Customer from "@/models/Customers";
-import Payment from "@/models/Payment";
+import { connectToDB } from "@/core/platform/connectDb";
+import Customer from "@/core/customers/models/Customers";
+import Payment from "@/core/payments/models/Payment";
 import { NextResponse } from "next/server";
-import { getUserFromCookie } from "@/lib/auth";
-import { logActivity } from "@/lib/activityLog";
-import { auditView, diffViews, snapshotChanges, extraChange, describeChanges } from "@/lib/audit";
-import { requirePermission } from "@/lib/permissions";
-import { recordCustomerPayment } from "@/lib/recordPayment";
+import { getUserFromCookie } from "@/core/platform/auth";
+import { logActivity } from "@/core/audit/activityLog";
+import { auditView, diffViews, snapshotChanges, extraChange, describeChanges } from "@/core/audit/audit";
+import { requirePermission } from "@/core/platform/permissions";
+import { recordCustomerPayment } from "@/core/payments/recordPayment";
 
 // Create a payment against a customer's outstanding debt.
 export async function POST(req) {
@@ -107,7 +107,7 @@ export async function GET(req) {
 
     if (startDateParam || endDateParam) {
       // The client resolves these to precise instants (see
-      // lib/dateUtils.js localDayStartISO/localDayEndISO) before sending
+      // core/shared/dateUtils.js localDayStartISO/localDayEndISO) before sending
       // them, so they're parsed directly here rather than re-derived
       // from a bare calendar date.
       query.createdAt = {};

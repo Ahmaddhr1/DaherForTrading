@@ -1,11 +1,11 @@
 "use client";
-import { t } from "@/lib/i18n";
-import { useT } from "@/lib/i18n/LangProvider";
+import { t } from "@/core/shared/i18n";
+import { useT } from "@/core/shared/i18n/LangProvider";
 
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
-import { toast } from "@/lib/i18n/toast";
+import { toast } from "@/core/shared/i18n/toast";
 import Link from "next/link";
 import {
   Users,
@@ -44,7 +44,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { PERMISSION_KEYS, PERMISSION_LABELS, emptyPermissions } from "@/lib/permissions";
+import { PERMISSION_KEYS, PERMISSION_LABELS, emptyPermissions } from "@/core/platform/permissions";
 
 const EMPTY_CREATE_FORM = {
   adminname: "",

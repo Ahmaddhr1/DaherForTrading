@@ -3,9 +3,9 @@
 import { describe, it, expect } from "vitest";
 import { call, loginAs } from "./helpers";
 import { makeProduct, makeCustomer } from "./fixtures";
-import Customer from "@/models/Customers";
-import Order from "@/models/Orders";
-import Payment from "@/models/Payment";
+import Customer from "@/core/customers/models/Customers";
+import Order from "@/core/orders/models/Orders";
+import Payment from "@/core/payments/models/Payment";
 import { POST as createOrder } from "@/app/api/orders/[id]/route";
 import { PUT as payPart } from "@/app/api/orders/[id]/paritallypaid/route";
 import { PUT as markPaid } from "@/app/api/orders/[id]/markpaid/route";

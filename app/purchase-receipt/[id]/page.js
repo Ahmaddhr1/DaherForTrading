@@ -1,11 +1,11 @@
 "use client";
-import { t } from "@/lib/i18n";
-import { useT } from "@/lib/i18n/LangProvider";
+import { t } from "@/core/shared/i18n";
+import { useT } from "@/core/shared/i18n/LangProvider";
 import BusinessHeading from "@/components/BusinessHeading";
 
 import { useQuery } from "@tanstack/react-query";
 import { useParams } from "next/navigation";
-import { format } from "@/lib/i18n/date";
+import { format } from "@/core/shared/i18n/date";
 import { Package, Calendar, Loader2, Receipt } from "lucide-react";
 import {
   Table,

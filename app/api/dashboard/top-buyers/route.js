@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
-import { connectToDB } from "@/lib/connectDb";
-import Order from "@/models/Orders";
+import { connectToDB } from "@/core/platform/connectDb";
+import Order from "@/core/orders/models/Orders";
 
 // Top customers by what they bought in a date range: total ordered (sum of
 // order totals) and the real profit those orders made (sum of Order.profit,

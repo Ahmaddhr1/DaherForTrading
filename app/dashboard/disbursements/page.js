@@ -1,12 +1,12 @@
 // app/dashboard/disbursements/page.jsx
 "use client";
-import { t } from "@/lib/i18n";
-import { useT } from "@/lib/i18n/LangProvider";
+import { t } from "@/core/shared/i18n";
+import { useT } from "@/core/shared/i18n/LangProvider";
 
 import React, { useEffect, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
-import { toast } from "@/lib/i18n/toast";
+import { toast } from "@/core/shared/i18n/toast";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -16,8 +16,8 @@ import { Modal } from "@/components/ui/modal";
 import { TableSkeleton } from "@/components/ui/skeleton-patterns";
 import { FiltersPanel } from "@/components/ui/filters-panel";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
-import { useHasPermission } from "@/lib/useHasPermission";
-import { getTodayDateString, localDayStartISO, localDayEndISO } from "@/lib/dateUtils";
+import { useHasPermission } from "@/core/platform/useHasPermission";
+import { getTodayDateString, localDayStartISO, localDayEndISO } from "@/core/shared/dateUtils";
 import {
   Table,
   TableBody,
@@ -42,7 +42,7 @@ import {
   Eye,
   Repeat,
 } from "lucide-react";
-import { format } from "@/lib/i18n/date";
+import { format } from "@/core/shared/i18n/date";
 import Link from "next/link";
 
 const CATEGORY_OPTIONS = ["Salaries", "Rent", "Utilities", "Maintenance", "Transport", "Other"];

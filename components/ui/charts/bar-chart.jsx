@@ -16,7 +16,7 @@ import {
   YAxis,
 } from "recharts";
 
-import { cn as cx } from "@/lib/utils";
+import { cn as cx } from "@/core/shared/utils";
 import {
   AvailableChartColors,
   constructCategoryColors,

@@ -3,8 +3,8 @@
 import { useEffect, useRef, useState } from "react";
 import { Printer, Loader2, ChevronDown, Usb, Bluetooth, Plus, Check, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { toast } from "@/lib/i18n/toast";
-import { useT } from "@/lib/i18n/LangProvider";
+import { toast } from "@/core/shared/i18n/toast";
+import { useT } from "@/core/shared/i18n/LangProvider";
 import {
   isDirectPrintSupported,
   supportsUsb,
@@ -17,7 +17,7 @@ import {
   printReceiptDirect,
   onPrinterChange,
   UsbBlockedError,
-} from "@/lib/escposPrinter";
+} from "@/core/printing/escposPrinter";
 
 // One-click thermal printing on computers (Chrome/Edge). The printer list
 // shows every printer this site may use - USB printers (WebUSB) and

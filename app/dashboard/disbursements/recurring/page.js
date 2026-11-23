@@ -1,11 +1,11 @@
 "use client";
-import { t } from "@/lib/i18n";
-import { useT } from "@/lib/i18n/LangProvider";
+import { t } from "@/core/shared/i18n";
+import { useT } from "@/core/shared/i18n/LangProvider";
 
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
-import { toast } from "@/lib/i18n/toast";
+import { toast } from "@/core/shared/i18n/toast";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -16,7 +16,7 @@ import { Modal } from "@/components/ui/modal";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { ListSkeleton } from "@/components/ui/skeleton-patterns";
 import { Plus, Repeat, Trash2, Edit, Loader2, Pause, Play } from "lucide-react";
-import { useHasPermission } from "@/lib/useHasPermission";
+import { useHasPermission } from "@/core/platform/useHasPermission";
 
 const CATEGORY_OPTIONS = ["Salaries", "Rent", "Utilities", "Maintenance", "Transport", "Other"];
 const EMPTY_FORM = { description: "", amount: "", category: "Other", dayOfMonth: "1" };

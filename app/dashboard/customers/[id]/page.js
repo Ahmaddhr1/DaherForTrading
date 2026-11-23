@@ -8,11 +8,11 @@ import { User, Phone, Layers, StickyNote, Pencil, Package, Eye, FileText, PhoneC
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { PageHeaderSkeleton, FormSkeleton } from "@/components/ui/skeleton-patterns";
-import { useT } from "@/lib/i18n/LangProvider";
-import { format } from "@/lib/i18n/date";
-import { useHasPermission } from "@/lib/useHasPermission";
-import { getTierLabel } from "@/lib/priceTiers";
-import { whatsappUrl } from "@/lib/whatsapp";
+import { useT } from "@/core/shared/i18n/LangProvider";
+import { format } from "@/core/shared/i18n/date";
+import { useHasPermission } from "@/core/platform/useHasPermission";
+import { getTierLabel } from "@/core/products/priceTiers";
+import { whatsappUrl } from "@/core/shared/whatsapp";
 
 // Read-only customer profile. Editing lives at /dashboard/customers/[id]/edit
 // (needs canEditCustomers - see middleware.js); the Edit button only shows

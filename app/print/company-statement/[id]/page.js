@@ -4,8 +4,8 @@ import { Suspense } from "react";
 import { useParams, useSearchParams } from "next/navigation";
 import ThermalPrintPage from "@/components/ThermalPrintPage";
 import StatementPrintDoc from "@/components/statements/StatementPrintDoc";
-import { buildCompanyStatementReceipt } from "@/lib/statementReceiptData";
-import { statementApiQuery, statementPeriodLabel, statementPrintQuery } from "@/lib/statementPeriod";
+import { buildCompanyStatementReceipt } from "@/core/printing/statementReceiptData";
+import { statementApiQuery, statementPeriodLabel, statementPrintQuery } from "@/core/shared/statementPeriod";
 
 // Print page for the company statement (black-and-white), like the order
 // receipt page: shows the statement with Back / Print, and opens the print

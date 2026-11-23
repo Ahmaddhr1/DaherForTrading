@@ -1,5 +1,5 @@
-import { connectToDB } from "@/lib/connectDb";
-import { getSupplierPriceTrend } from "@/lib/supplierPriceTrends";
+import { connectToDB } from "@/core/platform/connectDb";
+import { getSupplierPriceTrend } from "@/core/reports/supplierPriceTrends";
 import { NextResponse } from "next/server";
 
 export async function GET(req) {

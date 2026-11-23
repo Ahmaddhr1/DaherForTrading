@@ -1,12 +1,12 @@
 "use client";
-import { t } from "@/lib/i18n";
-import { useT } from "@/lib/i18n/LangProvider";
+import { t } from "@/core/shared/i18n";
+import { useT } from "@/core/shared/i18n/LangProvider";
 
 import { useState } from "react";
 import { useParams } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
-import { format } from "@/lib/i18n/date";
+import { format } from "@/core/shared/i18n/date";
 import {
   Table,
   TableBody,
@@ -28,7 +28,7 @@ import {
   ChevronLeft,
   ChevronRight,
 } from "lucide-react";
-import { localDayStartISO, localDayEndISO } from "@/lib/dateUtils";
+import { localDayStartISO, localDayEndISO } from "@/core/shared/dateUtils";
 
 const ADJUSTMENT_LABELS = {
   damaged: "Damaged",

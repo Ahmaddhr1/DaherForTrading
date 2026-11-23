@@ -1,7 +1,7 @@
 import { MySideBar } from "@/components/MySideBar";
 import { MobileBottomBar } from "@/components/MobileBottomBar";
 import { PageBackBar } from "@/components/PageBackBar";
-import { CartProvider } from "@/lib/cartContext";
+import { CartProvider } from "@/core/orders/cartContext";
 import CartDrawer from "@/app/dashboard/products/CartDrawer";
 
 export default function RootLayout({ children }) {

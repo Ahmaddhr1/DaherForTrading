@@ -1,13 +1,13 @@
 "use client";
-import { t } from "@/lib/i18n";
-import { useT } from "@/lib/i18n/LangProvider";
+import { t } from "@/core/shared/i18n";
+import { useT } from "@/core/shared/i18n/LangProvider";
 
 import { useEffect, useState } from "react";
 import { useTheme } from "next-themes";
 import { Sun, Moon } from "lucide-react";
 
 // Cycles light -> dark -> light. Deliberately skips "system" as a toggle
-// state (system is still the default on first load, set in lib/providers.jsx)
+// state (system is still the default on first load, set in core/platform/providers.jsx)
 // to keep this a simple two-state switch rather than a 3-way cycle.
 export function ThemeToggle({ className = "", collapsed = false }) {
   const t = useT();

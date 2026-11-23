@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
-import { connectToDB } from "@/lib/connectDb";
-import Purchase from "@/models/Purchase";
+import { connectToDB } from "@/core/platform/connectDb";
+import Purchase from "@/core/suppliers/models/Purchase";
 
 // Top companies (suppliers) by what you bought from them in a date range:
 // total purchased (sum of purchase totals) and the expected profit on that

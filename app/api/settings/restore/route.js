@@ -1,20 +1,20 @@
 import { NextResponse } from "next/server";
 import mongoose from "mongoose";
-import { connectToDB } from "@/lib/connectDb";
-import { getUserFromCookie } from "@/lib/auth";
-import { logActivity } from "@/lib/activityLog";
-import { extraChange } from "@/lib/audit";
-import Customer from "@/models/Customers";
-import Order from "@/models/Orders";
-import Product from "@/models/Products";
-import Category from "@/models/Category";
-import Company from "@/models/Company";
-import Purchase from "@/models/Purchase";
-import Payment from "@/models/Payment";
-import SupplierPayment from "@/models/SupplierPayment";
-import Disbursement from "@/models/Disbursement";
-import StockAdjustment from "@/models/StockAdjustment";
-import AppSettings from "@/models/AppSettings";
+import { connectToDB } from "@/core/platform/connectDb";
+import { getUserFromCookie } from "@/core/platform/auth";
+import { logActivity } from "@/core/audit/activityLog";
+import { extraChange } from "@/core/audit/audit";
+import Customer from "@/core/customers/models/Customers";
+import Order from "@/core/orders/models/Orders";
+import Product from "@/core/products/models/Products";
+import Category from "@/core/products/models/Category";
+import Company from "@/core/suppliers/models/Company";
+import Purchase from "@/core/suppliers/models/Purchase";
+import Payment from "@/core/payments/models/Payment";
+import SupplierPayment from "@/core/payments/models/SupplierPayment";
+import Disbursement from "@/core/expenses/models/Disbursement";
+import StockAdjustment from "@/core/products/models/StockAdjustment";
+import AppSettings from "@/core/settings/models/AppSettings";
 
 // Deliberately excludes Admin and LoginAttempt - restoring business data
 // must never touch login credentials or rate-limit state.

@@ -1,12 +1,12 @@
 import { NextResponse } from "next/server";
-import { connectToDB } from "@/lib/connectDb";
-import Purchase from "@/models/Purchase";
-import Company from "@/models/Company";
-import { getUserFromCookie } from "@/lib/auth";
-import { requirePermission } from "@/lib/permissions";
-import { logActivity } from "@/lib/activityLog";
-import { extraChange } from "@/lib/audit";
-import { recordSupplierPayment } from "@/lib/recordPayment";
+import { connectToDB } from "@/core/platform/connectDb";
+import Purchase from "@/core/suppliers/models/Purchase";
+import Company from "@/core/suppliers/models/Company";
+import { getUserFromCookie } from "@/core/platform/auth";
+import { requirePermission } from "@/core/platform/permissions";
+import { logActivity } from "@/core/audit/activityLog";
+import { extraChange } from "@/core/audit/audit";
+import { recordSupplierPayment } from "@/core/payments/recordPayment";
 
 // Marks an unpaid purchase as paid: reduces what we owe the company by the
 // purchase total and records a SupplierPayment, which shows up in the

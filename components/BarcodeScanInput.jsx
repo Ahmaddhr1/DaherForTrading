@@ -3,7 +3,7 @@
 import { useRef, useState } from "react";
 import { ScanBarcode } from "lucide-react";
 import { Input } from "@/components/ui/input";
-import { useT } from "@/lib/i18n/LangProvider";
+import { useT } from "@/core/shared/i18n/LangProvider";
 
 // Input for a USB / Bluetooth barcode scanner. Scanners type the code and
 // press Enter, so focus this box and scan: `onScan(code)` runs on Enter and

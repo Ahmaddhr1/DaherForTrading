@@ -1,12 +1,12 @@
-import { connectToDB } from "@/lib/connectDb";
-import Customer from "@/models/Customers";
-import Order from "@/models/Orders";
-import Product from "@/models/Products";
+import { connectToDB } from "@/core/platform/connectDb";
+import Customer from "@/core/customers/models/Customers";
+import Order from "@/core/orders/models/Orders";
+import Product from "@/core/products/models/Products";
 import { NextResponse } from "next/server";
-import { getUserFromCookie } from "@/lib/auth";
-import { requirePermission } from "@/lib/permissions";
-import { logActivity } from "@/lib/activityLog";
-import { auditView, diffViews, snapshotChanges, diffOrderLines, extraChange, describeChanges, orderLabel } from "@/lib/audit";
+import { getUserFromCookie } from "@/core/platform/auth";
+import { requirePermission } from "@/core/platform/permissions";
+import { logActivity } from "@/core/audit/activityLog";
+import { auditView, diffViews, snapshotChanges, diffOrderLines, extraChange, describeChanges, orderLabel } from "@/core/audit/audit";
 
 // Converts a draft into a real pending order: validates stock against the
 // draft's saved line items (stock was never reserved while it was a draft),

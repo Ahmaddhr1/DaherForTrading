@@ -1,5 +1,5 @@
-import { connectToDB } from "@/lib/connectDb";
-import AppSettings from "@/models/AppSettings";
+import { connectToDB } from "@/core/platform/connectDb";
+import AppSettings from "@/core/settings/models/AppSettings";
 import { NextResponse } from "next/server";
 
 // Public, read-only: the business name and phone printed on receipts,

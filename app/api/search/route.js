@@ -1,8 +1,8 @@
-import { connectToDB } from "@/lib/connectDb";
-import Customer from "@/models/Customers";
-import Product from "@/models/Products";
-import Company from "@/models/Company";
-import Order from "@/models/Orders";
+import { connectToDB } from "@/core/platform/connectDb";
+import Customer from "@/core/customers/models/Customers";
+import Product from "@/core/products/models/Products";
+import Company from "@/core/suppliers/models/Company";
+import Order from "@/core/orders/models/Orders";
 import { NextResponse } from "next/server";
 
 const RESULT_LIMIT = 5;

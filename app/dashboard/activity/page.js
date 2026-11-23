@@ -1,6 +1,6 @@
 "use client";
-import { t, dateLocale } from "@/lib/i18n";
-import { useT } from "@/lib/i18n/LangProvider";
+import { t, dateLocale } from "@/core/shared/i18n";
+import { useT } from "@/core/shared/i18n/LangProvider";
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
@@ -8,7 +8,7 @@ import { useRouter } from "next/navigation";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { History, ChevronLeft, ChevronRight, AlertCircle, Trash2, Search } from "lucide-react";
-import { toast } from "@/lib/i18n/toast";
+import { toast } from "@/core/shared/i18n/toast";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { TableSkeleton } from "@/components/ui/skeleton-patterns";
@@ -23,9 +23,9 @@ import {
 import { Button } from "@/components/ui/button";
 import { Modal } from "@/components/ui/modal";
 import { DateRangeFilter } from "@/app/dashboard/orders/components/DateRangeFilter";
-import { getTodayDateString, localDayStartISO, localDayEndISO } from "@/lib/dateUtils";
-import { AUDIT_ENTITY_TYPES, describeAction, actionKind, translateEntityLabel } from "@/lib/auditFields";
-import { useLang } from "@/lib/i18n/LangProvider";
+import { getTodayDateString, localDayStartISO, localDayEndISO } from "@/core/shared/dateUtils";
+import { AUDIT_ENTITY_TYPES, describeAction, actionKind, translateEntityLabel } from "@/core/audit/auditFields";
+import { useLang } from "@/core/shared/i18n/LangProvider";
 import { ChangePreview } from "@/components/audit/ChangesTable";
 
 const KIND_DOT = {

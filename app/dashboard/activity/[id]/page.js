@@ -1,6 +1,6 @@
 "use client";
-import { t, dateLocale } from "@/lib/i18n";
-import { useT } from "@/lib/i18n/LangProvider";
+import { t, dateLocale } from "@/core/shared/i18n";
+import { useT } from "@/core/shared/i18n/LangProvider";
 
 import Link from "next/link";
 import { useParams } from "next/navigation";
@@ -11,8 +11,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { TableSkeleton } from "@/components/ui/skeleton-patterns";
 import { ChangesTable } from "@/components/audit/ChangesTable";
-import { describeAction, actionKind, entityHref, translateEntityLabel } from "@/lib/auditFields";
-import { useLang } from "@/lib/i18n/LangProvider";
+import { describeAction, actionKind, entityHref, translateEntityLabel } from "@/core/audit/auditFields";
+import { useLang } from "@/core/shared/i18n/LangProvider";
 
 const KIND_BADGE = {
   create: "bg-green-100 text-green-800 dark:bg-green-900/40 dark:text-green-300",

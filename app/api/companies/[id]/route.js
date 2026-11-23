@@ -1,11 +1,11 @@
-import { connectToDB } from "@/lib/connectDb";
-import Company from "@/models/Company";
-import Purchase from "@/models/Purchase";
+import { connectToDB } from "@/core/platform/connectDb";
+import Company from "@/core/suppliers/models/Company";
+import Purchase from "@/core/suppliers/models/Purchase";
 import { NextResponse } from "next/server";
-import { getUserFromCookie } from "@/lib/auth";
-import { logActivity } from "@/lib/activityLog";
-import { auditView, diffViews, snapshotChanges, extraChange, describeChanges } from "@/lib/audit";
-import { requirePermission } from "@/lib/permissions";
+import { getUserFromCookie } from "@/core/platform/auth";
+import { logActivity } from "@/core/audit/activityLog";
+import { auditView, diffViews, snapshotChanges, extraChange, describeChanges } from "@/core/audit/audit";
+import { requirePermission } from "@/core/platform/permissions";
 
 // GET one company
 export async function GET(req, { params }) {

@@ -1,5 +1,5 @@
-import { connectToDB } from "@/lib/connectDb";
-import Admin from "@/models/Admin";
+import { connectToDB } from "@/core/platform/connectDb";
+import Admin from "@/core/platform/models/Admin";
 import { NextResponse } from "next/server";
 
 // Owner-only (enforced in middleware.js). Lists every admin account.

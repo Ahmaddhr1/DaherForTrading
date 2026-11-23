@@ -1,6 +1,6 @@
 "use client";
-import { t } from "@/lib/i18n";
-import { useT } from "@/lib/i18n/LangProvider";
+import { t } from "@/core/shared/i18n";
+import { useT } from "@/core/shared/i18n/LangProvider";
 
 import React, { useEffect, useState } from "react";
 import {
@@ -24,7 +24,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { TableSkeleton } from "@/components/ui/skeleton-patterns";
 import { FiltersPanel } from "@/components/ui/filters-panel";
-import { useHasPermission } from "@/lib/useHasPermission";
+import { useHasPermission } from "@/core/platform/useHasPermission";
 import {
   ChevronLeft,
   ChevronRight,
@@ -32,19 +32,19 @@ import {
   Filter,
   ArrowUpDown,
   Package, Truck } from "lucide-react";
-import { format } from "@/lib/i18n/date";
+import { format } from "@/core/shared/i18n/date";
 import { useRouter } from "next/navigation";
 import axios from "axios";
-import { toast } from "@/lib/i18n/toast";
+import { toast } from "@/core/shared/i18n/toast";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { localDayStartISO, localDayEndISO } from "@/lib/dateUtils";
+import { localDayStartISO, localDayEndISO } from "@/core/shared/dateUtils";
 import { DateRangeFilter } from "./DateRangeFilter";
 import { OrdersTotalsCard } from "./OrdersTotalsCard";
 import OrderCustomerName from "./OrderCustomerName";
 import OrderCard, { OrderStatusBadge } from "./OrderCard";
-import { DELIVERY_STATUSES } from "@/lib/delivery";
-import { orderNumber } from "@/lib/orderNumber";
-import { useIsOwner } from "@/lib/useIsOwner";
+import { DELIVERY_STATUSES } from "@/core/orders/delivery";
+import { orderNumber } from "@/core/orders/orderNumber";
+import { useIsOwner } from "@/core/platform/useIsOwner";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 
 const SORT_OPTIONS = [

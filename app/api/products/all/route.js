@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
-import { connectToDB } from "@/lib/connectDb";
-import Product from "@/models/Products";
-import Category from "@/models/Category";
+import { connectToDB } from "@/core/platform/connectDb";
+import Product from "@/core/products/models/Products";
+import Category from "@/core/products/models/Category";
 
 // Every product with its category name, no pagination - used by the
 // Products page's "Generate PDF" catalog export, which needs the whole

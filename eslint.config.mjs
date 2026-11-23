@@ -9,6 +9,45 @@ const compat = new FlatCompat({
   baseDirectory: __dirname,
 });
 
-const eslintConfig = [...compat.extends("next/core-web-vitals")];
+// Structure rules (see ARCHITECTURE.md). A violation fails `npm run lint`
+// and therefore CI.
+const OLD_PATHS = [
+  { group: ["@/lib/*", "@/models/*"], message: "lib/ and models/ moved into core/<domain>/ - see ARCHITECTURE.md." },
+];
+
+const eslintConfig = [
+  ...compat.extends("next/core-web-vitals"),
+  {
+    // Everywhere: the old flat folders are gone.
+    rules: { "no-restricted-imports": ["error", { patterns: OLD_PATHS }] },
+  },
+  {
+    // core/ is the base product: it never depends on add-on modules, on the
+    // Next.js routes/pages in app/, or on HTTP (services throw ServiceError,
+    // routes turn it into a response).
+    files: ["core/**/*.{js,jsx}"],
+    rules: {
+      "no-restricted-imports": [
+        "error",
+        {
+          patterns: [
+            ...OLD_PATHS,
+            { group: ["@/modules/*", "@/modules/**"], message: "core/ must never import an add-on module." },
+            { group: ["@/app/*", "@/app/**"], message: "core/ must not import routes or pages from app/." },
+          ],
+        },
+      ],
+    },
+  },
+  {
+    files: ["core/**/*Service.js", "core/reports/dailyClosing.js"],
+    rules: {
+      "no-restricted-imports": [
+        "error",
+        { paths: [{ name: "next/server", message: "Services don't speak HTTP - throw ServiceError instead." }], patterns: OLD_PATHS },
+      ],
+    },
+  },
+];
 
 export default eslintConfig;

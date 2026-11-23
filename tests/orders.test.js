@@ -2,9 +2,9 @@
 import { describe, it, expect } from "vitest";
 import { call, loginAs, money } from "./helpers";
 import { makeProduct, makeCustomer } from "./fixtures";
-import Product from "@/models/Products";
-import Customer from "@/models/Customers";
-import Order from "@/models/Orders";
+import Product from "@/core/products/models/Products";
+import Customer from "@/core/customers/models/Customers";
+import Order from "@/core/orders/models/Orders";
 import { POST as createOrder } from "@/app/api/orders/[id]/route";
 import { PUT as finalizeOrder } from "@/app/api/orders/[id]/finalize/route";
 
@@ -55,6 +55,7 @@ describe("creating an order", () => {
       body: { products: [{ productId: product._id, price: 10, quantity: 5 }] },
     });
     expect(res.status).toBe(400);
+    expect(res.body.message).toBe(`Insufficient stock for "${product.name}". Available: 2, requested: 5`);
     expect(await stockOf(product._id)).toBe(2);
     expect(await debtOf(customer._id)).toBe(0);
     expect(await Order.countDocuments({ customer: customer._id })).toBe(0);

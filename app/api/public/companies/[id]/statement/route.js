@@ -1,6 +1,6 @@
-import { connectToDB } from "@/lib/connectDb";
-import Company from "@/models/Company";
-import Purchase from "@/models/Purchase";
+import { connectToDB } from "@/core/platform/connectDb";
+import Company from "@/core/suppliers/models/Company";
+import Purchase from "@/core/suppliers/models/Purchase";
 import { NextResponse } from "next/server";
 
 // Public, unauthenticated, read-only statement for sharing (e.g. via a

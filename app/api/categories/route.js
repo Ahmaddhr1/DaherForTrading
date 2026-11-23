@@ -1,10 +1,10 @@
-import { connectToDB } from "@/lib/connectDb";
-import Category from "@/models/Category";
+import { connectToDB } from "@/core/platform/connectDb";
+import Category from "@/core/products/models/Category";
 import { NextResponse } from "next/server";
-import { getUserFromCookie } from "@/lib/auth";
-import { requirePermission } from "@/lib/permissions";
-import { logActivity } from "@/lib/activityLog";
-import { auditView, diffViews, snapshotChanges, extraChange, describeChanges } from "@/lib/audit";
+import { getUserFromCookie } from "@/core/platform/auth";
+import { requirePermission } from "@/core/platform/permissions";
+import { logActivity } from "@/core/audit/activityLog";
+import { auditView, diffViews, snapshotChanges, extraChange, describeChanges } from "@/core/audit/audit";
 
 export async function POST(req) {
   try {

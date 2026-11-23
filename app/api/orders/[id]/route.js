@@ -1,13 +1,15 @@
-import { connectToDB } from "@/lib/connectDb";
-import Customer from "@/models/Customers";
-import Order from "@/models/Orders";
-import Product from "@/models/Products";
+import { connectToDB } from "@/core/platform/connectDb";
+import { createCustomerOrder } from "@/core/orders/orderService";
+import { respondError } from "@/core/shared/serviceError";
+import Customer from "@/core/customers/models/Customers";
+import Order from "@/core/orders/models/Orders";
+import Product from "@/core/products/models/Products";
 import { NextResponse } from "next/server";
-import { getUserFromCookie } from "@/lib/auth";
-import { logActivity } from "@/lib/activityLog";
-import { auditView, diffViews, snapshotChanges, diffOrderLines, extraChange, describeChanges, orderLabel } from "@/lib/audit";
-import { priceOrderItems, PricingError } from "@/lib/orderPricing";
-import { requirePermission, hasPermission } from "@/lib/permissions";
+import { getUserFromCookie } from "@/core/platform/auth";
+import { logActivity } from "@/core/audit/activityLog";
+import { auditView, diffViews, snapshotChanges, diffOrderLines, extraChange, describeChanges, orderLabel } from "@/core/audit/audit";
+import { priceOrderItems, PricingError } from "@/core/orders/orderPricing";
+import { requirePermission, hasPermission } from "@/core/platform/permissions";
 
 // GET one
 export async function GET(_, { params }) {
@@ -330,121 +332,18 @@ export async function PUT(req, { params }) {
 
 export async function POST(req, { params }) {
   await connectToDB();
-  const forbiddenPermission = await requirePermission(await getUserFromCookie(), "canCreateOrders");
+  const user = await getUserFromCookie();
+  const forbiddenPermission = await requirePermission(user, "canCreateOrders");
   if (forbiddenPermission) return forbiddenPermission;
 
   try {
-    const customerId = params.id;
-    const { products, taxRate, asDraft, notes } = await req.json();
-
-    if (!products?.length) {
-      return NextResponse.json(
-        { message: "No products provided" },
-        { status: 400 }
-      );
-    }
-
-    // Needed to re-derive the correct price for a submitted line item
-    // without override permission - see priceOrderItems.
-    const user = await getUserFromCookie();
-    const customer = await Customer.findById(customerId);
-    if (!customer) {
-      return NextResponse.json({ message: "Customer not found" }, { status: 404 });
-    }
-
-    let priced;
-    try {
-      priced = await priceOrderItems(products, taxRate, {
-        canOverridePricing: hasPermission(user, "canOverrideOrderPricing"),
-        priceTier: customer.priceTier || 1,
-      });
-    } catch (err) {
-      if (err instanceof PricingError) {
-        return NextResponse.json({ message: err.message }, { status: err.status });
-      }
-      throw err;
-    }
-
-    // A draft doesn't touch stock, so it's exempt from the stock check -
-    // it's only enforced once the draft is finalized into a real order.
-    // Custom lines never touched inventory, so they're skipped here too.
-    if (!asDraft) {
-      for (let i = 0; i < priced.enrichedProducts.length; i++) {
-        const item = priced.enrichedProducts[i];
-        if (item.isCustom) continue;
-        const product = priced.productLookups[i];
-        if (product.quantity < item.quantity) {
-          return NextResponse.json(
-            {
-              message: `Insufficient stock for "${product.name}". Available: ${product.quantity}, requested: ${item.quantity}`,
-            },
-            { status: 400 }
-          );
-        }
-      }
-    }
-
-    const newOrder = await Order.create({
-      customer: customerId,
-      products: priced.enrichedProducts,
-      total: priced.total,
-      discountTotal: priced.discountTotal,
-      taxRate: priced.taxRate,
-      taxAmount: priced.taxAmount,
-      notes: typeof notes === "string" ? notes.trim().slice(0, 1000) : "",
-      status: asDraft ? "draft" : "pending",
-      remainingBalance: asDraft ? undefined : priced.total,
-      profit: priced.profit,
-    });
-
-    // A draft never reserves stock or counts toward debt until finalized.
-    // Custom lines are excluded - there's no stock to deduct for them.
-    if (!asDraft) {
-      const productUpdates = priced.enrichedProducts
-        .filter((item) => !item.isCustom)
-        .map((item) => ({
-          updateOne: {
-            filter: { _id: item.productId },
-            update: { $inc: { quantity: -item.quantity, nbOfOrders: item.quantity } },
-          },
-        }));
-      if (productUpdates.length) {
-        await Product.bulkWrite(productUpdates);
-      }
-    }
-
-    await Customer.findByIdAndUpdate(customerId, {
-      $push: { orders: newOrder._id },
-      ...(asDraft ? {} : { $inc: { debt: newOrder.total } }),
-    });
-
-    await logActivity({
-      admin: await getUserFromCookie(),
-      action: "order.create",
-      entityType: "Order",
-      entityId: newOrder._id,
-      entityLabel: orderLabel(newOrder),
-      summary: asDraft
-        ? `Saved a draft order worth $${priced.total.toFixed(2)} for ${customer.fullName}`
-        : `Created an order worth $${priced.total.toFixed(2)} for ${customer.fullName}`,
-      changes: [
-        ...snapshotChanges("Order", await auditView("Order", newOrder), "create"),
-        ...diffOrderLines([], newOrder.products),
-        asDraft
-          ? null
-          : extraChange("customer.debt", "Customer debt", customer.debt, customer.debt + newOrder.total, "money"),
-      ],
-    });
-
+    const input = await req.json();
+    const newOrder = await createCustomerOrder({ customerId: params.id, input, user });
     return NextResponse.json(
-      { message: asDraft ? "Draft saved successfully" : "Order created successfully", order: newOrder },
+      { message: input.asDraft ? "Draft saved successfully" : "Order created successfully", order: newOrder },
       { status: 201 }
     );
   } catch (error) {
-    console.log(error.message);
-    return NextResponse.json(
-      { message: "Error creating order", error: error.message },
-      { status: 500 }
-    );
+    return respondError(error, { message: "Error creating order" });
   }
 }

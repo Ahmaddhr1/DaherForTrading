@@ -1,16 +1,16 @@
 "use client";
-import { t } from "@/lib/i18n";
-import { useT } from "@/lib/i18n/LangProvider";
-import { whatsappNumber } from "@/lib/whatsapp";
-import { isTouchDevice } from "@/lib/isTouchDevice";
-import { applyThermalPageSize } from "@/lib/thermalPageSize";
+import { t } from "@/core/shared/i18n";
+import { useT } from "@/core/shared/i18n/LangProvider";
+import { whatsappNumber } from "@/core/shared/whatsapp";
+import { isTouchDevice } from "@/core/shared/isTouchDevice";
+import { applyThermalPageSize } from "@/core/printing/thermalPageSize";
 import DirectPrintButton, { useDirectPrint } from "@/components/DirectPrintButton";
 import { useRouter } from "next/navigation";
 
 import { useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useParams } from "next/navigation";
-import { format } from "@/lib/i18n/date";
+import { format } from "@/core/shared/i18n/date";
 import { Package, Building2, Calendar, Printer, MessageCircle, Receipt } from "lucide-react";
 import PurchaseThermalReceipt from "./PurchaseThermalReceipt";
 
@@ -28,7 +28,7 @@ import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { PageHeaderSkeleton, TableSkeleton } from "@/components/ui/skeleton-patterns";
-import { useSettings, formatLL } from "@/lib/currency";
+import { useSettings, formatLL } from "@/core/shared/currency";
 
 const fetchPurchase = async (purchaseId) => {
   const res = await fetch(`/api/purchases/${purchaseId}`);

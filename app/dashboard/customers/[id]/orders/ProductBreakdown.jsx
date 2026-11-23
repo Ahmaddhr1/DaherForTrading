@@ -1,6 +1,6 @@
 "use client";
-import { t } from "@/lib/i18n";
-import { useT } from "@/lib/i18n/LangProvider";
+import { t } from "@/core/shared/i18n";
+import { useT } from "@/core/shared/i18n/LangProvider";
 
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
@@ -17,7 +17,7 @@ import {
 } from "@/components/ui/table";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Package, Receipt, TrendingUp } from "lucide-react";
-import { localDayStartISO, localDayEndISO } from "@/lib/dateUtils";
+import { localDayStartISO, localDayEndISO } from "@/core/shared/dateUtils";
 
 export default function ProductBreakdown({ customerId }) {
   const t = useT();

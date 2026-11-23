@@ -1,13 +1,13 @@
-import { connectToDB } from "@/lib/connectDb";
-import Product from "@/models/Products";
-import Purchase from "@/models/Purchase";
-import AppSettings from "@/models/AppSettings";
+import { connectToDB } from "@/core/platform/connectDb";
+import Product from "@/core/products/models/Products";
+import Purchase from "@/core/suppliers/models/Purchase";
+import AppSettings from "@/core/settings/models/AppSettings";
 import { NextResponse } from "next/server";
-import { batchesInStock } from "@/lib/batches";
+import { batchesInStock } from "@/core/products/batches";
 
 // Powers the dashboard's expiry alert. Two sources:
 // - batches: purchases with an expiry date that are still in stock (see
-//   lib/batches.js - earliest expiry is assumed to sell first);
+//   core/products/batches.js - earliest expiry is assumed to sell first);
 // - products whose stock has no dated batches but have the product-level
 //   expiry date set.
 // An entry shows once today is inside the product's alert window

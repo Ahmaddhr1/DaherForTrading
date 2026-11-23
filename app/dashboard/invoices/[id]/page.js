@@ -1,4 +1,5 @@
 "use client";
+import Link from "next/link";
 import { t } from "@/lib/i18n";
 import { useT } from "@/lib/i18n/LangProvider";
 import { whatsappNumber } from "@/lib/whatsapp";
@@ -11,7 +12,7 @@ import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useParams } from "next/navigation";
 import { format } from "@/lib/i18n/date";
-import { User, Package, CreditCard, Calendar, Tag, Printer, MessageCircle, Receipt, RotateCcw, StickyNote } from "lucide-react";
+import { User, Package, CreditCard, Calendar, Tag, Printer, MessageCircle, Receipt, RotateCcw, StickyNote, PencilLine } from "lucide-react";
 import { toast } from "@/lib/i18n/toast";
 import ThermalReceipt from "./ThermalReceipt";
 import ProcessReturnModal from "./ProcessReturnModal";
@@ -55,6 +56,7 @@ export default function OrderDetailsPage() {
   const { data: settings } = useSettings();
   const [returnModalOpen, setReturnModalOpen] = useState(false);
   const { hasPermission: canProcessReturns } = useHasPermission("canProcessReturns");
+  const { hasPermission: canEditOrders } = useHasPermission("canEditOrders");
 
   const { data: returnsData } = useQuery({
     queryKey: ["order-returns", id],
@@ -173,6 +175,22 @@ export default function OrderDetailsPage() {
               <MessageCircle className="h-4 w-4" />
               {t("Share via WhatsApp")}
             </Button>
+            {canEditOrders && (order.status === "pending" || order.status === "draft") && (
+              <Link href={`/dashboard/orders/${id}/edit`}>
+                <Button variant="outline" className="flex items-center gap-2">
+                  <PencilLine className="h-4 w-4" />
+                  {t("Edit")}
+                </Button>
+              </Link>
+            )}
+            {order.status !== "draft" && order.status !== "paid" && (
+              <Link href={`/dashboard/orders/${id}`}>
+                <Button variant="outline" className="flex items-center gap-2">
+                  <CreditCard className="h-4 w-4" />
+                  {t("Record Payment")}
+                </Button>
+              </Link>
+            )}
             {order.status !== "draft" && canProcessReturns && (
               <Button
                 variant="outline"

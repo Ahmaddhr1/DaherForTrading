@@ -235,6 +235,12 @@ export default function ProductsPage() {
             </div>
 
             <div className="flex items-center gap-2 shrink-0">
+              <Link href="/dashboard/products/labels" aria-label={t("Barcode Labels")} title={t("Barcode Labels")}>
+                <Button variant="outline" className="flex items-center gap-2" title={t("Barcode Labels")}>
+                  <ScanBarcode className="h-4 w-4" />
+                  <span className="hidden sm:inline">{t("Barcode Labels")}</span>
+                </Button>
+              </Link>
               <Button
                 variant="outline"
                 onClick={() => setPdfModalOpen(true)}
@@ -405,7 +411,7 @@ export default function ProductsPage() {
                       try {
                         const { data } = await axios.post("/api/products/barcodes", { productIds: selectedIds });
                         if (data.assigned > 0) {
-                          toast.success(t("Generated {0} barcodes", { 0: data.assigned }));
+                          toast.success(data.assigned === 1 ? t("Generated 1 barcode") : t("Generated {0} barcodes", { 0: data.assigned }));
                           queryClient.invalidateQueries(["products"]);
                         } else {
                           toast.info("All selected products already have barcodes");

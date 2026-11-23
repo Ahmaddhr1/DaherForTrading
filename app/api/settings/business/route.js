@@ -40,7 +40,7 @@ export async function PUT(req) {
   if (forbidden) return forbidden;
 
   try {
-    const { dollarRate, taxRate, expiryAlertDays } = await req.json();
+    const { dollarRate, taxRate, expiryAlertDays, businessName, businessPhone } = await req.json();
 
     if (dollarRate !== undefined && (typeof dollarRate !== "number" || isNaN(dollarRate) || dollarRate < 0)) {
       return NextResponse.json({ error: "Dollar rate must be a non-negative number" }, { status: 400 });
@@ -56,10 +56,12 @@ export async function PUT(req) {
     }
 
     const settings = await getOrCreateSettings();
-    const before = { dollarRate: settings.dollarRate, taxRate: settings.taxRate, expiryAlertDays: settings.expiryAlertDays };
+    const before = { dollarRate: settings.dollarRate, taxRate: settings.taxRate, expiryAlertDays: settings.expiryAlertDays, businessName: settings.businessName, businessPhone: settings.businessPhone };
     if (dollarRate !== undefined) settings.dollarRate = dollarRate;
     if (taxRate !== undefined) settings.taxRate = taxRate;
     if (expiryAlertDays !== undefined) settings.expiryAlertDays = expiryAlertDays;
+    if (typeof businessName === "string") settings.businessName = businessName.trim().slice(0, 80);
+    if (typeof businessPhone === "string") settings.businessPhone = businessPhone.trim().slice(0, 30);
     await settings.save();
 
     const changes = diffViews("Settings", before, settings.toObject());

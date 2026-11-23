@@ -27,7 +27,7 @@ import {
   CheckCircle2,
   XCircle,
   Send,
-  Moon, CalendarClock } from "lucide-react";
+  Moon, CalendarClock, Store, Phone } from "lucide-react";
 import { useSettings } from "@/lib/currency";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { LanguageSwitch } from "@/components/LanguageSwitch";
@@ -62,12 +62,16 @@ export default function SettingsPage() {
   const [dollarRate, setDollarRate] = useState("");
   const [taxRate, setTaxRate] = useState("");
   const [expiryAlertDays, setExpiryAlertDays] = useState("30");
+  const [businessName, setBusinessName] = useState("");
+  const [businessPhone, setBusinessPhone] = useState("");
 
   useEffect(() => {
     if (settings) {
       setDollarRate(settings.dollarRate?.toString() ?? "");
       setTaxRate(settings.taxRate?.toString() ?? "");
       setExpiryAlertDays(settings.expiryAlertDays?.toString() ?? "30");
+      setBusinessName(settings.businessName || "");
+      setBusinessPhone(settings.businessPhone || "");
     }
   }, [settings]);
 
@@ -77,12 +81,15 @@ export default function SettingsPage() {
         dollarRate: parseFloat(dollarRate),
         taxRate: parseFloat(taxRate),
         expiryAlertDays: parseInt(expiryAlertDays, 10),
+        businessName,
+        businessPhone,
       });
       return res.data;
     },
     onSuccess: () => {
       toast.success("Business settings updated");
       queryClient.invalidateQueries({ queryKey: ["settings", "business"] });
+      queryClient.invalidateQueries({ queryKey: ["business-info"] });
     },
     onError: (error) => {
       toast.error(error.response?.data?.error || "Failed to update settings");
@@ -300,7 +307,7 @@ export default function SettingsPage() {
             </CardTitle>
             <CardDescription>
               {t(
-                "Used to show an LL equivalent on receipts and order/purchase forms, and to pre-fill tax on new orders and purchases"
+                "Your business name and phone for documents, the LL rate shown next to $ amounts, and the default tax for new orders and purchases"
               )}
             </CardDescription>
           </CardHeader>
@@ -309,6 +316,26 @@ export default function SettingsPage() {
               <p className="text-sm text-gray-500 dark:text-gray-400">{t("Loading...")}</p>
             ) : (
               <form onSubmit={handleSettingsSubmit} className="space-y-4">
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <div className="space-y-2">
+                    <Label htmlFor="businessName" className="flex items-center gap-2">
+                      <Store className="h-4 w-4" />
+                      {t("Business Name")}
+                    </Label>
+                    <Input id="businessName" value={businessName} maxLength={80} onChange={(e) => setBusinessName(e.target.value)} placeholder="Invento" disabled={!canManageSettings} />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="businessPhone" className="flex items-center gap-2">
+                      <Phone className="h-4 w-4" />
+                      {t("Business Phone")}
+                    </Label>
+                    <Input id="businessPhone" value={businessPhone} maxLength={30} onChange={(e) => setBusinessPhone(e.target.value)} placeholder="+961 ..." disabled={!canManageSettings} inputMode="tel" />
+                  </div>
+                </div>
+                <p className="text-xs text-gray-500 dark:text-gray-400">{t("Printed at the top of receipts, statements and shared documents.")}</p>
+
+                <Separator />
+
                 <div className="space-y-2">
                   <Label htmlFor="dollarRate" className="flex items-center gap-2">
                     <DollarSign className="h-4 w-4" />

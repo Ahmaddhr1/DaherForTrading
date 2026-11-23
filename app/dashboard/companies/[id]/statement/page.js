@@ -1,5 +1,6 @@
 "use client";
 import { useT } from "@/lib/i18n/LangProvider";
+import { useBusiness } from "@/lib/business";
 import { whatsappNumber } from "@/lib/whatsapp";
 
 import { Suspense, useState } from "react";
@@ -27,6 +28,7 @@ const fetchStatement = async (id, startDate, endDate) => {
 
 function CompanyStatementPageInner() {
   const t = useT();
+  const business = useBusiness();
   const router = useRouter();
   const { id } = useParams();
   const search = useSearchParams();
@@ -74,7 +76,7 @@ function CompanyStatementPageInner() {
   const handleShareThermalPdf = () => {
     try {
       setPdf({
-        blob: generateStatementPdf(receiptData),
+        blob: generateStatementPdf({ ...receiptData, business }),
         filename: `statement-${statement.name?.replace(/\s+/g, "-") || id}.pdf`,
       });
     } catch {

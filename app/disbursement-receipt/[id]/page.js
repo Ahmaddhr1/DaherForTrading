@@ -1,6 +1,7 @@
 "use client";
 import { t } from "@/lib/i18n";
 import { useT } from "@/lib/i18n/LangProvider";
+import BusinessHeading from "@/components/BusinessHeading";
 
 import { useQuery } from "@tanstack/react-query";
 import { useParams } from "next/navigation";
@@ -52,6 +53,7 @@ export default function PublicDisbursementReceiptPage() {
   return (
     <div className="force-light min-h-screen bg-gray-50 py-8 px-4">
       <div className="max-w-xl mx-auto">
+        <BusinessHeading variant="banner" />
         <Card className="shadow-sm border-gray-200">
           <CardHeader>
             <div className="flex items-center justify-between">

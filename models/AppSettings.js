@@ -6,6 +6,10 @@ import mongoose from "mongoose";
 const appSettingsSchema = new mongoose.Schema(
   {
     key: { type: String, default: "app", unique: true },
+    // This business's name and phone, printed on receipts, statements and
+    // shared documents (empty name -> "Invento").
+    businessName: { type: String, trim: true, default: "", maxlength: 80 },
+    businessPhone: { type: String, trim: true, default: "", maxlength: 30 },
     // Lebanese Lira per US Dollar. Manually updated as the rate moves -
     // used to show an LL equivalent alongside $ figures on receipts and
     // the order/purchase creation forms.

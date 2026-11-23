@@ -65,7 +65,7 @@ export default function BarcodeLabelsPage() {
     setGenerating(true);
     try {
       const { data: res } = await axios.post("/api/products/barcodes", { productIds: selectedIds });
-      if (res.assigned > 0) toast.success(t("Generated {0} barcodes", { 0: res.assigned }));
+      if (res.assigned > 0) toast.success(res.assigned === 1 ? t("Generated 1 barcode") : t("Generated {0} barcodes", { 0: res.assigned }));
       else toast.info("All selected products already have barcodes");
       // Refresh the list and the selected products' barcodes.
       const fresh = await queryClient.fetchQuery({

@@ -397,6 +397,28 @@ export default function ProductsPage() {
                     {t("Delete")}
                   </Button>
                 )}
+                {canEditProducts && (
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={async () => {
+                      try {
+                        const { data } = await axios.post("/api/products/barcodes", { productIds: selectedIds });
+                        if (data.assigned > 0) {
+                          toast.success(t("Generated {0} barcodes", { 0: data.assigned }));
+                          queryClient.invalidateQueries(["products"]);
+                        } else {
+                          toast.info("All selected products already have barcodes");
+                        }
+                      } catch {
+                        toast.error("Couldn't generate barcodes");
+                      }
+                    }}
+                  >
+                    <ScanBarcode className="h-3.5 w-3.5 me-1" />
+                    {t("Generate Barcodes")}
+                  </Button>
+                )}
                 <Button size="sm" variant="outline" onClick={() => window.open(`/print/labels?ids=${selectedIds.join(",")}`, "_blank")}>
                   <ScanBarcode className="h-3.5 w-3.5 me-1" />
                   {t("Print Labels")}

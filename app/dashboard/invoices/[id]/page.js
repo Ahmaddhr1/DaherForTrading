@@ -2,6 +2,7 @@
 import Link from "next/link";
 import { t } from "@/lib/i18n";
 import { useT } from "@/lib/i18n/LangProvider";
+import DeliveryPanel from "@/components/DeliveryPanel";
 import { whatsappNumber } from "@/lib/whatsapp";
 import { isTouchDevice } from "@/lib/isTouchDevice";
 import { applyThermalPageSize } from "@/lib/thermalPageSize";
@@ -316,6 +317,8 @@ export default function OrderDetailsPage() {
                 </div>
               </CardContent>
             </Card>
+
+            <DeliveryPanel order={order} />
 
             {/* Payment Summary */}
             <Card className="shadow-sm border-gray-200 dark:border-gray-800">

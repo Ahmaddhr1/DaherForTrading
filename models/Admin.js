@@ -52,6 +52,7 @@ const adminSchema = new mongoose.Schema(
       canEditOrders: { type: Boolean, default: false },
       canOverrideOrderPricing: { type: Boolean, default: false },
       canFinalizeOrders: { type: Boolean, default: false },
+      canManageDeliveries: { type: Boolean, default: false },
     },
   },
   { timestamps: true }

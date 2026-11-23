@@ -7,7 +7,7 @@ import { useBusiness } from "@/lib/business";
 
 const money = (n) => {
   const v = Number(n || 0);
-  return `${v < 0 ? "-" : ""}$${Math.abs(v).toFixed(2)}`;
+  return `${v < 0 ? "-" : ""}$${Math.abs(v).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 };
 
 // The end-of-day closing as a document: summary, the drawer count and the

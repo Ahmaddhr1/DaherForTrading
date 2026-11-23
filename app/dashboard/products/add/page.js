@@ -11,7 +11,7 @@ import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import axios from "axios";
-import { Loader2, PackagePlus, DollarSign, Tag, Package, TrendingUp, Box, Ruler, AlertTriangle, Truck, Layers, ImagePlus, X, Percent, CalendarClock, BellRing } from "lucide-react";
+import { Loader2, PackagePlus, DollarSign, Tag, Package, TrendingUp, Box, Ruler, AlertTriangle, Truck, Layers, ImagePlus, X, Percent, CalendarClock, BellRing, ScanBarcode } from "lucide-react";
 import React, { useState } from "react";
 import { toast } from "@/lib/i18n/toast";
 import { useRouter } from "next/navigation";
@@ -59,6 +59,7 @@ const Page = () => {
     unit: "pcs",
     lowStockThreshold: "5",
     expiryDate: "",
+    barcode: "",
     expiryAlertDays: "",
     defaultSupplier: "",
     discount: "",
@@ -106,6 +107,7 @@ const Page = () => {
         unit: form.unit,
         lowStockThreshold: form.lowStockThreshold,
         expiryDate: form.expiryDate || null,
+        barcode: form.barcode,
         expiryAlertDays: form.expiryAlertDays || null,
         defaultSupplier: form.defaultSupplier || null,
         discount: form.discount === "" ? 0 : parseFloat(form.discount),
@@ -309,6 +311,24 @@ const Page = () => {
 
                     <div className="grid gap-4 sm:grid-cols-2">
                       <div className="space-y-2">
+                        <Label htmlFor="barcode" className="text-sm font-medium flex items-center gap-2">
+                          <ScanBarcode className="h-4 w-4" />
+                          {t("Barcode")}
+                        </Label>
+                        <Input
+                          id="barcode"
+                          name="barcode"
+                          value={form.barcode}
+                          onChange={handleChange}
+                          placeholder={t("Scan or type the barcode")}
+                          className="focus:border-purple-500 transition-colors"
+                          autoComplete="off"
+                          onKeyDown={(e) => e.key === "Enter" && e.preventDefault()}
+                        />
+                        <p className="text-xs text-gray-500 dark:text-gray-400">{t("Optional - lets a scanner add this product to orders")}</p>
+                      </div>
+
+                      <div className="space-y-2">
                         <Label htmlFor="unit" className="text-sm font-medium flex items-center gap-2">
                           <Ruler className="h-4 w-4" />
                           {t("Unit of Measure")}
@@ -360,7 +380,7 @@ const Page = () => {
                           onChange={handleChange}
                           className="focus:border-purple-500 transition-colors"
                         />
-                        <p className="text-xs text-gray-500 dark:text-gray-400">{t("Optional - shows on the dashboard when it gets close")}</p>
+                        <p className="text-xs text-gray-500 dark:text-gray-400">{t("Used when purchases have no expiry date - set it per delivery on Add Purchase")}</p>
                       </div>
 
                       <div className="space-y-2">

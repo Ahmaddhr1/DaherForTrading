@@ -22,7 +22,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Search, Package, Plus, Edit, Trash2, ChevronLeft, ChevronRight, Loader2, DollarSign, Box, TrendingUp, Wallet, AlertTriangle, LayoutList, LayoutGrid, FileDown, Filter, Tag, X } from "lucide-react";
+import { Search, Package, Plus, Edit, Trash2, ChevronLeft, ChevronRight, Loader2, DollarSign, Box, TrendingUp, Wallet, AlertTriangle, LayoutList, LayoutGrid, FileDown, Filter, Tag, X, ScanBarcode } from "lucide-react";
 import ProductGridView from "./ProductGridView";
 import GeneratePdfModal from "./GeneratePdfModal";
 import CategoryFilterModal from "./CategoryFilterModal";
@@ -397,6 +397,10 @@ export default function ProductsPage() {
                     {t("Delete")}
                   </Button>
                 )}
+                <Button size="sm" variant="outline" onClick={() => window.open(`/print/labels?ids=${selectedIds.join(",")}`, "_blank")}>
+                  <ScanBarcode className="h-3.5 w-3.5 me-1" />
+                  {t("Print Labels")}
+                </Button>
                 <Button size="sm" variant="ghost" onClick={() => setSelectedIds([])}>
                   <X className="h-3.5 w-3.5 me-1" />
                   {t("Clear")}

@@ -23,6 +23,7 @@
     "dotenv": "^16.5.0",
     "html-to-image": "1.11.11",
     "jose": "^6.2.11",
+    "jsbarcode": "3.11.6",
     "jsonwebtoken": "^9.0.2",
     "jspdf": "^4.2.1",
     "jspdf-autotable": "^5.0.9",

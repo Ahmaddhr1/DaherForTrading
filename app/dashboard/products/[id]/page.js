@@ -1,6 +1,7 @@
 "use client";
 import { t, dateLocale } from "@/lib/i18n";
 import { useT } from "@/lib/i18n/LangProvider";
+import ProductBatches from "@/components/ProductBatches";
 import { useSettings } from "@/lib/currency";
 
 import { useParams, useRouter } from "next/navigation";
@@ -16,7 +17,7 @@ import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { FormSkeleton, PageHeaderSkeleton } from "@/components/ui/skeleton-patterns";
-import { Loader2, Package, DollarSign, Tag, Box, TrendingUp, PackageCheck, Ruler, AlertTriangle, Truck, Layers, ImagePlus, X, Percent, CalendarClock, BellRing } from "lucide-react";
+import { Loader2, Package, DollarSign, Tag, Box, TrendingUp, PackageCheck, Ruler, AlertTriangle, Truck, Layers, ImagePlus, X, Percent, CalendarClock, BellRing, ScanBarcode } from "lucide-react";
 import Link from "next/link";
 import ProductHistory from "./ProductHistory";
 import StockAdjustments from "./StockAdjustments";
@@ -77,6 +78,7 @@ const EditProductPage = () => {
     unit: "pcs",
     lowStockThreshold: "5",
     expiryDate: "",
+    barcode: "",
     expiryAlertDays: "",
     defaultSupplier: "",
     discount: "",
@@ -102,6 +104,7 @@ const EditProductPage = () => {
         unit: product.unit || "pcs",
         lowStockThreshold: product.lowStockThreshold?.toString() ?? "5",
         expiryDate: product.expiryDate ? String(product.expiryDate).slice(0, 10) : "",
+        barcode: product.barcode || "",
         expiryAlertDays: product.expiryAlertDays ? String(product.expiryAlertDays) : "",
         defaultSupplier: product.defaultSupplier || "",
         discount: product.discount?.toString() ?? "0",
@@ -393,6 +396,31 @@ const EditProductPage = () => {
 
                     <div className="grid gap-4 sm:grid-cols-2">
                       <div className="space-y-2">
+                        <Label htmlFor="barcode" className="text-sm font-medium flex items-center gap-2">
+                          <ScanBarcode className="h-4 w-4" />
+                          {t("Barcode")}
+                        </Label>
+                        <Input
+                          id="barcode"
+                          name="barcode"
+                          value={form.barcode}
+                          onChange={handleChange}
+                          placeholder={t("Scan or type the barcode")}
+                          className="focus:border-purple-500 transition-colors"
+                          autoComplete="off"
+                          onKeyDown={(e) => e.key === "Enter" && e.preventDefault()}
+                        />
+                        <p className="text-xs text-gray-500 dark:text-gray-400">
+                          {t("Optional - lets a scanner add this product to orders")}
+                          {product?.barcode && (
+                            <a href={`/print/labels?ids=${id}`} className="ms-2 font-medium text-purple-600 hover:underline">
+                              {t("Print label")}
+                            </a>
+                          )}
+                        </p>
+                      </div>
+
+                      <div className="space-y-2">
                         <Label htmlFor="unit" className="text-sm font-medium flex items-center gap-2">
                           <Ruler className="h-4 w-4" />
                           {t("Unit of Measure")}
@@ -443,7 +471,7 @@ const EditProductPage = () => {
                           onChange={handleChange}
                           className="focus:border-purple-500 transition-colors"
                         />
-                        <p className="text-xs text-gray-500 dark:text-gray-400">{t("Optional - shows on the dashboard when it gets close")}</p>
+                        <p className="text-xs text-gray-500 dark:text-gray-400">{t("Used when purchases have no expiry date - set it per delivery on Add Purchase")}</p>
                       </div>
 
                       <div className="space-y-2">
@@ -465,6 +493,10 @@ const EditProductPage = () => {
                         <p className="text-xs text-gray-500 dark:text-gray-400">
                           {t("Leave empty to use the default ({0} days, set in Settings)", { 0: defaultAlertDays })}
                         </p>
+                      </div>
+
+                      <div className="sm:col-span-2">
+                        <ProductBatches productId={id} />
                       </div>
 
                       <div className="space-y-2">

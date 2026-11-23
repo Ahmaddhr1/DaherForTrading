@@ -2,6 +2,7 @@
 "use client";
 import { t } from "@/lib/i18n";
 import { useT } from "@/lib/i18n/LangProvider";
+import BarcodeScanInput from "@/components/BarcodeScanInput";
 
 import React, { useEffect, useState } from "react";
 import axios from "axios";
@@ -178,6 +179,38 @@ const MakeOrderPage = () => {
     }));
   };
 
+  // Barcode scanner: an existing line of that product gets +1, otherwise it
+  // fills the empty line or adds a new one.
+  const [pendingScan, setPendingScan] = useState(null);
+  const handleScan = (code) => {
+    const product = products.find((p) => p.barcode && p.barcode === code);
+    if (!product) {
+      toast.error(t("No product with barcode {0}", { 0: code }));
+      return;
+    }
+    const existing = orderRows.find((r) => !r.isCustom && r.productId === product._id);
+    if (existing) {
+      handleRowChange(existing.id, "quantity", String((existing.quantity || 1) + 1));
+      return;
+    }
+    const empty = orderRows.find((r) => !r.isCustom && !r.productId);
+    if (empty) {
+      handleRowChange(empty.id, "productId", product._id);
+      return;
+    }
+    setPendingScan(product._id);
+    addProductRow();
+  };
+  useEffect(() => {
+    if (!pendingScan) return;
+    const empty = orderRows.find((r) => !r.isCustom && !r.productId);
+    if (empty) {
+      handleRowChange(empty.id, "productId", pendingScan);
+      setPendingScan(null);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [orderRows, pendingScan]);
+
   // Subtotal before any discount
   const calculateSubtotal = () => {
     return orderRows.reduce((total, row) => {
@@ -351,6 +384,7 @@ const MakeOrderPage = () => {
 
               {/* Product Rows */}
               <div className="space-y-4">
+                <BarcodeScanInput onScan={handleScan} />
                 {orderRows.map((row, index) => (
                   <div key={row.id} className="p-4 border rounded-lg bg-gray-50 dark:bg-gray-950 space-y-4">
                     <div className="flex items-center justify-between">

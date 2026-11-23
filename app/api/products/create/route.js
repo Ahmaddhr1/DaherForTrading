@@ -15,6 +15,7 @@ export async function POST(req) {
   try {
     const {
       name,
+      barcode,
       quantity,
       price,
       initialPrice,
@@ -122,9 +123,18 @@ export async function POST(req) {
       return NextResponse.json({ error: err.message }, { status: 400 });
     }
 
+    const cleanBarcode = typeof barcode === "string" && barcode.trim() ? barcode.trim() : undefined;
+    if (cleanBarcode) {
+      const taken = await Product.findOne({ barcode: cleanBarcode }).select("name");
+      if (taken) {
+        return NextResponse.json({ error: `This barcode is already used by "${taken.name}".` }, { status: 400 });
+      }
+    }
+
     // Create the product
     const product = new Product({
       name: name.trim(),
+      barcode: cleanBarcode,
       quantity: parsedQuantity,
       price: parsedPrice,
       priceWholesale: parsedPriceWholesale,

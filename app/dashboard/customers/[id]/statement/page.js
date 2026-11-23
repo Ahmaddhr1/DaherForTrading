@@ -4,7 +4,7 @@ import { whatsappNumber } from "@/lib/whatsapp";
 
 import { Suspense, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { useParams, useSearchParams } from "next/navigation";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { format } from "@/lib/i18n/date";
 import { Printer, MessageCircle, Receipt, Loader2 } from "lucide-react";
 import { toast } from "@/lib/i18n/toast";
@@ -16,7 +16,7 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { PageHeaderSkeleton, TableSkeleton } from "@/components/ui/skeleton-patterns";
 import CustomerStatementDoc from "@/components/statements/CustomerStatementDoc";
-import { statementApiQuery, statementPeriodLabel } from "@/lib/statementPeriod";
+import { statementApiQuery, statementPeriodLabel, statementPrintQuery } from "@/lib/statementPeriod";
 import { buildCustomerStatementReceipt } from "@/lib/statementReceiptData";
 
 const fetchStatement = async (id, startDate, endDate) => {
@@ -27,6 +27,7 @@ const fetchStatement = async (id, startDate, endDate) => {
 
 function CustomerStatementPageInner() {
   const t = useT();
+  const router = useRouter();
   const { id } = useParams();
   const search = useSearchParams();
   const [startDate, setStartDate] = useState(search.get("from") || "");
@@ -63,6 +64,10 @@ function CustomerStatementPageInner() {
   // Black-and-white PDF statement: shown in a window with Print (choose a
   // printer), Share and Download.
   const [pdf, setPdf] = useState(null);
+  // Print Statement: the print page (statement + Print button, choose the
+  // printer), like the order receipt.
+  const handlePrintStatement = () =>
+    router.push(`/print/statement/${id}${statementPrintQuery(startDate, endDate)}`);
   const handleShareThermalPdf = () => {
     try {
       setPdf({
@@ -111,13 +116,17 @@ function CustomerStatementPageInner() {
         <p className="text-xs text-gray-500 dark:text-gray-400 pb-2">{t("Leave blank for all time.")}</p>
       </div>
       <div className="flex flex-wrap gap-2 mt-3">
-        <Button onClick={handleShareThermalPdf} className="flex items-center gap-2" aria-label={t("Print Statement")}>
+        <Button onClick={handlePrintStatement} className="flex items-center gap-2" aria-label={t("Print Statement")}>
           <Printer className="h-4 w-4" />
           {t("Print Statement")}
         </Button>
         <Button onClick={handleShareWhatsApp} className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white" aria-label={t("Share via WhatsApp")}>
           <MessageCircle className="h-4 w-4" />
           {t("Share via WhatsApp")}
+        </Button>
+        <Button variant="outline" onClick={handleShareThermalPdf} className="flex items-center gap-2" aria-label={t("PDF")}>
+          <Receipt className="h-4 w-4" />
+          {t("PDF")}
         </Button>
       </div>
     </>
@@ -128,7 +137,7 @@ function CustomerStatementPageInner() {
       <div className="container mx-auto px-4">
         <CustomerStatementDoc statement={statement} periodLabel={periodLabel} toolbar={toolbar} />
       </div>
-      <PdfPreviewDialog open={!!pdf} onClose={() => setPdf(null)} blob={pdf?.blob} filename={pdf?.filename} title={t("Print Statement")} />
+      <PdfPreviewDialog open={!!pdf} onClose={() => setPdf(null)} blob={pdf?.blob} filename={pdf?.filename} title={t("PDF Statement")} />
     </div>
   );
 }

@@ -2,7 +2,7 @@
 import { describe, it, expect } from "vitest";
 import { call, loginAs } from "./helpers";
 import { makeProduct, makeCustomer, makeCompany } from "./fixtures";
-import Product from "@/models/Products";
+import Product from "@/core/products/models/Products";
 import { POST as createOrder } from "@/app/api/orders/[id]/route";
 import { POST as manualPayment } from "@/app/api/payments/route";
 import { POST as recordPurchase } from "@/app/api/companies/[id]/purchases/route";

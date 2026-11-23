@@ -1,5 +1,5 @@
-import { connectToDB } from "@/lib/connectDb";
-import { getProfitMarginReport } from "@/lib/profitMargin";
+import { connectToDB } from "@/core/platform/connectDb";
+import { getProfitMarginReport } from "@/core/reports/profitMargin";
 import { NextResponse } from "next/server";
 
 export async function GET(req) {

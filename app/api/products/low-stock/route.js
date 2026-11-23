@@ -1,5 +1,5 @@
-import { connectToDB } from "@/lib/connectDb";
-import Product from "@/models/Products";
+import { connectToDB } from "@/core/platform/connectDb";
+import Product from "@/core/products/models/Products";
 import { NextResponse } from "next/server";
 
 // Powers the dashboard's low-stock alert widget: products at or below

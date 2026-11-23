@@ -1,13 +1,13 @@
 
 "use client";
-import { t } from "@/lib/i18n";
-import { useT } from "@/lib/i18n/LangProvider";
+import { t } from "@/core/shared/i18n";
+import { useT } from "@/core/shared/i18n/LangProvider";
 
 import React, { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
-import { toast } from "@/lib/i18n/toast";
+import { toast } from "@/core/shared/i18n/toast";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -15,7 +15,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Label } from "@/components/ui/label";
 import { FormSkeleton, ListSkeleton, PageHeaderSkeleton } from "@/components/ui/skeleton-patterns";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
-import { useHasPermission } from "@/lib/useHasPermission";
+import { useHasPermission } from "@/core/platform/useHasPermission";
 import {
   Table,
   TableBody,

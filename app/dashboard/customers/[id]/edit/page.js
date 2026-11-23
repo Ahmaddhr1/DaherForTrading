@@ -1,7 +1,7 @@
 "use client";
-import { t } from "@/lib/i18n";
-import { useT } from "@/lib/i18n/LangProvider";
-import { whatsappUrl } from "@/lib/whatsapp";
+import { t } from "@/core/shared/i18n";
+import { useT } from "@/core/shared/i18n/LangProvider";
+import { whatsappUrl } from "@/core/shared/whatsapp";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -12,16 +12,16 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { FormSkeleton, PageHeaderSkeleton } from "@/components/ui/skeleton-patterns";
 import { Eye, Loader2, User, Phone, DollarSign, UserCog, Package, PhoneCall, Lock, FileText, Layers, AlertTriangle, StickyNote } from "lucide-react";
-import { format } from "@/lib/i18n/date";
+import { format } from "@/core/shared/i18n/date";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
-import { toast } from "@/lib/i18n/toast";
+import { toast } from "@/core/shared/i18n/toast";
 import { useParams } from "next/navigation";
 import Link from "next/link";
-import { PRICE_TIERS } from "@/lib/priceTiers";
-import { useHasPermission } from "@/lib/useHasPermission";
+import { PRICE_TIERS } from "@/core/products/priceTiers";
+import { useHasPermission } from "@/core/platform/useHasPermission";
 
 const EditCustomerPage = () => {
   const t = useT();

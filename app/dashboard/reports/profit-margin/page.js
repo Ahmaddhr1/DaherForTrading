@@ -1,6 +1,6 @@
 "use client";
-import { t, dateLocale } from "@/lib/i18n";
-import { useT } from "@/lib/i18n/LangProvider";
+import { t, dateLocale } from "@/core/shared/i18n";
+import { useT } from "@/core/shared/i18n/LangProvider";
 
 import { useMemo, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";

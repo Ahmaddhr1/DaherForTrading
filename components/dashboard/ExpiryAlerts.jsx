@@ -9,8 +9,8 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { CalendarClock, CalendarCheck, Box, ChevronLeft, ChevronRight } from "lucide-react";
-import { useT } from "@/lib/i18n/LangProvider";
-import { format } from "@/lib/i18n/date";
+import { useT } from "@/core/shared/i18n/LangProvider";
+import { format } from "@/core/shared/i18n/date";
 
 const PAGE_SIZE = 5;
 

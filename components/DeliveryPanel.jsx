@@ -8,10 +8,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { toast } from "@/lib/i18n/toast";
-import { useT } from "@/lib/i18n/LangProvider";
-import { useHasPermission } from "@/lib/useHasPermission";
-import { DELIVERY_STATUSES, deliveryInfo } from "@/lib/delivery";
+import { toast } from "@/core/shared/i18n/toast";
+import { useT } from "@/core/shared/i18n/LangProvider";
+import { useHasPermission } from "@/core/platform/useHasPermission";
+import { DELIVERY_STATUSES, deliveryInfo } from "@/core/orders/delivery";
 
 // Optional delivery on an order: status (separate from payment) and the
 // delivery person. Editable with canManageDeliveries; read-only otherwise.

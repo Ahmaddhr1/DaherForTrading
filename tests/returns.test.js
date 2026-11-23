@@ -3,8 +3,8 @@
 import { describe, it, expect } from "vitest";
 import { call, loginAs } from "./helpers";
 import { makeProduct, makeCustomer } from "./fixtures";
-import Product from "@/models/Products";
-import Customer from "@/models/Customers";
+import Product from "@/core/products/models/Products";
+import Customer from "@/core/customers/models/Customers";
 import { POST as createOrder } from "@/app/api/orders/[id]/route";
 import { POST as createReturn } from "@/app/api/orders/[id]/returns/route";
 
@@ -24,6 +24,7 @@ describe("returning items", () => {
 
     const tooMany = await call(createReturn, { params: { id: order._id }, body: { items: [{ productId: product._id, quantity: 4 }] } });
     expect(tooMany.status).toBe(400); // only 3 left to return
+    expect(tooMany.body.error).toBe(`Only 3 of "${product.name}" can still be returned`);
     expect((await Product.findById(product._id)).quantity).toBe(17);
   });
 

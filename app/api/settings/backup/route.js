@@ -1,10 +1,10 @@
 import { NextResponse } from "next/server";
-import { generateBackupPayload } from "@/lib/backup";
+import { generateBackupPayload } from "@/core/platform/backup";
 
 // Protected by middleware (owner-only). Deliberately excludes the Admin
 // collection - password hashes should never leave the server in a file a
 // browser downloads to disk. Shares its data-gathering logic with the
-// automated email backup at /api/cron/backup via lib/backup.js, so both
+// automated email backup at /api/cron/backup via core/platform/backup.js, so both
 // always produce the exact same shape of file.
 export async function GET() {
   try {

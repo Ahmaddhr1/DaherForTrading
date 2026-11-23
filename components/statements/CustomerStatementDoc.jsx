@@ -1,8 +1,8 @@
 "use client";
 
 import { FileText, Calendar } from "lucide-react";
-import { format } from "@/lib/i18n/date";
-import { useT } from "@/lib/i18n/LangProvider";
+import { format } from "@/core/shared/i18n/date";
+import { useT } from "@/core/shared/i18n/LangProvider";
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";

@@ -5,8 +5,8 @@ import { useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import { Printer, ArrowLeft, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useT } from "@/lib/i18n/LangProvider";
-import { applyThermalPageSize, clearThermalPageSize } from "@/lib/thermalPageSize";
+import { useT } from "@/core/shared/i18n/LangProvider";
+import { applyThermalPageSize, clearThermalPageSize } from "@/core/printing/thermalPageSize";
 
 // Dedicated page that shows ONLY a thermal receipt and prints it. Used on
 // phones/tablets: there, window.print() returns immediately and the

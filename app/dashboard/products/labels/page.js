@@ -7,9 +7,9 @@ import axios from "axios";
 import { ScanBarcode, Search, Printer, Wand2, Loader2, ArrowLeft, ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { toast } from "@/lib/i18n/toast";
-import { useT } from "@/lib/i18n/LangProvider";
-import { useHasPermission } from "@/lib/useHasPermission";
+import { toast } from "@/core/shared/i18n/toast";
+import { useT } from "@/core/shared/i18n/LangProvider";
+import { useHasPermission } from "@/core/platform/useHasPermission";
 
 const PAGE_SIZE = 30;
 

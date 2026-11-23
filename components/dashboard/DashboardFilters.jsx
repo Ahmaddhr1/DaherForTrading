@@ -1,14 +1,14 @@
 // components/dashboard/DashboardFilters.jsx
 "use client";
-import { t } from "@/lib/i18n";
-import { useT } from "@/lib/i18n/LangProvider";
+import { t } from "@/core/shared/i18n";
+import { useT } from "@/core/shared/i18n/LangProvider";
 
 import React from "react";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { Card, CardContent } from "@/components/ui/card";
 import { FiltersPanel } from "@/components/ui/filters-panel";
-import { getTodayDateString } from "@/lib/dateUtils";
+import { getTodayDateString } from "@/core/shared/dateUtils";
 import { CalendarRange, ListFilter, Trophy, Package } from "lucide-react";
 
 const RANGE_OPTIONS = [

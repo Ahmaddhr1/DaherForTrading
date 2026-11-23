@@ -1,6 +1,6 @@
 "use client";
-import { t } from "@/lib/i18n";
-import { useT } from "@/lib/i18n/LangProvider";
+import { t } from "@/core/shared/i18n";
+import { useT } from "@/core/shared/i18n/LangProvider";
 
 import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import { ListSkeleton } from "@/components/ui/skeleton-patterns";
 import { OrdersTotalsCard } from "./OrdersTotalsCard";
 import OrderCard from "./OrderCard";
-import { useIsOwner } from "@/lib/useIsOwner";
+import { useIsOwner } from "@/core/platform/useIsOwner";
 
 const TodaysOrders = () => {
   const t = useT();

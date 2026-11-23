@@ -3,8 +3,8 @@
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { Layers3 } from "lucide-react";
-import { useT } from "@/lib/i18n/LangProvider";
-import { format } from "@/lib/i18n/date";
+import { useT } from "@/core/shared/i18n/LangProvider";
+import { format } from "@/core/shared/i18n/date";
 
 // Dated batches of this product still in stock (from purchases with an
 // expiry date), earliest expiry first.

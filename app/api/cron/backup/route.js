@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
-import { connectToDB } from "@/lib/connectDb";
-import AppSettings from "@/models/AppSettings";
-import { generateBackupPayload } from "@/lib/backup";
-import { sendBackupEmail } from "@/lib/mailer";
+import { connectToDB } from "@/core/platform/connectDb";
+import AppSettings from "@/core/settings/models/AppSettings";
+import { generateBackupPayload } from "@/core/platform/backup";
+import { sendBackupEmail } from "@/core/platform/mailer";
 
 // Automated backup: generates the same backup file as the manual "Download
 // Backup" button and emails it as an attachment. Nothing human logs in to
@@ -14,7 +14,7 @@ import { sendBackupEmail } from "@/lib/mailer";
 // actually work for backups to arrive:
 //   1. Vercel Cron (see vercel.json) - if deployed on Vercel, it calls this
 //      automatically and sends CRON_SECRET as `Authorization: Bearer ...`.
-//   2. lib/scheduledBackup.js - an in-process fallback for a self-hosted,
+//   2. core/platform/scheduledBackup.js - an in-process fallback for a self-hosted,
 //      always-on `next start` process (skipped entirely on Vercel).
 //   3. Any external cron service (e.g. cron-job.org) configured to GET
 //      this URL with the same Authorization header - a fallback that

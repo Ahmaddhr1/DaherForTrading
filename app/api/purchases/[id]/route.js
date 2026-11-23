@@ -1,5 +1,5 @@
-import { connectToDB } from "@/lib/connectDb";
-import Purchase from "@/models/Purchase";
+import { connectToDB } from "@/core/platform/connectDb";
+import Purchase from "@/core/suppliers/models/Purchase";
 import { NextResponse } from "next/server";
 
 // GET one purchase, with its company populated - used by the purchase

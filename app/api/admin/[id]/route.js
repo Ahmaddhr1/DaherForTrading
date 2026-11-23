@@ -1,11 +1,11 @@
-import { connectToDB } from "@/lib/connectDb";
-import Admin from "@/models/Admin";
+import { connectToDB } from "@/core/platform/connectDb";
+import Admin from "@/core/platform/models/Admin";
 import bcrypt from "bcryptjs";
 import { NextResponse } from "next/server";
-import { getUserFromCookie } from "@/lib/auth";
-import { PERMISSION_KEYS } from "@/lib/permissions";
-import { logActivity } from "@/lib/activityLog";
-import { diffViews, snapshotChanges, extraChange, describeChanges } from "@/lib/audit";
+import { getUserFromCookie } from "@/core/platform/auth";
+import { PERMISSION_KEYS } from "@/core/platform/permissions";
+import { logActivity } from "@/core/audit/activityLog";
+import { diffViews, snapshotChanges, extraChange, describeChanges } from "@/core/audit/audit";
 
 // Owner-only (enforced in middleware.js). Both handlers guard against an
 // owner locking the business out of its own dashboard: you can never act

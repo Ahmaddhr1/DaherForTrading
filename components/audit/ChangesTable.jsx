@@ -1,9 +1,9 @@
 "use client";
-import { t } from "@/lib/i18n";
-import { useT } from "@/lib/i18n/LangProvider";
+import { t } from "@/core/shared/i18n";
+import { useT } from "@/core/shared/i18n/LangProvider";
 
 import { ArrowRight } from "lucide-react";
-import { formatAuditValue, translateChangeLabel } from "@/lib/auditFields";
+import { formatAuditValue, translateChangeLabel } from "@/core/audit/auditFields";
 
 // Field-by-field "previous vs current" view of an audit entry's changes.
 // `kind` ("create" | "delete" | "change") only adjusts the column headings

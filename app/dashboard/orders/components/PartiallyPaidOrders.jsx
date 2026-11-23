@@ -1,6 +1,6 @@
 "use client";
-import { t } from "@/lib/i18n";
-import { useT } from "@/lib/i18n/LangProvider";
+import { t } from "@/core/shared/i18n";
+import { useT } from "@/core/shared/i18n/LangProvider";
 
 import { useEffect, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -9,11 +9,11 @@ import { AlertCircle, DollarSign, ChevronLeft, ChevronRight, X } from "lucide-re
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { ListSkeleton } from "@/components/ui/skeleton-patterns";
-import { localDayStartISO, localDayEndISO } from "@/lib/dateUtils";
+import { localDayStartISO, localDayEndISO } from "@/core/shared/dateUtils";
 import { DateRangeFilter } from "./DateRangeFilter";
 import { OrdersTotalsCard } from "./OrdersTotalsCard";
 import OrderCard from "./OrderCard";
-import { useIsOwner } from "@/lib/useIsOwner";
+import { useIsOwner } from "@/core/platform/useIsOwner";
 
 const PartiallyPaidOrders = () => {
   const t = useT();

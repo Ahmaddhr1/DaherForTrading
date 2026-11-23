@@ -1,11 +1,11 @@
-import { connectToDB } from "@/lib/connectDb";
-import Product from "@/models/Products";
-import StockAdjustment from "@/models/StockAdjustment";
+import { connectToDB } from "@/core/platform/connectDb";
+import Product from "@/core/products/models/Products";
+import StockAdjustment from "@/core/products/models/StockAdjustment";
 import { NextResponse } from "next/server";
-import { getUserFromCookie } from "@/lib/auth";
-import { logActivity } from "@/lib/activityLog";
-import { extraChange } from "@/lib/audit";
-import { requirePermission } from "@/lib/permissions";
+import { getUserFromCookie } from "@/core/platform/auth";
+import { logActivity } from "@/core/audit/activityLog";
+import { extraChange } from "@/core/audit/audit";
+import { requirePermission } from "@/core/platform/permissions";
 
 const VALID_TYPES = ["damaged", "lost", "expired", "correction", "other"];
 

@@ -1,8 +1,8 @@
 import { Geist, Geist_Mono, Space_Grotesk, IBM_Plex_Sans_Arabic } from "next/font/google";
 import { cookies } from "next/headers";
-import { LANG_COOKIE, isLang, dirFor } from "@/lib/i18n";
+import { LANG_COOKIE, isLang, dirFor } from "@/core/shared/i18n";
 import "./globals.css";
-import Providers from "@/lib/providers";
+import Providers from "@/core/platform/providers";
 import { Toaster } from "@/components/ui/sonner";
 import { SplashScreen } from "@/components/SplashScreen";
 

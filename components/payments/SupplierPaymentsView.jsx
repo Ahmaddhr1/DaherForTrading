@@ -1,12 +1,12 @@
 "use client";
-import { t } from "@/lib/i18n";
-import { useT } from "@/lib/i18n/LangProvider";
+import { t } from "@/core/shared/i18n";
+import { useT } from "@/core/shared/i18n/LangProvider";
 
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
-import { format } from "@/lib/i18n/date";
+import { format } from "@/core/shared/i18n/date";
 import { Search, Building2, History, ChevronLeft, ChevronRight, X, CheckCircle } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -14,7 +14,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { TableSkeleton } from "@/components/ui/skeleton-patterns";
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { getTodayDateString, localDayStartISO, localDayEndISO } from "@/lib/dateUtils";
+import { getTodayDateString, localDayStartISO, localDayEndISO } from "@/core/shared/dateUtils";
 
 // "Supplier payments" view of the Payments tab: money paid to companies,
 // created when an unpaid purchase is marked as paid.

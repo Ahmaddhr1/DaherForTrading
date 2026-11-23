@@ -4,7 +4,7 @@ import { Suspense, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import ThermalPrintPage from "@/components/ThermalPrintPage";
 import ClosingDoc from "@/components/closing/ClosingDoc";
-import { localDayStartISO, localDayEndISO, getTodayDateString } from "@/lib/dateUtils";
+import { localDayStartISO, localDayEndISO, getTodayDateString } from "@/core/shared/dateUtils";
 
 // Print page for the daily closing (A4, Back / Print, print dialog opens by
 // itself - like the statements).

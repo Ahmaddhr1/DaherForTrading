@@ -1,15 +1,15 @@
 "use client";
-import { t } from "@/lib/i18n";
-import { useT } from "@/lib/i18n/LangProvider";
-import { isTouchDevice } from "@/lib/isTouchDevice";
-import { applyThermalPageSize } from "@/lib/thermalPageSize";
+import { t } from "@/core/shared/i18n";
+import { useT } from "@/core/shared/i18n/LangProvider";
+import { isTouchDevice } from "@/core/shared/isTouchDevice";
+import { applyThermalPageSize } from "@/core/printing/thermalPageSize";
 import DirectPrintButton, { useDirectPrint } from "@/components/DirectPrintButton";
 import { useRouter } from "next/navigation";
 
 import { useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useParams } from "next/navigation";
-import { format } from "@/lib/i18n/date";
+import { format } from "@/core/shared/i18n/date";
 import { Receipt, Calendar, Printer, MessageCircle, TrendingDown } from "lucide-react";
 import DisbursementThermalReceipt from "./DisbursementThermalReceipt";
 
@@ -19,7 +19,7 @@ import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { PageHeaderSkeleton } from "@/components/ui/skeleton-patterns";
-import { useSettings, formatLL } from "@/lib/currency";
+import { useSettings, formatLL } from "@/core/shared/currency";
 
 const fetchDisbursement = async (id) => {
   const res = await fetch(`/api/disbursements/${id}`);

@@ -1,9 +1,9 @@
 import mongoose from "mongoose";
-import { connectToDB } from "@/lib/connectDb";
-import ActivityLog from "@/models/ActivityLog";
+import { connectToDB } from "@/core/platform/connectDb";
+import ActivityLog from "@/core/audit/models/ActivityLog";
 import { NextResponse } from "next/server";
-import { getUserFromCookie } from "@/lib/auth";
-import { logActivity } from "@/lib/activityLog";
+import { getUserFromCookie } from "@/core/platform/auth";
+import { logActivity } from "@/core/audit/activityLog";
 
 // Owner-only (enforced in middleware.js). Paginated/filterable activity
 // log, following the same pagination shape as /api/orders.

@@ -1,15 +1,15 @@
-import { connectToDB } from "@/lib/connectDb";
-import Product from "@/models/Products";
-import Category from "@/models/Category";
-import Order from "@/models/Orders";
+import { connectToDB } from "@/core/platform/connectDb";
+import Product from "@/core/products/models/Products";
+import Category from "@/core/products/models/Category";
+import Order from "@/core/orders/models/Orders";
 import { NextResponse } from "next/server";
-import { getUserFromCookie } from "@/lib/auth";
-import { logActivity } from "@/lib/activityLog";
-import { extraChange } from "@/lib/audit";
-import { AUDIT_FIELDS } from "@/lib/auditFields";
+import { getUserFromCookie } from "@/core/platform/auth";
+import { logActivity } from "@/core/audit/activityLog";
+import { extraChange } from "@/core/audit/audit";
+import { AUDIT_FIELDS } from "@/core/audit/auditFields";
 
 const fieldMeta = (field) => AUDIT_FIELDS.Product.find(([key]) => key === field) || [field, field, "money"];
-import { requirePermission } from "@/lib/permissions";
+import { requirePermission } from "@/core/platform/permissions";
 
 const PRICE_FIELDS = ["price", "priceWholesale", "priceDistributor", "priceVip", "initialPrice", "discount"];
 const PRICE_MODES = ["set", "increasePercent", "decreasePercent", "increaseAmount", "decreaseAmount"];

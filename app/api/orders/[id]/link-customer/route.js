@@ -1,11 +1,11 @@
-import { connectToDB } from "@/lib/connectDb";
-import Customer from "@/models/Customers";
-import Order from "@/models/Orders";
+import { connectToDB } from "@/core/platform/connectDb";
+import Customer from "@/core/customers/models/Customers";
+import Order from "@/core/orders/models/Orders";
 import { NextResponse } from "next/server";
-import { logActivity } from "@/lib/activityLog";
-import { auditView, diffViews, snapshotChanges, diffOrderLines, extraChange, describeChanges, orderLabel } from "@/lib/audit";
-import { getUserFromCookie } from "@/lib/auth";
-import { requirePermission } from "@/lib/permissions";
+import { logActivity } from "@/core/audit/activityLog";
+import { auditView, diffViews, snapshotChanges, diffOrderLines, extraChange, describeChanges, orderLabel } from "@/core/audit/audit";
+import { getUserFromCookie } from "@/core/platform/auth";
+import { requirePermission } from "@/core/platform/permissions";
 
 // Attaches a real customer to a draft that only has a hand-typed
 // customerNameText (from the product-grid cart's "type a name" checkout).

@@ -1,7 +1,7 @@
 // app/dashboard/page.jsx
 "use client";
-import { t } from "@/lib/i18n";
-import { useT } from "@/lib/i18n/LangProvider";
+import { t } from "@/core/shared/i18n";
+import { useT } from "@/core/shared/i18n/LangProvider";
 
 import React, { useState } from "react";
 import SummaryCards from "@/components/dashboard/SummaryCards";
@@ -18,7 +18,7 @@ import SalesTrendsChart from "@/components/dashboard/SalesTrendsChart";
 import RealProfitChart from "@/components/dashboard/RealProfitChart";
 import TopPartiesChart from "@/components/dashboard/TopPartiesChart";
 import { Users, Building2 } from "lucide-react";
-import { getTodayDateString, localDayStartISO, localDayEndISO } from "@/lib/dateUtils";
+import { getTodayDateString, localDayStartISO, localDayEndISO } from "@/core/shared/dateUtils";
 
 const DEFAULT_FILTERS = {
   range: "all",
@@ -38,7 +38,7 @@ export default function DashboardPage() {
   // Resolved to precise UTC instants here (in the browser) rather than
   // sent as bare dates, so "custom" range filtering means the admin's own
   // local calendar day - not whatever timezone the server happens to run
-  // in. See lib/dateUtils.js.
+  // in. See core/shared/dateUtils.js.
   const rangeStart = localDayStartISO(filters.startDate);
   const rangeEnd = localDayEndISO(filters.endDate);
 

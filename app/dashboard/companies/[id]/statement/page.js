@@ -1,15 +1,15 @@
 "use client";
-import { useT } from "@/lib/i18n/LangProvider";
-import { useBusiness } from "@/lib/business";
-import { whatsappNumber } from "@/lib/whatsapp";
+import { useT } from "@/core/shared/i18n/LangProvider";
+import { useBusiness } from "@/core/shared/business";
+import { whatsappNumber } from "@/core/shared/whatsapp";
 
 import { Suspense, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
-import { format } from "@/lib/i18n/date";
+import { format } from "@/core/shared/i18n/date";
 import { Printer, MessageCircle, Receipt, Loader2, ClipboardList, Package } from "lucide-react";
-import { toast } from "@/lib/i18n/toast";
-import { generateStatementPdf } from "@/lib/thermalPdf";
+import { toast } from "@/core/shared/i18n/toast";
+import { generateStatementPdf } from "@/core/printing/thermalPdf";
 import PdfPreviewDialog from "@/components/PdfPreviewDialog";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -17,8 +17,8 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { PageHeaderSkeleton, TableSkeleton } from "@/components/ui/skeleton-patterns";
 import CompanyStatementDoc from "@/components/statements/CompanyStatementDoc";
-import { statementApiQuery, statementPeriodLabel, statementPrintQuery } from "@/lib/statementPeriod";
-import { buildCompanyStatementReceipt } from "@/lib/statementReceiptData";
+import { statementApiQuery, statementPeriodLabel, statementPrintQuery } from "@/core/shared/statementPeriod";
+import { buildCompanyStatementReceipt } from "@/core/printing/statementReceiptData";
 
 const fetchStatement = async (id, startDate, endDate) => {
   const res = await fetch(`/api/companies/${id}/statement${statementApiQuery(startDate, endDate)}`);

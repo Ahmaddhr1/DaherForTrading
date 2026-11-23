@@ -1,7 +1,7 @@
 // components/dashboard/TopPartiesChart.jsx
 "use client";
-import { t } from "@/lib/i18n";
-import { useT } from "@/lib/i18n/LangProvider";
+import { t } from "@/core/shared/i18n";
+import { useT } from "@/core/shared/i18n/LangProvider";
 
 import React, { useMemo, useState } from "react";
 import Link from "next/link";
@@ -10,7 +10,7 @@ import axios from "axios";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { BarChart } from "@/components/ui/charts/bar-chart";
-import { getTodayDateString, localDayStartISO, localDayEndISO } from "@/lib/dateUtils";
+import { getTodayDateString, localDayStartISO, localDayEndISO } from "@/core/shared/dateUtils";
 
 // Shared "Top 10 X" chart used for both customers (what they bought + the
 // real profit it made) and companies (what we bought from them + expected

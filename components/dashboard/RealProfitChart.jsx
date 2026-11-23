@@ -1,7 +1,7 @@
 // components/dashboard/RealProfitChart.jsx
 "use client";
-import { t, dateLocale } from "@/lib/i18n";
-import { useT } from "@/lib/i18n/LangProvider";
+import { t, dateLocale } from "@/core/shared/i18n";
+import { useT } from "@/core/shared/i18n/LangProvider";
 
 import React, { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
@@ -9,7 +9,7 @@ import axios from "axios";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { TrendingUp } from "lucide-react";
-import { localDayStartISO, localDayEndISO } from "@/lib/dateUtils";
+import { localDayStartISO, localDayEndISO } from "@/core/shared/dateUtils";
 import { LineChart } from "@/components/ui/charts/line-chart";
 
 const GRANULARITY_OPTIONS = [

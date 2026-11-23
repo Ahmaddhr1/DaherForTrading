@@ -1,6 +1,6 @@
 // Small helpers so tests read like the app's real flows.
 import jwt from "jsonwebtoken";
-import { emptyPermissions } from "@/lib/permissions";
+import { emptyPermissions } from "@/core/platform/permissions";
 
 // Act as a user for the following API calls.
 //   loginAs("owner")                          - full access

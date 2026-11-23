@@ -1,11 +1,11 @@
 import { NextResponse } from "next/server";
-import Order from "@/models/Orders";
-import { connectToDB } from "@/lib/connectDb";
-import { getUserFromCookie } from "@/lib/auth";
-import { requirePermission } from "@/lib/permissions";
-import { logActivity } from "@/lib/activityLog";
-import { auditView, diffViews, extraChange, orderLabel } from "@/lib/audit";
-import { recordCustomerPayment } from "@/lib/recordPayment";
+import Order from "@/core/orders/models/Orders";
+import { connectToDB } from "@/core/platform/connectDb";
+import { getUserFromCookie } from "@/core/platform/auth";
+import { requirePermission } from "@/core/platform/permissions";
+import { logActivity } from "@/core/audit/activityLog";
+import { auditView, diffViews, extraChange, orderLabel } from "@/core/audit/audit";
+import { recordCustomerPayment } from "@/core/payments/recordPayment";
 
 // Applies a partial payment to an order. The amount is recorded as ONE
 // payment (linked to the order) via recordCustomerPayment, which is also the

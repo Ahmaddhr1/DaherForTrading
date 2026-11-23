@@ -1,13 +1,13 @@
-import { connectToDB } from "@/lib/connectDb";
-import Customer from "@/models/Customers";
-import Order from "@/models/Orders";
-import Payment from "@/models/Payment";
-import { getCustomerOverdueInfo, DEFAULT_OVERDUE_DAYS } from "@/lib/overdueCustomers";
+import { connectToDB } from "@/core/platform/connectDb";
+import Customer from "@/core/customers/models/Customers";
+import Order from "@/core/orders/models/Orders";
+import Payment from "@/core/payments/models/Payment";
+import { getCustomerOverdueInfo, DEFAULT_OVERDUE_DAYS } from "@/core/customers/overdueCustomers";
 import { NextResponse } from "next/server";
-import { getUserFromCookie } from "@/lib/auth";
-import { requirePermission } from "@/lib/permissions";
-import { logActivity } from "@/lib/activityLog";
-import { auditView, diffViews, snapshotChanges, extraChange, describeChanges } from "@/lib/audit";
+import { getUserFromCookie } from "@/core/platform/auth";
+import { requirePermission } from "@/core/platform/permissions";
+import { logActivity } from "@/core/audit/activityLog";
+import { auditView, diffViews, snapshotChanges, extraChange, describeChanges } from "@/core/audit/audit";
 
 // GET one customer
 export async function GET(req, { params }) {

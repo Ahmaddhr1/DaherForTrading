@@ -1,19 +1,19 @@
 "use client";
-import { t } from "@/lib/i18n";
-import { useT } from "@/lib/i18n/LangProvider";
+import { t } from "@/core/shared/i18n";
+import { useT } from "@/core/shared/i18n/LangProvider";
 
 import { useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
 import { Home, ClipboardList, ShoppingCart, Wallet, Boxes, MoreHorizontal, LogOut, X, Search, UserRound, CreditCard } from "lucide-react";
-import { toast } from "@/lib/i18n/toast";
+import { toast } from "@/core/shared/i18n/toast";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
-import tabs from "@/lib/SideBarTabs";
-import { useCart } from "@/lib/cartContext";
+import tabs from "@/core/shared/SideBarTabs";
+import { useCart } from "@/core/orders/cartContext";
 import { GlobalSearchModal } from "@/components/GlobalSearchModal";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
-import { hasPermission } from "@/lib/permissions";
+import { hasPermission } from "@/core/platform/permissions";
 
 // Searches both top-level tabs and any nested `children` (see
 // SideBarTabs.js) - mobile doesn't nest them visually, it just needs to

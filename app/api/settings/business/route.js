@@ -1,17 +1,17 @@
-import { connectToDB } from "@/lib/connectDb";
-import AppSettings from "@/models/AppSettings";
+import { connectToDB } from "@/core/platform/connectDb";
+import AppSettings from "@/core/settings/models/AppSettings";
 import { NextResponse } from "next/server";
-import { getUserFromCookie } from "@/lib/auth";
-import { logActivity } from "@/lib/activityLog";
-import { diffViews, snapshotChanges, extraChange, describeChanges } from "@/lib/audit";
-import { requirePermission } from "@/lib/permissions";
+import { getUserFromCookie } from "@/core/platform/auth";
+import { logActivity } from "@/core/audit/activityLog";
+import { diffViews, snapshotChanges, extraChange, describeChanges } from "@/core/audit/audit";
+import { requirePermission } from "@/core/platform/permissions";
 
 // Business-wide settings (dollar->LL rate, default tax rate). Viewable (GET)
 // by any logged-in admin - see middleware.js, which does not list this path
 // as owner-only, since the exchange rate is day-to-day operational data
 // rather than an admin/security setting. Editing (PUT) still needs the
 // canManageSettings permission, same opt-in-extra-capability pattern as
-// canManageDisbursements etc. (see lib/permissions.js).
+// canManageDisbursements etc. (see core/platform/permissions.js).
 
 async function getOrCreateSettings() {
   let settings = await AppSettings.findOne({ key: "app" });

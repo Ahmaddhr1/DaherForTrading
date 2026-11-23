@@ -1,7 +1,7 @@
 "use client";
-import { t } from "@/lib/i18n";
-import { useT } from "@/lib/i18n/LangProvider";
-import { useSettings } from "@/lib/currency";
+import { t } from "@/core/shared/i18n";
+import { useT } from "@/core/shared/i18n/LangProvider";
+import { useSettings } from "@/core/shared/currency";
 
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -13,7 +13,7 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { Loader2, PackagePlus, DollarSign, Tag, Package, TrendingUp, Box, Ruler, AlertTriangle, Truck, Layers, ImagePlus, X, Percent, CalendarClock, BellRing, ScanBarcode } from "lucide-react";
 import React, { useState } from "react";
-import { toast } from "@/lib/i18n/toast";
+import { toast } from "@/core/shared/i18n/toast";
 import { useRouter } from "next/navigation";
 
 const fetchCategories = async () => {

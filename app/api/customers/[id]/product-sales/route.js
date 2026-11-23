@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
-import { connectToDB } from "@/lib/connectDb";
-import Customer from "@/models/Customers";
-import Order from "@/models/Orders";
+import { connectToDB } from "@/core/platform/connectDb";
+import Customer from "@/core/customers/models/Customers";
+import Order from "@/core/orders/models/Orders";
 import { NextResponse } from "next/server";
 
 // Per-product breakdown of what this customer has bought: quantity, sales
@@ -27,7 +27,7 @@ export async function GET(req, { params }) {
     const match = { customer: customer._id, status: { $ne: "draft" } };
     if (startDateParam || endDateParam) {
       // The client resolves these to precise instants before sending them
-      // (see lib/dateUtils.js localDayStartISO/localDayEndISO).
+      // (see core/shared/dateUtils.js localDayStartISO/localDayEndISO).
       match.createdAt = {};
       if (startDateParam) match.createdAt.$gte = new Date(startDateParam);
       if (endDateParam) match.createdAt.$lte = new Date(endDateParam);

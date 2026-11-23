@@ -1,23 +1,23 @@
 "use client";
 import Link from "next/link";
-import { t } from "@/lib/i18n";
-import { useT } from "@/lib/i18n/LangProvider";
+import { t } from "@/core/shared/i18n";
+import { useT } from "@/core/shared/i18n/LangProvider";
 import DeliveryPanel from "@/components/DeliveryPanel";
-import { whatsappNumber } from "@/lib/whatsapp";
-import { isTouchDevice } from "@/lib/isTouchDevice";
-import { applyThermalPageSize } from "@/lib/thermalPageSize";
+import { whatsappNumber } from "@/core/shared/whatsapp";
+import { isTouchDevice } from "@/core/shared/isTouchDevice";
+import { applyThermalPageSize } from "@/core/printing/thermalPageSize";
 import DirectPrintButton, { useDirectPrint } from "@/components/DirectPrintButton";
 import { useRouter } from "next/navigation";
 
 import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useParams } from "next/navigation";
-import { format } from "@/lib/i18n/date";
+import { format } from "@/core/shared/i18n/date";
 import { User, Package, CreditCard, Calendar, Tag, Printer, MessageCircle, Receipt, RotateCcw, StickyNote, PencilLine } from "lucide-react";
-import { toast } from "@/lib/i18n/toast";
+import { toast } from "@/core/shared/i18n/toast";
 import ThermalReceipt from "./ThermalReceipt";
 import ProcessReturnModal from "./ProcessReturnModal";
-import { useHasPermission } from "@/lib/useHasPermission";
+import { useHasPermission } from "@/core/platform/useHasPermission";
 
 import {
   Table,
@@ -33,7 +33,7 @@ import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { PageHeaderSkeleton, TableSkeleton } from "@/components/ui/skeleton-patterns";
-import { useSettings, formatLL } from "@/lib/currency";
+import { useSettings, formatLL } from "@/core/shared/currency";
 
 const fetchOrder = async (id) => {
   const res = await fetch(`/api/orders/${id}`);

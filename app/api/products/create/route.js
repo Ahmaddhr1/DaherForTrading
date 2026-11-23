@@ -1,11 +1,11 @@
-import { connectToDB } from "@/lib/connectDb";
-import Product from "@/models/Products";
-import Category from "@/models/Category"; // import category model
+import { connectToDB } from "@/core/platform/connectDb";
+import Product from "@/core/products/models/Products";
+import Category from "@/core/products/models/Category"; // import category model
 import { NextResponse } from "next/server";
-import { getUserFromCookie } from "@/lib/auth";
-import { logActivity } from "@/lib/activityLog";
-import { auditView, snapshotChanges } from "@/lib/audit";
-import { requirePermission } from "@/lib/permissions";
+import { getUserFromCookie } from "@/core/platform/auth";
+import { logActivity } from "@/core/audit/activityLog";
+import { auditView, snapshotChanges } from "@/core/audit/audit";
+import { requirePermission } from "@/core/platform/permissions";
 
 export async function POST(req) {
   await connectToDB();
@@ -104,7 +104,7 @@ export async function POST(req) {
 
     // Wholesale/Distributor/VIP tier prices - each optional; a blank/omitted
     // one defaults to the Retail price so every tier is priced from the
-    // start (lib/priceTiers.js also falls back to `price` at read time, so
+    // start (core/products/priceTiers.js also falls back to `price` at read time, so
     // this is a convenience default, not something other code depends on).
     const parseTierPrice = (value, label) => {
       if (value === undefined || value === null || value === "") return parsedPrice;

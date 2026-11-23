@@ -1,7 +1,7 @@
 // components/dashboard/SalesTrendsChart.jsx
 "use client";
-import { t, dateLocale } from "@/lib/i18n";
-import { useT } from "@/lib/i18n/LangProvider";
+import { t, dateLocale } from "@/core/shared/i18n";
+import { useT } from "@/core/shared/i18n/LangProvider";
 
 import React, { useState } from "react";
 import { useQuery } from "@tanstack/react-query";

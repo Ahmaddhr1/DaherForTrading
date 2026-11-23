@@ -1,9 +1,9 @@
 import { NextResponse } from "next/server";
-import { runDueRecurringDisbursements } from "@/lib/recurringDisbursements";
+import { runDueRecurringDisbursements } from "@/core/expenses/recurringDisbursements";
 
 // Same secret-header auth as /api/cron/backup - see that route for the
 // full picture of what can call this (Vercel Cron via vercel.json, the
-// in-process fallback in lib/scheduledRecurringDisbursements.js, or any
+// in-process fallback in core/expenses/scheduledRecurringDisbursements.js, or any
 // external cron service hitting this URL with the same Authorization
 // header).
 export async function GET(req) {

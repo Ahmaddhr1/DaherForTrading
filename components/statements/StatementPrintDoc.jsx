@@ -1,11 +1,11 @@
 "use client";
 
 import { useEffect } from "react";
-import { useT } from "@/lib/i18n/LangProvider";
-import { useBusiness } from "@/lib/business";
+import { useT } from "@/core/shared/i18n/LangProvider";
+import { useBusiness } from "@/core/shared/business";
 
 // The black-and-white statement as a printable A4 page - the same layout
-// as the PDF from "PDF" (lib/thermalPdf.js generateStatementPdf): Courier,
+// as the PDF from "PDF" (core/printing/thermalPdf.js generateStatementPdf): Courier,
 // centred header, a grid table with alternate grey rows, dashed rules,
 // totals and footer. Used by the statement print pages (/print/statement,
 // /print/company-statement).

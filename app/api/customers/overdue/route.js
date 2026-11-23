@@ -1,5 +1,5 @@
-import { connectToDB } from "@/lib/connectDb";
-import { getOverdueCustomers, DEFAULT_OVERDUE_DAYS } from "@/lib/overdueCustomers";
+import { connectToDB } from "@/core/platform/connectDb";
+import { getOverdueCustomers, DEFAULT_OVERDUE_DAYS } from "@/core/customers/overdueCustomers";
 import { NextResponse } from "next/server";
 
 export async function GET(req) {

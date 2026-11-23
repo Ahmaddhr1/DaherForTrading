@@ -1,11 +1,11 @@
 "use client";
-import { t, dateLocale } from "@/lib/i18n";
-import { useT } from "@/lib/i18n/LangProvider";
+import { t, dateLocale } from "@/core/shared/i18n";
+import { useT } from "@/core/shared/i18n/LangProvider";
 
 import React, { useEffect, useRef, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
-import { toast } from "@/lib/i18n/toast";
+import { toast } from "@/core/shared/i18n/toast";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -28,12 +28,12 @@ import {
   XCircle,
   Send,
   Moon, CalendarClock, Store, Phone } from "lucide-react";
-import { useSettings } from "@/lib/currency";
+import { useSettings } from "@/core/shared/currency";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { LanguageSwitch } from "@/components/LanguageSwitch";
 import { Languages } from "lucide-react";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
-import { useHasPermission } from "@/lib/useHasPermission";
+import { useHasPermission } from "@/core/platform/useHasPermission";
 
 const restoreWarning = () =>
   t("This will permanently replace all current customers, orders, products, categories, companies, purchases, payments, and disbursements with the contents of this file. This cannot be undone. Continue?");

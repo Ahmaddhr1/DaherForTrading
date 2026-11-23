@@ -1,6 +1,6 @@
-import { connectToDB } from "@/lib/connectDb";
-import Disbursement from "@/models/Disbursement";
-import AppSettings from "@/models/AppSettings";
+import { connectToDB } from "@/core/platform/connectDb";
+import Disbursement from "@/core/expenses/models/Disbursement";
+import AppSettings from "@/core/settings/models/AppSettings";
 import { NextResponse } from "next/server";
 
 // Public, unauthenticated, read-only view of a single disbursement (an

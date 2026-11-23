@@ -1,6 +1,6 @@
 "use client";
-import { t } from "@/lib/i18n";
-import { useT } from "@/lib/i18n/LangProvider";
+import { t } from "@/core/shared/i18n";
+import { useT } from "@/core/shared/i18n/LangProvider";
 
 import React, { useEffect, useState } from "react";
 import {
@@ -23,17 +23,17 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { TableSkeleton } from "@/components/ui/skeleton-patterns";
 import { ChevronLeft, ChevronRight, Search, FileText } from "lucide-react";
-import { format } from "@/lib/i18n/date";
+import { format } from "@/core/shared/i18n/date";
 import { useRouter } from "next/navigation";
 import axios from "axios";
-import { toast } from "@/lib/i18n/toast";
+import { toast } from "@/core/shared/i18n/toast";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import OrderCustomerName from "./OrderCustomerName";
 import OrderCard from "./OrderCard";
-import { orderNumber } from "@/lib/orderNumber";
+import { orderNumber } from "@/core/orders/orderNumber";
 import LinkCustomerModal from "./LinkCustomerModal";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
-import { useHasPermission } from "@/lib/useHasPermission";
+import { useHasPermission } from "@/core/platform/useHasPermission";
 
 const PAGE_SIZE_OPTIONS = [10, 20, 50];
 

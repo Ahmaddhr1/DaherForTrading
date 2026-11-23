@@ -1,12 +1,12 @@
-import { connectToDB } from "@/lib/connectDb";
-import Product from "@/models/Products";
-import Category from "@/models/Category"; // import your Category model
-import Order from "@/models/Orders";
+import { connectToDB } from "@/core/platform/connectDb";
+import Product from "@/core/products/models/Products";
+import Category from "@/core/products/models/Category"; // import your Category model
+import Order from "@/core/orders/models/Orders";
 import { NextResponse } from "next/server";
-import { getUserFromCookie } from "@/lib/auth";
-import { logActivity } from "@/lib/activityLog";
-import { auditView, diffViews, snapshotChanges, describeChanges } from "@/lib/audit";
-import { requirePermission } from "@/lib/permissions";
+import { getUserFromCookie } from "@/core/platform/auth";
+import { logActivity } from "@/core/audit/activityLog";
+import { auditView, diffViews, snapshotChanges, describeChanges } from "@/core/audit/audit";
+import { requirePermission } from "@/core/platform/permissions";
 
 // GET a product by ID
 export async function GET(_, { params }) {

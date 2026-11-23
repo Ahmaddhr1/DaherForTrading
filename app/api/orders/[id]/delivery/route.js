@@ -1,11 +1,11 @@
-import { connectToDB } from "@/lib/connectDb";
-import Order from "@/models/Orders";
+import { connectToDB } from "@/core/platform/connectDb";
+import Order from "@/core/orders/models/Orders";
 import { NextResponse } from "next/server";
-import { getUserFromCookie } from "@/lib/auth";
-import { requirePermission } from "@/lib/permissions";
-import { logActivity } from "@/lib/activityLog";
-import { auditView, diffViews, describeChanges } from "@/lib/audit";
-import { DELIVERY_VALUES } from "@/lib/delivery";
+import { getUserFromCookie } from "@/core/platform/auth";
+import { requirePermission } from "@/core/platform/permissions";
+import { logActivity } from "@/core/audit/activityLog";
+import { auditView, diffViews, describeChanges } from "@/core/audit/audit";
+import { DELIVERY_VALUES } from "@/core/orders/delivery";
 
 // Set / change / clear an order's optional delivery: status and delivery
 // person. Needs canManageDeliveries (owners always pass). Doesn't touch

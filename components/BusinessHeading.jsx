@@ -1,6 +1,6 @@
 "use client";
 
-import { useBusiness } from "@/lib/business";
+import { useBusiness } from "@/core/shared/business";
 
 // Business name (and phone) at the top of receipts and documents.
 // variant "receipt": thermal receipts; "banner": shared document pages.

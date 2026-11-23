@@ -1,10 +1,10 @@
 import { NextResponse } from "next/server";
-import { connectToDB } from "@/lib/connectDb";
-import AppSettings from "@/models/AppSettings";
-import { generateBackupPayload } from "@/lib/backup";
-import { sendBackupEmail } from "@/lib/mailer";
-import { getUserFromCookie } from "@/lib/auth";
-import { logActivity } from "@/lib/activityLog";
+import { connectToDB } from "@/core/platform/connectDb";
+import AppSettings from "@/core/settings/models/AppSettings";
+import { generateBackupPayload } from "@/core/platform/backup";
+import { sendBackupEmail } from "@/core/platform/mailer";
+import { getUserFromCookie } from "@/core/platform/auth";
+import { logActivity } from "@/core/audit/activityLog";
 
 // Lets an owner trigger the exact same backup+email pipeline as the
 // scheduled job (see app/api/cron/backup/route.js), on demand, from the

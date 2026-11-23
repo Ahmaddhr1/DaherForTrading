@@ -1,12 +1,12 @@
 "use client";
-import { t } from "@/lib/i18n";
-import { useT } from "@/lib/i18n/LangProvider";
+import { t } from "@/core/shared/i18n";
+import { useT } from "@/core/shared/i18n/LangProvider";
 
 // Reusable "From" / "To" <input type="date"> pair, styled to match the
 // other filter controls on the orders pages (see e.g. the Category/Sort
 // selects on the customer orders table). Values are kept as plain
 // "YYYY-MM-DD" strings in the parent's state - the parent converts them to
-// precise UTC instants with lib/dateUtils.js's localDayStartISO/
+// precise UTC instants with core/shared/dateUtils.js's localDayStartISO/
 // localDayEndISO right before sending them to the API, same pattern used
 // everywhere else in this app that filters by date.
 export function DateRangeFilter({ startDate, endDate, onStartDateChange, onEndDateChange }) {

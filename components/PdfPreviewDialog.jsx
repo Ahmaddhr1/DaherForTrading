@@ -3,9 +3,9 @@
 import { useEffect, useMemo, useRef } from "react";
 import { Printer, Share2, Download, X, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useT } from "@/lib/i18n/LangProvider";
-import { toast } from "@/lib/i18n/toast";
-import { isTouchDevice } from "@/lib/isTouchDevice";
+import { useT } from "@/core/shared/i18n/LangProvider";
+import { toast } from "@/core/shared/i18n/toast";
+import { isTouchDevice } from "@/core/shared/isTouchDevice";
 
 // Shows a generated PDF (the black-and-white statement) with Print, Share
 // and Download. On computers the PDF is shown in the window and Print opens

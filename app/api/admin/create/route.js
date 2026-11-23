@@ -1,11 +1,11 @@
-import { connectToDB } from '@/lib/connectDb.js'
-import Admin from '@/models/Admin'
+import { connectToDB } from '@/core/platform/connectDb.js'
+import Admin from '@/core/platform/models/Admin'
 import bcrypt from 'bcryptjs'
 import { NextResponse } from 'next/server'
-import { PERMISSION_KEYS } from '@/lib/permissions'
-import { getUserFromCookie } from '@/lib/auth'
-import { logActivity } from '@/lib/activityLog'
-import { snapshotChanges } from '@/lib/audit'
+import { PERMISSION_KEYS } from '@/core/platform/permissions'
+import { getUserFromCookie } from '@/core/platform/auth'
+import { logActivity } from '@/core/audit/activityLog'
+import { snapshotChanges } from '@/core/audit/audit'
 
 // Owner-only (enforced in middleware.js). Creates a new admin account -
 // "owner" or "employee", defaulting to "employee" so a mistyped/omitted
@@ -31,7 +31,7 @@ export async function POST(req) {
 
     const resolvedRole = role === 'owner' ? 'owner' : 'employee'
     // Only meaningful for an employee - an owner has every permission
-    // implicitly (see lib/permissions.js) regardless of what's stored here.
+    // implicitly (see core/platform/permissions.js) regardless of what's stored here.
     const resolvedPermissions = {}
     for (const key of PERMISSION_KEYS) {
       resolvedPermissions[key] = !!permissions?.[key]

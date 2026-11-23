@@ -1,12 +1,12 @@
 // app/dashboard/payments/page.jsx
 "use client";
-import { t } from "@/lib/i18n";
-import { useT } from "@/lib/i18n/LangProvider";
+import { t } from "@/core/shared/i18n";
+import { useT } from "@/core/shared/i18n/LangProvider";
 
 import React, { useEffect, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
-import { toast } from "@/lib/i18n/toast";
+import { toast } from "@/core/shared/i18n/toast";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
@@ -15,7 +15,7 @@ import { Modal } from "@/components/ui/modal";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { TableSkeleton } from "@/components/ui/skeleton-patterns";
 import { FiltersPanel } from "@/components/ui/filters-panel";
-import { getTodayDateString, localDayStartISO, localDayEndISO } from "@/lib/dateUtils";
+import { getTodayDateString, localDayStartISO, localDayEndISO } from "@/core/shared/dateUtils";
 import {
   Table,
   TableBody,
@@ -40,8 +40,8 @@ import {
   X,
   History,
 } from "lucide-react";
-import { format } from "@/lib/i18n/date";
-import { useHasPermission } from "@/lib/useHasPermission";
+import { format } from "@/core/shared/i18n/date";
+import { useHasPermission } from "@/core/platform/useHasPermission";
 import Link from "next/link";
 import SupplierPaymentsView from "@/components/payments/SupplierPaymentsView";
 

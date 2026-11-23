@@ -1,8 +1,8 @@
-import { connectToDB } from "@/lib/connectDb";
-import Admin from "@/models/Admin";
+import { connectToDB } from "@/core/platform/connectDb";
+import Admin from "@/core/platform/models/Admin";
 import { NextResponse } from "next/server";
-import { generateOtpCode, hashOtpCode, OTP_TTL_MS, OTP_RESEND_COOLDOWN_MS } from "@/lib/otp";
-import { sendOtpEmail } from "@/lib/mailer";
+import { generateOtpCode, hashOtpCode, OTP_TTL_MS, OTP_RESEND_COOLDOWN_MS } from "@/core/platform/otp";
+import { sendOtpEmail } from "@/core/platform/mailer";
 
 // Re-sends a fresh code for an in-progress login (password already
 // verified by /api/admin/login). Gated by a short cooldown, tracked on the

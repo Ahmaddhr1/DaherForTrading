@@ -1,14 +1,14 @@
 // app/dashboard/products/page.jsx
 "use client";
-import { t } from "@/lib/i18n";
-import { useT } from "@/lib/i18n/LangProvider";
+import { t } from "@/core/shared/i18n";
+import { useT } from "@/core/shared/i18n/LangProvider";
 
 import React, { useState, useEffect, useRef } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
-import { toast } from "@/lib/i18n/toast";
+import { toast } from "@/core/shared/i18n/toast";
 import Link from "next/link";
-import { format } from "@/lib/i18n/date";
+import { format } from "@/core/shared/i18n/date";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
@@ -29,9 +29,9 @@ import CategoryFilterModal from "./CategoryFilterModal";
 import BulkPriceUpdateModal from "./BulkPriceUpdateModal";
 import BulkCategoryModal from "./BulkCategoryModal";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
-import { useCart } from "@/lib/cartContext";
-import { useIsOwner } from "@/lib/useIsOwner";
-import { useHasPermission } from "@/lib/useHasPermission";
+import { useCart } from "@/core/orders/cartContext";
+import { useIsOwner } from "@/core/platform/useIsOwner";
+import { useHasPermission } from "@/core/platform/useHasPermission";
 
 export default function ProductsPage() {
   const t = useT();

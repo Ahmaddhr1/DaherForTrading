@@ -1,10 +1,10 @@
 import { NextResponse } from "next/server";
-import { connectToDB } from "@/lib/connectDb";
-import Product from "@/models/Products";
-import Order from "@/models/Orders";
-import Customer from "@/models/Customers";
-import Category from "@/models/Category";
-import { resolveDateRange } from "@/lib/dashboardRange";
+import { connectToDB } from "@/core/platform/connectDb";
+import Product from "@/core/products/models/Products";
+import Order from "@/core/orders/models/Orders";
+import Customer from "@/core/customers/models/Customers";
+import Category from "@/core/products/models/Category";
+import { resolveDateRange } from "@/core/shared/dashboardRange";
 
 export async function GET(req) {
   try {

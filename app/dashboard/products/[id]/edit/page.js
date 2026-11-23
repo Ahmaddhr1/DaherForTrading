@@ -1,14 +1,14 @@
 "use client";
-import { t, dateLocale } from "@/lib/i18n";
-import { useT } from "@/lib/i18n/LangProvider";
+import { t, dateLocale } from "@/core/shared/i18n";
+import { useT } from "@/core/shared/i18n/LangProvider";
 import ProductBatches from "@/components/ProductBatches";
-import { useSettings } from "@/lib/currency";
+import { useSettings } from "@/core/shared/currency";
 
 import { useParams, useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
-import { toast } from "@/lib/i18n/toast";
+import { toast } from "@/core/shared/i18n/toast";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -21,7 +21,7 @@ import { Loader2, Package, DollarSign, Tag, Box, TrendingUp, PackageCheck, Ruler
 import Link from "next/link";
 import ProductHistory from "../ProductHistory";
 import StockAdjustments from "../StockAdjustments";
-import { useHasPermission } from "@/lib/useHasPermission";
+import { useHasPermission } from "@/core/platform/useHasPermission";
 
 const fetchProduct = async (id) => {
   const res = await axios.get(`/api/products/${id}`);

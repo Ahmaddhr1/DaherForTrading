@@ -1,6 +1,6 @@
 "use client";
-import { t } from "@/lib/i18n";
-import { useT } from "@/lib/i18n/LangProvider";
+import { t } from "@/core/shared/i18n";
+import { useT } from "@/core/shared/i18n/LangProvider";
 
 import { Card, CardContent } from "@/components/ui/card";
 import { Receipt, TrendingUp, Wallet } from "lucide-react";

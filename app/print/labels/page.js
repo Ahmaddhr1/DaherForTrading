@@ -9,7 +9,7 @@ import { ArrowLeft, Printer, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useT } from "@/lib/i18n/LangProvider";
+import { useT } from "@/core/shared/i18n/LangProvider";
 
 // Printable barcode labels: /print/labels?ids=a,b,c - one label per product
 // (or more with "Copies"), laid out on A4 sheets. Products without a

@@ -1,7 +1,7 @@
 "use client";
 
 import { Languages } from "lucide-react";
-import { useLang } from "@/lib/i18n/LangProvider";
+import { useLang } from "@/core/shared/i18n/LangProvider";
 
 // Switches the whole app between English and Arabic (RTL). Shows the OTHER
 // language, written in its own script, so it's recognisable either way.

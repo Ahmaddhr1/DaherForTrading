@@ -1,6 +1,6 @@
 "use client";
-import { t } from "@/lib/i18n";
-import { useT } from "@/lib/i18n/LangProvider";
+import { t } from "@/core/shared/i18n";
+import { useT } from "@/core/shared/i18n/LangProvider";
 import BarcodeScanInput from "@/components/BarcodeScanInput";
 
 import React, { useEffect, useState } from "react";
@@ -12,15 +12,15 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { PageHeaderSkeleton, ListSkeleton } from "@/components/ui/skeleton-patterns";
-import { toast } from "@/lib/i18n/toast";
+import { toast } from "@/core/shared/i18n/toast";
 import { Loader2, Plus, Trash2, PencilLine, CheckCircle, Layers, Gift, PackagePlus, StickyNote } from "lucide-react";
 import Link from "next/link";
-import { useSettings, formatLL } from "@/lib/currency";
+import { useSettings, formatLL } from "@/core/shared/currency";
 import { Combobox } from "@/components/ui/combobox";
-import { getTierPrice, getTierLabel } from "@/lib/priceTiers";
+import { getTierPrice, getTierLabel } from "@/core/products/priceTiers";
 import OrderCustomerName from "../../components/OrderCustomerName";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
-import { useHasPermission } from "@/lib/useHasPermission";
+import { useHasPermission } from "@/core/platform/useHasPermission";
 
 let rowIdCounter = 1;
 

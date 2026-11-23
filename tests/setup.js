@@ -23,7 +23,7 @@ vi.mock("next/headers", () => ({
 }));
 
 beforeAll(async () => {
-  const { connectToDB } = await import("@/lib/connectDb");
+  const { connectToDB } = await import("@/core/platform/connectDb");
   await connectToDB();
   await mongoose.connection.db.dropDatabase();
 });

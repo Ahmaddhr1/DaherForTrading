@@ -8,10 +8,10 @@ import { Building2, Phone, MapPin, Pencil, Plus, History, FileText, PhoneCall, D
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { PageHeaderSkeleton, FormSkeleton } from "@/components/ui/skeleton-patterns";
-import { useT } from "@/lib/i18n/LangProvider";
-import { format } from "@/lib/i18n/date";
-import { useHasPermission } from "@/lib/useHasPermission";
-import { whatsappUrl } from "@/lib/whatsapp";
+import { useT } from "@/core/shared/i18n/LangProvider";
+import { format } from "@/core/shared/i18n/date";
+import { useHasPermission } from "@/core/platform/useHasPermission";
+import { whatsappUrl } from "@/core/shared/whatsapp";
 
 // Read-only company (supplier) profile. Editing lives at
 // /dashboard/companies/[id]/edit (needs canEditCompanies - see

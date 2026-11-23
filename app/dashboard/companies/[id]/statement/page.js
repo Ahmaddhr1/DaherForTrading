@@ -4,7 +4,7 @@ import { whatsappNumber } from "@/lib/whatsapp";
 
 import { Suspense, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { useParams, useSearchParams } from "next/navigation";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { format } from "@/lib/i18n/date";
 import { Printer, MessageCircle, Receipt, Loader2, ClipboardList, Package } from "lucide-react";
 import { toast } from "@/lib/i18n/toast";
@@ -16,7 +16,7 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { PageHeaderSkeleton, TableSkeleton } from "@/components/ui/skeleton-patterns";
 import CompanyStatementDoc from "@/components/statements/CompanyStatementDoc";
-import { statementApiQuery, statementPeriodLabel } from "@/lib/statementPeriod";
+import { statementApiQuery, statementPeriodLabel, statementPrintQuery } from "@/lib/statementPeriod";
 import { buildCompanyStatementReceipt } from "@/lib/statementReceiptData";
 
 const fetchStatement = async (id, startDate, endDate) => {
@@ -27,6 +27,7 @@ const fetchStatement = async (id, startDate, endDate) => {
 
 function CompanyStatementPageInner() {
   const t = useT();
+  const router = useRouter();
   const { id } = useParams();
   const search = useSearchParams();
   const [startDate, setStartDate] = useState(search.get("from") || "");
@@ -66,6 +67,10 @@ function CompanyStatementPageInner() {
   // Black-and-white PDF statement: shown in a window with Print (choose a
   // printer), Share and Download.
   const [pdf, setPdf] = useState(null);
+  // Print Statement: the print page (statement + Print button, choose the
+  // printer), like the order receipt.
+  const handlePrintStatement = () =>
+    router.push(`/print/company-statement/${id}${statementPrintQuery(startDate, endDate)}` + (view === "products" ? `${statementPrintQuery(startDate, endDate) ? "&" : "?"}view=products` : ""));
   const handleShareThermalPdf = () => {
     try {
       setPdf({
@@ -134,13 +139,17 @@ function CompanyStatementPageInner() {
         ))}
       </div>
       <div className="flex flex-wrap gap-2 mt-3">
-        <Button onClick={handleShareThermalPdf} className="flex items-center gap-2" aria-label={t("Print Statement")}>
+        <Button onClick={handlePrintStatement} className="flex items-center gap-2" aria-label={t("Print Statement")}>
           <Printer className="h-4 w-4" />
           {t("Print Statement")}
         </Button>
         <Button onClick={handleShareWhatsApp} className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white" aria-label={t("Share via WhatsApp")}>
           <MessageCircle className="h-4 w-4" />
           {t("Share via WhatsApp")}
+        </Button>
+        <Button variant="outline" onClick={handleShareThermalPdf} className="flex items-center gap-2" aria-label={t("PDF")}>
+          <Receipt className="h-4 w-4" />
+          {t("PDF")}
         </Button>
       </div>
     </>
@@ -151,7 +160,7 @@ function CompanyStatementPageInner() {
       <div className="container mx-auto px-4">
         <CompanyStatementDoc statement={statement} periodLabel={periodLabel} view={view} toolbar={toolbar} />
       </div>
-      <PdfPreviewDialog open={!!pdf} onClose={() => setPdf(null)} blob={pdf?.blob} filename={pdf?.filename} title={t("Print Statement")} />
+      <PdfPreviewDialog open={!!pdf} onClose={() => setPdf(null)} blob={pdf?.blob} filename={pdf?.filename} title={t("PDF Statement")} />
     </div>
   );
 }

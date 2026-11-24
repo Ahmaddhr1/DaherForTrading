@@ -4,6 +4,13 @@ import path from "path";
 
 let transporter = null;
 
+// Who the app's emails come from: SMTP_FROM if set (e.g. "Invento <support@getinvento.app>"),
+// otherwise the SMTP login shown with the Invento name.
+function senderAddress() {
+  if (process.env.SMTP_FROM) return process.env.SMTP_FROM;
+  return `"Invento" <${process.env.SMTP_USER}>`;
+}
+
 // Lazily built so a missing SMTP config only breaks the backup email path
 // (with a clear error) instead of crashing the whole app at import time.
 function getTransporter() {
@@ -19,8 +26,8 @@ function getTransporter() {
   transporter = nodemailer.createTransport({
     host: SMTP_HOST,
     port: SMTP_PORT ? parseInt(SMTP_PORT, 10) : 587,
-    // true for port 465 (implicit TLS), false for 587/25 (STARTTLS) - most
-    // providers (Gmail, SendGrid, Mailgun, etc.) use 587.
+    // true for port 465 (implicit TLS), false for 587/25 (STARTTLS).
+    // Zoho (support@getinvento.app): smtp.zoho.com, port 465, SMTP_SECURE=true.
     secure: SMTP_SECURE === "true",
     auth: { user: SMTP_USER, pass: SMTP_PASS },
   });
@@ -34,7 +41,7 @@ function getTransporter() {
 // "send whatever backup was generated" function.
 export async function sendBackupEmail({ to, filename, jsonContent, generatedAt }) {
   const transport = getTransporter();
-  const from = process.env.SMTP_FROM || process.env.SMTP_USER;
+  const from = senderAddress();
 
   await transport.sendMail({
     from,
@@ -57,7 +64,7 @@ export async function sendBackupEmail({ to, filename, jsonContent, generatedAt }
 // on any external image host.
 export async function sendOtpEmail({ to, adminname, code }) {
   const transport = getTransporter();
-  const from = process.env.SMTP_FROM || process.env.SMTP_USER;
+  const from = senderAddress();
   const logoPath = path.join(process.cwd(), "public", "icons", "icon-512.png");
   const logoBuffer = fs.existsSync(logoPath) ? fs.readFileSync(logoPath) : null;
 

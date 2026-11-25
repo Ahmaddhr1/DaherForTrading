@@ -49,6 +49,19 @@ Delivery, barcodes, direct printing, recurring expenses stay in every edition.
 - Grand, elite animations: page transitions, scroll reveals, image zoom/parallax, smooth variant
   switching. Furniture gets the most premium treatment (large imagery, room scenes, swatch
   morphs, dimension overlays). Respects reduced-motion; stays fast on phones.
+- **Settings → Website**: a full control panel for the shop's site (no code, no developer):
+  - Homepage: pick the hero/main photo or video, background image/color, headline + button text
+    and link; add, remove, reorder and show/hide sections.
+  - Featured: choose featured products and collections, set a product as the "main" product.
+  - Sales: put a product, variant, collection or category on sale (% or fixed price), with start
+    and end dates and a "Sale" badge; countdown optional. Store sale prices never change the
+    in-shop prices unless the owner chooses to.
+  - Products on the site: show/hide any product, choose which photo is the cover, hide out-of-stock
+    or show "made to order".
+  - Branding: logo, colors, fonts (from a curated set), theme per edition, animation intensity.
+  - Pages: about, contact, delivery & returns, size guide... with an editor.
+  - Announcement bar, contact details, WhatsApp order button, SEO title/description, share image.
+  - Live preview (desktop / phone) before publishing; publish / unpublish the site.
 - Footer driven by Invento Settings: the owner adds/removes links (social, WhatsApp, phone,
   email, address, map, custom pages); the footer layout adapts to how many links exist
   (1 column → multi-column, centered when few) and is fully responsive.

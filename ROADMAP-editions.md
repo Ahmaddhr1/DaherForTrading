@@ -56,6 +56,9 @@ Delivery, barcodes, direct printing, recurring expenses stay in every edition.
   - Sales: put a product, variant, collection or category on sale (% or fixed price), with start
     and end dates and a "Sale" badge; countdown optional. Store sale prices never change the
     in-shop prices unless the owner chooses to.
+  - "New" badge: shown automatically on products added in the last N days (owner sets N,
+    e.g. 14), or set/removed by hand per product; optional "New arrivals" section on the homepage.
+    Badges (New, Sale, Low stock, Made to order) can each be turned on/off and recolored.
   - Products on the site: show/hide any product, choose which photo is the cover, hide out-of-stock
     or show "made to order".
   - Branding: logo, colors, fonts (from a curated set), theme per edition, animation intensity.

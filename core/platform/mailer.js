@@ -7,8 +7,9 @@ let transporter = null;
 // Who the app's emails come from: SMTP_FROM if set (e.g. "Invento <support@getinvento.app>"),
 // otherwise the SMTP login shown with the Invento name.
 function senderAddress() {
-  if (process.env.SMTP_FROM) return process.env.SMTP_FROM;
-  return `"Invento" <${process.env.SMTP_USER}>`;
+  const from = (process.env.SMTP_FROM || "").trim();
+  if (from) return from;
+  return `"Invento" <${(process.env.SMTP_USER || "").trim()}>`;
 }
 
 // Lazily built so a missing SMTP config only breaks the backup email path
@@ -16,19 +17,25 @@ function senderAddress() {
 function getTransporter() {
   if (transporter) return transporter;
 
-  const { SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS, SMTP_SECURE } = process.env;
+  // Trimmed: a value pasted into Vercel with a trailing space or newline
+  // otherwise fails the login with a confusing "authentication failed".
+  const env = (k) => (process.env[k] || "").trim();
+  const SMTP_HOST = env("SMTP_HOST"), SMTP_PORT = env("SMTP_PORT"), SMTP_USER = env("SMTP_USER");
+  const SMTP_PASS = env("SMTP_PASS"), SMTP_SECURE = env("SMTP_SECURE").toLowerCase();
   if (!SMTP_HOST || !SMTP_USER || !SMTP_PASS) {
     throw new Error(
       "Email is not configured - set SMTP_HOST, SMTP_PORT, SMTP_USER, and SMTP_PASS in your environment."
     );
   }
 
+  const port = SMTP_PORT ? parseInt(SMTP_PORT, 10) : 587;
   transporter = nodemailer.createTransport({
     host: SMTP_HOST,
-    port: SMTP_PORT ? parseInt(SMTP_PORT, 10) : 587,
+    port,
     // true for port 465 (implicit TLS), false for 587/25 (STARTTLS).
     // Zoho (support@getinvento.app): smtp.zoho.com, port 465, SMTP_SECURE=true.
-    secure: SMTP_SECURE === "true",
+    // Port 465 always needs it, so it's on there even if SMTP_SECURE is missing.
+    secure: SMTP_SECURE === "true" || port === 465,
     auth: { user: SMTP_USER, pass: SMTP_PASS },
   });
 

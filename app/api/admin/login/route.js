@@ -67,6 +67,8 @@ export async function POST(req) {
   try {
     await sendOtpEmail({ to: admin.email, adminname: admin.adminname, code });
   } catch (err) {
+    // Shows in Vercel -> Logs (no password in it): e.g. "EAUTH 535 Authentication Failed".
+    console.error("OTP email failed:", err?.code || "", err?.responseCode || "", err?.message);
     return NextResponse.json(
       { error: "Couldn't send the login code email. Contact an owner to check the email settings." },
       { status: 500 }

@@ -42,6 +42,7 @@ export async function POST(req) {
   try {
     await sendOtpEmail({ to: admin.email, adminname: admin.adminname, code });
   } catch (err) {
+    console.error("OTP email failed:", err?.code || "", err?.responseCode || "", err?.message);
     return NextResponse.json({ error: "Couldn't send the login code email" }, { status: 500 });
   }
 

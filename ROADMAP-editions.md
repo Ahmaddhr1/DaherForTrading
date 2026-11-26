@@ -41,6 +41,14 @@ warranty, delivery scheduling (existing delivery feature), assembly/care PDFs.
 
 Delivery, barcodes, direct printing, recurring expenses stay in every edition.
 
+## Printing (before / with the editions)
+- Thermal label printing: labels page gets a size choice — A4 sheet (today) or thermal roll
+  40×30, 50×30, 50×25, 58×40 mm or custom; one label per page so the printer cuts right.
+- Direct print to label printers (USB / Bluetooth / COM) with TSPL/ZPL commands.
+- Variant labels ("Basic T-shirt · M / Black") and sale price with the old price crossed out.
+- Invento print helper: small app installed once on the shop PC that prints silently to any
+  printer (receipts + labels) and avoids the Windows USB driver problem (no Zadig needed).
+
 ## Invento Store (after the editions)
 - Public website per shop, fed by the catalog/variants data; customers pick size/color/finish and
   order; the order arrives in Invento as a draft.

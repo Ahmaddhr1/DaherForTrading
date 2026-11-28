@@ -9,7 +9,8 @@ import { Home, ClipboardList, ShoppingCart, Wallet, Boxes, MoreHorizontal, LogOu
 import { toast } from "@/core/shared/i18n/toast";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
-import tabs from "@/core/shared/SideBarTabs";
+import coreTabs from "@/core/shared/SideBarTabs";
+import { useModuleTabs, useModuleNavLabels } from "@/modules/ui/navTabs";
 import { useCart } from "@/core/orders/cartContext";
 import { GlobalSearchModal } from "@/components/GlobalSearchModal";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
@@ -18,7 +19,7 @@ import { hasPermission } from "@/core/platform/permissions";
 // Searches both top-level tabs and any nested `children` (see
 // SideBarTabs.js) - mobile doesn't nest them visually, it just needs to
 // find them by label for its own flat section groupings below.
-const findTab = (label) => {
+const findTabIn = (tabs, label) => {
   for (const tab of tabs) {
     if (tab.label === label) return tab;
     const child = tab.children?.find((c) => c.label === label);
@@ -31,6 +32,9 @@ const findTab = (label) => {
 // sidebar it replaces below that breakpoint.
 export function MobileBottomBar() {
   const t = useT();
+  const tabs = useModuleTabs(coreTabs);
+  const findTab = (label) => findTabIn(tabs, label);
+  const moduleStockPages = useModuleNavLabels("Products");
   const pathname = usePathname();
   const router = useRouter();
   const [openSection, setOpenSection] = useState(null);
@@ -131,7 +135,7 @@ export function MobileBottomBar() {
       key: "inventory",
       label: "Stock",
       icon: <Boxes size={20} />,
-      items: ["Products", "Categories", "Companies", "Stock History"].map(findTab).filter(Boolean),
+      items: ["Products", ...moduleStockPages, "Categories", "Companies", "Stock History"].map(findTab).filter(Boolean),
     },
     {
       key: "more",

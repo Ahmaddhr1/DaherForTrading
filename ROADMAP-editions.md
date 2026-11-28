@@ -1,6 +1,6 @@
 # Editions & add-ons: plan (not built yet)
 
-Status: notes only. Build starts when the owner says "go".
+Status: module system, catalog, variants, clothing, electronics (+ serials), furniture and thermal label sizes are built (see CHANGELOG 2026-11-28). Next: direct TSPL/ZPL label printing, the print helper, then the store.
 Build order: module system → catalog + variants → clothing → electronics → furniture → store.
 
 ## How editions switch on

@@ -17,6 +17,8 @@ import Link from "next/link";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useSettings, formatLL } from "@/core/shared/currency";
 import { Combobox } from "@/components/ui/combobox";
+import { useModule, useModules } from "@/modules/ModulesProvider";
+import { VariantChooser } from "@/modules/variants/ui/VariantChooser";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 
 let nextRowId = 1;
@@ -46,6 +48,8 @@ const NewPurchasePage = () => {
     enabled: !!companyId,
   });
 
+  const hasVariants = useModule("variants");
+  const hasExpiry = useModules().has("expiry");
   const { data: products = [], isLoading: productsLoading } = useQuery({
     queryKey: ["products-all"],
     queryFn: async () => {
@@ -226,6 +230,9 @@ const NewPurchasePage = () => {
                           </span>
                         )}
                       />
+                      {hasVariants && row.productId && (
+                        <VariantChooser product={products.find((p) => p._id === row.productId)} products={products} onPick={(id) => updateRow(row.id, "productId", id)} />
+                      )}
 
                       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <div className="space-y-2">
@@ -267,6 +274,7 @@ const NewPurchasePage = () => {
                           />
                         </div>
 
+                        {hasExpiry && (
                         <div className="space-y-2">
                           <Label className="text-sm font-medium">{t("Expiry Date")}</Label>
                           <Input
@@ -276,6 +284,7 @@ const NewPurchasePage = () => {
                           />
                           <p className="text-xs text-gray-500 dark:text-gray-400">{t("Optional - this delivery's expiry")}</p>
                         </div>
+                        )}
                       </div>
                     </div>
                   );

@@ -34,12 +34,15 @@ import { LanguageSwitch } from "@/components/LanguageSwitch";
 import { Languages } from "lucide-react";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { useHasPermission } from "@/core/platform/useHasPermission";
+import { useModules } from "@/modules/ModulesProvider";
+import { EditionCard } from "@/modules/ui/EditionCard";
 
 const restoreWarning = () =>
   t("This will permanently replace all current customers, orders, products, categories, companies, purchases, payments, and disbursements with the contents of this file. This cannot be undone. Continue?");
 
 export default function SettingsPage() {
   const t = useT();
+  const mods = useModules();
   const queryClient = useQueryClient();
 
   // Backup/restore is owner-only server-side (middleware.js) - this just
@@ -270,6 +273,8 @@ export default function SettingsPage() {
           </div>
         </div>
 
+        <EditionCard />
+
         {/* Language */}
         <Card className="shadow-sm border-gray-200 dark:border-gray-800 mb-6">
           <CardHeader>
@@ -381,6 +386,8 @@ export default function SettingsPage() {
                   </p>
                 </div>
 
+                {mods.has("expiry") && (
+                  <>
                 <Separator />
 
                 <div className="space-y-2">
@@ -403,6 +410,9 @@ export default function SettingsPage() {
                     {t("Used for products that don't have their own alert days. Products inside their alert window (and expired ones) are listed on the dashboard.")}
                   </p>
                 </div>
+
+                  </>
+                )}
 
                 <Button
                   data-keep-label

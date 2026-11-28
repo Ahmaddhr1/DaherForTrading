@@ -7,6 +7,7 @@ import { getUserFromCookie } from "@/core/platform/auth";
 import { logActivity } from "@/core/audit/activityLog";
 import { auditView, diffViews, snapshotChanges, describeChanges } from "@/core/audit/audit";
 import { requirePermission } from "@/core/platform/permissions";
+import { sanitizeProductExtra } from "@/modules/server";
 
 // GET a product by ID
 export async function GET(_, { params }) {
@@ -107,7 +108,12 @@ export async function PUT(req, { params }) {
       body.discount = 0;
     }
     if (body.img !== undefined) {
-      body.img = Array.isArray(body.img) ? body.img.filter((url) => typeof url === "string" && url) : [];
+      body.img = Array.isArray(body.img) ? body.img.filter((url) => typeof url === "string" && url).slice(0, 8) : [];
+    }
+    // Add-on module data: validated per enabled module; the variant link and
+    // data of switched-off modules are kept as they were.
+    if (body.extra !== undefined) {
+      body.extra = sanitizeProductExtra(body.extra, beforeUpdate.extra);
     }
 
     // Wholesale/Distributor/VIP tier prices - a blank string means "use the

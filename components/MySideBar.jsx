@@ -8,7 +8,8 @@ import Link from "next/link";
 import { LogOut, ListCollapse, Search, ChevronDown } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
-import tabs from "@/core/shared/SideBarTabs";
+import coreTabs from "@/core/shared/SideBarTabs";
+import { useModuleTabs } from "@/modules/ui/navTabs";
 import { toast } from "@/core/shared/i18n/toast";
 import { GlobalSearchModal } from "@/components/GlobalSearchModal";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
@@ -18,6 +19,7 @@ import { hasPermission } from "@/core/platform/permissions";
 // MobileBottomBar instead - see components/MobileBottomBar.jsx.
 export function MySideBar() {
   const t = useT();
+  const tabs = useModuleTabs(coreTabs);
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [expandedTabs, setExpandedTabs] = useState({});

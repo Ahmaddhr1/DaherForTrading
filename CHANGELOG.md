@@ -1,5 +1,21 @@
 # Changelog
 
+## 2026-11-28
+
+### Editions & add-ons
+- **Module system**: one codebase, an edition per deployment via `INVENTO_EDITION` (`base`, `clothing`, `electronics`, `furniture`) and optional `INVENTO_MODULES` (`+serials,-expiry`). Settings shows the edition and its add-ons. Rules in `ARCHITECTURE.md`.
+- **Rich catalog**: up to 8 photos per product (reorder, first is the cover), brand, short and full description, tags.
+- **Styles (variants)**: one style generates every size/color/finish combination as its own product with its own stock, barcode and price; stock grid (sizes x colors); add a size or color later; edit shared details once for all variants; photos per color.
+- **Product options**: sizes, colors with swatches, fabrics, finishes, storage, brands, departments, spec templates... managed in Settings -> Product options and addable inline from the product/style form. Used values can only be hidden.
+- **Orders**: on a variant line, tap the size/color buttons (out-of-stock ones are struck through) - also on order edit and supplier purchases.
+- **Clothing**: size sets (letters, shoes, kids), department, season, fit, material, care instructions, size guide table.
+- **Electronics**: model number, condition grades, warranty months, spec sheets with templates (phone, laptop, TV, accessory); **serial / IMEI tracking** per unit (record on the product, assign on the order, never more than the line quantity), warranty lookup by serial, returned/defective units.
+- **Furniture**: dimensions (W x D x H, cm/in), weight, materials, room, style, assembly, boxes per item, made-to-order and lead time, warranty, care; fabric and finish swatches.
+- **Expiry is now an add-on**: on in base Invento, off in the clothing, electronics and furniture editions.
+
+### Printing
+- Barcode labels for **thermal label printers**: 40x30, 50x30, 50x25, 58x40 mm or a custom size, one label per page (A4 sheets still available). The choice is remembered.
+
 ## 2026-11-23
 
 ### Structure & quality

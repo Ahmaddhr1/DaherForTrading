@@ -17,6 +17,9 @@ import { useHasPermission } from "@/core/platform/useHasPermission";
 import { useSettings } from "@/core/shared/currency";
 import { PRICE_TIERS } from "@/core/products/priceTiers";
 import ProductBatches from "@/components/ProductBatches";
+import { useModules } from "@/modules/ModulesProvider";
+import { ProductModuleDetails } from "@/modules/ui/ProductModuleDetails";
+import { SerialsPanel } from "@/modules/serials/ui/SerialsPanel";
 import StockAdjustments from "./StockAdjustments";
 import ProductHistory from "./ProductHistory";
 
@@ -30,6 +33,7 @@ export default function ProductViewPage() {
   const { hasPermission: canSeeProfit } = useHasPermission("canViewStats");
   const { hasPermission: canRecordPurchases } = useHasPermission("canRecordPurchases");
   const { data: settings } = useSettings();
+  const mods = useModules();
 
   const { data: product, isLoading, isError } = useQuery({
     queryKey: ["product", id],
@@ -136,16 +140,22 @@ export default function ProductViewPage() {
                   {supplierName ? <Link href={`/dashboard/companies/${supplierId}`} className="text-blue-600 hover:underline">{supplierName}</Link> : "—"}
                 </Field>
                 <Field icon={Percent} label={t("Default Discount (%)")}>{Number(product.discount || 0)}%</Field>
-                <Field icon={CalendarClock} label={t("Expiry Date")}>
-                  {product.expiryDate ? format(new Date(product.expiryDate), "MMM d, yyyy") : "—"}
-                </Field>
-                <Field icon={BellRing} label={t("Alert days before expiry")}>
-                  {alertDays} {product.expiryAlertDays ? "" : <span className="text-xs text-gray-500">({t("default")})</span>}
-                </Field>
+                {mods.has("expiry") && (
+                  <>
+                    <Field icon={CalendarClock} label={t("Expiry Date")}>
+                      {product.expiryDate ? format(new Date(product.expiryDate), "MMM d, yyyy") : "—"}
+                    </Field>
+                    <Field icon={BellRing} label={t("Alert days before expiry")}>
+                      {alertDays} {product.expiryAlertDays ? "" : <span className="text-xs text-gray-500">({t("default")})</span>}
+                    </Field>
+                  </>
+                )}
               </CardContent>
             </Card>
 
-            <ProductBatches productId={id} />
+            <ProductModuleDetails product={product} />
+            {mods.has("serials") && <SerialsPanel product={product} />}
+            {mods.has("expiry") && <ProductBatches productId={id} />}
             <StockAdjustments productId={id} currentQuantity={product.quantity} unit={product.unit} />
             {canSeeProfit && <ProductHistory productId={id} />}
           </div>

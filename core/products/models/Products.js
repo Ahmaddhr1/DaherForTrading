@@ -44,9 +44,15 @@ const productSchema = new mongoose.Schema(
     // when it's added to an order - see addorder/page.js, which pre-fills
     // the line's $ discount from this instead of starting at 0.
     discount: { type: Number, default: 0, min: 0, max: 100 },
+    // Data owned by add-on modules (modules/), one key per module id, e.g.
+    // extra.catalog = { brand, summary, ... }, extra.variant = { group, options }.
+    // Core never reads inside it; modules/server.js validates what goes in.
+    extra: { type: mongoose.Schema.Types.Mixed, default: undefined },
   },
   { timestamps: true }
 );
+
+productSchema.index({ "extra.variant.group": 1 }, { sparse: true });
 
 const Product =
   mongoose.models.Product || mongoose.model("Product", productSchema);

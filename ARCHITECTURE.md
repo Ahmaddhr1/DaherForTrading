@@ -23,7 +23,16 @@ core/                    the base product - never knows add-ons exist
   expenses/              recurring expenses (+ scheduler)        models/Disbursement, RecurringDisbursement
   reports/               dailyClosing, profit margins, supplier price trends, employee performance
   settings/              models/AppSettings
-modules/                 add-ons (coming next): variants, serials-warranty, installments, ...
+modules/                 add-ons, switched on per deployment (see "Editions and add-on modules")
+  registry.js            every module + every edition; resolveModules(edition, overrides)
+  config.js / server.js  what this deployment runs (env vars), product-data validation, requireModule() 404 guard
+  ModulesProvider.jsx    useModules() / useModule(id) in client components
+  fields.js              field types modules can add to products
+  ui/                    shared add-on UI: product fields, photo gallery, option lists, Settings pages
+  lists/                 option lists (sizes, colors, brands...)      models/OptionList
+  variants/              styles: every size x color as its own product   models/ProductGroup
+  serials/               serial / IMEI per unit + warranty             models/SerialUnit
+  catalog/ apparel/ electronics/ furniture/ expiry/   manifests (fields, lists, nav)
 app/                     Next.js routes and pages only - thin
   api/...                check login + permission, read the request, call a core service, return the response
   dashboard/...          pages
@@ -44,9 +53,10 @@ tests/                   integration tests against a real throwaway MongoDB (see
 2. **One place per rule.** Order money math is only in `orders/orderPricing`;
    every payment goes through `payments/recordPayment`; debts are only changed by
    services.
-3. **`core/` never imports `modules/` or `app/`.** Modules plug into core
-   through fixed extension points (next step), so a disabled or broken module
-   can't break the base product.
+3. **`core/` never imports `modules/` or `app/`.** Modules build on core;
+   core only offers one generic slot (`Product.extra`, validated by
+   `modules/config.js`), so a disabled or broken module can't break the base
+   product. Modules never import `app/` either.
 4. **Imports use the domain path** (`@/core/orders/orderService`). The old
    `@/lib/*` and `@/models/*` paths are gone.
 5. **Every change comes with tests.** Core money/stock flows are covered in
@@ -63,6 +73,41 @@ a production build on every pull request; don't merge a red PR.
 | a rule about orders, stock, debts, payments | the matching `core/<domain>/` service (+ a test) |
 | a new database model for the base product | `core/<domain>/models/` |
 | a helper used by several domains | `core/shared/` |
-| something only one edition needs (sizes/colors, IMEI, installments...) | a module in `modules/<name>/` (next step) |
+| something only one edition needs (sizes/colors, IMEI, installments...) | a module in `modules/<name>/` (manifest + optional service/models/ui), registered in `modules/registry.js` |
 | an API endpoint | `app/api/...` - thin, calling a service |
 | a page | `app/dashboard/...`, using `components/` |
+
+## Editions and add-on modules
+
+One codebase, one Vercel project (and database) per customer. Each project
+picks its edition with environment variables:
+
+| Variable | Values | Effect |
+|---|---|---|
+| `INVENTO_EDITION` | `base` (default), `clothing`, `electronics`, `furniture` | turns on that edition's modules |
+| `INVENTO_MODULES` | e.g. `+serials,-expiry` | adds/removes single modules on top |
+
+| Edition | Modules |
+|---|---|
+| base | expiry |
+| clothing | catalog, variants, apparel |
+| electronics | catalog, variants, electronics, serials |
+| furniture | catalog, variants, furniture |
+
+Change a variable in Vercel -> Redeploy. A switched-off module disappears from
+menus, forms and pages, and its API answers 404; its data stays in the
+database, so switching it back on brings everything back.
+
+A module is a folder in `modules/<id>/` with a `manifest.js`:
+
+- `fields` - extra product fields (stored in `Product.extra.<id>`, validated by `cleanFieldValue`)
+- `lists` - option lists it needs, seeded once with defaults (`kind: "variant" | "field" | "template"`)
+- `nav` - pages it adds under a core tab (e.g. Products)
+- `requires` - other modules it needs
+
+Option lists are managed in two places that write to the same list:
+Settings -> Product options, and "+ Add new" right inside the product/style
+form. Values used by products can be hidden but not deleted.
+
+Variants are ordinary products (`extra.variant = { group, options }`), so
+orders, returns, purchases, barcodes, labels and reports need no changes.

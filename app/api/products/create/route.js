@@ -6,6 +6,7 @@ import { getUserFromCookie } from "@/core/platform/auth";
 import { logActivity } from "@/core/audit/activityLog";
 import { auditView, snapshotChanges } from "@/core/audit/audit";
 import { requirePermission } from "@/core/platform/permissions";
+import { sanitizeProductExtra } from "@/modules/server";
 
 export async function POST(req) {
   await connectToDB();
@@ -31,6 +32,7 @@ export async function POST(req) {
       priceVip,
       img,
       discount,
+      extra,
     } = await req.json();
 
     if (!name?.trim() || price == null) {
@@ -151,8 +153,9 @@ export async function POST(req) {
           ? null
           : Math.min(3650, Math.max(1, parseInt(expiryAlertDays, 10))),
       defaultSupplier: parsedDefaultSupplier,
-      img: Array.isArray(img) ? img.filter((url) => typeof url === "string" && url) : [],
+      img: Array.isArray(img) ? img.filter((url) => typeof url === "string" && url).slice(0, 8) : [],
       discount: parsedDiscount,
+      extra: sanitizeProductExtra(extra),
     });
 
     await product.save();

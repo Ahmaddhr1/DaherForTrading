@@ -18,6 +18,8 @@ import { Loader2, Plus, Trash2, ShoppingCart, Save, Layers, Gift, PackagePlus, S
 import Link from "next/link";
 import { useSettings, formatLL } from "@/core/shared/currency";
 import { Combobox } from "@/components/ui/combobox";
+import { useModule } from "@/modules/ModulesProvider";
+import { VariantChooser } from "@/modules/variants/ui/VariantChooser";
 import { getTierPrice, getTierLabel } from "@/core/products/priceTiers";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { useHasPermission } from "@/core/platform/useHasPermission";
@@ -47,6 +49,7 @@ const makeCustomRow = (forceFree) => ({
 });
 
 const MakeOrderPage = () => {
+  const hasVariants = useModule("variants");
   const t = useT();
   const { id: customerId } = useParams();
   const router = useRouter();
@@ -426,6 +429,13 @@ const MakeOrderPage = () => {
                             </span>
                           </span>
                         )}
+                      />
+                    )}
+                    {hasVariants && !row.isCustom && row.productId && (
+                      <VariantChooser
+                        product={products.find((p) => p._id === row.productId)}
+                        products={products}
+                        onPick={(id) => handleRowChange(row.id, "productId", id)}
                       />
                     )}
 

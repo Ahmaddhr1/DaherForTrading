@@ -15,6 +15,10 @@ import { Loader2, PackagePlus, DollarSign, Tag, Package, TrendingUp, Box, Ruler,
 import React, { useState } from "react";
 import { toast } from "@/core/shared/i18n/toast";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { useModules } from "@/modules/ModulesProvider";
+import { ProductModuleFields } from "@/modules/ui/ProductModuleFields";
+import { PhotoGallery } from "@/modules/ui/PhotoGallery";
 
 const fetchCategories = async () => {
   const { data } = await axios.get("/api/categories", { params: { all: true } });
@@ -35,6 +39,11 @@ const Page = () => {
   const { data: appSettings } = useSettings();
   const defaultAlertDays = appSettings?.expiryAlertDays || 30;
   const router = useRouter();
+  const mods = useModules();
+  // Add-on data (brand, sizes guide, specs, dimensions...) and the photo
+  // gallery, when this edition has them.
+  const [extra, setExtra] = useState({});
+  const [photos, setPhotos] = useState([]);
 
   const { data: categories, isLoading: categoriesLoading, isError: categoriesError } = useQuery({
     queryKey: ["categories"],
@@ -86,8 +95,8 @@ const Page = () => {
       const initialPrice = parseFloat(form.initialPrice);
       const profit = price - initialPrice;
 
-      let img = [];
-      if (imageFile) {
+      let img = mods.has("catalog") ? photos : [];
+      if (!mods.has("catalog") && imageFile) {
         const uploadData = new FormData();
         uploadData.append("file", imageFile);
         const { data: uploadResult } = await axios.post("/api/products/upload-image", uploadData);
@@ -112,6 +121,7 @@ const Page = () => {
         defaultSupplier: form.defaultSupplier || null,
         discount: form.discount === "" ? 0 : parseFloat(form.discount),
         img,
+        extra,
       };
 
       const { data } = await axios.post("/api/products/create", payload);
@@ -204,6 +214,12 @@ const Page = () => {
               </CardHeader>
               <CardContent>
                 <form onSubmit={handleSubmit} className="space-y-6">
+                  {mods.has("variants") && (
+                    <div className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-blue-200 bg-blue-50 px-3 py-2 text-sm text-blue-900 dark:border-blue-900 dark:bg-blue-950/40 dark:text-blue-200">
+                      <span>{t("Comes in several sizes or colors? Create a style and every combination is made for you.")}</span>
+                      <Link href="/dashboard/styles/new" className="font-medium underline">{t("New style")}</Link>
+                    </div>
+                  )}
                   {/* Basic Information Section */}
                   <div className="space-y-4">
                     <div className="flex items-center gap-2 text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">
@@ -270,6 +286,15 @@ const Page = () => {
                         <p className="text-xs text-gray-500 dark:text-gray-400">{t("Leave blank to start at 0 and add stock later via a purchase")}</p>
                       </div>
 
+                      {mods.has("catalog") ? (
+                        <div className="space-y-2 sm:col-span-2">
+                          <Label className="text-sm font-medium flex items-center gap-2">
+                            <ImagePlus className="h-4 w-4" />
+                            {t("Photos (the first one is the cover)")}
+                          </Label>
+                          <PhotoGallery value={photos} onChange={setPhotos} max={8} />
+                        </div>
+                      ) : (
                       <div className="space-y-2">
                         <Label htmlFor="productImage" className="text-sm font-medium flex items-center gap-2">
                           <ImagePlus className="h-4 w-4" />
@@ -297,6 +322,7 @@ const Page = () => {
                           />
                         )}
                       </div>
+                      )}
                     </div>
                   </div>
 
@@ -385,6 +411,8 @@ const Page = () => {
                         <p className="text-xs text-gray-500 dark:text-gray-400">{t("Alerts you when stock falls to or below this number")}</p>
                       </div>
 
+                      {mods.has("expiry") && (
+                      <>
                       <div className="space-y-2">
                         <Label htmlFor="expiryDate" className="text-sm font-medium flex items-center gap-2">
                           <CalendarClock className="h-4 w-4" />
@@ -421,6 +449,9 @@ const Page = () => {
                           {t("Leave empty to use the default ({0} days, set in Settings)", { 0: defaultAlertDays })}
                         </p>
                       </div>
+
+                      </>
+                      )}
 
                       <div className="space-y-2">
                         <Label htmlFor="discount" className="text-sm font-medium flex items-center gap-2">
@@ -582,6 +613,13 @@ const Page = () => {
                   <Separator />
 
                   {/* Submit Button */}
+                  {mods.sections.length > 0 && (
+                    <>
+                      <Separator />
+                      <ProductModuleFields value={extra} onChange={setExtra} />
+                    </>
+                  )}
+
                   <div className="flex gap-3 pt-2">
                     <Button
                       type="button"

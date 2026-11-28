@@ -3,6 +3,8 @@ import Link from "next/link";
 import { t } from "@/core/shared/i18n";
 import { useT } from "@/core/shared/i18n/LangProvider";
 import DeliveryPanel from "@/components/DeliveryPanel";
+import { useModule } from "@/modules/ModulesProvider";
+import { OrderSerials } from "@/modules/serials/ui/OrderSerials";
 import { whatsappNumber } from "@/core/shared/whatsapp";
 import { isTouchDevice } from "@/core/shared/isTouchDevice";
 import { applyThermalPageSize } from "@/core/printing/thermalPageSize";
@@ -55,6 +57,7 @@ export default function OrderDetailsPage() {
   });
 
   const { data: settings } = useSettings();
+  const hasSerials = useModule("serials");
   const [returnModalOpen, setReturnModalOpen] = useState(false);
   const { hasPermission: canProcessReturns } = useHasPermission("canProcessReturns");
   const { hasPermission: canEditOrders } = useHasPermission("canEditOrders");
@@ -319,6 +322,7 @@ export default function OrderDetailsPage() {
             </Card>
 
             <DeliveryPanel order={order} />
+            {hasSerials && <OrderSerials order={order} />}
 
             {/* Payment Summary */}
             <Card className="shadow-sm border-gray-200 dark:border-gray-800">

@@ -7,6 +7,7 @@ import React, { useState } from "react";
 import SummaryCards from "@/components/dashboard/SummaryCards";
 import LowStockAlerts from "@/components/dashboard/LowStockAlerts";
 import ExpiryAlerts from "@/components/dashboard/ExpiryAlerts";
+import { useModule } from "@/modules/ModulesProvider";
 import DebtCard from "@/components/dashboard/DebtCard";
 import OrdersBreakdown from "@/components/dashboard/OrdersBreakdown";
 import ProfitChart from "@/components/dashboard/ProfitChart";
@@ -33,6 +34,7 @@ const DEFAULT_FILTERS = {
 
 export default function DashboardPage() {
   const t = useT();
+  const hasExpiry = useModule("expiry");
   const [filters, setFilters] = useState(DEFAULT_FILTERS);
 
   // Resolved to precise UTC instants here (in the browser) rather than
@@ -65,7 +67,7 @@ export default function DashboardPage() {
         <LowStockAlerts />
 
         {/* Expiring products (owner-chosen window, closest first) */}
-        <ExpiryAlerts />
+        {hasExpiry && <ExpiryAlerts />}
 
         {/* Debt and Orders */}
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 mb-8">

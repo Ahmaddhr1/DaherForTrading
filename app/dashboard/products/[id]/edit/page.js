@@ -20,6 +20,9 @@ import { FormSkeleton, PageHeaderSkeleton } from "@/components/ui/skeleton-patte
 import { Loader2, Package, DollarSign, Tag, Box, TrendingUp, PackageCheck, Ruler, AlertTriangle, Truck, Layers, ImagePlus, X, Percent, CalendarClock, BellRing, ScanBarcode, Printer } from "lucide-react";
 import Link from "next/link";
 import ProductHistory from "../ProductHistory";
+import { useModules } from "@/modules/ModulesProvider";
+import { ProductModuleFields } from "@/modules/ui/ProductModuleFields";
+import { PhotoGallery } from "@/modules/ui/PhotoGallery";
 import StockAdjustments from "../StockAdjustments";
 import { useHasPermission } from "@/core/platform/useHasPermission";
 
@@ -85,6 +88,10 @@ const EditProductPage = () => {
   });
 
   const [existingImageUrl, setExistingImageUrl] = useState(null);
+  const mods = useModules();
+  const isVariant = !!product?.extra?.variant && mods.has("variants");
+  const [extra, setExtra] = useState({});
+  const [photos, setPhotos] = useState([]);
   const [imageFile, setImageFile] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
   const [imageRemoved, setImageRemoved] = useState(false);
@@ -110,6 +117,8 @@ const EditProductPage = () => {
         discount: product.discount?.toString() ?? "0",
       });
       setExistingImageUrl(product.img?.[0] || null);
+      setExtra(product.extra || {});
+      setPhotos(product.img || []);
       setImageFile(null);
       setImagePreview(null);
       setImageRemoved(false);
@@ -134,7 +143,9 @@ const EditProductPage = () => {
   const mutation = useMutation({
     mutationFn: async () => {
       let img;
-      if (imageFile) {
+      if (mods.has("catalog") && !isVariant) {
+        img = photos;
+      } else if (imageFile) {
         const uploadData = new FormData();
         uploadData.append("file", imageFile);
         const { data: uploadResult } = await axios.post("/api/products/upload-image", uploadData);
@@ -151,6 +162,8 @@ const EditProductPage = () => {
         quantity: parseInt(form.quantity, 10),
         defaultSupplier: form.defaultSupplier || null,
         ...(img !== undefined ? { img } : {}),
+        // Variants get their shared details from their style.
+        ...(mods.sections.length && !isVariant ? { extra } : {}),
       };
       const res = await axios.put(`/api/products/${id}`, payload);
       return res.data;
@@ -356,6 +369,15 @@ const EditProductPage = () => {
                         />
                       </div>
 
+                      {mods.has("catalog") && !isVariant ? (
+                        <div className="space-y-2 sm:col-span-2">
+                          <Label className="text-sm font-medium flex items-center gap-2">
+                            <ImagePlus className="h-4 w-4" />
+                            {t("Photos (the first one is the cover)")}
+                          </Label>
+                          <PhotoGallery value={photos} onChange={setPhotos} max={8} />
+                        </div>
+                      ) : isVariant ? null : (
                       <div className="space-y-2">
                         <Label htmlFor="productImage" className="text-sm font-medium flex items-center gap-2">
                           <ImagePlus className="h-4 w-4" />
@@ -383,6 +405,7 @@ const EditProductPage = () => {
                           />
                         )}
                       </div>
+                      )}
                     </div>
                   </div>
 
@@ -485,6 +508,8 @@ const EditProductPage = () => {
                         />
                       </div>
 
+                      {mods.has("expiry") && (
+                      <>
                       <div className="space-y-2">
                         <Label htmlFor="expiryDate" className="text-sm font-medium flex items-center gap-2">
                           <CalendarClock className="h-4 w-4" />
@@ -525,6 +550,9 @@ const EditProductPage = () => {
                       <div className="sm:col-span-2">
                         <ProductBatches productId={id} />
                       </div>
+
+                      </>
+                      )}
 
                       <div className="space-y-2">
                         <Label htmlFor="discount" className="text-sm font-medium flex items-center gap-2">
@@ -691,6 +719,19 @@ const EditProductPage = () => {
                     </div>
                   </div>
                   </fieldset>
+
+                  {mods.sections.length > 0 && !isVariant && (
+                    <>
+                      <Separator />
+                      <ProductModuleFields value={extra} onChange={setExtra} />
+                    </>
+                  )}
+                  {isVariant && (
+                    <div className="rounded-lg border border-blue-200 bg-blue-50 px-3 py-2 text-sm text-blue-900 dark:border-blue-900 dark:bg-blue-950/40 dark:text-blue-200">
+                      {t("This is one size/color of a style. Photos and shared details are edited on the style.")}{" "}
+                      <Link href={`/dashboard/styles/${product.extra.variant.group}`} className="font-medium underline">{t("Open style")}</Link>
+                    </div>
+                  )}
 
                   <Separator />
 

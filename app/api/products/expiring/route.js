@@ -4,6 +4,7 @@ import Purchase from "@/core/suppliers/models/Purchase";
 import AppSettings from "@/core/settings/models/AppSettings";
 import { NextResponse } from "next/server";
 import { batchesInStock } from "@/core/products/batches";
+import { requireModule } from "@/modules/server";
 
 // Powers the dashboard's expiry alert. Two sources:
 // - batches: purchases with an expiry date that are still in stock (see
@@ -17,6 +18,8 @@ import { batchesInStock } from "@/core/products/batches";
 const DAY_MS = 86400000;
 
 export async function GET(req) {
+  const off = requireModule("expiry");
+  if (off) return off;
   await connectToDB();
   try {
     const { searchParams } = new URL(req.url);

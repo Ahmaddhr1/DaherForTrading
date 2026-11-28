@@ -17,6 +17,8 @@ import { Loader2, Plus, Trash2, PencilLine, CheckCircle, Layers, Gift, PackagePl
 import Link from "next/link";
 import { useSettings, formatLL } from "@/core/shared/currency";
 import { Combobox } from "@/components/ui/combobox";
+import { useModule } from "@/modules/ModulesProvider";
+import { VariantChooser } from "@/modules/variants/ui/VariantChooser";
 import { getTierPrice, getTierLabel } from "@/core/products/priceTiers";
 import OrderCustomerName from "../../components/OrderCustomerName";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
@@ -47,6 +49,7 @@ export default function EditOrderPage() {
   const { hasPermission: canEditOrders } = useHasPermission("canEditOrders");
 
   const [products, setProducts] = useState([]);
+  const hasVariants = useModule("variants");
   const [orderRows, setOrderRows] = useState([]);
   const [taxRate, setTaxRate] = useState("0");
   const [notes, setNotes] = useState("");
@@ -426,6 +429,13 @@ export default function EditOrderPage() {
                             </span>
                           </span>
                         )}
+                      />
+                    )}
+                    {hasVariants && !row.isCustom && row.productId && (
+                      <VariantChooser
+                        product={products.find((p) => p._id === row.productId)}
+                        products={products}
+                        onPick={(id) => handleRowChange(row.id, "productId", id)}
                       />
                     )}
 

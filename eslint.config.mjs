@@ -40,6 +40,29 @@ const eslintConfig = [
     },
   },
   {
+    // modules/ are add-ons: they build on core/ but never on routes/pages,
+    // and module services stay HTTP-free like core services.
+    files: ["modules/**/*.{js,jsx}"],
+    rules: {
+      "no-restricted-imports": [
+        "error",
+        { patterns: [...OLD_PATHS, { group: ["@/app/*", "@/app/**"], message: "modules/ must not import routes or pages from app/." }] },
+      ],
+    },
+  },
+  {
+    files: ["modules/**/service.js"],
+    rules: {
+      "no-restricted-imports": [
+        "error",
+        {
+          paths: [{ name: "next/server", message: "Services don't speak HTTP - throw ServiceError instead." }],
+          patterns: [...OLD_PATHS, { group: ["@/app/*", "@/app/**"], message: "modules/ must not import routes or pages from app/." }],
+        },
+      ],
+    },
+  },
+  {
     files: ["core/**/*Service.js", "core/reports/dailyClosing.js"],
     rules: {
       "no-restricted-imports": [

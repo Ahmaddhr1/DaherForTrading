@@ -3,6 +3,8 @@ import { cookies } from "next/headers";
 import { LANG_COOKIE, isLang, dirFor } from "@/core/shared/i18n";
 import "./globals.css";
 import Providers from "@/core/platform/providers";
+import { ModulesProvider } from "@/modules/ModulesProvider";
+import { editionInfo } from "@/modules/server";
 import { Toaster } from "@/components/ui/sonner";
 import { SplashScreen } from "@/components/SplashScreen";
 
@@ -53,6 +55,8 @@ export default async function RootLayout({ children }) {
   // right language and text direction.
   const cookieLang = (await cookies()).get(LANG_COOKIE)?.value;
   const lang = isLang(cookieLang) ? cookieLang : "en";
+  // Which edition/add-ons this deployment runs (INVENTO_EDITION / INVENTO_MODULES).
+  const { edition, modules } = editionInfo();
 
   return (
     <html
@@ -65,9 +69,11 @@ export default async function RootLayout({ children }) {
         className="antialiased"
       >
         <Providers lang={lang}>
+          <ModulesProvider edition={edition} modules={modules}>
           <SplashScreen />
           <Toaster dir={dirFor(lang)} position={lang === "ar" ? "top-left" : undefined} />
           {children}
+          </ModulesProvider>
         </Providers>
       </body>
     </html>
